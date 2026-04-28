@@ -65,14 +65,15 @@ function _legacyProductUrl() {
 
     // v00(2026-03-09): Fix for local dev multi-product redirect.
     // If on localhost, use relative paths based on selected product.
-    if (host === 'localhost' || host === '127.0.0.1') {
+    if (host === 'localhost' || host === '127.0.0.1' ||
+        !/(\.vsysai\.com|\.vworkai\.com|\.vmarketai\.com)$/.test(host)) {
         const localPaths = {
-            'vwork':   '/dashboard',
-            'vai':     '/vai-chat',
-            'voffice': '/voffice-download',
-            'vmarket': '/vmarket-search',
+            'vwork':   '/',
+            'vai':     '/?domain=vai',
+            'voffice': '/?domain=voffice',
+            'vmarket': '/?domain=vmarket',
         };
-        return localPaths[product] || '/dashboard';
+        return localPaths[product] || '/';
     }
 
     // If we can detect we're already on the right domain, use relative path

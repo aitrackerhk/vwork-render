@@ -1240,6 +1240,11 @@ App.updateAppSwitcherLinks = function(isLoggedIn) {
         var hostname = window.location.hostname.toLowerCase();
         var isLocal = hostname === 'localhost' || hostname === '127.0.0.1' ||
                       hostname.startsWith('localhost:') || hostname.startsWith('127.0.0.1:');
+        // Single-host mode: when not on the legacy multi-subdomain production hosts,
+        // route all product links via ?domain= on the current origin.
+        var isMultiHost = /(\.vsysai\.com|\.vworkai\.com|\.vmarketai\.com)$/.test(hostname);
+        var isSingleHost = !isMultiHost;
+        if (isSingleHost) { isLocal = true; }
 
         // Auto-detect login state if not explicitly provided
         if (typeof isLoggedIn === 'undefined') {
@@ -1252,8 +1257,8 @@ App.updateAppSwitcherLinks = function(isLoggedIn) {
             // When logged in → link to backend pages directly.
             // When logged out → link to product homepages.
             var localLoggedInMap = {
-                'vai':     '/vai-chat',
-                'vwork':   '/dashboard',
+                'vai':     '/?domain=vai',
+                'vwork':   '/',
                 'vmarket': '/?domain=vmarket',
                 'voffice': '/?domain=voffice'
             };
@@ -1301,7 +1306,7 @@ App.updateAppSwitcherLinks = function(isLoggedIn) {
         }
 
         // Footer links: logo & website → vsys homepage
-        var vsysUrl = isLocal ? 'http://localhost:3001/?domain=vsys' : 'https://www.vsysai.com';
+        var vsysUrl = isLocal ? '/' : 'https://www.vsysai.com';
         var footerWebsite = document.getElementById('vworkFooterWebsiteLink');
         if (footerWebsite) { footerWebsite.href = vsysUrl; footerWebsite.setAttribute('data-sso-link', ''); }
         var footerLogo = document.getElementById('footerLogoLink');
@@ -1309,10 +1314,10 @@ App.updateAppSwitcherLinks = function(isLoggedIn) {
 
         // Footer product links: use the same URL map as the app-switcher
         var footerUrlMap = isLocal ? {
-            'vai':     'http://localhost:3001/?domain=vai',
-            'vwork':   'http://localhost:3001/?domain=vwork',
-            'vmarket': 'http://localhost:3001/?domain=vmarket',
-            'voffice': 'http://localhost:3001/?domain=voffice'
+            'vai':     '/?domain=vai',
+            'vwork':   '/',
+            'vmarket': '/?domain=vmarket',
+            'voffice': '/?domain=voffice'
         } : {
             'vai':     'https://vai.vsysai.com',
             'vwork':   'https://www.vworkai.com',
