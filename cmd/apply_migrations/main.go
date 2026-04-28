@@ -62,9 +62,6 @@ func main() {
 			if !strings.HasSuffix(strings.ToLower(name), ".sql") {
 				continue
 			}
-			if strings.HasPrefix(name, "001_") || strings.HasPrefix(name, "002_") {
-				continue
-			}
 			if name == "rebuild_db.sql" || name == "__inspect_columns.sql" {
 				continue
 			}
@@ -88,10 +85,33 @@ func main() {
 			if err != nil {
 				log.Fatalf("read %s: %v", path, err)
 			}
-			if err := database.DB.Exec(string(sqlBytes)).Error; err != nil {
-				fmt.Printf("[pass %d] FAILED: %s -> %v\n", pass, f, err)
+			// Split on `;` newline and exec each stmt; swallow "already exists" / duplicate errors.
+			stmts := splitSQL(string(sqlBytes))
+			var fileErr error
+			ok, skip, dup := 0, 0, 0
+			for _, stmt := range stmts {
+				s := strings.TrimSpace(stmt)
+				if s == "" {
+					continue
+				}
+				if execErr := database.DB.Exec(s).Error; execErr != nil {
+					msg := strings.ToLower(execErr.Error())
+					if strings.Contains(msg, "already exists") || strings.Contains(msg, "duplicate") {
+						dup++
+						continue
+					}
+					// real error — record but continue (other statements may still apply).
+					fileErr = execErr
+					skip++
+					fmt.Printf("[pass %d]   ! %s -> %v\n", pass, firstLine(s), execErr)
+				} else {
+					ok++
+				}
+			}
+			fmt.Printf("[pass %d]   %s: ok=%d dup=%d err=%d\n", pass, f, ok, dup, skip)
+			if fileErr != nil && skip > 0 {
 				failed = append(failed, f)
-				lastErr = err
+				lastErr = fileErr
 			}
 		}
 		if len(failed) == len(pending) {
@@ -105,4 +125,109 @@ func main() {
 	}
 
 	fmt.Println("All migrations applied.")
+}
+
+// splitSQL splits a SQL script into statements by `;`, but respects
+// dollar-quoted bodies ($$ ... $$) and single-quoted strings, and ignores
+// `;` inside line comments (--) and block comments (/* */).
+func splitSQL(sql string) []string {
+	var out []string
+	var cur strings.Builder
+	i, n := 0, len(sql)
+	inSingle := false
+	inDollar := false
+	dollarTag := ""
+	for i < n {
+		c := sql[i]
+		// line comment
+		if !inSingle && !inDollar && c == '-' && i+1 < n && sql[i+1] == '-' {
+			for i < n && sql[i] != '\n' {
+				cur.WriteByte(sql[i])
+				i++
+			}
+			continue
+		}
+		// block comment
+		if !inSingle && !inDollar && c == '/' && i+1 < n && sql[i+1] == '*' {
+			cur.WriteByte(sql[i])
+			cur.WriteByte(sql[i+1])
+			i += 2
+			for i+1 < n && !(sql[i] == '*' && sql[i+1] == '/') {
+				cur.WriteByte(sql[i])
+				i++
+			}
+			if i+1 < n {
+				cur.WriteByte(sql[i])
+				cur.WriteByte(sql[i+1])
+				i += 2
+			}
+			continue
+		}
+		// dollar quote start/end
+		if !inSingle && c == '$' {
+			j := i + 1
+			for j < n && (sql[j] == '_' || (sql[j] >= 'a' && sql[j] <= 'z') || (sql[j] >= 'A' && sql[j] <= 'Z') || (sql[j] >= '0' && sql[j] <= '9')) {
+				j++
+			}
+			if j < n && sql[j] == '$' {
+				tag := sql[i : j+1]
+				if inDollar && tag == dollarTag {
+					cur.WriteString(tag)
+					i = j + 1
+					inDollar = false
+					dollarTag = ""
+					continue
+				}
+				if !inDollar {
+					cur.WriteString(tag)
+					i = j + 1
+					inDollar = true
+					dollarTag = tag
+					continue
+				}
+			}
+		}
+		if inDollar {
+			cur.WriteByte(c)
+			i++
+			continue
+		}
+		// single-quote string
+		if c == '\'' {
+			cur.WriteByte(c)
+			i++
+			if inSingle && i < n && sql[i] == '\'' {
+				cur.WriteByte(sql[i])
+				i++
+				continue
+			}
+			inSingle = !inSingle
+			continue
+		}
+		if !inSingle && c == ';' {
+			out = append(out, cur.String())
+			cur.Reset()
+			i++
+			continue
+		}
+		cur.WriteByte(c)
+		i++
+	}
+	if strings.TrimSpace(cur.String()) != "" {
+		out = append(out, cur.String())
+	}
+	return out
+}
+
+func firstLine(s string) string {
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\n' {
+			s = s[:i]
+			break
+		}
+	}
+	if len(s) > 80 {
+		s = s[:80] + "..."
+	}
+	return strings.TrimSpace(s)
 }
