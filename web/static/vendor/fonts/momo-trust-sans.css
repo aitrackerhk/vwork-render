@@ -1,0 +1,36 @@
+﻿@font-face {
+  font-family: 'Momo Trust Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/static/vendor/fonts/s/momotrustsans/v4/BXR8vFfHh_fFyXlQWZgO0TyUN7Pt3pVCeYWqJnZSW7RpbTo.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Momo Trust Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(/static/vendor/fonts/s/momotrustsans/v4/BXR8vFfHh_fFyXlQWZgO0TyUN7Pt3pVCeYWqJnZSW4ZpbTo.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Momo Trust Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(/static/vendor/fonts/s/momotrustsans/v4/BXR8vFfHh_fFyXlQWZgO0TyUN7Pt3pVCeYWqJnZSW2pubTo.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Momo Trust Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/static/vendor/fonts/s/momotrustsans/v4/BXR8vFfHh_fFyXlQWZgO0TyUN7Pt3pVCeYWqJnZSW1NubTo.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Momo Trust Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url(/static/vendor/fonts/s/momotrustsans/v4/BXR8vFfHh_fFyXlQWZgO0TyUN7Pt3pVCeYWqJnZSWzRubTo.ttf) format('truetype');
+}
+
