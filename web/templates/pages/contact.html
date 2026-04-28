@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="contact.title">?�絡客�? - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <title data-i18n-title="contact.title">聯絡客服 - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
     <link rel="icon" type="image/png" href="/static/vworkicon.png">
     <link rel="apple-touch-icon" href="/static/vworkicon.png">
     <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
@@ -11,9 +11,9 @@
     <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/static/css/custom.css">
     <link rel="stylesheet" href="/static/css/vsys.css">
-    <!-- i18n ?�闪?�样�?-->
+    <!-- i18n 防闪烁样式 -->
     <style>
-        /* �?body ??i18n-loading 类时，�??��??��?要翻译�??��?，避?�显示中?��??�换 */
+        /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
         body.i18n-loading [data-i18n],
         body.i18n-loading [data-i18n-placeholder],
         body.i18n-loading [data-i18n-title],
@@ -21,17 +21,20 @@
             visibility: hidden;
         }
     </style>
-    <!-- i18n ?��??��???- ?�页?�渲?��??��?，避?�闪??-->
+    <!-- i18n 初始化脚本 - 在页面渲染前执行，避免闪烁 -->
     <script>
         (function() {
-            // 立即读�?语�?设置（�?等�? DOMContentLoaded�?            const savedLang = localStorage.getItem('u-nai_lang');
-            // CMS ?��?套�?言設�?（歷?��??��?：部?��????��?輯使??localStorage.language
-            // ?��??��??��??��??�是中�?，�? data-i18n ?��?塊被翻�??��??��?混搭??            // ??CMS layout ?��?一次�?步�?�?CMS 語�??��?，避?�困?��?            const cmsLang = localStorage.getItem('language');
+            // 立即读取语言设置（不等待 DOMContentLoaded）
+            const savedLang = localStorage.getItem('u-nai_lang');
+            // CMS 另一套語言設定（歷史原因）：部分頁面/舊邏輯使用 localStorage.language
+            // 這會造成「頁面多數是中文，但 data-i18n 的區塊被翻成英文」的混搭。
+            // 在 CMS layout 內做一次同步：以 CMS 語言為準，避免困惑。
+            const cmsLang = localStorage.getItem('language');
             const browserLang = navigator.language || navigator.userLanguage;
             
-            let currentLang = 'zh'; // 默认中�?
+            let currentLang = 'zh'; // 默认中文
             
-            // ??cmsLang 存在且是?�援語系，優?�使?�並?�步??u-nai_lang
+            // 若 cmsLang 存在且是支援語系，優先使用並同步到 u-nai_lang
             if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
                 currentLang = cmsLang;
                 if (savedLang !== currentLang) {
@@ -40,7 +43,7 @@
             } else if (savedLang) {
                 currentLang = savedLang;
             } else {
-                // 检测�?览器语�?
+                // 检测浏览器语言
                 if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
                     currentLang = 'zh-CN';
                 } else if (browserLang.startsWith('zh')) {
@@ -51,16 +54,17 @@
                 localStorage.setItem('u-nai_lang', currentLang);
             }
             
-            // 将语言设置存储?�全局?��?，�? i18n.js 使用
+            // 将语言设置存储到全局变量，供 i18n.js 使用
             window.__INITIAL_LANG__ = currentLang;
             
-            // ?�论什么语言，都??body 渲�??��??�添??i18n-loading 类来?��??�容
-            // 这样?�以?�止?�翻译�??��??�示?��??�容（避?��?简?�换?��??��?�?            (function checkBody() {
+            // 无论什么语言，都在 body 渲染后立即添加 i18n-loading 类来隐藏内容
+            // 这样可以防止在翻译应用前显示原始内容（避免繁简切换时的闪烁）
+            (function checkBody() {
                 if (document.body) {
                     document.body.classList.add('i18n-loading');
                     
-                    // 添�?超时保护：�???5 秒�? i18n-loading 类�??��??�动移除
-                    // 这样?�以?�止 i18n.js ?�载失败?�页?��?容永远被?��?
+                    // 添加超时保护：如果 5 秒后 i18n-loading 类还在，自动移除
+                    // 这样可以防止 i18n.js 加载失败时页面内容永远被隐藏
                     setTimeout(function() {
                         if (document.body && document.body.classList.contains('i18n-loading')) {
                             console.warn('i18n-loading class still present after 5 seconds, removing it to prevent blank page');
@@ -68,14 +72,15 @@
                         }
                     }, 5000);
                 } else {
-                    // 如�? body 还没渲�?，使??requestAnimationFrame 快速�???                    requestAnimationFrame(checkBody);
+                    // 如果 body 还没渲染，使用 requestAnimationFrame 快速检查
+                    requestAnimationFrame(checkBody);
                 }
             })();
         })();
     </script>
 </head>
 <body class="contact-page">
-    <!-- 導航�?(vsys style) -->
+    <!-- 導航欄 (vsys style) -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar" >
         <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
             <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
@@ -119,13 +124,13 @@
                 <!-- Menu links on the left -->
                 <ul class="navbar-nav me-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首�?</a>
+                        <a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首頁</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/#about" id="navAboutLink" data-i18n="nav.about">?�於</a>
+                        <a class="nav-link" href="/#about" id="navAboutLink" data-i18n="nav.about">關於</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/contact" data-i18n="nav.contact">?�絡?��?/a>
+                        <a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a>
                     </li>
                 </ul>
                 <!-- Right side: theborderbox -->
@@ -159,30 +164,30 @@
                             </div>
                             <div class="dropdown" style="position: relative;">
                                 <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">?�援資�?</span>
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
-                                    <li><a class="dropdown-item" href="/help" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">?�援中�?</span></a></li>
-                                    <li><a class="dropdown-item" href="/contact" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">?�絡客�?</span></a></li>
+                                    <li><a class="dropdown-item" href="/help" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
                                 </ul>
                             </div>
                             <div class="dropdown" style="position: relative;">
                                 <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語�?</span>
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
-                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁�?中�?</a></li>
-                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中??/a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
                                     <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
                                 </ul>
                             </div>
                             <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
-                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">?��?</span>
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
                             </a>
                             <div class="dropdown" style="position: relative;">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
                                     <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
-                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">?�戶</span>
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li id="publicAICoinsDisplay" style="display: none;">
@@ -195,7 +200,7 @@
                                     <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
                                     <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">?�出</span></a></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -214,31 +219,31 @@
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link" href="/" id="sidebarHomeLink">
-                        <i class="bi bi-house"></i> <span data-i18n="nav.home">首�?</span>
+                        <i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/#about" id="sidebarAboutLink">
-                        <i class="bi bi-info-circle"></i> <span data-i18n="nav.about">?�於</span>
+                        <i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/contact">
-                        <i class="bi bi-envelope"></i> <span data-i18n="nav.contact">?�絡?��?/span>
+                        <i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span>
                     </a>
                 </li>
                 <li class="nav-item nav-group" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
                     <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#contactLanguageSubmenu" aria-expanded="false">
-                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語�?</span>
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <div class="collapse" id="contactLanguageSubmenu">
                         <ul class="nav flex-column submenu">
                             <li class="nav-item">
-                                <a class="nav-link" href="#" data-lang="zh">繁�?中�?</a>
+                                <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#" data-lang="zh-CN">简体中??/a>
+                                <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#" data-lang="en">English</a>
@@ -249,7 +254,7 @@
                 <li class="nav-item nav-group" id="contactUserDropdownItem" style="display: none;">
                     <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#contactUserSubmenu" aria-expanded="false">
                         <img id="contactUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
-                        <i class="bi bi-person-circle" id="contactUserIcon"></i> <span id="contactUserName" data-i18n="nav.user">?�戶</span>
+                        <i class="bi bi-person-circle" id="contactUserIcon"></i> <span id="contactUserName" data-i18n="nav.user">用戶</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <div class="collapse" id="contactUserSubmenu">
@@ -266,7 +271,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#" id="contactLogoutBtn">
-                                    <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">?�出</span>
+                                    <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
                                 </a>
                             </li>
                         </ul>
@@ -274,20 +279,20 @@
                 </li>
                 <li class="nav-item" id="contactLoginItem">
                     <a class="nav-link" href="/login">
-                        <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">?��?</span>
+                        <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">登錄</span>
                     </a>
                 </li>
             </ul>
         </nav>
     </div>
 
-    <!-- 主�??�容 -->
+    <!-- 主要內容 -->
     <div class="container" style="min-height: calc(100vh - 200px); padding-top: calc(var(--topnav-height, 56px) + 32px);">
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
                 <div class="text-center mb-4">
-                    <h1 class="display-5 fw-bold mb-2" data-i18n="contact.title">?�絡客�?</h1>
-                    <p class="lead text-muted mb-0" data-i18n="contact.subtitle">?�們�?樂�??�您?��?幫助</p>
+                    <h1 class="display-5 fw-bold mb-2" data-i18n="contact.title">聯絡客服</h1>
+                    <p class="lead text-muted mb-0" data-i18n="contact.subtitle">我們很樂意為您提供幫助</p>
                 </div>
                 
                 <div class="card contact-form-card shadow-lg border-0 p-4" style="border-radius: 1rem; overflow: hidden;">
@@ -296,41 +301,41 @@
                         <form id="contactForm">
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-                                    <label for="name" class="form-label fw-semibold"><span data-i18n="contact.name">姓�?</span> <span class="text-danger">*</span></label>
+                                    <label for="name" class="form-label fw-semibold"><span data-i18n="contact.name">姓名</span> <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control form-control-lg" id="name" name="name" required maxlength="50" placeholder="" style="border-radius: 0.5rem;">
                                 </div>
                                 <div class="col-md-6 mb-4">
-                                    <label for="email" class="form-label fw-semibold"><span data-i18n="contact.email">?��??�件</span> <span class="text-danger">*</span></label>
+                                    <label for="email" class="form-label fw-semibold"><span data-i18n="contact.email">電子郵件</span> <span class="text-danger">*</span></label>
                                     <input type="email" class="form-control form-control-lg" id="email" name="email" required placeholder="" style="border-radius: 0.5rem;">
                                 </div>
                             </div>
                             <div class="mb-4">
-                                <label for="phone" class="form-label fw-semibold"><span data-i18n="contact.phone">?�話?�碼</span></label>
+                                <label for="phone" class="form-label fw-semibold"><span data-i18n="contact.phone">電話號碼</span></label>
                                 <input type="tel" class="form-control form-control-lg" id="phone" name="phone" maxlength="20" placeholder="" style="border-radius: 0.5rem;">
                             </div>
                             <div class="mb-4">
-                                <label for="product" class="form-label fw-semibold"><span data-i18n="contact.product">?��??��?</span></label>
+                                <label for="product" class="form-label fw-semibold"><span data-i18n="contact.product">相關產品</span></label>
                                 <select class="form-select form-select-lg" id="product" name="product" style="border-radius: 0.5rem;">
-                                    <option value="" data-i18n="contact.productPlaceholder">請選?�產??/option>
+                                    <option value="" data-i18n="contact.productPlaceholder">請選擇產品</option>
                                     <option value="vwork" data-i18n="contact.productOptions.vwork">vWork</option>
                                     <option value="vai" data-i18n="contact.productOptions.vai">vAI</option>
                                     <option value="vmarket" data-i18n="contact.productOptions.vmarket">vMarket</option>
                                     <option value="voffice" data-i18n="contact.productOptions.voffice">vOffice</option>
-                                    <option value="other" data-i18n="contact.productOptions.other">?��?</option>
+                                    <option value="other" data-i18n="contact.productOptions.other">其他</option>
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="subject" class="form-label fw-semibold"><span data-i18n="contact.subject">主�?</span> <span class="text-danger">*</span></label>
+                                <label for="subject" class="form-label fw-semibold"><span data-i18n="contact.subject">主題</span> <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control form-control-lg" id="subject" name="subject" required maxlength="100" placeholder="" style="border-radius: 0.5rem;">
                             </div>
                             <div class="mb-4">
-                                <label for="message" class="form-label fw-semibold"><span data-i18n="contact.message">訊息?�容</span> <span class="text-danger">*</span></label>
+                                <label for="message" class="form-label fw-semibold"><span data-i18n="contact.message">訊息內容</span> <span class="text-danger">*</span></label>
                                 <textarea class="form-control form-control-lg" id="message" name="message" rows="6" required maxlength="2000" placeholder="" style="border-radius: 0.5rem; resize: vertical;"></textarea>
-                                <small class="text-muted" data-i18n="contact.maxChars">?��?2000 ?��?�?/small>
+                                <small class="text-muted" data-i18n="contact.maxChars">最多 2000 個字符</small>
                             </div>
                             <div class="d-grid mt-4">
                                 <button type="submit" class="btn btn-primary btn-lg px-5 py-3" style="border-radius: 0.5rem; font-weight: 600;" data-i18n="contact.send">
-                                    <i class="bi bi-send me-2"></i><span data-i18n="contact.send">?�送�???/span>
+                                    <i class="bi bi-send me-2"></i><span data-i18n="contact.send">發送訊息</span>
                                 </button>
                             </div>
                         </form>
@@ -339,7 +344,7 @@
                 
                 <div class="card mt-4 shadow-sm border-0" style="border-radius: 1rem;">
                     <div class="card-body p-4">
-                        <h5 class="mb-4 fw-bold"><i class="bi bi-info-circle me-2 text-primary"></i><span data-i18n="contact.otherWays">?��??�絡?��?</span></h5>
+                        <h5 class="mb-4 fw-bold"><i class="bi bi-info-circle me-2 text-primary"></i><span data-i18n="contact.otherWays">其他聯絡方式</span></h5>
                         <div class="row g-4">
                             <div class="col-md-4">
                                 <div class="d-flex align-items-center">
@@ -347,7 +352,7 @@
                                         <i class="bi bi-envelope fs-4 text-primary"></i>
                                     </div>
                                     <div>
-                                        <div class="small text-muted" data-i18n="contact.emailLabel">?��??�件</div>
+                                        <div class="small text-muted" data-i18n="contact.emailLabel">電子郵件</div>
                                         <a href="mailto:info@vsysai.com" class="text-decoration-none fw-semibold">info@vsysai.com</a>
                                     </div>
                                 </div>
@@ -358,7 +363,7 @@
                                         <i class="bi bi-geo-alt fs-4 text-success"></i>
                                     </div>
                                     <div>
-                                        <div class="small text-muted" data-i18n="contact.locationLabel">?��?</div>
+                                        <div class="small text-muted" data-i18n="contact.locationLabel">地址</div>
                                         <span class="fw-semibold" data-i18n="contact.location">香港</span>
                                     </div>
                                 </div>
@@ -369,8 +374,8 @@
                                         <i class="bi bi-clock fs-4 text-info"></i>
                                     </div>
                                     <div>
-                                        <div class="small text-muted" data-i18n="contact.hoursLabel">?�業?��?</div>
-                                        <span class="fw-semibold" data-i18n="contact.hours">?��??�週�? 9:00 - 18:00</span>
+                                        <div class="small text-muted" data-i18n="contact.hoursLabel">營業時間</div>
+                                        <span class="fw-semibold" data-i18n="contact.hours">週一至週五 9:00 - 18:00</span>
                                     </div>
                                 </div>
                             </div>
@@ -391,14 +396,14 @@
                             <img src="/static/vlogo.png" alt="vWork Logo" style="height: auto; max-height: 24px; display: block;">
                         </a>
                     </div>
-                    <p class="text-muted" data-i18n="footer.description">V-sys 以�??�幫助人�?，�?工�??��?活更簡單高�??��??�相信�??�?��?幫助每個人?��??��?，優?��?活�?/p>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
                     <div class="mt-3">
                         <a href="#" id="vworkFooterWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
                         <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.products">?��?</h6>
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
                         <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
@@ -407,24 +412,24 @@
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.info">資�?</h6>
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/" id="footerHomeLink" class="text-muted text-decoration-none" data-i18n="nav.home">首�?</a></li>
-                        <li class="mb-2"><a href="/#about" id="footerAboutLink" class="text-muted text-decoration-none" data-i18n="nav.about">?�於</a></li>
-                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">?�絡?��?/a></li>
+                        <li class="mb-2"><a href="/" id="footerHomeLink" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/#about" id="footerAboutLink" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.support">?�援資�?</h6>
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">?�援中�?</a></li>
-                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">?�絡客�?</a></li>
-                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">?��?條款</a></li>
-                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">?��??��?</a></li>
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.contact">?�繫?��?/h6>
+                    <h6 class="mb-3" data-i18n="footer.contact">聯繫我們</h6>
                     <ul class="list-unstyled text-muted">
                         <li class="mb-2">
                             <i class="bi bi-envelope me-2"></i>
@@ -436,7 +441,7 @@
                         </li>
                         <li class="mb-2">
                             <i class="bi bi-clock me-2"></i>
-                            <span data-i18n="footer.workingHours">?��??�週�? 9:00 - 18:00</span>
+                            <span data-i18n="footer.workingHours">週一至週五 9:00 - 18:00</span>
                         </li>
                     </ul>
                 </div>
@@ -456,14 +461,14 @@
     <script src="/static/js/app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // �?footer 移到 main-content 外面
+            // 將 footer 移到 main-content 外面
             const footer = document.querySelector('.site-footer-light');
             const mainContent = document.querySelector('.main-content');
             if (footer && mainContent && footer.parentElement === mainContent) {
                 mainContent.parentElement.insertBefore(footer, mainContent.nextSibling);
             }
             
-            // ?��???i18n
+            // 初始化 i18n
             if (typeof I18n !== 'undefined') {
                 I18n.init();
             }
@@ -584,7 +589,7 @@
                 });
             });
             
-            // �?localStorage ?�填?�用?��?（避?��?�?API 返�??�顯示「用?�」�?
+            // 從 localStorage 預填充用戶名（避免等待 API 返回時顯示「用戶」）
             function prefillUserFromCache() {
                 try {
                     const cachedUser = localStorage.getItem('user');
@@ -595,7 +600,8 @@
                             const contactUserName = document.getElementById('contactUserName');
                             if (userNameSpan) {
                                 userNameSpan.textContent = user.name;
-                                // 移除 data-i18n 屬性�??�止 i18n ?��??��?覆�??�戶??                                userNameSpan.removeAttribute('data-i18n');
+                                // 移除 data-i18n 屬性，防止 i18n 初始化時覆蓋用戶名
+                                userNameSpan.removeAttribute('data-i18n');
                             }
                             if (contactUserName) {
                                 contactUserName.textContent = user.name;
@@ -604,20 +610,22 @@
                         }
                     }
                 } catch (e) {
-                    // 忽略 localStorage 讀?�錯誤�?API ?�刷??                }
+                    // 忽略 localStorage 讀取錯誤，API 會刷新
+                }
             }
             
-            // 立即從緩存�?填�?
+            // 立即從緩存預填充
             prefillUserFromCache();
             
-            // ?��??�覽?��?一??下�???(bfcache) - re-verify auth state
+            // 處理瀏覽器上一頁/下一頁 (bfcache) - re-verify auth state
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted) {
                     checkAuthAndUpdateNav();
                 }
             });
             
-            // 檢查?��??�?�並?�新導航�?            checkAuthAndUpdateNav();
+            // 檢查登錄狀態並更新導航欄
+            checkAuthAndUpdateNav();
             
             const form = document.getElementById('contactForm');
             const alertContainer = document.getElementById('alertContainer');
@@ -663,15 +671,15 @@
                         showAlert(I18n.t('contact.success'), 'success');
                         form.reset();
                     } else {
-                        showAlert(I18n.t('contact.error') + '�? + (data.error || '?�知?�誤'), 'danger');
+                        showAlert(I18n.t('contact.error') + '：' + (data.error || '未知錯誤'), 'danger');
                     }
                 } catch (error) {
-                    showAlert(I18n.t('contact.error') + '�? + error.message, 'danger');
+                    showAlert(I18n.t('contact.error') + '：' + error.message, 'danger');
                 }
             });
         });
         
-        // 載入?��??�面??vCoin 餘�?
+        // 載入公開頁面的 vCoin 餘額
         async function loadPublicAICoinsBalance() {
             try {
                 const headers = { 'Accept': 'application/json' };
@@ -692,16 +700,18 @@
                 const aiCoinsDivider = document.getElementById('publicAICoinsDivider');
                 
                 if (aiCoinsDisplay && aiCoinsBalance) {
-                    // ?�顯示�?�?? coin 餘�?（�??��??��?費次?��??�為??��次數不是 coin�?                    aiCoinsBalance.textContent = balance;
+                    // 只顯示真正的 coin 餘額（不含每日免費次數，因為那是次數不是 coin）
+                    aiCoinsBalance.textContent = balance;
                     aiCoinsDisplay.style.display = 'block';
                     if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
                 }
             } catch (e) {
-                console.error('載入 vCoin 餘�?失�?:', e);
+                console.error('載入 vCoin 餘額失敗:', e);
             }
         }
         
-        // 檢查?��??�?�並?�新導航�?        async function checkAuthAndUpdateNav() {
+        // 檢查登錄狀態並更新導航欄
+        async function checkAuthAndUpdateNav() {
             const userDropdownNav = document.getElementById('userDropdown');
             const userNameSpan = document.getElementById('userName');
             const logoutBtn = document.getElementById('logoutBtn');
@@ -721,7 +731,8 @@
                     if (!resp.ok) return null;
                     const user = await resp.json();
 
-                    // best-effort：�?步�?存到 localStorage，方便其他�??�使?��?不影??cookie ?�入�?                    try {
+                    // best-effort：同步保存到 localStorage，方便其他頁面使用（不影響 cookie 登入）
+                    try {
                         if (user) localStorage.setItem('user', JSON.stringify(user));
                         if (user && user.tenant && user.tenant.subdomain) {
                             localStorage.setItem('tenant_subdomain', String(user.tenant.subdomain));
@@ -746,7 +757,7 @@
             const isLoggedIn = !!(user && user.name);
 
             if (isLoggedIn) {
-                // 已登?��?顯示?�戶下�??�單
+                // 已登錄，顯示用戶下拉菜單
                 if (userDropdownNav) {
                     userDropdownNav.style.display = '';
                 }
@@ -760,10 +771,10 @@
                     loginLink.style.display = 'none';
                 }
                 
-                // 載入 vCoin 餘�?
+                // 載入 vCoin 餘額
                 loadPublicAICoinsBalance();
 
-                // ?�新?�戶?�稱
+                // 更新用戶名稱
                 if (userNameSpan && user && user.name) {
                     userNameSpan.textContent = user.name;
                 }
@@ -774,7 +785,7 @@
                     contactUserName.textContent = user.name;
                 }
 
-                // 顯示?�戶?��?（profile_pic）�?沒�??�顯�?icon - Desktop
+                // 顯示用戶頭像（profile_pic），沒有則顯示 icon - Desktop
                 const avatarImg = document.getElementById('publicUserAvatar');
                 const avatarIcon = document.getElementById('publicUserIcon');
                 if (avatarImg) {
@@ -790,7 +801,7 @@
                             this.style.display = 'none';
                             this.setAttribute('data-error-handled', 'true');
                             if (avatarIcon) avatarIcon.style.display = '';
-                            this.onerror = null; // ?�止?��?觸發
+                            this.onerror = null; // 防止重複觸發
                         };
                     } else {
                         avatarImg.style.display = 'none';
@@ -798,7 +809,7 @@
                     }
                 }
 
-                // 顯示?�戶?��?（profile_pic）�?沒�??�顯�?icon - Contact Sidebar
+                // 顯示用戶頭像（profile_pic），沒有則顯示 icon - Contact Sidebar
                 const contactAvatarImg = document.getElementById('contactUserAvatar');
                 const contactAvatarIcon = document.getElementById('contactUserIcon');
                 if (contactAvatarImg) {
@@ -814,7 +825,7 @@
                             this.style.display = 'none';
                             this.setAttribute('data-error-handled', 'true');
                             if (contactAvatarIcon) contactAvatarIcon.style.display = '';
-                            this.onerror = null; // ?�止?��?觸發
+                            this.onerror = null; // 防止重複觸發
                         };
                     } else {
                         contactAvatarImg.style.display = 'none';
@@ -822,7 +833,7 @@
                     }
                 }
                 
-                // 綁�??�出?��?
+                // 綁定登出按鈕
                 if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
                     logoutBtn.setAttribute('data-bound', 'true');
                     logoutBtn.addEventListener('click', function(e) {
@@ -841,7 +852,8 @@
                     });
                 }
             } else {
-                // ?�登??                if (userDropdownNav) {
+                // 未登錄
+                if (userDropdownNav) {
                     userDropdownNav.style.display = 'none';
                 }
                 if (contactUserDropdownItem) {
@@ -856,10 +868,10 @@
             }
         }
         
-        // ??�� storage 變�? (cross-tab logout detection)
+        // 監聽 storage 變化 (cross-tab logout detection)
         window.addEventListener('storage', function(e) {
             if (e.key === 'auth_token' && !e.newValue) {
-                // auth_token was removed ??also clear HTTPOnly cookie then update nav
+                // auth_token was removed — also clear HTTPOnly cookie then update nav
                 fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
                   .finally(function() { checkAuthAndUpdateNav(); });
             } else if (e.key === null) {

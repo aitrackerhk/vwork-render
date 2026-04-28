@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title="helpVoffice.title">?�援中�? - vOffice - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <title data-i18n-title="helpVoffice.title">支援中心 - vOffice - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
     <link rel="icon" type="image/png" href="/static/vofficeicon.png">
     <link rel="apple-touch-icon" href="/static/vofficeicon.png">
     <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
@@ -90,9 +90,9 @@
             </ul>
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav me-auto align-items-center">
-                    <li class="nav-item"><a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首�?</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#about" id="navAboutLink" data-i18n="nav.about">?�於</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/contact" data-i18n="nav.contact">?�絡?��?/a></li>
+                    <li class="nav-item"><a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about" id="navAboutLink" data-i18n="nav.about">關於</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
@@ -124,36 +124,36 @@
                             </div>
                             <div class="dropdown" style="position: relative;">
                                 <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">?�援資�?</span>
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
-                                    <li><a class="dropdown-item" href="/help/voffice" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">?�援中�?</span></a></li>
-                                    <li><a class="dropdown-item" href="/contact?product=voffice" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">?�絡客�?</span></a></li>
+                                    <li><a class="dropdown-item" href="/help/voffice" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=voffice" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
                                 </ul>
                             </div>
                             <div class="dropdown" style="position: relative;">
                                 <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
-                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語�?</span>
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
-                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁�?中�?</a></li>
-                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中??/a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
                                     <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
                                 </ul>
                             </div>
                             <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
-                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">?��?</span>
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
                             </a>
                             <div class="dropdown" style="position: relative;">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
                                     <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
-                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">?�戶</span>
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
                                     <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">?�出</span></a></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -168,18 +168,18 @@
     <div class="sidebar d-lg-none" id="mobileSidebar">
         <nav class="sidebar-nav">
             <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" href="/" id="sidebarHomeLink"><i class="bi bi-house"></i> <span data-i18n="nav.home">首�?</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="#about" id="sidebarAboutLink"><i class="bi bi-info-circle"></i> <span data-i18n="nav.about">?�於</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="/contact"><i class="bi bi-envelope"></i> <span data-i18n="nav.contact">?�絡?��?/span></a></li>
+                <li class="nav-item"><a class="nav-link" href="/" id="sidebarHomeLink"><i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="#about" id="sidebarAboutLink"><i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact"><i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span></a></li>
                 <li class="nav-item nav-group">
                     <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#mobileLanguageSubmenu" aria-expanded="false">
-                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語�?</span>
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
                     <div class="collapse" id="mobileLanguageSubmenu">
                         <ul class="nav flex-column submenu">
-                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁�?中�?</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中??/a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
                             <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
                         </ul>
                     </div>
@@ -194,7 +194,7 @@
             <div class="col-12">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/help" data-i18n="helpVoffice.breadcrumb.supportCenter">?�援中�?</a></li>
+                        <li class="breadcrumb-item"><a href="/help" data-i18n="helpVoffice.breadcrumb.supportCenter">支援中心</a></li>
                         <li class="breadcrumb-item active">vOffice</li>
                     </ol>
                 </nav>
@@ -205,12 +205,12 @@
             <div class="col-12 col-lg-8 mx-auto">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h1 class="h3 mb-4"><i class="bi bi-file-earmark-text me-2 text-primary"></i><span data-i18n="helpVoffice.title">vOffice ?�援中�?</span></h1>
-                        <p class="text-muted" data-i18n="helpVoffice.description">vOffice ??V-sys ?��??��?上�?檔編輯�?作平?��??�援?��??�試算表?�簡?��?/p>
+                        <h1 class="h3 mb-4"><i class="bi bi-file-earmark-text me-2 text-primary"></i><span data-i18n="helpVoffice.title">vOffice 支援中心</span></h1>
+                        <p class="text-muted" data-i18n="helpVoffice.description">vOffice 是 V-sys 旗下的線上文檔編輯協作平台，支援文檔、試算表和簡報。</p>
                         <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i><span data-i18n="helpVoffice.underConstruction">vOffice ?�支?��?檔正?�建設中，敬請�?待�?/span>
+                            <i class="bi bi-info-circle me-2"></i><span data-i18n="helpVoffice.underConstruction">vOffice 的支援文檔正在建設中，敬請期待。</span>
                         </div>
-                        <p><span data-i18n="helpVoffice.contactPrompt">如�?任�??��?，歡�?/span> <a href="/contact" data-i18n="helpVoffice.contactLink">?�絡客�?</a>??/p>
+                        <p><span data-i18n="helpVoffice.contactPrompt">如有任何問題，歡迎</span> <a href="/contact" data-i18n="helpVoffice.contactLink">聯絡客服</a>。</p>
                     </div>
                 </div>
             </div>
@@ -227,10 +227,10 @@
                             <img src="/static/vlogo.png" alt="V-sys Logo" style="height: auto; max-height: 24px; display: block;">
                         </a>
                     </div>
-                    <p class="text-muted" data-i18n="footer.description">V-sys 以�??�幫助人�?，�?工�??��?活更簡單高�??��??�相信�??�?��?幫助每個人?��??��?，優?��?活�?/p>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.products">?��?</h6>
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="#" class="text-muted text-decoration-none" id="footerProductVAI">vAI</a></li>
                         <li class="mb-2"><a href="/" class="text-muted text-decoration-none" id="footerProductVWork">vWork</a></li>
@@ -239,25 +239,25 @@
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.info">資�?</h6>
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/" id="footerInfoHome" class="text-muted text-decoration-none" data-i18n="nav.home">首�?</a></li>
-                        <li class="mb-2"><a href="/" id="footerInfoAbout" class="text-muted text-decoration-none" data-i18n="nav.about">?�於</a></li>
-                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">?�絡?��?/a></li>
-                        <li class="mb-2"><a href="/sales-partner" class="text-muted text-decoration-none" data-i18n="footer.salesPartnerJoin">?�售?��???/a></li>
+                        <li class="mb-2"><a href="/" id="footerInfoHome" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/" id="footerInfoAbout" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
+                        <li class="mb-2"><a href="/sales-partner" class="text-muted text-decoration-none" data-i18n="footer.salesPartnerJoin">銷售商加盟</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.support">?�援資�?</h6>
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">?�援中�?</a></li>
-                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">?�絡客�?</a></li>
-                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">?��?條款</a></li>
-                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">?��??��?</a></li>
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <h6 class="mb-3" data-i18n="footer.contactUs">?�繫?��?/h6>
+                    <h6 class="mb-3" data-i18n="footer.contactUs">聯繫我們</h6>
                     <ul class="list-unstyled text-muted">
                         <li class="mb-2">
                             <i class="bi bi-envelope me-2"></i>
@@ -269,7 +269,7 @@
                         </li>
                         <li class="mb-2">
                             <i class="bi bi-clock me-2"></i>
-                            <span data-i18n="footer.hours">?��??�週�? 9:00 - 18:00</span>
+                            <span data-i18n="footer.hours">週一至週五 9:00 - 18:00</span>
                         </li>
                     </ul>
                 </div>

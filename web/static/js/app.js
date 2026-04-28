@@ -23,6 +23,10 @@ const DOMAIN_PRODUCT_MAP = {
     'vmarketai.com':      { product: 'vmarket', path: '/vmarket-search' },
 };
 
+function isSingleHostMode(host) {
+    return !/(\.vsysai\.com|\.vworkai\.com|\.vmarketai\.com)$/.test(host);
+}
+
 /**
  * Detect which product the current domain belongs to.
  * Returns an object { product, path } or null if unknown.
@@ -51,16 +55,16 @@ function getProductRedirectUrl() {
     const product = (localStorage.getItem('vlogin_product') || 'vwork').toLowerCase();
     const host = window.location.hostname.toLowerCase();
 
-    // v00(2026-03-09): Fix for local dev multi-product redirect.
-    // If on localhost, use relative paths based on selected product.
-    if (host === 'localhost' || host === '127.0.0.1') {
+    // On localhost or single-host deployments, keep users on the current origin
+    // and switch products via ?domain=.
+    if (host === 'localhost' || host === '127.0.0.1' || isSingleHostMode(host)) {
         const localPaths = {
-            'vwork':   '/dashboard',
-            'vai':     '/vai-chat',
-            'voffice': '/voffice-download',
-            'vmarket': '/vmarket-search',
+            'vwork':   '/',
+            'vai':     '/?domain=vai',
+            'voffice': '/?domain=voffice',
+            'vmarket': '/?domain=vmarket',
         };
-        return localPaths[product] || '/dashboard';
+        return localPaths[product] || '/';
     }
 
     const currentDomain = detectCurrentDomainProduct();
