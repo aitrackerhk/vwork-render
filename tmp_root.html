@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="site.title">AI 智能企業管理平台</title>
+    
+
+  <meta name="description" content="vWork 提供 POS、庫存、訂單、客戶管理的一站式企業管理方案，協助企業提升營運效率。">
+  <meta name="keywords" content="vWork, ERP, POS, 庫存管理, 訂單管理, 企業管理系統">
+  <link rel="canonical" href="https://vwork-api.onrender.com/">
+  <meta property="og:title" content="vWork - AI 智能企業管理平台">
+  <meta property="og:description" content="vWork 提供 POS、庫存、訂單、客戶管理的一站式企業管理方案，協助企業提升營運效率。">
+  <meta property="og:url" content="https://vwork-api.onrender.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://vwork-api.onrender.com/static/vworkicon.png">
+  
+  
+  <meta property="og:locale" content="zh_TW">
+  <meta property="og:locale:alternate" content="en_US"><meta property="og:locale:alternate" content="zh_CN">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="vWork - AI 智能企業管理平台">
+  <meta name="twitter:description" content="vWork 提供 POS、庫存、訂單、客戶管理的一站式企業管理方案，協助企業提升營運效率。">
+  <meta name="twitter:image" content="https://vwork-api.onrender.com/static/vworkicon.png">
+  
+  <link rel="alternate" hreflang="zh-TW" href="https://vwork-api.onrender.com/">
+  
+  <link rel="alternate" hreflang="en" href="https://vwork-api.onrender.com/en">
+  
+  <link rel="alternate" hreflang="zh-CN" href="https://vwork-api.onrender.com/zh-cn">
+  
+  <link rel="alternate" hreflang="x-default" href="https://vwork-api.onrender.com/">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Vwork","description":"vWork 提供 POS、庫存、訂單、客戶管理的一站式企業管理方案，協助企業提升營運效率。","applicationCategory":"BusinessApplication","operatingSystem":"Web","url":"https://vwork-api.onrender.com/"}</script>
+
+
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    
+    <style>
+         
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+        .hero-content h1,
+        .hero-content .lead,
+        .hero-content p {
+            font-family: 'Momo Trust Sans', 'Microsoft JhengHei', sans-serif;
+            font-weight: 600;
+        }
+        .hero-content h1 {
+            font-weight: 700;
+        }
+    </style>
+    
+    <script>
+        (function() {
+            
+            const savedLang = localStorage.getItem('u-nai_lang');
+            
+            
+            
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            
+            let currentLang = 'zh'; 
+            
+            
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) {
+                    localStorage.setItem('u-nai_lang', currentLang);
+                }
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+                    currentLang = 'zh-CN';
+                } else if (browserLang.startsWith('zh')) {
+                    currentLang = 'zh';
+                } else {
+                    currentLang = 'en';
+                }
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            
+            
+            window.__INITIAL_LANG__ = currentLang;
+            
+            
+            var urlParams = new URLSearchParams(window.location.search);
+            var partnerParam = urlParams.get('partner');
+            if (partnerParam) {
+                localStorage.setItem('partner', partnerParam);
+            }
+            
+            
+            
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    
+                    var style = document.createElement('style');
+                    style.textContent = '#pricing, a[href="#pricing"], .promo-topbar-sub { display: none !important; }';
+                    document.head.appendChild(style);
+                    document.addEventListener('DOMContentLoaded', function() {
+                        document.querySelectorAll('a[href="#pricing"]').forEach(function(el) {
+                            var li = el.closest('li');
+                            if (li) li.style.display = 'none';
+                        });
+                    });
+                    
+                    
+                    
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            console.warn('i18n-loading class still present after 5 seconds, removing it to prevent blank page');
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body class="home-page has-promo-topbar">
+    <div class="promo-topbar"><span data-i18n="promoTopbar.main">ERP+辦公軟件+AI 助理 免費試用</span> <span class="d-none promo-topbar-sub" data-i18n="promoTopbar.sub">連接 AI 低至 $250 每月</span></div>
+    
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100">
+        <div class="container-fluid px-3 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-end" href="/">
+                <img src="/static/logo3.png" alt="vWork">
+            </a>
+            
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcher">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                <span class="app-switcher-label">vAI</span>
+                            </a>
+                            <a href="/" class="app-switcher-item" data-app="vwork">
+                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                <span class="app-switcher-label">vWork</span>
+                            </a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                <span class="app-switcher-label">vMarket</span>
+                            </a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                <span class="app-switcher-label">vOffice</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item" id="goToSystemBtnMobile">
+                    <a class="nav-link" href="/dashboard" title="進入系統">
+                        <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="homeMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                        <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="collapse navbar-collapse d-none d-lg-block" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" data-i18n="nav.home">首頁</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.industries">行業</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/industry/catering" data-i18n="nav.industryCatering">餐飲</a></li>
+                            <li><a class="dropdown-item" href="/industry/retail" data-i18n="nav.industryRetail">零售</a></li>
+                            <li><a class="dropdown-item" href="/industry/ecommerce" data-i18n="nav.industryEcommerce">電商</a></li>
+                            <li><a class="dropdown-item" href="/industry/services" data-i18n="nav.industryServices">服務業</a></li>
+                            <li><a class="dropdown-item" href="/industry/wholesale" data-i18n="nav.industryWholesale">批發/製造</a></li>
+                            <li><a class="dropdown-item" href="/industry/sme" data-i18n="nav.industrySme">中小企業</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.customization">客制化</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/custom/website" data-i18n="nav.customWebsite">客制化網站</a></li>
+                            <li><a class="dropdown-item" href="/custom/features" data-i18n="nav.customFeatures">客制化功能</a></li>
+                        </ul>
+                    </li>
+                    <li class="d-none nav-item">
+                        <a class="nav-link d-none" href="#pricing" data-i18n="nav.pricing">定價</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vwork-events" data-i18n="nav.events">活動</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/vwork-blog">Blog</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    
+                    <li class="nav-item" id="tryFreeBtn">
+                        <a class="btn btn-sm btn-outline-secondary" href="/login?product=vwork" data-i18n="nav.tryFree" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">免費試用</a>
+                    </li>
+                    
+                    <li class="nav-item" id="goToSystemBtn" style="display: none;">
+                        <a class="btn btn-sm btn-outline-secondary" href="/dashboard" data-i18n="nav.goToSystem" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">前往系統</a>
+                    </li>
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                                </a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                            <span class="app-switcher-label">vAI</span>
+                                        </a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork">
+                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                            <span class="app-switcher-label">vWork</span>
+                                        </a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                            <span class="app-switcher-label">vMarket</span>
+                                        </a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                            <span class="app-switcher-label">vOffice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help/vwork" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=vwork" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                            <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                            <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                        </ul>
+                            </div>
+                            <a class="nav-link" href="/login?product=vwork" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+                            </a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                            <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                            <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li id="publicAICoinsDisplay" style="display: none;">
+                                <a class="dropdown-item" href="/vcoins">
+                                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                                    <span class="fw-bold" id="publicAICoinsBalance">0</span>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+                            <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                            <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                        </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    
+    <div class="sidebar-overlay" id="homeSidebarOverlay"></div>
+    
+    
+    <div class="sidebar" id="homeSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeMobileIndustrySubmenu" aria-expanded="false">
+                        <i class="bi bi-building"></i> <span data-i18n="nav.industries">行業</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="homeMobileIndustrySubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/industry/catering">
+                                    <i class="bi bi-cup-hot"></i> <span data-i18n="nav.industryCatering">餐飲</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/industry/retail">
+                                    <i class="bi bi-shop"></i> <span data-i18n="nav.industryRetail">零售</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/industry/ecommerce">
+                                    <i class="bi bi-cart3"></i> <span data-i18n="nav.industryEcommerce">電商</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/industry/services">
+                                    <i class="bi bi-briefcase"></i> <span data-i18n="nav.industryServices">服務業</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/industry/wholesale">
+                                    <i class="bi bi-building"></i> <span data-i18n="nav.industryWholesale">批發/製造</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/industry/sme">
+                                    <i class="bi bi-buildings"></i> <span data-i18n="nav.industrySme">中小企業</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeMobileCustomSubmenu" aria-expanded="false">
+                        <i class="bi bi-palette"></i> <span data-i18n="nav.customization">客制化</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="homeMobileCustomSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/custom/website">
+                                    <i class="bi bi-globe"></i> <span data-i18n="nav.customWebsite">客制化網站</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/custom/features">
+                                    <i class="bi bi-gear"></i> <span data-i18n="nav.customFeatures">客制化功能</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="d-none nav-item">
+                    <a class="nav-link d-none" href="#pricing">
+                        <i class="bi bi-tag"></i> <span data-i18n="nav.pricing">定價</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/vwork-events">
+                        <i class="bi bi-calendar-event"></i> <span data-i18n="nav.events">活動</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/vwork-blog">
+                        <i class="bi bi-journal-text"></i> <span>Blog</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-group" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeMobileSupportSubmenu" aria-expanded="false">
+                        <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="homeMobileSupportSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/help/vwork" target="_blank">
+                                    <i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/contact?product=vwork" target="_blank">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeLanguageSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="homeLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="en">English</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item nav-group" id="homeUserDropdownItem" style="display: none;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeUserSubmenu" aria-expanded="false">
+                        <img id="homeUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                        <i class="bi bi-person-circle" id="homeUserIcon"></i> <span id="homeUserName" data-i18n="nav.user">用戶</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="homeUserSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/personal-data">
+                                    <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/billing">
+                                    <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="homeLogoutBtn">
+                                    <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item" id="homeLoginItem">
+                    <a class="nav-link" href="/login?product=vwork">
+                        <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">登錄</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+    <div class="hero-carousel" id="heroCarousel">
+        
+        
+
+        
+        <div class="hero-slide hero-slide--active" data-slide="0">
+            <section class="hero-section py-5">
+                <div class="container-fluid px-3">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 hero-content">
+                            <h1 class="display-4 fw-bold mb-3"><span data-i18n="hero.titleLine1">AI 賦能,</span><span class="text-primary" data-i18n="hero.titleHighlight">化繁為易</span></h1>
+                            <p class="lead mb-3" style="font-size: 1.35rem;" data-i18n="hero.description">ERP + POS + 會計 + 網店 + CRM + 餐飲 + 物流 + AI 助手，全部整合在一起。不用再東拼西湊。</p>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <a href="/login?product=vwork" class="btn btn-light btn-lg" data-i18n="hero.getStarted">免費試用</a>
+                                <a href="#why-vwork" class="btn btn-outline-light btn-lg" data-i18n="hero.learnMore">看看省多少</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 hero-banner-right">
+                            <div class="hero-banner-grid-wrapper">
+                                <div class="hero-banner-grid">
+                                    <div class="hero-banner-square" style="background-image: url('/static/work1.jpg');"></div>
+                                    <div class="hero-banner-square" style="background-image: url('/static/work2.jpg');"></div>
+                                    <div class="hero-banner-square" style="background-image: url('/static/work3.jpg');"></div>
+                                    <div class="hero-banner-square" style="background-image: url('/static/work4.jpg');"></div>
+                                </div>
+                                <div class="hero-banner-overlay">
+                                    <span class="hero-banner-text" data-i18n="hero.supportIndustries">支援不同行業</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="hero-mobile-section d-lg-none">
+                <div class="hero-mobile-grid-wrapper">
+                    <div class="hero-mobile-grid">
+                        <div class="hero-mobile-square" style="background-image: url('/static/work1.jpg');"></div>
+                        <div class="hero-mobile-square" style="background-image: url('/static/work2.jpg');"></div>
+                        <div class="hero-mobile-square" style="background-image: url('/static/work3.jpg');"></div>
+                        <div class="hero-mobile-square" style="background-image: url('/static/work4.jpg');"></div>
+                    </div>
+                    <div class="hero-mobile-overlay">
+                        <span class="hero-banner-text" data-i18n="hero.supportIndustries">支援不同行業</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        
+        <div class="hero-carousel-dots" style="display:none;">
+            <button class="hero-dot hero-dot--active" data-dot="0" aria-label="Slide 1"></button>
+            
+        </div>
+    </div>
+
+    
+    <section id="why-vwork" class="py-5" style="background: #fff;">
+        <div class="container-fluid px-3">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold"><span data-i18n="whyVwork.title">為什麼 16,000+ 間中小企需要</span> <span style="color: #4285f4;">vWork</span></h2>
+                <p class="text-muted lead" data-i18n="whyVwork.subtitle">更高效、低成本、讓決策有數據支持</p>
+            </div>
+            <div class="row g-4">
+                
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-diagram-3 fs-1 text-white"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.integration.title">一個系統，連接全部</h4>
+                        <p class="text-muted mb-3" data-i18n="whyVwork.integration.desc">訂單、庫存、會計、客戶、網店、POS、餐飲、物流 — 全部在同一個系統。數據自動串聯，不用再手動對帳。</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <img src="/static/vaiicon.png" alt="vAi" style="width: 80px; height: 80px; border-radius: 50%; object-fit: contain; border: 1px solid #dee2e6;">
+                        </div>
+                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.ai.title">vAi 連接, 快速使用</h4>
+                        <p class="text-muted mb-3" data-i18n="whyVwork.ai.desc">不是掛在旁邊的 chatbot。vAi 直接讀取你的訂單、客戶、庫存數據，回答業務問題、生成報表、給出決策建議，更可生成產品影片。</p>
+                        <a href="/?domain=vai" class="btn btn-sm btn-outline-primary mt-auto align-self-center" data-i18n="whyVwork.ai.learnMore">了解更多</a>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: inline-flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-piggy-bank fs-1 text-white"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.price.title">同樣功能，價格只要十分之一</h4>
+                        <p class="text-muted mb-3" data-i18n="whyVwork.price.desc">vWork 固定月費，不限用戶數。5 個人用和 50 個人用，價格一樣。其他平台按人頭收費，人越多越貴。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-0 justify-content-center">
+                
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <img src="/static/vofficeicon.png" alt="vOffice" style="width: 80px; height: 80px; border-radius: 50%; object-fit: contain;">
+                        </div>
+                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.voffice.title">vOffice — 免費辦公套件</h4>
+                        <p class="text-muted mb-3" data-i18n="whyVwork.voffice.desc">內建文件、試算表、簡報編輯器，支援 Word / Excel / PowerPoint 格式。團隊可直接在 vWork 內協作，不用額外訂閱其他辦公軟件。</p>
+                        <a href="/?domain=voffice" class="btn btn-sm btn-outline-primary mt-auto align-self-center" data-i18n="whyVwork.voffice.learnMore">了解更多</a>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100 text-center p-4">
+                        <div class="mb-3">
+                            <img src="/static/vmarketicon.png" alt="vMarket" style="width: 80px; height: 80px; border-radius: 50%; object-fit: contain;">
+                        </div>
+                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.vmarket.title">vMarket — 商品市集</h4>
+                        <p class="text-muted mb-3" data-i18n="whyVwork.vmarket.desc">將你的產品上架到 vMarket 市集，觸及更多潛在客戶。內建的共享平台讓中小企業也能擁有自己的銷售渠道，零額外成本。</p>
+                        <a href="/?domain=vmarket" class="btn btn-sm btn-outline-primary mt-auto align-self-center" data-i18n="whyVwork.vmarket.learnMore">了解更多</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="py-5" style="background: #F5F5F8; display: none;">
+        <div class="container-fluid px-3">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold" data-i18n="comparison.title">你現在花多少錢？</h2>
+                <p class="text-muted lead" data-i18n="comparison.subtitle">我們首創你賺錢先收錢模式，5 張單後先開始收費。即使正式開始收費後我們依然節省很多</p>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    
+                    <div class="d-none d-lg-block">
+                        <div class="table-responsive">
+                            <table class="table table-hover bg-white shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                                <thead style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: #fff;">
+                                    <tr>
+                                        <th class="py-3 px-4" data-i18n="comparison.header.solution">方案</th>
+                                        <th class="py-3 px-4 text-center" data-i18n="comparison.header.modules">包含功能</th>
+                                        <th class="py-3 px-4 text-center" data-i18n="comparison.header.users">用戶數</th>
+                                        <th class="py-3 px-4 text-end" data-i18n="comparison.header.monthly">每月費用 (HKD)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 4px solid #3b82f6;">
+                                        <td class="py-3 px-4 fw-bold" style="color: #1e40af;">
+                                            <img src="/static/vworkicon.png" alt="vWork" style="width: 24px; height: 24px; margin-right: 8px; vertical-align: middle;">
+                                            vWork
+                                        </td>
+                                        <td class="py-3 px-4 text-center"><span class="badge bg-primary" data-i18n="comparison.vwork.modules">全部 40+ 模組</span></td>
+                                        <td class="py-3 px-4 text-center fw-bold" style="color: #059669;" data-i18n="comparison.vwork.users">無限</td>
+                                        <td class="py-3 px-4 text-end"><span class="fs-4 fw-bold" style="color: #1e40af;">$250</span><small class="text-muted" data-i18n="comparison.yearlyNote"> (年付)</small></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 text-muted">Shopify + Xero + Monday.com</td>
+                                        <td class="py-3 px-4 text-center"><span class="text-muted" data-i18n="comparison.shopify.modules">網店 + 會計 + 項目</span></td>
+                                        <td class="py-3 px-4 text-center">5</td>
+                                        <td class="py-3 px-4 text-end text-muted">~$2,300</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 text-muted">Zoho One</td>
+                                        <td class="py-3 px-4 text-center"><span class="text-muted" data-i18n="comparison.zoho.modules">CRM + 會計 + 項目</span></td>
+                                        <td class="py-3 px-4 text-center">5</td>
+                                        <td class="py-3 px-4 text-end text-muted">~$1,755</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 text-muted">Odoo Standard</td>
+                                        <td class="py-3 px-4 text-center"><span class="text-muted" data-i18n="comparison.odoo.modules">ERP 基礎</span></td>
+                                        <td class="py-3 px-4 text-center">5</td>
+                                        <td class="py-3 px-4 text-end text-muted">~$527</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 px-4 text-muted">Eats365</td>
+                                        <td class="py-3 px-4 text-center"><span class="text-muted" data-i18n="comparison.eats365.modules">POS + 餐飲</span></td>
+                                        <td class="py-3 px-4 text-center">—</td>
+                                        <td class="py-3 px-4 text-end text-muted">$500–1,500</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="d-lg-none">
+                        <div class="row g-3">
+                            
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 4px solid #3b82f6 !important;">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="fw-bold" style="color: #1e40af;">
+                                                <img src="/static/vworkicon.png" alt="vWork" style="width: 24px; height: 24px; margin-right: 6px; vertical-align: middle;">
+                                                vWork
+                                            </div>
+                                            <div><span class="fs-5 fw-bold" style="color: #1e40af;">$250</span><small class="text-muted" data-i18n="comparison.yearlyNote"> (年付)</small></div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <span class="badge bg-primary" data-i18n="comparison.vwork.modules">全部 40+ 模組</span>
+                                            <small class="fw-bold" style="color: #059669;" data-i18n="comparison.vwork.users">無限</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm bg-white">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="text-muted fw-bold">Shopify + Xero + Monday.com</div>
+                                            <div class="text-muted">~$2,300</div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <small class="text-muted" data-i18n="comparison.shopify.modules">網店 + 會計 + 項目</small>
+                                            <small class="text-muted">5 <span data-i18n="comparison.header.users">用戶數</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm bg-white">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="text-muted fw-bold">Zoho One</div>
+                                            <div class="text-muted">~$1,755</div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <small class="text-muted" data-i18n="comparison.zoho.modules">CRM + 會計 + 項目</small>
+                                            <small class="text-muted">5 <span data-i18n="comparison.header.users">用戶數</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm bg-white">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="text-muted fw-bold">Odoo Standard</div>
+                                            <div class="text-muted">~$527</div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <small class="text-muted" data-i18n="comparison.odoo.modules">ERP 基礎</small>
+                                            <small class="text-muted">5 <span data-i18n="comparison.header.users">用戶數</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm bg-white">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <div class="text-muted fw-bold">Eats365</div>
+                                            <div class="text-muted">$500–1,500</div>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <small class="text-muted" data-i18n="comparison.eats365.modules">POS + 餐飲</small>
+                                            <small class="text-muted">—</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="d-none text-center text-muted mt-3" style="font-size: 0.85rem;" data-i18n="comparison.note">* 價格基於各產品官網公開定價，2026/03 年資料。vWork 年付方案 $250/月（$3,000/年）。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section id="ai-assistant" class="py-5 position-relative" style="background: #F5F5F8; overflow: hidden;">
+        <div class="container-fluid px-3 position-relative">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-3" style="color: #1e293b;">
+                    <span data-i18n="aiAssistant.titlePrefix">全能商業</span>
+                    <span class="gradient-text">vAi</span>
+                    <span data-i18n="aiAssistant.titleSuffix">助手</span>
+                </h2>
+                <p class="lead mb-4" style="color: #475569;" data-i18n="aiAssistant.subtitle">讓 AI 成為您最得力的商業夥伴</p>
+            </div>
+            <div class="ai-assistant-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; margin: 0 auto; padding-left: 0; padding-right: 0;">
+                
+                <div class="ai-main-card" style="grid-column: 1 / 7; grid-row: 1 / 3;">
+                    <div class="card border-0 shadow-lg h-100" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1.5rem;">
+                        <div class="card-body p-4 d-flex flex-column justify-content-center position-relative">
+                            
+                            <div id="aiAssistantChatDemo" class="ai-assistant-chat-demo">
+                                
+                                
+                                <div class="ai-assistant-chat-overlay"></div>
+                            </div>
+                            <div class="text-center mt-4" style="position: relative; z-index: 2;">
+                                <a href="/login?product=vwork" class="btn btn-primary btn-lg px-4" data-i18n="aiAssistant.cta">立即體驗</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-small-card" style="grid-column: 7 / 10; grid-row: 1 / 2;">
+                    <div class="card border-0 shadow-lg h-100" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(-2deg);">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-chat-dots fs-1" style="color: #667eea;"></i>
+                            </div>
+                            <h5 class="mb-2" style="color: #333;" data-i18n="aiAssistant.features.0.title">智能問答</h5>
+                            <p class="text-muted mb-0 small" data-i18n="aiAssistant.features.0.desc">隨時隨地詢問業務問題，獲得即時專業建議</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-small-card" style="grid-column: 10 / 13; grid-row: 1 / 2;">
+                    <div class="card border-0 shadow-lg h-100" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(2deg);">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-graph-up-arrow fs-1" style="color: #764ba2;"></i>
+                            </div>
+                            <h5 class="mb-2" style="color: #333;" data-i18n="aiAssistant.features.1.title">數據分析</h5>
+                            <p class="text-muted mb-0 small" data-i18n="aiAssistant.features.1.desc">自動分析業務數據，發現趨勢和機會</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-small-card" style="grid-column: 7 / 10; grid-row: 2 / 3;">
+                    <div class="card border-0 shadow-lg h-100" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(1.5deg);">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-lightning-charge fs-1" style="color: #f093fb;"></i>
+                            </div>
+                            <h5 class="mb-2" style="color: #333;" data-i18n="aiAssistant.features.2.title">自動化建議</h5>
+                            <p class="text-muted mb-0 small" data-i18n="aiAssistant.features.2.desc">根據業務情況提供優化建議，提升效率</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-small-card" style="grid-column: 10 / 13; grid-row: 2 / 3;">
+                    <div class="card border-0 shadow-lg h-100" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(-1.5deg);">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <i class="bi bi-file-text fs-1" style="color: #4facfe;"></i>
+                            </div>
+                            <h5 class="mb-2" style="color: #333;" data-i18n="aiAssistant.features.3.title">智能報表</h5>
+                            <p class="text-muted mb-0 small" data-i18n="aiAssistant.features.3.desc">快速生成專業報表，節省時間和精力</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            @media (max-width: 992px) {
+                .ai-assistant-grid {
+                    grid-template-columns: 1fr !important;
+                }
+                .ai-main-card,
+                .ai-small-card {
+                    grid-column: 1 / -1 !important;
+                    grid-row: auto !important;
+                }
+                .ai-small-card .card {
+                    transform: none !important;
+                }
+                .ai-main-card .card > .card-body,
+                .ai-small-card .card > .card-body {
+                    padding: 1rem !important;
+                }
+            }
+            .ai-small-card:hover .card {
+                transform: scale(1.05) rotate(0deg) !important;
+                transition: transform 0.3s ease;
+            }
+            .ai-main-card:hover .card {
+                transform: scale(1.02);
+                transition: transform 0.3s ease;
+            }
+            
+        </style>
+    </section>
+
+    
+    <section id="tools" class="py-5 tools-section" style="background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+        <div class="container-fluid px-3">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold" data-i18n="tools.title">強大工具</h2>
+                <p class="text-muted lead" data-i18n="tools.subtitle">為您的業務提供全方位的數位化工具</p>
+            </div>
+            <div class="row g-5">
+                
+                <div class="col-md-4 text-center">
+                    <img src="/static/tool_pos.png" alt="Kiosk Mode POS" class="img-fluid mb-3" style="max-height: 200px; border-radius: 12px;">
+                    <h4 class="fw-bold mb-2" data-i18n="tools.kiosk.title">Kiosk Mode POS 自助收銀系統</h4>
+                    <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.kiosk.desc_short">專為零售門店設計的自助收銀模式，簡潔直觀的界面，支持多種付款方式，提升結帳效率。</p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
+                        <span class="badge bg-success" data-i18n="tools.kiosk.features.0">簡潔界面</span>
+                        <span class="badge bg-success" data-i18n="tools.kiosk.features.1">快速結帳</span>
+                        <span class="badge bg-success" data-i18n="tools.kiosk.features.2">多種付款</span>
+                        <span class="badge bg-success" data-i18n="tools.kiosk.features.3">自助服務</span>
+                    </div>
+                    <a href="/login?product=vwork" class="btn btn-success px-4 py-2" data-i18n="tools.kiosk.cta">立即體驗</a>
+                </div>
+                
+                <div class="col-md-4 text-center">
+                    <img src="/static/tool_leadfinder.png" alt="自動搵客系統" class="img-fluid mb-3" style="max-height: 200px; border-radius: 12px;">
+                    <h4 class="fw-bold mb-2" data-i18n="tools.leadFinder.title">自動搵客系統</h4>
+                    <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.leadFinder.desc_short">AI 自動搜尋潛在客戶，智能分析匹配度，自動發送個性化外展訊息，讓商機主動找上門。</p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
+                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.0">AI 搵客</span>
+                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.1">自動外展</span>
+                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.2">智能匹配</span>
+                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.3">定時發送</span>
+                    </div>
+                    <a href="/login?product=vwork" class="btn btn-warning px-4 py-2" data-i18n="tools.leadFinder.cta">立即體驗</a>
+                </div>
+                
+                <div class="col-md-4 text-center">
+                    <img src="/static/tool_web.png" alt="網站建置工具" class="img-fluid mb-3" style="max-height: 200px; border-radius: 12px;">
+                    <h4 class="fw-bold mb-2" data-i18n="tools.vbuilder.title">可視化建站工具</h4>
+                    <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.vbuilder.desc_short">無需編程知識，拖拽式操作創建專業網站。豐富模板、實時預覽，所見即所得。</p>
+                    <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
+                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.0">拖拽式編輯</span>
+                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.1">豐富模板</span>
+                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.2">實時預覽</span>
+                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.3">響應式設計</span>
+                    </div>
+                    <a href="/login?product=vwork" class="btn btn-primary px-4 py-2" data-i18n="tools.vbuilder.cta">立即體驗</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section id="use-cases" class="py-5">
+        <div class="container-fluid px-3 position-relative use-cases-wrapper">
+            <div class="text-center mb-4">
+                <h2 class="display-5 fw-bold mb-3" data-i18n="useCases.title">不管什麼行業，都能用</h2>
+                <p class="text-muted lead" data-i18n="useCases.subtitle">vWork 的高整合性讓每個行業都能找到適合自己的用法</p>
+            </div>
+            <div class="use-cases-carousel">
+                <div class="use-cases-scroll" data-scroll-container>
+                    <div class="use-case-item">
+                        <div class="card use-case-card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-cup-hot fs-1 text-success"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2" data-i18n="useCases.0.title">餐飲</h4>
+                                <p class="text-muted mb-3" data-i18n="useCases.0.desc">三大外賣平台訂單自動匯入 + POS 收銀 + 餐桌管理 + 排隊叫號 + 庫存扣減，一個後台全搞定</p>
+                                <div class="mt-auto"><a href="/industry/catering" class="btn btn-sm btn-outline-primary" style="border-radius: 100px;" data-i18n="useCases.learnMore">了解更多</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="use-case-item">
+                        <div class="card use-case-card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-bag fs-1 text-primary"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2" data-i18n="useCases.1.title">零售</h4>
+                                <p class="text-muted mb-3" data-i18n="useCases.1.desc">POS + 網店 + 庫存實時同步 + 會員積分 + 會計自動入帳，線上線下完全打通</p>
+                                <div class="mt-auto"><a href="/industry/retail" class="btn btn-sm btn-outline-primary" style="border-radius: 100px;" data-i18n="useCases.learnMore">了解更多</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="use-case-item">
+                        <div class="card use-case-card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-cart3 fs-1 text-primary"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2" data-i18n="useCases.2.title">電商</h4>
+                                <p class="text-muted mb-3" data-i18n="useCases.2.desc">網店 + 訂單 + SF Express/Lalamove 物流串接 + 庫存 + 會計，一個系統全包，省掉 3-4 個訂閱</p>
+                                <div class="mt-auto"><a href="/industry/ecommerce" class="btn btn-sm btn-outline-primary" style="border-radius: 100px;" data-i18n="useCases.learnMore">了解更多</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="use-case-item">
+                        <div class="card use-case-card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-scissors fs-1 text-info"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2" data-i18n="useCases.3.title">服務業</h4>
+                                <p class="text-muted mb-3" data-i18n="useCases.3.desc">服務單 + 客戶管理 + 預約排程 + 員工排班 + WhatsApp 通知，客戶歷史一目了然</p>
+                                <div class="mt-auto"><a href="/industry/services" class="btn btn-sm btn-outline-primary" style="border-radius: 100px;" data-i18n="useCases.learnMore">了解更多</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="use-case-item">
+                        <div class="card use-case-card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-building fs-1 text-warning"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2" data-i18n="useCases.4.title">批發/製造</h4>
+                                <p class="text-muted mb-3" data-i18n="useCases.4.desc">採購單 + 庫存管理 + 訂單 + 出貨 + 會計，供應鏈全流程數據自動串聯</p>
+                                <div class="mt-auto"><a href="/industry/wholesale" class="btn btn-sm btn-outline-primary" style="border-radius: 100px;" data-i18n="useCases.learnMore">了解更多</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="use-case-item">
+                        <div class="card use-case-card border-0 shadow-sm h-100">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-briefcase fs-1 text-secondary"></i>
+                                </div>
+                                <h4 class="fw-bold mb-2" data-i18n="useCases.5.title">中小企業</h4>
+                                <p class="text-muted mb-3" data-i18n="useCases.5.desc">免費即可開始用，$250/月享受全功能。AI 助手幫你做分析、寫報表、管數據，等於多請了一個員工</p>
+                                <div class="mt-auto"><a href="/industry/sme" class="btn btn-sm btn-outline-primary" style="border-radius: 100px;" data-i18n="useCases.learnMore">了解更多</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="use-cases-nav">
+                    <button class="btn use-cases-nav-btn use-cases-nav-btn-left" type="button" data-direction="left" aria-label="Previous">
+                        <i class="bi bi-caret-left-fill"></i>
+                    </button>
+                    <button class="btn use-cases-nav-btn use-cases-nav-btn-right" type="button" data-direction="right" aria-label="Next">
+                        <i class="bi bi-caret-right-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const container = document.querySelector('#use-cases [data-scroll-container]');
+                const buttons = document.querySelectorAll('#use-cases .use-cases-nav-btn');
+                if (!container || buttons.length === 0) return;
+
+                const getStep = () => {
+                    const firstCard = container.querySelector('.use-case-item');
+                    if (!firstCard) return 0;
+                    const styles = window.getComputedStyle(container);
+                    const gap = parseFloat(styles.columnGap || styles.gap || '0') || 0;
+                    return firstCard.offsetWidth + gap;
+                };
+
+                const updateNavState = () => {
+                    const maxScrollLeft = container.scrollWidth - container.clientWidth;
+                    const atStart = container.scrollLeft <= 2;
+                    const atEnd = container.scrollLeft >= maxScrollLeft - 2;
+                    buttons.forEach((btn) => {
+                        const dir = btn.getAttribute('data-direction');
+                        const disabled = (dir === 'left' && atStart) || (dir === 'right' && atEnd);
+                        btn.disabled = disabled;
+                        btn.classList.toggle('is-disabled', disabled);
+                    });
+                };
+
+                buttons.forEach((btn) => {
+                    btn.addEventListener('click', () => {
+                        if (btn.disabled) return;
+                        const dir = btn.getAttribute('data-direction');
+                        const step = getStep();
+                        if (!step) return;
+                        const offset = dir === 'left' ? -step : step;
+                        container.scrollBy({ left: offset, behavior: 'smooth' });
+                    });
+                });
+
+                container.addEventListener('scroll', updateNavState, { passive: true });
+                window.addEventListener('resize', updateNavState);
+                updateNavState();
+            });
+        </script>
+    </section>
+
+    
+    <section class="py-5 position-relative" style="background: #F5F5F8; overflow: hidden;">
+        <div class="container-fluid px-3 position-relative">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold">
+                    <span data-i18n="scenarios.title">你的日常，</span><span class="gradient-text" data-i18n="scenarios.titleHighlight">vWork 全部搞定</span>
+                </h2>
+                <p class="text-muted lead" data-i18n="scenarios.subtitle">不管你做什麼行業，這些場景你一定遇過</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 p-3">
+                        <div class="card-body">
+                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
+                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.0.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.0.painDesc">Excel 記庫存、另一個系統開單、再手動輸入會計軟件。每天花 2 小時對數。</p>
+                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
+                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.0.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.0.solutionDesc">開單 → 庫存自動扣 → 會計自動入帳。零手動，零出錯。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 p-3">
+                        <div class="card-body">
+                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
+                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.1.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.1.painDesc">Foodpanda、Keeta、Deliveroo 三個平台三部 iPad，忙的時候漏單、出錯。</p>
+                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
+                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.1.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.1.solutionDesc">三個平台的訂單自動匯入同一個後台。一個畫面看全部，自動接單。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 p-3">
+                        <div class="card-body">
+                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
+                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.2.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.2.painDesc">月底要出報表，從 3 個系統導出數據，再用 Excel 合併。老闆問業績只能說「等一下」。</p>
+                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
+                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.2.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.2.solutionDesc">直接問 vAi：「上個月營收多少？」3 秒出答案。AI 連接所有數據，隨問隨答。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm h-100 p-3">
+                        <div class="card-body">
+                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
+                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.3.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.3.painDesc">用 Excel 排班、手動計薪、逐個算加班費。每月出糧日通宵趕工，還經常算錯被員工投訴。</p>
+                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
+                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.3.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.3.solutionDesc">自動排班、打卡紀錄自動計薪、加班補水一鍵算好。出糧日一鍵匯出，零錯誤零加班。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="partners-section py-5">
+        <div class="container-fluid px-3">
+            <h3 class="text-center mb-5" data-i18n="partners.title">合作夥伴</h3>
+            <div class="partners-container">
+                <div class="partners-slider">
+                    
+                    <div class="partner-logo">
+                        <img src="/static/partner1.png" alt="Partner 1" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 1</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner2.png" alt="Partner 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 2</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner3.png" alt="Partner 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 3</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner4.png" alt="Partner 4" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 4</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner5.png" alt="Partner 5" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 5</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner6.png" alt="Partner 6" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 6</div>
+                    </div>
+                    
+                    <div class="partner-logo">
+                        <img src="/static/partner1.png" alt="Partner 1" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 1</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner2.png" alt="Partner 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 2</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner3.png" alt="Partner 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 3</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner4.png" alt="Partner 4" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 4</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner5.png" alt="Partner 5" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 5</div>
+                    </div>
+                    <div class="partner-logo">
+                        <img src="/static/partner6.png" alt="Partner 6" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 150px; height: 60px; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); border-radius: 8px; align-items: center; justify-content: center; color: #6366f1; font-weight: 600;">Partner 6</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section id="pricing" class="py-5">
+        <div class="container-fluid px-3">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold" data-i18n="pricing.title">定價方案</h2>
+                <p class="text-muted" data-i18n="pricing.subtitle">選擇適合您企業的方案</p>
+                
+                <div class="d-inline-flex align-items-center gap-2 mt-2 mb-1 px-3 py-2" style="background: linear-gradient(135deg, #fff8e1, #fff3cd); border-radius: 50px; border: 1px solid #ffc107;">
+                    <svg class="vcoin-icon" width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <span class="fw-semibold" style="color: #b8860b; font-size: 0.95rem;" data-i18n="pricing.welcomeBonus">註冊即送 50 vCoin，立即體驗 AI 功能！</span>
+                </div>
+                
+                <style>
+                    .pricing-toggle {
+                        display: inline-flex;
+                        align-items: center;
+                        background: #f1f5f9;
+                        border-radius: 100px;
+                        padding: 4px;
+                        gap: 0;
+                        position: relative;
+                    }
+                    .pricing-toggle-opt {
+                        position: relative;
+                        z-index: 1;
+                        padding: 0.5rem 1.5rem;
+                        font-size: 0.9rem;
+                        font-weight: 600;
+                        border: none;
+                        background: transparent;
+                        color: #64748b;
+                        border-radius: 100px;
+                        cursor: pointer;
+                        transition: color 0.25s ease;
+                        white-space: nowrap;
+                    }
+                    .pricing-toggle-opt.active {
+                        color: #fff;
+                    }
+                    .pricing-toggle-slider {
+                        position: absolute;
+                        top: 4px;
+                        height: calc(100% - 8px);
+                        border-radius: 100px;
+                        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+                        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        z-index: 0;
+                    }
+                    .pricing-toggle-save {
+                        display: inline-block;
+                        margin-left: 0.75rem;
+                        padding: 0.25rem 0.65rem;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        color: #059669;
+                        background: rgba(5, 150, 105, 0.1);
+                        border-radius: 100px;
+                        letter-spacing: 0.01em;
+                    }
+                </style>
+                <div class="d-flex justify-content-center align-items-center mt-3">
+                    <div class="pricing-toggle" id="pricingToggle">
+                        <div class="pricing-toggle-slider" id="pricingToggleSlider"></div>
+                        <button type="button" class="pricing-toggle-opt" id="pricingOptMonthly" data-i18n="pricing.monthlyBilling">月付</button>
+                        <button type="button" class="pricing-toggle-opt active" id="pricingOptYearly" data-i18n="pricing.yearlyBilling">年付</button>
+                    </div>
+                    <span class="pricing-toggle-save" id="pricingToggleSave" data-i18n="pricing.yearlySaveTag">省 34%</span>
+                </div>
+            </div>
+            
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card shadow-sm" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0;">
+                        <div class="card-body py-3 px-4">
+                            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                <div>
+                                    <div class="badge bg-secondary mb-1" data-i18n="pricing.free.badge">免費</div>
+                                    <h4 class="mb-0" data-i18n="pricing.free.name">免費方案</h4>
+                                </div>
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-receipt me-1 text-muted"></i><span data-i18n="pricing.free.features.0">訂單上限 5 單</span></span>
+                                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-clipboard-check me-1 text-muted"></i><span data-i18n="pricing.free.features.0b">服務單上限 5 單</span></span>
+                                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-list-task me-1 text-muted"></i><span data-i18n="pricing.free.features.1">項目 task 總數上限 5 個</span></span>
+                                    <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-star text-info me-1"></i><span data-i18n="pricing.free.features.2">AI 每日 5 問</span></span>
+                                </div>
+                                <a href="/login?product=vwork" class="btn btn-outline-secondary" data-i18n="pricing.free.button">開始免費使用</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4 justify-content-center">
+                
+                <div class="col-xl col-md-6">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="badge bg-primary mb-2" data-i18n="pricing.vsuite.badge">基本</div>
+                            <h3 data-i18n="pricing.vsuite.name">vSuite</h3>
+                            
+                            <div class="pricing-monthly">
+                                <div class="display-4 fw-bold">
+                                    <span data-i18n="pricing.vsuite.monthlyPrice">$380</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-yearly">
+                                <div class="display-4 fw-bold">
+                                    <span data-i18n="pricing.vsuite.yearlyPrice">$250</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                                </div>
+                                <div class="text-muted small" data-i18n="pricing.vsuite.yearlyTotal">年付 $3,000</div>
+                                <div class="alert alert-success py-1 px-2 mb-0 mt-1" style="font-size: 0.8125rem;">
+                                    <strong data-i18n="pricing.vsuite.yearlySavings">節省 $1,560/年</strong>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-4 mt-3">
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite.features.0">所有基本功能</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite.features.1">無限記錄</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite.features.2">無廣告</span></li>
+                                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <strong>500</strong> <span data-i18n="pricing.vsuite.features.3">vCoins/月</span></li>
+                                <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <span data-i18n="pricing.vsuite.features.4">vWork - ERP 企業管理</span></li>
+                                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-receipt"></i> <span data-i18n="pricing.vsuite.features.4a">訂單管理</span></li>
+                                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-box-seam"></i> <span data-i18n="pricing.vsuite.features.4b">庫存管理</span></li>
+                                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-shop-window"></i> <span data-i18n="pricing.vsuite.features.4c">POS 銷售系統</span></li>
+                                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-cup-straw"></i> <span data-i18n="pricing.vsuite.features.4d">餐飲管理</span></li>
+                                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-layout-text-window-reverse"></i> <span data-i18n="pricing.vsuite.features.4e">CMS 內容管理</span></li>
+                                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-globe"></i> <span data-i18n="pricing.vsuite.features.4f">網站建置</span></li>
+                                <li class="mb-2 ps-4 small text-muted"><i class="bi bi-robot"></i> <span data-i18n="pricing.vsuite.features.4g">vAi 智能助手</span></li>
+                                <li class="mb-2"><i class="bi bi-file-earmark-text text-warning"></i> <span data-i18n="pricing.vsuite.features.5">vOffice - AI 智慧辦公</span></li>
+                                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="pricing.vsuite.features.6">vMarket - 商品市集</span></li>
+                            </ul>
+                            <a href="/login?product=vwork" class="btn btn-primary" data-i18n="pricing.vsuite.button">立即訂閱</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xl col-md-6">
+                    <div class="card shadow h-100 position-relative" style="border: 2px solid #0d6efd;">
+                        <div class="card-body text-center p-4">
+                            <div class="badge bg-success mb-2" data-i18n="pricing.vsuite_pro.badge">熱門</div>
+                            <h3 data-i18n="pricing.vsuite_pro.name">vSuite Pro</h3>
+                            
+                            <div class="pricing-monthly">
+                                <div class="display-4 fw-bold">
+                                    <span data-i18n="pricing.vsuite_pro.monthlyPrice">$880</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-yearly">
+                                <div class="display-4 fw-bold">
+                                    <span data-i18n="pricing.vsuite_pro.yearlyPrice">$800</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                                </div>
+                                <div class="text-muted small" data-i18n="pricing.vsuite_pro.yearlyTotal">年付 $9,600</div>
+                                <div class="alert alert-success py-1 px-2 mb-0 mt-1" style="font-size: 0.8125rem;">
+                                    <strong data-i18n="pricing.vsuite_pro.yearlySavings">節省 $960/年</strong>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-4 mt-3">
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.0">所有 vSuite 功能</span></li>
+                                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <strong>1,000</strong> <span data-i18n="pricing.vsuite_pro.features.2">vCoins/月</span></li>
+                                <li class="mb-2"><i class="bi bi-camera-video text-primary"></i> <span data-i18n="pricing.vsuite_pro.features.video">vAi 影片生成</span></li>
+                                <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <span data-i18n="pricing.vsuite_pro.features.3">vWork - ERP 企業管理</span></li>
+                                <li class="mb-2"><i class="bi bi-file-earmark-text text-warning"></i> <span data-i18n="pricing.vsuite_pro.features.4">vOffice - AI 智慧辦公</span></li>
+                                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="pricing.vsuite_pro.features.5">vMarket - 商品市集</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.6">企業支援服務</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.7">資料遺失防護</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.8">安全控管服務</span></li>
+                            </ul>
+                            <a href="/login?product=vwork" class="btn btn-success" data-i18n="pricing.vsuite_pro.button">立即訂閱</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xl col-md-6">
+                    <div class="card shadow h-100 position-relative" style="border: 2px solid #6f42c1;">
+                        <div class="card-body text-center p-4">
+                            <div class="badge mb-2" style="background: #6f42c1;" data-i18n="pricing.vsuite_pro_plus.badge">最強方案</div>
+                            <h3 data-i18n="pricing.vsuite_pro_plus.name">vSuite Pro+</h3>
+                            
+                            <div class="pricing-monthly">
+                                <div class="display-4 fw-bold">
+                                    <span data-i18n="pricing.vsuite_pro_plus.monthlyPrice">$2,500</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-yearly">
+                                <div class="display-4 fw-bold">
+                                    <span data-i18n="pricing.vsuite_pro_plus.yearlyPrice">$2,200</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                                </div>
+                                <div class="text-muted small" data-i18n="pricing.vsuite_pro_plus.yearlyTotal">年付 $26,400</div>
+                                <div class="alert alert-success py-1 px-2 mb-0 mt-1" style="font-size: 0.8125rem;">
+                                    <strong data-i18n="pricing.vsuite_pro_plus.yearlySavings">節省 $3,600/年</strong>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-4 mt-3">
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.0">所有 vSuite Pro 功能</span></li>
+                                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <span data-i18n="pricing.vsuite_pro_plus.features.1">每月 3,000 vCoins</span></li>
+                                <li class="mb-2"><i class="bi bi-search text-danger"></i> <span data-i18n="pricing.vsuite_pro_plus.features.leadFinder">自動搵客系統</span></li>
+                                <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <span data-i18n="pricing.vsuite_pro_plus.features.3">vWork - ERP 企業管理</span></li>
+                                <li class="mb-2"><i class="bi bi-file-earmark-text text-warning"></i> <span data-i18n="pricing.vsuite_pro_plus.features.4">vOffice - AI 智慧辦公</span></li>
+                                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="pricing.vsuite_pro_plus.features.5">vMarket - 商品市集</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.6">企業支援服務</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.7">資料遺失防護</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.8">安全控管服務</span></li>
+                            </ul>
+                            <a href="/login?product=vwork" class="btn" style="background: #6f42c1; color: #fff;" data-i18n="pricing.vsuite_pro_plus.button">立即訂閱</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xl col-md-6">
+                    <div class="card shadow-sm h-100" style="border: 2px solid #dee2e6;">
+                        <div class="card-body text-center p-4">
+                            <div class="badge mb-2 bg-dark" data-i18n="pricing.custom.badge">專屬定制</div>
+                            <h3 data-i18n="pricing.custom.name">自訂方案</h3>
+                            <div class="display-4 fw-bold mb-3">
+                                <span data-i18n="pricing.custom.price">客製化</span>
+                            </div>
+                            <ul class="list-unstyled mb-4" id="customFeatures">
+                                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.0">完全定制系統</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.1">專屬技術支持</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.2">個性化功能開發</span></li>
+                                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.3">專屬顧問服務</span></li>
+                            </ul>
+                            <a href="/contact" class="btn btn-dark" id="customContactBtn" data-i18n="pricing.custom.button">聯繫我們</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    
+    <script>
+    (function() {
+        var pricingIsYearly = true;
+
+        function positionPricingSlider() {
+            var slider = document.getElementById('pricingToggleSlider');
+            var optM = document.getElementById('pricingOptMonthly');
+            var optY = document.getElementById('pricingOptYearly');
+            if (!slider || !optM || !optY) return;
+            var active = pricingIsYearly ? optY : optM;
+            slider.style.left = active.offsetLeft + 'px';
+            slider.style.width = active.offsetWidth + 'px';
+        }
+
+        function updatePricingDisplay() {
+            var optM = document.getElementById('pricingOptMonthly');
+            var optY = document.getElementById('pricingOptYearly');
+            var saveTag = document.getElementById('pricingToggleSave');
+            if (!optM || !optY) return;
+
+            optM.classList.toggle('active', !pricingIsYearly);
+            optY.classList.toggle('active', pricingIsYearly);
+            if (saveTag) {
+                if (pricingIsYearly) {
+                    saveTag.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pricing.yearlySaveTag', '省 34%') : '省 34%';
+                    saveTag.style.opacity = '1';
+                    saveTag.style.color = '#059669';
+                    saveTag.style.background = 'rgba(5, 150, 105, 0.1)';
+                } else {
+                    saveTag.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pricing.noDiscount', '沒有優惠') : '沒有優惠';
+                    saveTag.style.opacity = '1';
+                    saveTag.style.color = '#94a3b8';
+                    saveTag.style.background = 'rgba(148, 163, 184, 0.1)';
+                }
+            }
+
+            positionPricingSlider();
+
+            var monthlyEls = document.querySelectorAll('#pricing .pricing-monthly');
+            var yearlyEls = document.querySelectorAll('#pricing .pricing-yearly');
+            for (var i = 0; i < monthlyEls.length; i++) {
+                monthlyEls[i].style.display = pricingIsYearly ? 'none' : 'block';
+            }
+            for (var j = 0; j < yearlyEls.length; j++) {
+                yearlyEls[j].style.display = pricingIsYearly ? 'block' : 'none';
+            }
+        }
+
+        var optM = document.getElementById('pricingOptMonthly');
+        var optY = document.getElementById('pricingOptYearly');
+        if (optM) optM.addEventListener('click', function() { pricingIsYearly = false; updatePricingDisplay(); });
+        if (optY) optY.addEventListener('click', function() { pricingIsYearly = true; updatePricingDisplay(); });
+
+        updatePricingDisplay();
+        window.addEventListener('resize', positionPricingSlider);
+        window.addEventListener('languageChanged', function() {
+            setTimeout(positionPricingSlider, 50);
+        });
+    })();
+    </script>
+
+    
+    <section class="cta-section py-5">
+        <div class="container-fluid px-3">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h3 class="mb-2" style="color: var(--nir-dark); font-weight: 700;" data-i18n="cta.title">還在用 Excel + 多個系統拼湊？</h3>
+                    <p class="text-muted mb-0" data-i18n="cta.subtitle">免費試用 vWork，體驗一個後台管理全部業務的感覺</p>
+                </div>
+                <div class="col-lg-4 text-lg-end text-start mt-3 mt-lg-0">
+                    <a href="/login?product=vwork" class="btn btn-nir" data-i18n="cta.button">免費開始</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <footer class="site-footer-light">
+        <div class="container-fluid px-3">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="vWork Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                    <div class="mt-3">
+                        <a href="#" id="vworkFooterWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
+                        <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#features" class="text-muted text-decoration-none" data-i18n="footer.features">功能</a></li>
+                        <li class="d-none mb-2"><a style="display: none !important;" href="#pricing" class="text-muted text-decoration-none" data-i18n="footer.pricing">定價</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contact">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.email">info@vsysai.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span data-i18n="footer.location">香港</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span data-i18n="footer.workingHours">週一至週五 9:00 - 18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 V-sys Limited. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    
+    <a href="https://wa.me/85246237234?text=您好，我想了解vWork系統" target="_blank" class="whatsapp-floating-btn" title="聯繫客服">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js?v=20260119"></script>
+    <script src="/static/js/sso.js"></script>
+    
+    
+    <script src="/static/js/features-slider.js?v=20260119"></script>
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const homeMobileMenuToggle = document.getElementById('homeMobileMenuToggle');
+            const homeSidebar = document.getElementById('homeSidebar');
+            const homeSidebarOverlay = document.getElementById('homeSidebarOverlay');
+            
+            function toggleHomeSidebar() {
+                if (homeSidebar) {
+                    homeSidebar.classList.toggle('show');
+                }
+                if (homeSidebarOverlay) {
+                    homeSidebarOverlay.classList.toggle('show');
+                }
+            }
+            
+            if (homeMobileMenuToggle) {
+                homeMobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleHomeSidebar();
+                });
+            }
+            
+            if (homeSidebarOverlay) {
+                homeSidebarOverlay.addEventListener('click', function() {
+                    if (homeSidebar) {
+                        homeSidebar.classList.remove('show');
+                    }
+                    homeSidebarOverlay.classList.remove('show');
+                });
+            }
+            
+            
+            function closeHomeSidebar() {
+                if (homeSidebar) {
+                    homeSidebar.classList.remove('show');
+                }
+                if (homeSidebarOverlay) {
+                    homeSidebarOverlay.classList.remove('show');
+                }
+            }
+            
+            
+            const homeNavLinks = document.querySelectorAll('#homeSidebar .nav-link:not(.nav-group-toggle)');
+            homeNavLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    
+                    if (!this.hasAttribute('data-lang')) {
+                        closeHomeSidebar();
+                    }
+                });
+            });
+            
+            
+            const homeLangLinks = document.querySelectorAll('#homeLanguageSubmenu .nav-link[data-lang]');
+            homeLangLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                    
+                    closeHomeSidebar();
+                });
+            });
+            
+            
+            const homeLogoutBtn = document.getElementById('homeLogoutBtn');
+            if (homeLogoutBtn) {
+                homeLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof App !== 'undefined' && App.logout) {
+                        App.logout();
+                    } else {
+                        fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                          .finally(function() {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('tenant_subdomain');
+                            window.location.replace('/?logged_out=1');
+                          });
+                    }
+                });
+            }
+            
+            
+            document.querySelectorAll('[data-lang]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                });
+            });
+            
+            
+            const langZh = document.getElementById('lang-zh');
+            const langEn = document.getElementById('lang-en');
+
+            
+            function updateLangButtons() {
+                if (I18n.currentLang === 'zh') {
+                    if (langZh) langZh.classList.add('active');
+                    if (langEn) langEn.classList.remove('active');
+                } else {
+                    if (langZh) langZh.classList.remove('active');
+                    if (langEn) langEn.classList.add('active');
+                }
+            }
+
+            
+            if (langZh) {
+                langZh.addEventListener('click', function() {
+                    I18n.switchLanguage('zh');
+                    updateLangButtons();
+                });
+            }
+
+            if (langEn) {
+                langEn.addEventListener('click', function() {
+                    I18n.switchLanguage('en');
+                    updateLangButtons();
+                });
+            }
+
+            
+            updateLangButtons();
+            
+            
+            function prefillUserFromCache() {
+                try {
+                    const cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        const user = JSON.parse(cachedUser);
+                        if (user && user.name) {
+                            const userNameSpan = document.getElementById('userName');
+                            const homeUserName = document.getElementById('homeUserName');
+                            if (userNameSpan) {
+                                userNameSpan.textContent = user.name;
+                                
+                                userNameSpan.removeAttribute('data-i18n');
+                            }
+                            if (homeUserName) {
+                                homeUserName.textContent = user.name;
+                                homeUserName.removeAttribute('data-i18n');
+                            }
+                            
+                            
+                            const avatarImg = document.getElementById('publicUserAvatar');
+                            const avatarIcon = document.getElementById('publicUserIcon');
+                            const homeAvatarImg = document.getElementById('homeUserAvatar');
+                            const homeAvatarIcon = document.getElementById('homeUserIcon');
+                            
+                            if (user.profile_pic) {
+                                let url = String(user.profile_pic);
+                                if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                                    url = '/' + url;
+                                }
+                                if (url) {
+                                    if (avatarImg) {
+                                        avatarImg.src = url;
+                                        avatarImg.style.display = 'inline-block';
+                                        if (avatarIcon) avatarIcon.style.display = 'none';
+                                    }
+                                    if (homeAvatarImg) {
+                                        homeAvatarImg.src = url;
+                                        homeAvatarImg.style.display = 'inline-block';
+                                        if (homeAvatarIcon) homeAvatarIcon.style.display = 'none';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    
+                }
+            }
+            
+            
+            prefillUserFromCache();
+            
+            
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    checkAuthAndUpdateNav();
+                }
+            });
+            
+            
+            checkAuthAndUpdateNav();
+            
+            
+        });
+        
+        
+        async function loadPublicAICoinsBalance() {
+            try {
+                const headers = { 'Accept': 'application/json' };
+                const token = localStorage.getItem('auth_token');
+                if (!token || token === 'temp_token') return;
+                headers['Authorization'] = `Bearer ${token}`;
+                const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+                
+                const resp = await fetch('/api/v1/ai-coins/balance', { headers });
+                if (!resp.ok) return;
+                const data = await resp.json();
+                
+                const balance = data.balance || 0;
+                
+                const aiCoinsDisplay = document.getElementById('publicAICoinsDisplay');
+                const aiCoinsBalance = document.getElementById('publicAICoinsBalance');
+                const aiCoinsDivider = document.getElementById('publicAICoinsDivider');
+                
+                if (aiCoinsDisplay && aiCoinsBalance) {
+                    
+                    aiCoinsBalance.textContent = balance;
+                    aiCoinsDisplay.style.display = 'block';
+                    if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('載入 vCoin 餘額失敗:', e);
+            }
+        }
+        
+        
+        
+        async function checkAuthAndUpdateNav() {
+            const tryFreeBtn = document.getElementById('tryFreeBtn');
+            const userDropdownNav = document.getElementById('userDropdown');
+            const userNameSpan = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginLink = document.getElementById('loginLink');
+            const goToSystemBtnMobile = document.getElementById('goToSystemBtnMobile');
+            const homeUserDropdownItem = document.getElementById('homeUserDropdownItem');
+            const homeLoginItem = document.getElementById('homeLoginItem');
+
+            async function fetchCurrentUserSilently() {
+                try {
+                    const headers = { 'Accept': 'application/json' };
+                    const token = localStorage.getItem('auth_token');
+                    if (token && token !== 'temp_token') {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    } else {
+                        
+                        
+                        return null;
+                    }
+                    const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                    if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+
+                    const resp = await fetch('/api/v1/user/me', { headers });
+                    if (!resp.ok) {
+                        
+                        
+                        return null;
+                    }
+                    const user = await resp.json();
+
+                    
+                    try {
+                        if (user) localStorage.setItem('user', JSON.stringify(user));
+                        if (user && user.tenant && user.tenant.subdomain) {
+                            localStorage.setItem('tenant_subdomain', String(user.tenant.subdomain));
+                        }
+                    } catch (_e) {   }
+                    return user;
+                } catch (_e) {
+                    
+                    return null;
+                }
+            }
+
+            const user = await fetchCurrentUserSilently();
+            let finalUser = user;
+            if (!finalUser) {
+                
+                
+                const hadToken = localStorage.getItem('auth_token');
+                if (hadToken) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tenant_subdomain');
+                }
+            }
+            const isLoggedIn = !!(finalUser && finalUser.name);
+
+            
+            if (typeof App !== 'undefined' && typeof App.updateAppSwitcherLinks === 'function') {
+                App.updateAppSwitcherLinks(isLoggedIn);
+            }
+
+            if (isLoggedIn) {
+                
+                if (tryFreeBtn) {
+                    tryFreeBtn.style.display = 'none';
+                }
+                const goToSystemBtn = document.getElementById('goToSystemBtn');
+                if (goToSystemBtn) {
+                    goToSystemBtn.style.display = 'list-item';
+                }
+                if (goToSystemBtnMobile) {
+                    goToSystemBtnMobile.style.display = 'list-item';
+                }
+                if (userDropdownNav) {
+                    userDropdownNav.style.display = '';
+                }
+                if (homeUserDropdownItem) {
+                    homeUserDropdownItem.style.display = 'block';
+                }
+                if (homeLoginItem) {
+                    homeLoginItem.style.display = 'none';
+                }
+                if (loginLink) {
+                    loginLink.style.display = 'none';
+                }
+                
+                
+                loadPublicAICoinsBalance();
+                
+                
+                const monthlySubscribeBtn = document.getElementById('monthlySubscribeBtn');
+                const yearlySubscribeBtn = document.getElementById('yearlySubscribeBtn');
+                if (monthlySubscribeBtn) {
+                    monthlySubscribeBtn.href = '/billing';
+                }
+                if (yearlySubscribeBtn) {
+                    yearlySubscribeBtn.href = '/billing';
+                }
+                
+                
+                if (userNameSpan && finalUser && finalUser.name) {
+                    userNameSpan.textContent = finalUser.name;
+                }
+
+                
+                const homeUserName = document.getElementById('homeUserName');
+                if (homeUserName && finalUser && finalUser.name) {
+                    homeUserName.textContent = finalUser.name;
+                }
+
+                
+                const avatarImg = document.getElementById('publicUserAvatar');
+                const avatarIcon = document.getElementById('publicUserIcon');
+                if (avatarImg) {
+                    let url = (finalUser && finalUser.profile_pic) ? String(finalUser.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                        url = '/' + url;
+                    }
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            this.setAttribute('data-error-handled', 'true');
+                            if (avatarIcon) avatarIcon.style.display = '';
+                            this.onerror = null; 
+                        };
+                    } else {
+                        avatarImg.style.display = 'none';
+                        if (avatarIcon) avatarIcon.style.display = '';
+                    }
+                }
+
+                
+                const homeAvatarImg = document.getElementById('homeUserAvatar');
+                const homeAvatarIcon = document.getElementById('homeUserIcon');
+                if (homeAvatarImg) {
+                    let url = (finalUser && finalUser.profile_pic) ? String(finalUser.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                        url = '/' + url;
+                    }
+                    if (url) {
+                        homeAvatarImg.src = url;
+                        homeAvatarImg.style.display = 'inline-block';
+                        if (homeAvatarIcon) homeAvatarIcon.style.display = 'none';
+                        homeAvatarImg.onerror = function() {
+                            homeAvatarImg.style.display = 'none';
+                            if (homeAvatarIcon) homeAvatarIcon.style.display = '';
+                        };
+                    } else {
+                        homeAvatarImg.style.display = 'none';
+                        if (homeAvatarIcon) homeAvatarIcon.style.display = '';
+                    }
+                }
+                
+                
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                              .finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace('/?logged_out=1');
+                              });
+                        }
+                    });
+                }
+            } else {
+                
+                if (tryFreeBtn) {
+                    tryFreeBtn.style.display = 'list-item';
+                }
+                const goToSystemBtn = document.getElementById('goToSystemBtn');
+                if (goToSystemBtn) {
+                    goToSystemBtn.style.display = 'none';
+                }
+                
+                if (goToSystemBtnMobile) {
+                    goToSystemBtnMobile.style.display = 'list-item';
+                }
+                if (userDropdownNav) {
+                    userDropdownNav.style.display = 'none';
+                }
+                if (homeUserDropdownItem) {
+                    homeUserDropdownItem.style.display = 'none';
+                }
+                if (homeLoginItem) {
+                    homeLoginItem.style.display = 'block';
+                }
+                if (loginLink) {
+                    loginLink.style.display = '';
+                }
+                
+                
+                const monthlySubscribeBtn = document.getElementById('monthlySubscribeBtn');
+                const yearlySubscribeBtn = document.getElementById('yearlySubscribeBtn');
+                if (monthlySubscribeBtn) {
+                    monthlySubscribeBtn.href = '/login?product=vwork';
+                }
+                if (yearlySubscribeBtn) {
+                    yearlySubscribeBtn.href = '/login?product=vwork';
+                }
+            }
+        }
+        
+        
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'auth_token' && !e.newValue) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === null) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === 'auth_token') {
+                checkAuthAndUpdateNav();
+            }
+        });
+        
+        
+        
+        
+        (function() {
+            const chatContainer = document.getElementById('aiAssistantChatDemo');
+            if (!chatContainer) return;
+            
+            
+            function getConversations() {
+                
+                if (typeof I18n === 'undefined' || !I18n._ready) {
+                    
+                    return [
+                        {
+                            user: '如何讓業務決策更快速？',
+                            ai: '配合 vAi 助手，讓您的業務決策更快速、更準確、更高效。'
+                        },
+                        {
+                            user: 'vAi 能幫我做什麼？',
+                            ai: 'vAi 能理解您的業務需求，優化流程、降低成本。'
+                        }
+                    ];
+                }
+                
+                
+                return [
+                    {
+                        user: I18n.t('aiAssistant.chatDemo.0.user') || '如何讓業務決策更快速？',
+                        ai: I18n.t('aiAssistant.chatDemo.0.ai') || '配合 vAi 助手，讓您的業務決策更快速、更準確、更高效。'
+                    },
+                    {
+                        user: I18n.t('aiAssistant.chatDemo.1.user') || 'vAi 能幫我做什麼？',
+                        ai: I18n.t('aiAssistant.chatDemo.1.ai') || 'vAi 能理解您的業務需求，優化流程、降低成本。'
+                    }
+                ];
+            }
+            
+            let conversations = getConversations();
+            
+            let currentConversationIndex = 0;
+            let isTyping = false;
+            
+            
+            function typeText(element, text, speed = 30, callback) {
+                let index = 0;
+                element.textContent = '';
+                isTyping = true;
+                
+                function type() {
+                    if (index < text.length) {
+                        element.textContent += text.charAt(index);
+                        index++;
+                        setTimeout(type, speed);
+                    } else {
+                        isTyping = false;
+                        if (callback) callback();
+                    }
+                }
+                
+                type();
+            }
+            
+            
+            function createMessage(isUser, content, showTyping = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `d-flex ${isUser ? 'justify-content-end' : 'justify-content-start'} message-item`;
+                
+                let avatarHtml = '';
+                let bubbleClass = isUser ? 'user' : 'ai';
+                
+                if (!isUser) {
+                    avatarHtml = `
+                        <div class="avatar-circle me-2">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                    `;
+                }
+                
+                const contentHtml = showTyping 
+                    ? '<div class="typing-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>'
+                    : `<div style="white-space: pre-wrap; word-wrap: break-word;">${content}</div>`;
+                
+                messageDiv.innerHTML = `
+                    ${avatarHtml}
+                    <div class="message-bubble ${bubbleClass} position-relative" style="max-width: 70%;">
+                        ${contentHtml}
+                    </div>
+                    ${isUser ? `
+                        <div class="avatar-circle ms-2">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    ` : ''}
+                `;
+                
+                return messageDiv;
+            }
+            
+            
+            function scrollToBottom() {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            
+            function showConversation(index) {
+                
+                conversations = getConversations();
+                
+                if (index >= conversations.length) {
+                    
+                    return;
+                }
+                
+                const conversation = conversations[index];
+                
+                
+                const userMessage = createMessage(true, conversation.user);
+                chatContainer.appendChild(userMessage);
+                scrollToBottom();
+                
+                
+                const userBubble = userMessage.querySelector('.message-bubble div');
+                userBubble.textContent = '';
+                typeText(userBubble, conversation.user, 30, () => {
+                    
+                    setTimeout(() => {
+                        
+                        const thinkingMessage = createMessage(false, '', true);
+                        chatContainer.appendChild(thinkingMessage);
+                        scrollToBottom();
+                        
+                        
+                        setTimeout(() => {
+                            
+                            thinkingMessage.remove();
+                            
+                            
+                            const aiMessage = createMessage(false, conversation.ai);
+                            chatContainer.appendChild(aiMessage);
+                            scrollToBottom();
+                            
+                            const aiBubble = aiMessage.querySelector('.message-bubble div');
+                            aiBubble.textContent = '';
+                            typeText(aiBubble, conversation.ai, 20, () => {
+                                
+                                setTimeout(() => {
+                                    currentConversationIndex++;
+                                    if (currentConversationIndex < conversations.length) {
+                                        showConversation(currentConversationIndex);
+                                    }
+                                }, 1500);
+                            });
+                        }, 1500);
+                    }, 500);
+                });
+            }
+            
+            
+            let hasStarted = false;
+            let pageLoaded = false;
+            
+            
+            if (document.readyState !== 'loading') {
+                pageLoaded = true;
+            } else {
+                document.addEventListener('DOMContentLoaded', () => {
+                    pageLoaded = true;
+                }, { once: true });
+            }
+            
+            function startIfNeeded() {
+                if (hasStarted || currentConversationIndex !== 0 || !pageLoaded) return;
+                if (window.scrollY <= 10 && window.innerWidth > 991.98) return;
+                hasStarted = true;
+                setTimeout(() => {
+                    showConversation(0);
+                }, 300);
+            }
+
+            if (typeof IntersectionObserver !== 'undefined') {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (!entry.isIntersecting) return;
+                        startIfNeeded();
+                        if (hasStarted) observer.unobserve(entry.target);
+                    });
+                }, { threshold: 0.3, rootMargin: '-100px 0px' });
+                
+                observer.observe(chatContainer);
+            } else {
+                const tick = () => {
+                    if (hasStarted) return;
+                    const rect = chatContainer.getBoundingClientRect();
+                    const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+                    if (rect.top < vh && rect.bottom > 0) {
+                        startIfNeeded();
+                    }
+                    requestAnimationFrame(tick);
+                };
+                requestAnimationFrame(tick);
+            }
+        })();
+    </script>
+    
+    <script>
+        (function() {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            
+            function handleScroll() {
+                if (window.scrollY > 60) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+            
+            
+            handleScroll();
+            
+            
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
+    </script>
+    <script>
+        (function() {
+            const promo = document.querySelector('.promo-topbar');
+            const body = document.body;
+            if (!promo || !body) return;
+
+            function handlePromoScroll() {
+                const shouldHide = window.scrollY > 20;
+                promo.classList.toggle('is-hidden', shouldHide);
+                if (body.classList.contains('has-promo-topbar')) {
+                    body.classList.toggle('promo-topbar-hidden', shouldHide);
+                }
+            }
+
+            handlePromoScroll();
+            window.addEventListener('scroll', handlePromoScroll, { passive: true });
+        })();
+    </script>
+    
+    <script>
+        (function() {
+            var carousel = document.getElementById('heroCarousel');
+            if (!carousel) return;
+
+            var slides = carousel.querySelectorAll('.hero-slide');
+            var dots   = carousel.querySelectorAll('.hero-dot');
+            var total  = slides.length;
+            var current = 0;
+            var interval = 10000;
+            var timer = null;
+
+            function goTo(idx) {
+                if (idx === current) return;
+                slides[current].classList.remove('hero-slide--active');
+                dots[current].classList.remove('hero-dot--active');
+                current = idx;
+                slides[current].classList.add('hero-slide--active');
+                dots[current].classList.add('hero-dot--active');
+                carousel.setAttribute('data-active-slide', current);
+            }
+
+            function next() {
+                goTo((current + 1) % total);
+            }
+
+            function startTimer() {
+                stopTimer();
+                timer = setInterval(next, interval);
+            }
+
+            function stopTimer() {
+                if (timer) { clearInterval(timer); timer = null; }
+            }
+
+            
+            dots.forEach(function(dot) {
+                dot.addEventListener('click', function() {
+                    goTo(parseInt(dot.getAttribute('data-dot'), 10));
+                    startTimer();
+                });
+            });
+
+            
+            carousel.addEventListener('mouseenter', stopTimer);
+            carousel.addEventListener('mouseleave', startTimer);
+
+            
+            carousel.setAttribute('data-active-slide', 0);
+            startTimer();
+        })();
+    </script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

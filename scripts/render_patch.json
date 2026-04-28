@@ -1,0 +1,1 @@
+{"serviceDetails":{"envSpecificDetails":{"buildCommand":"go build -o api ./cmd/api && go build -o apply_migrations ./cmd/apply_migrations","startCommand":"./apply_migrations 2>&1 | tail -200; ./api"}}}
