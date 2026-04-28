@@ -1,0 +1,23 @@
+{
+  "name": "service_management",
+  "title": "服務管理",
+  "version": 4,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/service-orders" },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "highlight", "selector": ".container-fluid", "text": { "zh": "服務單列表：管理所有服務訂單", "zh-CN": "服务单列表：管理所有服务订单", "en": "Service orders: manage all service orders" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "#searchInput, input[type='search']", "text": { "zh": "搜尋服務單號或客戶名稱", "zh-CN": "搜索服务单号或客户名称", "en": "Search by order number or customer name" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "a.btn.btn-primary[href='/service-orders/new']", "text": { "zh": "新增服務單：建立服務流程", "zh-CN": "新增服务单：建立服务流程", "en": "Create new service order" } },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "click", "selector": "a.btn.btn-primary[href='/service-orders/new']" },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "highlight", "selector": "#serviceOrderTabs", "text": { "zh": "四大分頁：資料、付款、預約、退款", "zh-CN": "四大分页：数据、付款、预约、退款", "en": "Four tabs: Data, Payment, Appointment, Refund" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "#serviceOrderForm", "text": { "zh": "填寫客戶、服務明細，完成建單", "zh-CN": "填写客户、服务明细，完成建单", "en": "Fill customer, service items to complete the order" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "done" }
+  ]
+}

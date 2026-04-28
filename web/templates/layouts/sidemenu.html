@@ -1,0 +1,1045 @@
+{{define "layouts/sidemenu.html"}}
+<!-- Side Menu -->
+<div class="sidebar" id="sidebar">
+    <nav class="sidebar-nav">
+        <!-- 菜單編輯按鈕 -->
+        <div class="sidebar-menu-edit-btn" id="sidebarMenuEditBtn" title="編輯菜單" data-i18n-title="menu.editMenu">
+            <i class="bi bi-sliders sidebar-menu-edit-icon"></i>
+            <span class="sidebar-menu-edit-text" data-i18n="menu.editMenuBar">編輯目錄</span>
+        </div>
+        <ul class="nav flex-column" id="sidebarMenuList">
+            <!-- Mobile-only: 全站搜尋入口 -->
+            <li class="nav-item d-lg-none" data-menu-key="cms-search-mobile">
+                <a class="nav-link" href="/cms-search" id="nav-cms-search-mobile">
+                    <i class="bi bi-search"></i> <span data-i18n="cms.globalSearch.pageTitle">全站搜尋</span>
+                </a>
+            </li>
+            <!-- 核心業務 -->
+            <li class="nav-item" data-permission="dashboard" data-menu-key="dashboard">
+                <a class="nav-link" href="/dashboard" id="nav-dashboard">
+                    <i class="bi bi-speedometer2"></i> <span data-i18n="menu.dashboard">儀表板</span>
+                </a>
+            </li>
+
+            <!-- 業務目標 -->
+            <li class="nav-item" data-permission="business-goals" data-menu-key="businessGoals">
+                <a class="nav-link" href="/business-goals" id="nav-business-goals">
+                    <i class="bi bi-bullseye"></i> <span data-i18n="menu.businessGoals">業務目標</span>
+                </a>
+            </li>
+
+            <!-- POS 收銀台 -->
+            <li class="nav-item" data-permission="pos" data-menu-key="pos">
+                <!-- href 使用 javascript:void(0) 以避免預設跳轉，交由 JS 控制彈窗 -->
+                <a class="nav-link" href="javascript:void(0)" id="nav-pos" onclick="return window.openPosStoreSelector ? window.openPosStoreSelector(event) : false;">
+                    <i class="bi bi-cash-coin"></i> <span data-i18n="menu.pos">POS 收銀台</span>
+                </a>
+            </li>
+
+            <!-- 日曆 -->
+            <li class="nav-item" data-permission="calendars" data-menu-key="calendars">
+                <a class="nav-link" href="/calendars" id="nav-calendars">
+                    <i class="bi bi-calendar"></i> <span data-i18n="menu.calendars">日曆</span>
+                </a>
+            </li>
+
+            <!-- 網站（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="vBuilder">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vBuilderSubmenu" aria-expanded="false">
+                    <i class="bi bi-file-earmark-text"></i> <span data-i18n="menu.vBuilder">網站</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="vBuilderSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="pages">
+                            <a class="nav-link" href="/pages" id="nav-pages">
+                                <i class="bi bi-file-earmark-text"></i> <span data-i18n="menu.pages">頁面管理</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="pages">
+                            <a class="nav-link" href="/blogs" id="nav-blogs">
+                                <i class="bi bi-journal-text"></i> <span data-i18n="menu.blogs">博客管理</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="pages">
+                            <a class="nav-link" href="/website-theme" id="nav-website-theme">
+                                <i class="bi bi-palette"></i> <span data-i18n="pages.websiteTheme.title">網站主題</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="pages">
+                            <a class="nav-link" href="/website-settings" id="nav-website-settings">
+                                <i class="bi bi-gear"></i> <span data-i18n="pages.websiteSettings.title">網站設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="pages">
+                            <a class="nav-link" href="/website-domains" id="nav-website-domains">
+                                <i class="bi bi-link-45deg"></i> <span data-i18n="menu.customDomainSSL">自訂網域 & SSL</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="pages">
+                            <a class="nav-link" href="/website-page-views" id="nav-website-page-views">
+                                <i class="bi bi-bar-chart"></i> <span data-i18n="menu.pageViews">瀏覽報告</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="company">
+                            <a class="nav-link" href="#" id="nav-company" onclick="openCompanyPage(event); return false;">
+                                <i class="bi bi-globe"></i> <span data-i18n="nav.companyPage">公司頁面</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="support-communications">
+                            <a class="nav-link" href="/support-communications" id="nav-support-communications">
+                                <i class="bi bi-envelope-paper"></i> <span data-i18n="menu.contactForms">聯絡表單</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 客戶管理（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="customerManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#customerSubmenu" aria-expanded="false">
+                    <i class="bi bi-people-fill"></i> <span data-i18n="menu.customerManagement">客戶管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="customerSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="customers">
+                            <a class="nav-link" href="/customers" id="nav-customers">
+                                <i class="bi bi-people"></i> <span data-i18n="menu.customers">客戶</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="customer-labels">
+                            <a class="nav-link" href="/customer-labels" id="nav-customer-labels">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.customerLabels">客戶標籤</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="phone-country-codes">
+                            <a class="nav-link" href="/phone-country-codes" id="nav-phone-country-codes">
+                                <i class="bi bi-telephone"></i> <span data-i18n="menu.phoneCountryCodes">電話區號</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="member-levels">
+                            <a class="nav-link" href="/member-levels" id="nav-member-levels">
+                                <i class="bi bi-star"></i> <span data-i18n="menu.memberLevels">會員等級</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="referrals">
+                            <a class="nav-link" href="/referrals" id="nav-referrals">
+                                <i class="bi bi-person-check"></i> <span data-i18n="menu.referrals">介紹記錄</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="customers">
+                            <a class="nav-link" href="/customer-analysis-report" id="nav-customer-analysis-report">
+                                <i class="bi bi-graph-up"></i> <span data-i18n="menu.customerAnalysisReport">客戶分析報告</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 優惠管理（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="promotionManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#couponPointsSubmenu" aria-expanded="false">
+                    <i class="bi bi-ticket-perforated"></i> <span data-i18n="menu.promotionManagement">優惠管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="couponPointsSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="coupons">
+                            <a class="nav-link" href="/coupons" id="nav-coupons">
+                                <i class="bi bi-ticket-perforated"></i> <span data-i18n="menu.coupons">優惠券</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="points">
+                            <a class="nav-link" href="/points" id="nav-points">
+                                <i class="bi bi-trophy"></i> <span data-i18n="menu.points">積分</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="points-history">
+                            <a class="nav-link" href="/points-history" id="nav-points-history">
+                                <i class="bi bi-clock-history"></i> <span data-i18n="menu.pointsHistory">積分記錄</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="point-settings">
+                            <a class="nav-link" href="/point-settings" id="nav-point-settings">
+                                <i class="bi bi-gear"></i> <span data-i18n="menu.pointSettings">積分設置</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="stamp-settings">
+                            <a class="nav-link" href="/stamp-settings" id="nav-stamp-settings">
+                                <i class="bi bi-award"></i> <span data-i18n="menu.stampSettings">印花設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="stamp-records">
+                            <a class="nav-link" href="/stamp-records" id="nav-stamp-records">
+                                <i class="bi bi-clock-history"></i> <span data-i18n="menu.stampRecords">印花記錄</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 產品管理（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="productManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#productSubmenu" aria-expanded="false">
+                    <i class="bi bi-box-seam"></i> <span data-i18n="menu.productManagement">產品管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="productSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="products">
+                            <a class="nav-link" href="/products" id="nav-products">
+                                <i class="bi bi-box"></i> <span data-i18n="menu.products">產品</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="product-labels">
+                            <a class="nav-link" href="/product-labels" id="nav-product-labels">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.productLabels">產品標籤</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="product-taxes">
+                            <a class="nav-link" href="/product-taxes" id="nav-product-taxes">
+                                <i class="bi bi-percent"></i> <span data-i18n="menu.productTaxes">產品稅</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="product-types">
+                            <a class="nav-link" href="/product-types" id="nav-product-types">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.productTypes">產品類型</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="product-attributes">
+                            <a class="nav-link" href="/product-attributes" id="nav-product-attributes">
+                                <i class="bi bi-list-check"></i> <span data-i18n="menu.productAttributes">產品屬性</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="brands">
+                            <a class="nav-link" href="/brands" id="nav-brands">
+                                <i class="bi bi-award"></i> <span data-i18n="menu.brands">品牌</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="products">
+                            <a class="nav-link" href="/product-sync-settings" id="nav-product-sync-settings">
+                                <i class="bi bi-arrow-repeat"></i> <span data-i18n="menu.productSyncSettings">產品同步設定</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 訂單管理（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="orderManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#orderSubmenu" aria-expanded="false">
+                    <i class="bi bi-cart"></i> <span data-i18n="menu.orderManagement">訂單管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="orderSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-menu-subkey="guide-order-flow">
+                            <a class="nav-link" href="/guide/order-flow" id="nav-guide-order-flow">
+                                <i class="bi bi-signpost-2"></i> <span data-i18n="menu.orderFlowGuide">流程指南</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="orders">
+                            <a class="nav-link" href="/orders" id="nav-orders">
+                                <i class="bi bi-cart"></i> <span data-i18n="menu.orders">訂單</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="orders">
+                            <a class="nav-link" href="/quotations" id="nav-quotations">
+                                <i class="bi bi-file-earmark-text"></i> <span data-i18n="menu.quotations">報價單</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="order-labels">
+                            <a class="nav-link" href="/order-labels" id="nav-order-labels">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.orderLabels">訂單標籤</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="order-reports">
+                            <a class="nav-link" href="/order-reports" id="nav-order-reports">
+                                <i class="bi bi-file-earmark-text"></i> <span data-i18n="menu.orderReports">訂單報表</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="payment-methods">
+                            <a class="nav-link" href="/payment-methods" id="nav-payment-methods">
+                                <i class="bi bi-credit-card"></i> <span data-i18n="menu.paymentMethods">付款方式</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="payment-methods">
+                            <a class="nav-link" href="/stripe-connect" id="nav-stripe-connect">
+                                <i class="bi bi-link-45deg"></i> <span data-i18n="menu.stripeConnect">Stripe Connect</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 倉庫管理（可折疊） -->
+            <li class="nav-item nav-group" data-module="warehouse" data-menu-key="warehouseManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#warehouseSubmenu" aria-expanded="false">
+                    <i class="bi bi-building"></i> <span data-i18n="menu.warehouseManagement">倉庫管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="warehouseSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="warehouses">
+                            <a class="nav-link" href="/warehouses" id="nav-warehouses">
+                                <i class="bi bi-building"></i> <span data-i18n="menu.warehouses">倉庫</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="inventory-movements">
+                            <a class="nav-link" href="/inventory-movements" id="nav-inventory-movements">
+                                <i class="bi bi-arrow-left-right"></i> <span data-i18n="menu.inventoryMovements">出入貨記錄</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="inventory-processing">
+                            <a class="nav-link" href="/inventory-processing" id="nav-inventory-processing">
+                                <i class="bi bi-box-seam"></i> <span data-i18n="menu.inventoryProcessing">出入庫處理</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="inventory-counts">
+                            <a class="nav-link" href="/inventory-counts" id="nav-inventory-counts">
+                                <i class="bi bi-clipboard-check"></i> <span data-i18n="menu.inventoryCounts">庫存盤點</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="low-stock">
+                            <a class="nav-link" href="/inventory/low-stock" id="nav-low-stock">
+                                <i class="bi bi-exclamation-triangle"></i> <span data-i18n="menu.lowStock">低庫存預警</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="inventory-settings">
+                            <a class="nav-link" href="/inventory-settings" id="nav-inventory-settings">
+                                <i class="bi bi-gear"></i> <span data-i18n="menu.inventorySettings">庫存設定</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 物流管理（可折疊） -->
+            <li class="nav-item nav-group" data-module="logistics" data-menu-key="logisticsManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#logisticsSubmenu" aria-expanded="false">
+                    <i class="bi bi-truck"></i> <span data-i18n="menu.logisticsManagement">物流管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="logisticsSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="shipping-methods">
+                            <a class="nav-link" href="/shipping-methods" id="nav-shipping-methods">
+                                <i class="bi bi-signpost-2"></i> <span data-i18n="menu.shippingMethods">運送方式</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="logistics-companies">
+                            <a class="nav-link" href="/logistics-companies" id="nav-logistics-companies">
+                                <i class="bi bi-building"></i> <span data-i18n="menu.logisticsCompanies">物流公司</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="shipments">
+                            <a class="nav-link" href="/shipments" id="nav-shipments">
+                                <i class="bi bi-box-seam"></i> <span data-i18n="menu.shipments">配送</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="shipping-integrations">
+                            <a class="nav-link" href="/shipping-integrations" id="nav-shipping-integrations">
+                                <i class="bi bi-plug"></i> <span data-i18n="menu.shippingIntegrations">配送連接</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 服務管理（可折疊） -->
+            <li class="nav-item nav-group" data-module="service" data-menu-key="serviceManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#serviceSubmenu" aria-expanded="false">
+                    <i class="bi bi-tools"></i> <span data-i18n="menu.serviceManagement">服務管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="serviceSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="service-orders">
+                            <a class="nav-link" href="/service-orders" id="nav-service-orders">
+                                <i class="bi bi-clipboard-check"></i> <span data-i18n="menu.serviceOrders">服務單</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="service-order-labels">
+                            <a class="nav-link" href="/service-order-labels" id="nav-service-order-labels">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.serviceOrderLabels">服務單標籤</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="services">
+                            <a class="nav-link" href="/services" id="nav-services">
+                                <i class="bi bi-tools"></i> <span data-i18n="menu.services">服務</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="service-taxes">
+                            <a class="nav-link" href="/service-taxes" id="nav-service-taxes">
+                                <i class="bi bi-percent"></i> <span data-i18n="menu.serviceTaxes">服務稅</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="service-staffs">
+                            <a class="nav-link" href="/service-staffs" id="nav-service-staffs">
+                                <i class="bi bi-person-badge"></i> <span data-i18n="menu.serviceStaffs">服務員</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="appointments">
+                            <a class="nav-link" href="/appointments" id="nav-appointments">
+                                <i class="bi bi-calendar-check"></i> <span data-i18n="menu.appointments">預約</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="appointments">
+                            <a class="nav-link" href="/appointment-calendar" id="nav-appointment-calendar">
+                                <i class="bi bi-calendar3"></i> <span data-i18n="menu.appointmentCalendar">預約日曆</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="service-types">
+                            <a class="nav-link" href="/service-types" id="nav-service-types">
+                                <i class="bi bi-list-ul"></i> <span data-i18n="menu.serviceTypes">服務種類</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="services">
+                            <a class="nav-link" href="/service-settings" id="nav-service-settings">
+                                <i class="bi bi-gear"></i> <span data-i18n="menu.serviceSettings">服務設定</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 課程管理（教育/教學模板） -->
+            <li class="nav-item nav-group" data-module="courses" data-menu-key="courseManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#coursesSubmenu" aria-expanded="false">
+                    <i class="bi bi-mortarboard"></i> <span data-i18n="menu.courseManagement">課程管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="coursesSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="service-orders">
+                            <a class="nav-link" href="/service-orders?service_type_code=course" id="nav-course-orders">
+                                <i class="bi bi-journal-bookmark"></i> <span data-i18n="menu.courseOrders">課程</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="service-staffs">
+                            <a class="nav-link" href="/service-staffs?service_type_code=course" id="nav-course-instructors">
+                                <i class="bi bi-person-video3"></i> <span data-i18n="menu.courseInstructors">導師</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="appointments">
+                            <a class="nav-link" href="/appointment-calendar?service_type_code=course" id="nav-course-calendar">
+                                <i class="bi bi-calendar3"></i> <span data-i18n="menu.courseCalendar">課程日曆</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="appointments">
+                            <a class="nav-link" href="/appointments?service_type_code=course" id="nav-course-appointments">
+                                <i class="bi bi-calendar-check"></i> <span data-i18n="menu.courseAppointments">課程預約</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 餐飲（可折疊） -->
+            <li class="nav-item nav-group" data-module="dining" data-menu-key="dining">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#diningSubmenu" aria-expanded="false">
+                    <i class="bi bi-cup-hot"></i> <span data-i18n="menu.dining">餐飲</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="diningSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-menu-subkey="guide-dining-flow">
+                            <a class="nav-link" href="/guide/dining-flow" id="nav-guide-dining-flow">
+                                <i class="bi bi-signpost-2"></i> <span data-i18n="menu.diningFlowGuide">流程指南</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="orders">
+                            <a class="nav-link" href="/orders?source_type=dining" id="nav-dining-orders">
+                                <i class="bi bi-receipt"></i> <span data-i18n="menu.diningOrders">餐飲訂單</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-tables">
+                            <a class="nav-link" href="/dining-tables" id="nav-dining-tables">
+                                <i class="bi bi-table"></i> <span data-i18n="menu.diningTables">餐桌列表</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-areas">
+                            <a class="nav-link" href="/dining-areas" id="nav-dining-areas">
+                                <i class="bi bi-grid-3x3-gap"></i> <span data-i18n="menu.diningAreas">餐桌區</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-tables">
+                            <a class="nav-link" href="/dining-tables/board" id="nav-dining-tables-board">
+                                <i class="bi bi-ui-checks-grid"></i> <span data-i18n="menu.diningTableBoard">餐桌管理</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-menu">
+                            <a class="nav-link" href="javascript:void(0)" id="nav-dining-menu" onclick="return window.openDiningMenuPreview ? window.openDiningMenuPreview(event) : false;">
+                                <i class="bi bi-journal-text"></i> <span data-i18n="menu.diningMenu">菜單</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-queues">
+                            <a class="nav-link" href="/dining-queues" id="nav-dining-queues">
+                                <i class="bi bi-people"></i> <span data-i18n="menu.diningQueues">候位排隊</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-queues">
+                            <a class="nav-link" href="javascript:void(0)" id="nav-dining-queue-board" onclick="return window.openDiningQueueBoardStoreSelector ? window.openDiningQueueBoardStoreSelector(event) : false;">
+                                <i class="bi bi-list-ul"></i> <span data-i18n="menu.diningQueueBoard">候位看板</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-settings">
+                            <a class="nav-link" href="/dining-settings" id="nav-dining-settings">
+                                <i class="bi bi-gear"></i> <span data-i18n="menu.diningSettings">餐飲設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-settings">
+                            <a class="nav-link" href="/dining-ticket-settings" id="nav-dining-ticket-settings">
+                                <i class="bi bi-printer"></i> <span data-i18n="menu.diningTicketSettings">候位票打印機</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="dining-settings">
+                            <a class="nav-link" href="/diningorder-ticket-settings" id="nav-diningorder-ticket-settings">
+                                <i class="bi bi-egg-fried"></i> <span data-i18n="menu.diningOrderTicketSettings">廚房點餐單打印機</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="delivery-integrations">
+                            <a class="nav-link" href="/delivery-integrations" id="nav-delivery-integrations">
+                                <i class="bi bi-scooter"></i> <span data-i18n="menu.deliveryIntegrations">外賣平台整合</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="delivery-orders">
+                            <a class="nav-link" href="/delivery-orders" id="nav-delivery-orders">
+                                <i class="bi bi-bag-check"></i> <span data-i18n="menu.deliveryOrders">外賣訂單</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 項目管理（可折疊） -->
+            <li class="nav-item nav-group" data-module="projects" data-menu-key="projectManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#projectSubmenu" aria-expanded="false">
+                    <i class="bi bi-kanban"></i> <span data-i18n="menu.projectManagement">項目管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="projectSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="projects">
+                            <a class="nav-link" href="/projects" id="nav-projects">
+                                <i class="bi bi-folder2-open"></i> <span data-i18n="menu.projects">項目</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="project_types">
+                            <a class="nav-link" href="/project-types" id="nav-project-types">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.projectTypes">項目類型</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="projects">
+                            <a class="nav-link" href="/project-analysis-report" id="nav-project-analysis-report">
+                                <i class="bi bi-bar-chart"></i> <span data-i18n="menu.projectAnalysisReport">項目分析報告</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 資源管理（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="resourceManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#resourceSubmenu" aria-expanded="false">
+                    <i class="bi bi-boxes"></i> <span data-i18n="menu.resourceManagement">資源管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="resourceSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="stores">
+                            <a class="nav-link" href="/stores" id="nav-stores">
+                                <i class="bi bi-shop"></i> <span data-i18n="menu.stores">店舖</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="rooms">
+                            <a class="nav-link" href="/rooms" id="nav-rooms">
+                                <i class="bi bi-door-open"></i> <span data-i18n="menu.rooms">房間</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="equipments">
+                            <a class="nav-link" href="/equipments" id="nav-equipments">
+                                <i class="bi bi-gear"></i> <span data-i18n="menu.equipments">設備</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="vehicles">
+                            <a class="nav-link" href="/vehicles" id="nav-vehicles">
+                                <i class="bi bi-car-front"></i> <span data-i18n="menu.vehicles">車輛</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="rooms">
+                            <a class="nav-link" href="/resource-usage-calendar" id="nav-resource-usage-calendar">
+                                <i class="bi bi-calendar3"></i> <span data-i18n="menu.resourceUsageCalendar">資源使用日曆</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="rental-orders">
+                            <a class="nav-link" href="/rental-orders" id="nav-rental-orders">
+                                <i class="bi bi-clipboard-check"></i> <span data-i18n="menu.rentalOrders">出租單</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="rental-order-labels">
+                            <a class="nav-link" href="/rental-order-labels" id="nav-rental-order-labels">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.rentalOrderLabels">出租單標籤</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 採購管理（可折疊） -->
+            <li class="nav-item nav-group" data-module="purchase" data-menu-key="procurementManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#procurementSubmenu" aria-expanded="false">
+                    <i class="bi bi-bag-check"></i> <span data-i18n="menu.procurementManagement">採購管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="procurementSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="purchase-orders" data-module="purchase">
+                            <a class="nav-link" href="/purchase-orders" id="nav-purchase-orders">
+                                <i class="bi bi-cart-plus"></i> <span data-i18n="menu.purchaseOrders">採購</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="purchase-order-labels" data-module="purchase">
+                            <a class="nav-link" href="/purchase-order-labels" id="nav-purchase-order-labels">
+                                <i class="bi bi-tags"></i> <span data-i18n="menu.purchaseOrderLabels">採購標籤</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="suppliers" data-module="suppliers">
+                            <a class="nav-link" href="/suppliers" id="nav-suppliers">
+                                <i class="bi bi-truck"></i> <span data-i18n="menu.suppliers">供應商</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 會計模組 -->
+            <li class="nav-item nav-group" data-module="accounting" data-menu-key="accounting">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#accountingSubmenu" aria-expanded="false">
+                    <i class="bi bi-calculator"></i> <span data-i18n="menu.accounting">會計</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="accountingSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="accounting" data-menu-subkey="accounting-overview">
+                            <a class="nav-link" href="/accounting" id="nav-accounting">
+                                <i class="bi bi-graph-up"></i> <span data-i18n="menu.accountingOverview">會計總覽</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="accounting" data-menu-subkey="accounting-reports">
+                            <a class="nav-link" href="/accounting/reports" id="nav-accounting-reports">
+                                <i class="bi bi-file-earmark-bar-graph"></i> <span>專業報表</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="accounting" data-menu-subkey="accounting-accounts">
+                            <a class="nav-link" href="/accounts" id="nav-accounts">
+                                <i class="bi bi-diagram-3"></i> <span>會計科目表</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="accounting" data-menu-subkey="accounting-journal-entries">
+                            <a class="nav-link" href="/journal-entries" id="nav-journal-entries">
+                                <i class="bi bi-journal-text"></i> <span>日記帳</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="accounting" data-menu-subkey="accounting-tax-configs">
+                            <a class="nav-link" href="/tax-configs" id="nav-tax-configs">
+                                <i class="bi bi-receipt-cutoff"></i> <span>稅務配置</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="accounting" data-menu-subkey="accounting-posting-rules">
+                            <a class="nav-link" href="/posting-rules" id="nav-posting-rules">
+                                <i class="bi bi-diagram-2"></i> <span>自動過帳規則</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="incomes">
+                            <a class="nav-link" href="/incomes" id="nav-incomes">
+                                <i class="bi bi-arrow-down-circle"></i> <span data-i18n="menu.incomes">收入</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="expenses">
+                            <a class="nav-link" href="/expenses" id="nav-expenses">
+                                <i class="bi bi-arrow-up-circle"></i> <span data-i18n="menu.expenses">支出</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="expense-requests">
+                            <a class="nav-link" href="/expense-requests" id="nav-expense-requests">
+                                <i class="bi bi-question-circle"></i> <span data-i18n="menu.expenseRequests">支出申請</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="bank-accounts">
+                            <a class="nav-link" href="/bank-accounts" id="nav-bank-accounts">
+                                <i class="bi bi-bank"></i> <span data-i18n="menu.bankAccounts">銀行賬戶</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- HR 模組（可折疊） -->
+            <li class="nav-item nav-group" data-module="hr" data-menu-key="hrManagement">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#hrSubmenu" aria-expanded="false">
+                    <i class="bi bi-person-badge"></i> <span data-i18n="menu.hrManagement">HR 管理</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="hrSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="attendance-clock">
+                            <a class="nav-link" href="/attendance/clock" id="nav-attendance-clock">
+                                <i class="bi bi-clock"></i> <span data-i18n="menu.clockIn">打卡</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="attendances">
+                            <a class="nav-link" href="/attendances" id="nav-attendances">
+                                <i class="bi bi-clock-history"></i> <span data-i18n="menu.attendanceRecords">打卡記錄</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="attendance-reports">
+                            <a class="nav-link" href="/attendance-reports" id="nav-attendance-reports">
+                                <i class="bi bi-file-earmark-text"></i> <span data-i18n="menu.attendanceReports">打卡報告</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="leave-requests">
+                            <a class="nav-link" href="/leave-requests" id="nav-leave-requests">
+                                <i class="bi bi-calendar-x"></i> <span data-i18n="menu.leaveRequests">請假申請</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="holidays">
+                            <a class="nav-link" href="/holidays" id="nav-holidays">
+                                <i class="bi bi-calendar-check"></i> <span data-i18n="menu.holidays">假期</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="shifts">
+                            <a class="nav-link" href="/shifts" id="nav-shifts">
+                                <i class="bi bi-clock"></i> <span data-i18n="menu.shifts">工作時段</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="payrolls">
+                            <a class="nav-link" href="/payrolls" id="nav-payrolls">
+                                <i class="bi bi-cash-stack"></i> <span data-i18n="menu.payrolls">薪資記錄</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="payroll_adjustment_presets">
+                            <a class="nav-link" href="/payroll-adjustment-presets" id="nav-payroll-adjustment-presets">
+                                <i class="bi bi-sliders"></i> <span data-i18n="menu.payrollAdjustmentPresets">薪資附加項目</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="job-vacancies">
+                            <a class="nav-link" href="/job-vacancies" id="nav-job-vacancies">
+                                <i class="bi bi-briefcase"></i> <span data-i18n="menu.jobVacancies">空缺</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="job-applicants">
+                            <a class="nav-link" href="/job-applicants" id="nav-job-applicants">
+                                <i class="bi bi-person-lines-fill"></i> <span data-i18n="menu.jobApplicants">求職者</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="job-hires">
+                            <a class="nav-link" href="/job-hires" id="nav-job-hires">
+                                <i class="bi bi-person-plus"></i> <span data-i18n="menu.jobHires">聘請</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 個人工具（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="personalTools">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#personalSubmenu" aria-expanded="false">
+                    <i class="bi bi-person"></i> <span data-i18n="menu.personalTools">個人工具</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="personalSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="reminders">
+                            <a class="nav-link" href="/reminders" id="nav-reminders">
+                                <i class="bi bi-bell"></i> <span data-i18n="menu.reminders">提醒</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="notifications">
+                            <a class="nav-link position-relative" href="/notifications" id="nav-notifications">
+                                <i class="bi bi-exclamation-square"></i> <span data-i18n="menu.notifications">提示資訊</span>
+                                <span class="badge bg-danger position-absolute top-0 start-100 translate-middle" id="sidemenuUnreadNotificationBadge" style="display: none; font-size: 0.6rem; padding: 0.15em 0.35em;">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="messages">
+                            <a class="nav-link" href="/messages" id="nav-messages">
+                                <i class="bi bi-envelope"></i> <span data-i18n="menu.messages">訊息</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="notes">
+                            <a class="nav-link" href="/notes" id="nav-notes">
+                                <i class="bi bi-sticky"></i> <span data-i18n="menu.notes">備忘</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="personal-data">
+                            <a class="nav-link" href="/personal-data" id="nav-personal-data">
+                                <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 宣傳（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="otherFeatures" style="">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#otherSubmenu" aria-expanded="false">
+                    <i class="bi bi-grid"></i> <span data-i18n="menu.otherFeatures">宣傳</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="otherSubmenu" style="">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="promotions">
+                            <a class="nav-link" href="/promotions" id="nav-promotions">
+                                <i class="bi bi-megaphone"></i> <span data-i18n="menu.promotions">推廣發送</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="customers">
+                            <a class="nav-link" href="/lead-finder" id="nav-lead-finder">
+                                <i class="bi bi-search-heart"></i> <span data-i18n="menu.leadFinder">搵客工具</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="customers">
+                            <a class="nav-link" href="/lead-finder/results" id="nav-lead-list">
+                                <i class="bi bi-person-lines-fill"></i> <span data-i18n="menu.leadList">Lead 列表</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="promotions">
+                            <a class="nav-link" href="/auto-outreach" id="nav-auto-outreach">
+                                <i class="bi bi-robot"></i> <span data-i18n="menu.autoOutreach">自動搵客</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="ad-positions">
+                            <a class="nav-link" href="/ad-positions" id="nav-ad-positions">
+                                <i class="bi bi-display"></i> <span data-i18n="menu.adPositions">廣告位置</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="google-ads">
+                            <a class="nav-link" href="/google-ads" id="nav-google-ads">
+                                <i class="bi bi-google"></i> <span data-i18n="menu.googleAds">Google 廣告</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+
+            <!-- 系統設定（可折疊） -->
+            <li class="nav-item nav-group" data-menu-key="systemSettings">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#settingsSubmenu" aria-expanded="false">
+                    <i class="bi bi-gear"></i> <span data-i18n="menu.systemSettings">系統設定</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="settingsSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="enterprises">
+                            <a class="nav-link" href="/enterprises" id="nav-enterprises">
+                                <i class="bi bi-building"></i> <span data-i18n="menu.enterprises">企業設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="document-settings">
+                            <a class="nav-link" href="/document-settings" id="nav-document-settings">
+                                <i class="bi bi-file-text"></i> <span data-i18n="menu.documentSettings">文件設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="document-auto-settings">
+                            <a class="nav-link" href="/document-auto-settings" id="nav-document-auto-settings">
+                                <i class="bi bi-sliders"></i> <span data-i18n="menu.documentAutoSettings">單據設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="pos-settings">
+                            <a class="nav-link" href="/pos-settings" id="nav-pos-settings">
+                                <i class="bi bi-gear"></i> <span data-i18n="menu.posSettings">POS 設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="notification-settings">
+                            <a class="nav-link" href="/notification-settings" id="nav-notification-settings">
+                                <i class="bi bi-bell"></i> <span data-i18n="menu.notificationSettings">系統提示設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="enterprises">
+                            <a class="nav-link" href="/vmarket-settings" id="nav-vmarket-settings">
+                                <i class="bi bi-shop"></i> <span data-i18n="menu.vmarketSettings">VMarket 設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/printer-settings" id="nav-printer-settings">
+                                <i class="bi bi-printer"></i> <span data-i18n="menu.printerSettings">打印機設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/pos-ticket-settings" id="nav-pos-ticket-settings">
+                                <i class="bi bi-receipt"></i> <span data-i18n="menu.posTicketSettings">POS 小票設定</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/card-terminal-settings" id="nav-card-terminal-settings">
+                                <i class="bi bi-credit-card"></i> <span data-i18n="menu.cardTerminalSettings">卡機設定</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav flex-column submenu">
+                        <!-- 企業管理/子域名功能暫時隱藏（保留後端與資料，僅隱藏入口） -->
+                        <li class="nav-item" data-permission="departments">
+                            <a class="nav-link" href="/departments" id="nav-departments">
+                                <i class="bi bi-diagram-3"></i> <span data-i18n="nav.departments">部門</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="roles">
+                            <a class="nav-link" href="/roles" id="nav-roles">
+                                <i class="bi bi-person-badge"></i> <span data-i18n="nav.roles">角色</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="currencies">
+                            <a class="nav-link" href="/currencies" id="nav-currencies">
+                                <i class="bi bi-currency-exchange"></i> <span data-i18n="menu.currencies">貨幣</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="users">
+                            <a class="nav-link" href="/users" id="nav-users">
+                                <i class="bi bi-people"></i> <span data-i18n="menu.employees">員工管理</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="activity-logs">
+                            <a class="nav-link" href="/activity-logs" id="nav-activity-logs">
+                                <i class="bi bi-clock-history"></i> <span data-i18n="menu.activityLogs">活動記錄</span>
+                            </a>
+                        </li>
+                        <!-- TODO: temporarily hidden, re-enable when API token feature is ready
+                        <li class="nav-item" data-permission="users">
+                            <a class="nav-link" href="/api-tokens" id="nav-api-tokens">
+                                <i class="bi bi-key"></i> <span data-i18n="menu.apiTokens">API Tokens</span>
+                            </a>
+                        </li>
+                        -->
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 訂閱 -->
+            <li class="nav-item nav-group" data-menu-key="billing">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#billingSubmenu" aria-expanded="false">
+                    <i class="bi bi-credit-card"></i> <span data-i18n="menu.billingCenter">費用中心</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="billingSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="billing">
+                            <a class="nav-link" href="/billing" id="nav-billing">
+                                <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="ai-coins">
+                            <a class="nav-link" href="/vcoins" id="nav-ai-coins">
+                                <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="currentColor"/></svg> <span data-i18n="nav.aiCoins">vCoin</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="hardware-purchase">
+                            <a class="nav-link" href="/hardware-purchase" id="nav-hardware-purchase">
+                                <i class="bi bi-bag-check"></i> <span data-i18n="menu.hardwarePurchase">硬件</span>
+                            </a>
+                        </li>
+                        <!-- 暫時隱藏 app-manager 選單項目
+                        <li class="nav-item" data-permission="app-manager">
+                            <a class="nav-link" href="/app-manager" id="nav-app-manager">
+                                <i class="bi bi-phone"></i> <span data-i18n="nav.appManager">手機 App</span>
+                            </a>
+                        </li>
+                        -->
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 返回首頁 -->
+            <li class="nav-item" data-menu-key="home">
+                <a class="nav-link" href="/" id="nav-home">
+                    <i class="bi bi-house-door"></i> <span data-i18n="menu.backToHome">返回首頁</span>
+                </a>
+            </li>
+            
+            <!-- Mobile only: support info, language, user dropdown -->
+            <li class="nav-item d-lg-none nav-group" data-menu-key="mobile-support" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vworkCmsMobileSupportSubmenu" aria-expanded="false">
+                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="vworkCmsMobileSupportSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/help/vwork" target="_blank">
+                                <i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact?product=vwork" target="_blank">
+                                <i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item d-lg-none nav-group" data-menu-key="mobile-language">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#mobileLanguageSubmenu" aria-expanded="false">
+                    <i class="bi bi-translate"></i> <span data-i18n="nav.language">語言</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="mobileLanguageSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lang="en">English</a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item d-lg-none nav-group" data-menu-key="mobile-user">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#mobileUserSubmenu" aria-expanded="false">
+                    <img id="sidemenuUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                    <i class="bi bi-person-circle" id="sidemenuUserIcon"></i> <span id="sidemenuUserName" data-i18n="nav.user">用戶</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="mobileUserSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/personal-data">
+                                <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/billing">
+                                <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="logoutBtnSidemenu">
+                                <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Sidebar Toggle Button (for mobile) - Hidden, using topnav mobileMenuToggle instead -->
+<button class="sidebar-toggle d-none" id="sidebarToggle" type="button" style="display: none !important;">
+    <i class="bi bi-list"></i>
+</button>
+<script>
+// Override "返回首頁" link for sales partner tenants
+(function() {
+    if (window.salesPartnerCode) {
+        var homeLink = document.getElementById('nav-home');
+        if (homeLink) {
+            homeLink.href = '/' + window.salesPartnerCode.toLowerCase();
+        }
+    }
+})();
+</script>
+{{end}}

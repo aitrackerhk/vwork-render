@@ -1,0 +1,483 @@
+{{define "pages/subscription_required"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂閱方案 - vWork</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <style>
+        .plan-cards,
+        #subscribeBtn,
+        #actionError {
+            display: none !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #F5F5F8;
+        }
+        
+        /* 簡化的背景 */
+        .subscription-background {
+            display: none;
+        }
+
+        .subscription-modal {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .subscription-content {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            max-width: 1100px;
+            width: 100%;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .subscription-logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .subscription-logo img {
+            height: 40px;
+            width: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .subscription-modal {
+                padding: 0;
+            }
+            
+            .subscription-content {
+                max-width: 100%;
+                border-radius: 0;
+                min-height: 100vh;
+                padding: 1rem;
+            }
+            
+            .subscription-logo img {
+                height: 24px;
+            }
+        }
+
+        .subscription-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+
+        .subscription-content h1 {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subscription-content .subtitle {
+            color: #64748b;
+            font-size: 0.9375rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .subscription-content .help-text {
+            color: #94a3b8;
+            font-size: 0.8125rem;
+            margin-top: 0.25rem;
+        }
+
+        .plan-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            margin: 2rem 0;
+            justify-content: center;
+        }
+
+        .plan-card {
+            flex: 1 1 280px;
+            min-width: 280px;
+            max-width: 100%;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .plan-cards {
+                flex-direction: column;
+            }
+            
+            .plan-card {
+                flex: 1 1 100%;
+                min-width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .plan-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        }
+
+        .plan-card.selected {
+            border-color: #0d6efd;
+            background: rgba(13, 110, 253, 0.05);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        }
+
+        .plan-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 24px;
+            height: 24px;
+            background: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+
+        .plan-card h3 {
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .plan-card .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0d6efd;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .plan-card .price .period {
+            font-size: 0.9375rem;
+            font-weight: 400;
+            color: #64748b;
+        }
+
+        .plan-card .features {
+            list-style: none;
+            padding: 0;
+            margin: 1.25rem 0;
+            text-align: left;
+        }
+
+        .plan-card .features li {
+            padding: 0.5rem 0;
+            color: #475569;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .plan-card .features li:before {
+            content: "✓";
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .btn-subscribe {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: #0d6efd;
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 1.5rem;
+        }
+
+        .btn-subscribe:hover:not(:disabled) {
+            background: #0b5ed7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .btn-subscribe:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #94a3b8;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="subscription-background"></div>
+    
+    <div class="subscription-modal">
+        <div class="subscription-content">
+            <div class="subscription-logo">
+                <img src="/static/logo3.png" alt="vWork Logo">
+            </div>
+            
+            <div class="subscription-header">
+                <h1>方案資訊暫時隱藏</h1>
+                <p class="subtitle">目前前端不顯示訂閱方案與價格。</p>
+                <p class="help-text">如需協助，請聯絡客服。</p>
+            </div>
+
+            <div class="alert alert-info text-center mb-0" id="planCards">
+                <i class="bi bi-info-circle me-2"></i>訂閱資訊暫時未開放顯示。
+            </div>
+            
+            <div class="text-center">
+                <a href="/" class="back-link">
+                    <i class="bi bi-arrow-left me-1"></i> 返回首頁
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedPlanId = 'vsuite_yearly'; // Default: vSuite yearly
+        let isYearly = true;
+
+        const plans = {
+            vsuite: {
+                name: 'vSuite',
+                monthlyPrice: '$380',
+                yearlyPrice: '$250',
+                period: '/月',
+                yearlyTotal: '年付 $3,000',
+                badge: '熱門',
+                badgeClass: 'bg-primary',
+                yearlySavings: '節省 $1,560/年',
+                features: ['所有功能', '無限記錄', '無廣告', '每月 500 vCoins', 'vOffice - AI 智慧辦公', '　文件、表格、簡報編輯', '　PDF 檢視、編輯與轉換', '　離線桌面版（Windows/macOS/Linux）', '　AI 撰寫、翻譯、摘要、分析', 'vMarket - 商品市集', '支援服務']
+            },
+            vsuite_pro: {
+                name: 'vSuite Pro',
+                monthlyPrice: '$880',
+                yearlyPrice: '$800',
+                period: '/月',
+                yearlyTotal: '年付 $9,600',
+                badge: '推薦',
+                badgeClass: 'bg-success',
+                yearlySavings: '節省 $960/年',
+                features: ['所有 vSuite 功能', '無廣告', '每月 1,000 vCoins', 'vAi 影片生成', 'vOffice - AI 智慧辦公', '　文件、表格、簡報編輯', '　PDF 檢視、編輯與轉換', '　離線桌面版（Windows/macOS/Linux）', '　AI 撰寫、翻譯、摘要、分析', 'vMarket - 商品市集', '企業支援服務', '資料遺失防護', '安全控管服務']
+            },
+            vsuite_pro_plus: {
+                name: 'vSuite Pro+',
+                monthlyPrice: '$2,500',
+                yearlyPrice: '$2,200',
+                period: '/月',
+                yearlyTotal: '年付 $26,400',
+                badge: '最強方案',
+                badgeClass: 'bg-warning text-dark',
+                yearlySavings: '節省 $3,600/年',
+                features: ['所有 vSuite Pro 功能', '每月 3,000 vCoins', 'vAi 影片生成', '自動搵客 Lead Finder', 'vOffice - AI 智慧辦公', '　文件、表格、簡報編輯', '　PDF 檢視、編輯與轉換', '　離線桌面版（Windows/macOS/Linux）', '　AI 撰寫、翻譯、摘要、分析', 'vMarket - 商品市集', '企業支援服務', '資料遺失防護', '安全控管服務']
+            }
+        };
+
+        function getPlanId(tier) {
+            return tier + (isYearly ? '_yearly' : '_monthly');
+        }
+
+        function renderPlans() {
+            const planCards = document.getElementById('planCards');
+
+            // Toggle
+            let html = '<div class="d-flex justify-content-center align-items-center gap-2 mb-3 w-100">';
+            html += '<span id="srToggleLabelM" class="fw-semibold" style="opacity:' + (isYearly ? '0.5' : '1') + '">月付</span>';
+            html += '<div class="form-check form-switch mb-0">';
+            html += '<input class="form-check-input" type="checkbox" role="switch" id="srBillingToggle"' + (isYearly ? ' checked' : '') + ' style="width:3rem;height:1.5rem;cursor:pointer;" onchange="toggleBilling(this.checked)">';
+            html += '</div>';
+            html += '<span id="srToggleLabelY" class="fw-semibold text-success" style="opacity:' + (isYearly ? '1' : '0.5') + '">年付</span>';
+            html += '</div>';
+
+            // Plan cards
+            Object.keys(plans).forEach(function(tier) {
+                var plan = plans[tier];
+                var planId = getPlanId(tier);
+                var price = isYearly ? plan.yearlyPrice : plan.monthlyPrice;
+                html += '<div class="plan-card ' + (selectedPlanId === planId ? 'selected' : '') + '" data-plan-id="' + planId + '" onclick="selectPlan(\'' + planId + '\')">';
+                html += '<div class="badge ' + plan.badgeClass + ' mb-2">' + plan.badge + '</div>';
+                html += '<h3>' + plan.name + '</h3>';
+                html += '<div class="price">' + price + '<span class="period">' + plan.period + '</span></div>';
+                if (isYearly && plan.yearlyTotal) {
+                    html += '<div class="text-muted small mb-2">' + plan.yearlyTotal + '</div>';
+                }
+                if (isYearly && plan.yearlySavings) {
+                    html += '<div class="alert alert-success py-2 px-3 mb-2" style="font-size: 0.875rem;"><strong>' + plan.yearlySavings + '</strong></div>';
+                }
+                html += '<ul class="features">';
+                plan.features.forEach(function(f) { html += '<li>' + f + '</li>'; });
+                html += '</ul></div>';
+            });
+
+            planCards.innerHTML = html;
+            updateSubscribeButton();
+        }
+
+        function toggleBilling(checked) {
+            isYearly = checked;
+            // Preserve tier selection but update billing cycle
+            var currentTier = selectedPlanId.replace('_monthly', '').replace('_yearly', '');
+            selectedPlanId = getPlanId(currentTier);
+            renderPlans();
+        }
+        
+        function updateSubscribeButton() {
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            if (selectedPlanId) {
+                var tier = selectedPlanId.replace('_monthly', '').replace('_yearly', '');
+                var planName = plans[tier] ? plans[tier].name : selectedPlanId;
+                subscribeBtn.disabled = false;
+                subscribeBtn.textContent = '立即訂閱 ' + planName;
+            } else {
+                subscribeBtn.disabled = true;
+                subscribeBtn.textContent = '選擇方案以繼續';
+            }
+        }
+
+        function selectPlan(planId) {
+            selectedPlanId = planId;
+            
+            document.querySelectorAll('.plan-card').forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            var selectedCard = document.querySelector('[data-plan-id="' + planId + '"]');
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+            
+            updateSubscribeButton();
+        }
+
+        document.getElementById('subscribeBtn').addEventListener('click', async function() {
+            if (!selectedPlanId) return;
+
+            const btn = this;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>正在前往付款...';
+
+            try {
+                const errBox = document.getElementById('actionError');
+                if (errBox) errBox.classList.add('d-none');
+
+                const token = localStorage.getItem('auth_token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token && token !== 'temp_token') {
+                    headers['Authorization'] = 'Bearer ' + token;
+                }
+
+                const resp = await fetch('/api/v1/billing/create-checkout-session', {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ plan: selectedPlanId })
+                });
+
+                const data = await resp.json().catch(function() { return {}; });
+                if (!resp.ok) {
+                    var msg = (data && (data.error || data.message)) ? (data.error || data.message) : '建立付款連結失敗（' + resp.status + '）';
+                    if (errBox) {
+                        errBox.textContent = msg;
+                        errBox.classList.remove('d-none');
+                    } else {
+                        window.alert(msg);
+                    }
+                    return;
+                }
+
+                if (data && data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                    return;
+                }
+
+                var msg2 = '未取得 Stripe 付款連結（checkout_url），請聯絡客服';
+                if (errBox) {
+                    errBox.textContent = msg2;
+                    errBox.classList.remove('d-none');
+                } else {
+                    window.alert(msg2);
+                }
+            } catch (e) {
+                var errBox2 = document.getElementById('actionError');
+                var msg3 = '網路錯誤，請稍後再試';
+                if (errBox2) {
+                    errBox2.textContent = msg3;
+                    errBox2.classList.remove('d-none');
+                } else {
+                    window.alert(msg3);
+                }
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                updateSubscribeButton();
+            }
+        });
+
+        // Init
+        // If partner mode is active, hide plan cards and show contact message
+        if (localStorage.getItem('partner')) {
+            var planCards = document.getElementById('planCards');
+            if (planCards) planCards.style.display = 'none';
+            var subscribeBtn = document.getElementById('subscribeBtn');
+            if (subscribeBtn) subscribeBtn.style.display = 'none';
+            var header = document.querySelector('.subscription-header');
+            if (header) {
+                var notice = document.createElement('div');
+                notice.className = 'alert alert-info mt-3';
+                notice.innerHTML = '<i class="bi bi-info-circle me-2"></i>請聯絡您的合作夥伴以了解訂閱方案。';
+                header.appendChild(notice);
+            }
+        } else {
+            renderPlans();
+        }
+
+        window.showSubscriptionPopup = function() {
+            if (window.location.pathname === '/subscription-required') {
+                window.location.reload();
+            } else {
+                if (typeof Router !== 'undefined' && Router.go) { Router.go('/subscription-required'); } else { window.location.href = '/subscription-required'; }
+            }
+        };
+    </script>
+</body>
+</html>
+{{end}}

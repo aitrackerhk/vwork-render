@@ -1,0 +1,525 @@
+/* ===== V-sys Login Page - Google-Style Centered Card ===== */
+* { box-sizing: border-box; }
+
+body.login-page {
+    margin: 0;
+    padding-top: 0 !important;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: #f0f4f9;
+    font-family: 'Google Sans', 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Page wrapper: vertical flex to push footer to bottom */
+/* Start hidden to prevent flash when JS redirects logged-in users */
+.vlogin-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.15s ease-in;
+}
+.vlogin-wrapper.vlogin-ready {
+    opacity: 1;
+}
+
+/* Main content area: centers the card */
+.vlogin-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+}
+
+/* The centered card */
+.vlogin-card {
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 28px;
+    width: 100%;
+    max-width: 1040px;
+    min-height: 480px;
+    display: flex;
+    overflow: visible;
+    padding: 48px 40px;
+    gap: 40px;
+}
+
+/* Card left side: logo + title + subtitle */
+.vlogin-card-left {
+    flex: 0 0 40%;
+    max-width: 40%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 8px;
+}
+
+.vlogin-logo {
+    height: 40px;
+    width: 40px;
+    display: block;
+    margin-bottom: 20px;
+    object-fit: contain;
+}
+
+.vlogin-title {
+    font-size: 36px;
+    font-weight: 400;
+    color: #202124;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+.vlogin-subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    color: #202124;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.vlogin-promo {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a73e8;
+    margin: 15px 0 0 0;
+    line-height: 1.4;
+}
+
+/* Product Selector - placed inside card-left */
+.vlogin-product-selector-wrap {
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+.vlogin-product-selector {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border: 1px solid #dadce0;
+    border-radius: 100px;
+    background: #fff;
+    font-size: 13px;
+    color: #3c4043;
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+.vlogin-product-selector:hover {
+    border-color: #b0b8c1;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.vlogin-product-selector .product-label {
+    color: #5f6368;
+    font-size: 13px;
+    white-space: nowrap;
+}
+.vlogin-product-selector .product-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+.vlogin-product-selector .product-icon[src*="vaiicon"] {
+    border: 1px solid #d1d5db;
+}
+.vlogin-product-selector .product-name {
+    font-weight: 600;
+    color: #202124;
+    font-size: 13px;
+}
+.vlogin-product-selector .product-chevron {
+    font-size: 10px;
+    color: #5f6368;
+    transition: transform 0.2s;
+}
+.vlogin-product-selector.open .product-chevron {
+    transform: rotate(180deg);
+}
+
+.vlogin-product-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    min-width: 200px;
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+}
+.vlogin-product-dropdown.show {
+    display: block;
+}
+.vlogin-product-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 13px;
+    color: #3c4043;
+}
+.vlogin-product-option:hover {
+    background: #f1f3f4;
+}
+.vlogin-product-option.active {
+    background: #e8f0fe;
+    font-weight: 600;
+    color: #1a73e8;
+}
+.vlogin-product-option img {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+}
+.vlogin-product-option img[src*="vaiicon"] {
+    border: 1px solid #d1d5db;
+}
+
+/* Card right side: form area */
+.vlogin-card-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Form Styles - Google Material style */
+.vlogin-form-group {
+    margin-bottom: 24px;
+}
+.vlogin-form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #5f6368;
+    margin-bottom: 8px;
+}
+.vlogin-form-group input,
+.vlogin-form-group select {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #202124;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+.vlogin-form-group input:focus,
+.vlogin-form-group select:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+}
+.vlogin-form-group .input-wrapper {
+    position: relative;
+}
+.vlogin-form-group .input-wrapper .toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #5f6368;
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* Links - Google blue */
+.vlogin-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a73e8;
+    text-decoration: none;
+    cursor: pointer;
+}
+.vlogin-link:hover {
+    color: #174ea6;
+    text-decoration: underline;
+}
+
+.vlogin-help-text {
+    font-size: 14px;
+    color: #5f6368;
+    line-height: 1.6;
+    margin: 16px 0 0 0;
+}
+.vlogin-help-text a {
+    color: #1a73e8;
+    font-weight: 500;
+    text-decoration: none;
+}
+.vlogin-help-text a:hover {
+    text-decoration: underline;
+}
+
+/* Switch link row */
+.vlogin-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+/* Submit button placed before divider */
+.vlogin-submit-btn {
+    width: 100%;
+    margin-top: 24px;
+}
+
+.vlogin-signup-link {
+    font-size: 14px;
+    color: #5f6368;
+    width: 100%;
+}
+.vlogin-signup-link a {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 500;
+}
+.vlogin-signup-link a:hover {
+    text-decoration: underline;
+}
+.vlogin-signup-link .vlogin-btn {
+    width: 100%;
+    text-decoration: none;
+}
+.vlogin-signup-link .vlogin-btn:hover {
+    text-decoration: none;
+}
+
+/* Login Button - dark pill */
+.vlogin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 100px;
+    background: #1e1e1e;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    letter-spacing: 0.25px;
+    min-height: 40px;
+}
+.vlogin-btn:hover {
+    background: #333;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.vlogin-btn .btn-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.vlogin-btn .btn-icon i {
+    font-size: 16px;
+}
+
+.vlogin-btn-primary {
+    background: #1e1e1e;
+    color: #fff;
+}
+.vlogin-btn-primary:hover {
+    background: #333;
+    color: #fff;
+}
+
+.vlogin-btn-outline {
+    background: #f5f5f5;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    font-weight: 500;
+}
+.vlogin-btn-outline:hover {
+    background: #e8e8e8;
+    border-color: #c6c6c6;
+}
+
+.vlogin-btn-success {
+    background: #1e8e3e;
+    color: #fff;
+}
+.vlogin-btn-success:hover {
+    background: #188038;
+    color: #fff;
+}
+
+/* Full-width button variant for Google/social logins */
+.vlogin-btn-social {
+    width: 100%;
+    background: #fff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+    border-radius: 100px;
+    padding: 10px 24px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.vlogin-btn-social:hover {
+    background: #f8f9fa;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.vlogin-btn-social + .vlogin-btn-social {
+    margin-top: 12px;
+}
+
+/* Divider */
+.vlogin-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    gap: 16px;
+}
+.vlogin-divider::before,
+.vlogin-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #dadce0;
+}
+.vlogin-divider span {
+    font-size: 13px;
+    color: #5f6368;
+    white-space: nowrap;
+}
+
+/* ===== Page Footer (outside card) ===== */
+.vlogin-page-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    font-size: 13px;
+    color: #5f6368;
+    flex-shrink: 0;
+}
+
+.vlogin-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vlogin-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.vlogin-footer-right a {
+    color: #5f6368;
+    text-decoration: none;
+    font-size: 13px;
+}
+.vlogin-footer-right a:hover {
+    color: #202124;
+}
+
+/* Language Switcher in footer */
+.vlogin-lang-switcher {
+    position: relative;
+}
+.vlogin-lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: #5f6368;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.vlogin-lang-btn:hover {
+    background: #e8eaed;
+}
+
+/* Hidden elements for auth.js compat */
+.vlogin-hidden { display: none !important; }
+
+/* Alert container override */
+#alertContainer {
+    z-index: 9999 !important;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    body.login-page {
+        background: #fff;
+    }
+    .vlogin-card {
+        flex-direction: column;
+        padding: 32px 24px;
+        gap: 24px;
+        border-radius: 0;
+        border: none;
+        max-width: 100%;
+        min-height: auto;
+        box-shadow: none;
+    }
+    .vlogin-card-left {
+        flex: none;
+        max-width: 100%;
+    }
+    .vlogin-card-right {
+        flex: none;
+    }
+    .vlogin-title {
+        font-size: 28px;
+    }
+    .vlogin-product-selector-wrap {
+        margin-top: 16px;
+        padding-top: 0;
+    }
+    .vlogin-main {
+        padding: 24px 0px;
+    }
+    .vlogin-page-footer {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        text-align: center;
+        padding: 16px;
+    }
+    .vlogin-footer-right {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .vlogin-card {
+        padding: 24px 20px;
+    }
+    .vlogin-title {
+        font-size: 24px;
+    }
+    .vlogin-signup-link {
+        text-align: center;
+    }
+    .vlogin-product-selector {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+}

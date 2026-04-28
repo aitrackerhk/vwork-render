@@ -1,0 +1,395 @@
+{{define "pages/profile_guide"}}
+<style>
+    /* 使用與登錄頁面相同的背景樣式 */
+    body.profile-guide-page {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #ffffff 40%,
+            #f8fafc 65%,
+            #eef2ff 82%,
+            #ffffff 100%
+        );
+        background-size: 400% 400%;
+        animation: loginGradientFlow 22s ease infinite;
+        overflow-x: hidden;
+    }
+    @keyframes loginGradientFlow {
+        0% { background-position: 0% 50%; }
+        25% { background-position: 100% 50%; }
+        50% { background-position: 100% 100%; }
+        75% { background-position: 0% 100%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    body.profile-guide-page::before,
+    body.profile-guide-page::after {
+        content: '';
+        position: fixed;
+        inset: -40%;
+        pointer-events: none;
+        z-index: 0;
+        background:
+            radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+        animation: loginGlowMove 30s linear infinite;
+        opacity: 1;
+    }
+    body.profile-guide-page::after {
+        animation-duration: 42s;
+        opacity: 0.7;
+        filter: blur(2px);
+    }
+    @keyframes loginGlowMove {
+        0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+        50% { transform: translate(80px, 60px) scale(1.08) rotate(180deg); }
+        100% { transform: translate(0, 0) scale(1) rotate(360deg); }
+    }
+    
+    body.profile-guide-page > * {
+        position: relative;
+        z-index: 1;
+    }
+    
+    body.profile-guide-page .card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 30px !important;
+    }
+</style>
+
+<div class="container">
+    <div class="row justify-content-center min-vh-100 align-items-center" style="padding: 80px 20px;">
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="text-center mb-4">
+                        <div class="d-flex align-items-end justify-content-center mb-3" style="gap: 8px;">
+                            <img src="/static/logo3.png" alt="vWork" style="height: auto; max-height: 32px; display: block;">
+                        </div>
+                        <h5 class="mb-2" data-i18n="pages.profileGuide.title">完善您的個人資料</h5>
+                        <p class="text-muted small mb-0" data-i18n="pages.profileGuide.subtitle">請填寫以下資料以完成設置（可選，可稍後填寫）</p>
+                    </div>
+                    
+                    <form id="profileGuideForm">
+                        <div class="mb-3">
+                            <label for="guideName" class="form-label" data-i18n="pages.profileGuide.name">姓名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="guideName" name="name" required maxlength="50">
+                            <small class="text-muted" data-i18n="pages.profileGuide.maxLength50">最多 50 個字符</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="guidePhoneCode" class="form-label" data-i18n="login.phoneCode">電話區號</label>
+                            <select class="form-select" id="guidePhoneCode" name="phone_country_code"></select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="guidePhone" class="form-label" data-i18n="login.phone">電話</label>
+                            <input type="text" class="form-control" id="guidePhone" name="phone" data-i18n-placeholder="login.phonePlaceholder" placeholder="請輸入電話號碼">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="guideBirthDate" class="form-label" data-i18n="fields.birthDate">出生日期</label>
+                            <input type="date" class="form-control" id="guideBirthDate" name="birth_date">
+                        </div>
+                        
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary" data-i18n="pages.profileGuide.submitButton" style="border-radius: 100px;">
+                                保存並繼續
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="btnSkip" data-i18n="pages.profileGuide.skipButton" style="border-radius: 100px;">
+                                稍後填寫
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div id="alertContainer" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const t = (key, fallback) => {
+        try {
+            if (typeof I18n === 'undefined' || !I18n.t) return (fallback ?? key);
+            const v = I18n.t(key);
+            if (!v || v === key) return (fallback ?? key);
+            return v;
+        } catch (_e) {
+            return (fallback ?? key);
+        }
+    };
+
+    // 檢查認證
+    if (!App || typeof App.checkAuth !== 'function' || !App.checkAuth()) {
+        window.location.href = '/login';
+        return;
+    }
+
+    // 加載用戶信息
+    let currentUser = null;
+    try {
+        currentUser = await App.apiRequest('/api/v1/user/me');
+        
+        // 預填充基本字段
+        if (currentUser && currentUser.name) {
+            document.getElementById('guideName').value = currentUser.name || '';
+        }
+        
+        if (currentUser && currentUser.birth_date) {
+            const birthDate = new Date(currentUser.birth_date);
+            const formattedDate = birthDate.toISOString().split('T')[0];
+            document.getElementById('guideBirthDate').value = formattedDate;
+        }
+        
+        // 電話號碼的處理會在 Select2 初始化后進行
+    } catch (error) {
+        console.error('載入用戶信息失敗:', error);
+    }
+
+    // 初始化電話區號 Select2
+    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+        const phoneCodeSelect = document.getElementById('guidePhoneCode');
+        if (phoneCodeSelect) {
+            // 動態加載 Select2 CSS 和 JS（如果尚未加載）
+            if (typeof $.fn.select2 === 'undefined') {
+                const select2CSS = document.createElement('link');
+                select2CSS.rel = 'stylesheet';
+                select2CSS.href = '/static/vendor/select2/select2.min.css';
+                document.head.appendChild(select2CSS);
+                
+                const select2BootstrapCSS = document.createElement('link');
+                select2BootstrapCSS.rel = 'stylesheet';
+                select2BootstrapCSS.href = '/static/vendor/select2-bootstrap5/select2-bootstrap-5-theme.min.css';
+                document.head.appendChild(select2BootstrapCSS);
+            }
+
+            // 使用與註冊頁面相同的電話區號列表
+            const COUNTRY_PHONE_CODES = {
+                '+1': 'United States / Canada',
+                '+7': 'Russia / Kazakhstan',
+                '+20': 'Egypt',
+                '+27': 'South Africa',
+                '+30': 'Greece',
+                '+31': 'Netherlands',
+                '+32': 'Belgium',
+                '+33': 'France',
+                '+34': 'Spain',
+                '+36': 'Hungary',
+                '+39': 'Italy',
+                '+40': 'Romania',
+                '+41': 'Switzerland',
+                '+43': 'Austria',
+                '+44': 'United Kingdom',
+                '+45': 'Denmark',
+                '+46': 'Sweden',
+                '+47': 'Norway',
+                '+48': 'Poland',
+                '+49': 'Germany',
+                '+51': 'Peru',
+                '+52': 'Mexico',
+                '+53': 'Cuba',
+                '+54': 'Argentina',
+                '+55': 'Brazil',
+                '+56': 'Chile',
+                '+57': 'Colombia',
+                '+58': 'Venezuela',
+                '+60': 'Malaysia',
+                '+61': 'Australia',
+                '+62': 'Indonesia',
+                '+63': 'Philippines',
+                '+64': 'New Zealand',
+                '+65': 'Singapore',
+                '+66': 'Thailand',
+                '+81': 'Japan',
+                '+82': 'South Korea',
+                '+84': 'Vietnam',
+                '+86': 'China',
+                '+90': 'Turkey',
+                '+91': 'India',
+                '+92': 'Pakistan',
+                '+93': 'Afghanistan',
+                '+94': 'Sri Lanka',
+                '+95': 'Myanmar',
+                '+98': 'Iran',
+                '+852': 'Hong Kong',
+                '+853': 'Macau',
+                '+886': 'Taiwan'
+            };
+
+            const localOptions = [];
+            Object.keys(COUNTRY_PHONE_CODES).forEach(code => {
+                localOptions.push({
+                    id: code,
+                    text: code,
+                    name: COUNTRY_PHONE_CODES[code] || ''
+                });
+            });
+
+            $(phoneCodeSelect).select2({
+                theme: 'bootstrap-5',
+                placeholder: t('login.searchPhoneCode', '搜尋電話區號...'),
+                allowClear: true,
+                width: '100%',
+                data: localOptions,
+                minimumInputLength: 0,
+            });
+
+            // 設置電話區號和電話號碼（在 Select2 初始化后）
+            $(phoneCodeSelect).on('select2:select', function() {
+                // Select2 初始化完成后的回调
+            });
+            
+            // 設置默認值和電話號碼
+            let phoneCodeValue = '+852'; // 默認值
+            let phoneNumber = '';
+            
+            if (currentUser) {
+                // 優先使用 phone_country_code
+                if (currentUser.phone_country_code) {
+                    phoneCodeValue = currentUser.phone_country_code;
+                }
+                
+                // 處理電話號碼
+                if (currentUser.phone) {
+                    const phone = currentUser.phone || '';
+                    const phoneParts = phone.split(' ');
+                    if (phoneParts.length > 1) {
+                        // 如果有區號，檢查第一部分是否是區號
+                        if (phoneParts[0].startsWith('+')) {
+                            phoneCodeValue = phoneParts[0];
+                            phoneNumber = phoneParts.slice(1).join(' ');
+                        } else {
+                            phoneNumber = phone;
+                        }
+                    } else {
+                        phoneNumber = phone;
+                    }
+                }
+            }
+            
+            // 設置電話區號 Select2 的值
+            $(phoneCodeSelect).val(phoneCodeValue).trigger('change');
+            
+            // 設置電話號碼輸入框的值
+            document.getElementById('guidePhone').value = phoneNumber;
+        }
+    }
+
+    // 提交表單
+    const form = document.getElementById('profileGuideForm');
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = t('pages.profileGuide.saving', '保存中...');
+
+        const phoneCodeSelect = document.getElementById('guidePhoneCode');
+        const phoneCode = (typeof $ !== 'undefined' && $(phoneCodeSelect).hasClass('select2-hidden-accessible')) 
+            ? $(phoneCodeSelect).val() 
+            : (phoneCodeSelect?.value || '');
+
+        const formData = {
+            name: document.getElementById('guideName').value.trim(),
+            phone: document.getElementById('guidePhone').value.trim() || null,
+            phone_country_code: phoneCode || null,
+            birth_date: document.getElementById('guideBirthDate').value || null,
+            skip: false
+        };
+
+        try {
+            const response = await App.apiRequest('/api/v1/user/profile/guide', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            App.showAlert(t('pages.profileGuide.saveSuccess', '資料已保存！正在跳轉...'), 'success');
+            
+            // 重新獲取用戶信息以檢查租戶狀態
+            setTimeout(async () => {
+                try {
+                    const updatedUser = await App.apiRequest('/api/v1/user/me');
+                    if (updatedUser && (!updatedUser.tenant_id || updatedUser.tenant_id === null)) {
+                        window.location.href = getSetupTenantUrl();
+                    } else {
+                        // Redirect to the product the user selected at login
+                        redirectToProductPage();
+                    }
+                } catch (error) {
+                    console.error('獲取用戶信息失敗:', error);
+                    // 如果獲取失敗，直接跳轉到設置租戶頁面
+                    window.location.href = getSetupTenantUrl();
+                }
+            }, 1000);
+        } catch (error) {
+            console.error('保存失敗:', error);
+            App.showAlert(error.message || t('pages.profileGuide.saveFailed', '保存失敗，請稍後再試'), 'danger');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    });
+
+    // 跳過按鈕
+    const skipBtn = document.getElementById('btnSkip');
+    skipBtn.addEventListener('click', async function() {
+        if (!confirm(t('pages.profileGuide.skipConfirm', '確定要跳過嗎？您可以稍後在帳戶設置中填寫這些資料。'))) {
+            return;
+        }
+
+        skipBtn.disabled = true;
+        skipBtn.textContent = t('pages.profileGuide.saving', '處理中...');
+
+        const formData = {
+            skip: true
+        };
+
+        try {
+            await App.apiRequest('/api/v1/user/profile/guide', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            App.showAlert(t('pages.profileGuide.skipSuccess', '已跳過，正在跳轉...'), 'success');
+            
+            // 重新獲取用戶信息以檢查租戶狀態
+            setTimeout(async () => {
+                try {
+                    const updatedUser = await App.apiRequest('/api/v1/user/me');
+                    if (updatedUser && (!updatedUser.tenant_id || updatedUser.tenant_id === null)) {
+                        window.location.href = getSetupTenantUrl();
+                    } else {
+                        // Redirect to the product the user selected at login
+                        redirectToProductPage();
+                    }
+                } catch (error) {
+                    console.error('獲取用戶信息失敗:', error);
+                    // 如果獲取失敗，直接跳轉到設置租戶頁面
+                    window.location.href = getSetupTenantUrl();
+                }
+            }, 1000);
+        } catch (error) {
+            console.error('跳過失敗:', error);
+            App.showAlert(error.message || t('pages.profileGuide.skipFailed', '處理失敗，請稍後再試'), 'danger');
+            skipBtn.disabled = false;
+            skipBtn.textContent = t('pages.profileGuide.skipButton', '稍後填寫');
+        }
+    });
+});
+</script>
+{{end}}
+

@@ -1,0 +1,17 @@
+{
+  "name": "crm_demo",
+  "title": "客戶管理與分析",
+  "version": 1,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/customers" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#dataTable tr:first-child .btn-outline-primary", "text": { "zh": "點擊查看客戶詳細資料與消費記錄", "zh-CN": "点击查看客户详细资料与消费记录", "en": "Open customer details and history" } },
+    { "action": "click", "selector": "#dataTable tr:first-child .btn-outline-primary" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": ".form-button-bar.show button[type=\"submit\"].btn.btn-primary", "text": { "zh": "點擊「保存」更新客戶資料", "zh-CN": "点击「保存」更新客户资料", "en": "Click Save to update customer" } },
+    { "action": "click", "selector": ".form-button-bar.show button[type=\"submit\"].btn.btn-primary" },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "done" }
+  ]
+}

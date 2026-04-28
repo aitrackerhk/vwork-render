@@ -1,0 +1,1210 @@
+{{ define "pages/shipping_integrations" }}
+<div class="container py-4">
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h4 class="mb-1"><i class="bi bi-truck me-2"></i><span data-i18n="shippingIntegrations.title">配送連接設定</span></h4>
+            <p class="text-muted small mb-0" data-i18n="shippingIntegrations.subtitle">設定物流商 API 連接，自動獲取運單號、運費報價和追蹤狀態。</p>
+        </div>
+        <button class="btn btn-primary" id="shippingSaveBtn" onclick="saveShippingIntegrations()">
+            <i class="bi bi-save me-1"></i><span data-i18n="shippingIntegrations.saveSettings">保存設定</span>
+        </button>
+    </div>
+
+    <!-- 選擇物流商 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="bi bi-plus-circle me-2"></i><span data-i18n="shippingIntegrations.addTitle">添加物流商連接</span></h5>
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="addShippingSelect" data-i18n="shippingIntegrations.selectLabel">選擇要連接的物流商</label>
+                    <select class="form-select" id="addShippingSelect">
+                        <option value="" data-i18n="shippingIntegrations.selectPlaceholder">請選擇物流商...</option>
+                        <option value="sfexpress">🚚 SF Express 順豐速遞</option>
+                        <option value="lalamove">🛵 Lalamove 啦啦快送</option>
+                        <option value="dhl">📦 DHL Express</option>
+                        <option value="ups">📦 UPS</option>
+                        <option value="fedex">📦 FedEx</option>
+                        <option value="amazon">📦 Amazon Shipping</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <button class="btn btn-outline-primary" id="addShippingBtn" onclick="addShippingProvider()">
+                        <i class="bi bi-plus-lg me-1"></i><span data-i18n="shippingIntegrations.add">添加</span>
+                    </button>
+                </div>
+            </div>
+            <p class="text-muted small mt-2 mb-0" data-i18n="shippingIntegrations.supportedHint">只顯示已支援 API 連接的物流商。</p>
+        </div>
+    </div>
+
+    <!-- SF Express 順豐速遞 -->
+    <div class="card mb-4 sp-card" id="sfexpressCard" data-sp="sfexpress" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <img src="/static/images/integrations/sf-express.png" alt="SF Express" 
+                         class="me-2" style="height: 24px; width: auto;" 
+                         onerror="this.style.display='none'">
+                    <h5 class="mb-0">SF Express 順豐速遞</h5>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeShippingProvider('sfexpress')" data-i18n-title="shippingIntegrations.remove" title="移除"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="shippingIntegrations.sfexpress.subtitle">連接順豐速遞 API，自動獲取運單號、運費報價和追蹤狀態。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.environment">環境</label>
+                <select class="form-select" id="sfexpressEnvironment">
+                    <option value="sandbox" data-i18n="shippingIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="shippingIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="shippingIntegrations.sandboxHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.sfexpress.partnerId">客戶編碼 (Partner ID)</label>
+                <input type="text" class="form-control" id="sfexpressPartnerId" 
+                       placeholder="順豐提供的客戶編碼">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.sfexpress.checkword">校驗碼 (Checkword)</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="sfexpressCheckword" 
+                           placeholder="順豐提供的校驗碼">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('sfexpressCheckword')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="shippingIntegrations.featuresTitle">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="sfexpressAutoCreateOrder" checked>
+                <label class="form-check-label" for="sfexpressAutoCreateOrder" data-i18n="shippingIntegrations.autoCreateOrder">
+                    自動創建運單
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.sfexpress.autoCreateOrderHint">發貨時自動向順豐創建運單。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="sfexpressAutoTrack" checked>
+                <label class="form-check-label" for="sfexpressAutoTrack" data-i18n="shippingIntegrations.autoTrack">
+                    自動追蹤狀態
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.autoTrackHint">定時查詢運單狀態並更新。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="sfexpressQueryPrice">
+                <label class="form-check-label" for="sfexpressQueryPrice" data-i18n="shippingIntegrations.queryPrice">
+                    查詢運費報價
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.queryPriceHint">發貨前自動查詢運費報價。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-box me-1"></i><span data-i18n="shippingIntegrations.defaultSettingsTitle">預設發件設定</span></h6>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.sfexpress.expressType">預設快件產品</label>
+                <select class="form-select" id="sfexpressExpressType">
+                    <option value="1" data-i18n="shippingIntegrations.sfexpress.express1">順豐標快</option>
+                    <option value="2" data-i18n="shippingIntegrations.sfexpress.express2">順豐特惠</option>
+                    <option value="5" data-i18n="shippingIntegrations.sfexpress.express5">順豐次晨</option>
+                    <option value="6" data-i18n="shippingIntegrations.sfexpress.express6">順豐即日</option>
+                    <option value="12" data-i18n="shippingIntegrations.sfexpress.express12">順豐標快（國際）</option>
+                    <option value="231" data-i18n="shippingIntegrations.sfexpress.express231">陸運包裹</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.sfexpress.payMethod">付款方式</label>
+                <select class="form-select" id="sfexpressPayMethod">
+                    <option value="1" data-i18n="shippingIntegrations.sfexpress.payMethodSender">寄方付</option>
+                    <option value="2" data-i18n="shippingIntegrations.sfexpress.payMethodReceiver">收方付</option>
+                    <option value="3" data-i18n="shippingIntegrations.sfexpress.payMethodThirdParty">第三方付</option>
+                </select>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testSFExpressConnection()">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="shippingIntegrations.testConnection">測試連接</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lalamove 啦啦快送 -->
+    <div class="card mb-4 sp-card" id="lalamoveCard" data-sp="lalamove" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <img src="/static/images/integrations/lalamove.png" alt="Lalamove" 
+                         class="me-2" style="height: 24px; width: auto;" 
+                         onerror="this.style.display='none'">
+                    <h5 class="mb-0">Lalamove 啦啦快送</h5>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeShippingProvider('lalamove')" data-i18n-title="shippingIntegrations.remove" title="移除"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="shippingIntegrations.lalamove.subtitle">連接 Lalamove API，實現同城即時配送、即時報價和訂單追蹤。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.environment">環境</label>
+                <select class="form-select" id="lalamoveEnvironment">
+                    <option value="sandbox" data-i18n="shippingIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="shippingIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="shippingIntegrations.sandboxHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.lalamove.market">服務區域</label>
+                <select class="form-select" id="lalamoveMarket">
+                    <option value="HK">香港 Hong Kong</option>
+                    <option value="SG">新加坡 Singapore</option>
+                    <option value="TW">台灣 Taiwan</option>
+                    <option value="TH">泰國 Thailand</option>
+                    <option value="VN">越南 Vietnam</option>
+                    <option value="PH">菲律賓 Philippines</option>
+                    <option value="MY">馬來西亞 Malaysia</option>
+                    <option value="ID">印尼 Indonesia</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">API Key</label>
+                <input type="text" class="form-control" id="lalamoveApiKey" 
+                       placeholder="Lalamove 開發者後台獲取">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">API Secret</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="lalamoveApiSecret" 
+                           placeholder="Lalamove 開發者後台獲取">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('lalamoveApiSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="shippingIntegrations.featuresTitle">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="lalamoveAutoQuote" checked>
+                <label class="form-check-label" for="lalamoveAutoQuote" data-i18n="shippingIntegrations.lalamove.autoQuote">
+                    自動報價
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.lalamove.autoQuoteHint">建立訂單時自動獲取即時運費報價。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="lalamoveAutoTrack" checked>
+                <label class="form-check-label" for="lalamoveAutoTrack" data-i18n="shippingIntegrations.autoTrack">
+                    自動追蹤狀態
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.lalamove.autoTrackHint">使用 Webhook 即時更新配送狀態。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-truck me-1"></i><span data-i18n="shippingIntegrations.defaultDeliveryTitle">預設配送設定</span></h6>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.lalamove.serviceType">預設車型</label>
+                <select class="form-select" id="lalamoveServiceType">
+                    <option value="MOTORCYCLE" data-i18n="shippingIntegrations.lalamove.motorcycle">電單車 Motorcycle</option>
+                    <option value="CAR" data-i18n="shippingIntegrations.lalamove.car">私家車 Car</option>
+                    <option value="VAN" data-i18n="shippingIntegrations.lalamove.van">客貨車 Van</option>
+                    <option value="TRUCK330" data-i18n="shippingIntegrations.lalamove.truck330">3.3噸貨車 Truck 330</option>
+                    <option value="TRUCK550" data-i18n="shippingIntegrations.lalamove.truck550">5.5噸貨車 Truck 550</option>
+                </select>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="lalamoveRequireSignature">
+                <label class="form-check-label" for="lalamoveRequireSignature" data-i18n="shippingIntegrations.lalamove.requireSignature">
+                    需要簽收
+                </label>
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="lalamovePurchaseService">
+                <label class="form-check-label" for="lalamovePurchaseService" data-i18n="shippingIntegrations.lalamove.purchaseService">
+                    代購服務
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.lalamove.purchaseServiceHint">司機可代為購買物品。</small>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testLalamoveConnection()">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="shippingIntegrations.testConnection">測試連接</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DHL Express -->
+    <div class="card mb-4 sp-card" id="dhlCard" data-sp="dhl" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <img src="/static/images/integrations/dhl.png" alt="DHL Express" 
+                         class="me-2" style="height: 24px; width: auto;" 
+                         onerror="this.style.display='none'">
+                    <h5 class="mb-0">DHL Express</h5>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeShippingProvider('dhl')" data-i18n-title="shippingIntegrations.remove" title="移除"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="shippingIntegrations.dhl.subtitle">連接 DHL Express MyDHL API，支援國際快遞、運費查詢和物流追蹤。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.environment">環境</label>
+                <select class="form-select" id="dhlEnvironment">
+                    <option value="sandbox" data-i18n="shippingIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="shippingIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="shippingIntegrations.sandboxHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">API Key</label>
+                <input type="text" class="form-control" id="dhlApiKey" 
+                       placeholder="DHL Developer Portal 獲取">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">API Secret</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="dhlApiSecret" 
+                           placeholder="DHL Developer Portal 獲取">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('dhlApiSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.dhl.accountNo">DHL 帳號 (Account Number)</label>
+                <input type="text" class="form-control" id="dhlAccountNo" 
+                       placeholder="DHL Express 帳號號碼">
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="shippingIntegrations.featuresTitle">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="dhlAutoCreateOrder" checked>
+                <label class="form-check-label" for="dhlAutoCreateOrder" data-i18n="shippingIntegrations.autoCreateOrder">
+                    自動創建運單
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.dhl.autoCreateOrderHint">發貨時自動向 DHL 創建運單。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="dhlAutoTrack" checked>
+                <label class="form-check-label" for="dhlAutoTrack" data-i18n="shippingIntegrations.autoTrack">
+                    自動追蹤狀態
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.autoTrackHint">定時查詢運單狀態並更新。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="dhlQueryPrice">
+                <label class="form-check-label" for="dhlQueryPrice" data-i18n="shippingIntegrations.queryPrice">
+                    查詢運費報價
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.queryPriceHint">發貨前自動查詢運費報價。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-box me-1"></i><span data-i18n="shippingIntegrations.defaultSettingsTitle">預設發件設定</span></h6>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.dhl.productCode">預設產品代碼</label>
+                <select class="form-select" id="dhlProductCode">
+                    <option value="P">Express Worldwide (P)</option>
+                    <option value="D">Express Worldwide Doc (D)</option>
+                    <option value="U">Express Worldwide (EU) (U)</option>
+                    <option value="K">Express 9:00 (K)</option>
+                    <option value="E">Express 9:00 Doc (E)</option>
+                    <option value="T">Express 12:00 (T)</option>
+                    <option value="Y">Express 12:00 Doc (Y)</option>
+                    <option value="N">Domestic Express (N)</option>
+                </select>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testDHLConnection()">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="shippingIntegrations.testConnection">測試連接</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UPS -->
+    <div class="card mb-4 sp-card" id="upsCard" data-sp="ups" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <img src="/static/images/integrations/ups.png" alt="UPS" 
+                         class="me-2" style="height: 24px; width: auto;" 
+                         onerror="this.style.display='none'">
+                    <h5 class="mb-0">UPS</h5>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeShippingProvider('ups')" data-i18n-title="shippingIntegrations.remove" title="移除"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="shippingIntegrations.ups.subtitle">連接 UPS API，支援國際及國內快遞、運費查詢和物流追蹤。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.environment">環境</label>
+                <select class="form-select" id="upsEnvironment">
+                    <option value="sandbox" data-i18n="shippingIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="shippingIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="shippingIntegrations.sandboxHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client ID</label>
+                <input type="text" class="form-control" id="upsClientId" 
+                       placeholder="UPS Developer Portal 獲取">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client Secret</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="upsClientSecret" 
+                           placeholder="UPS Developer Portal 獲取">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('upsClientSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.ups.accountNo">UPS 帳號 (Account Number)</label>
+                <input type="text" class="form-control" id="upsAccountNo" 
+                       placeholder="UPS 帳號號碼">
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="shippingIntegrations.featuresTitle">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="upsAutoCreateOrder" checked>
+                <label class="form-check-label" for="upsAutoCreateOrder" data-i18n="shippingIntegrations.autoCreateOrder">
+                    自動創建運單
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.ups.autoCreateOrderHint">發貨時自動向 UPS 創建運單。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="upsAutoTrack" checked>
+                <label class="form-check-label" for="upsAutoTrack" data-i18n="shippingIntegrations.autoTrack">
+                    自動追蹤狀態
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.autoTrackHint">定時查詢運單狀態並更新。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="upsQueryPrice">
+                <label class="form-check-label" for="upsQueryPrice" data-i18n="shippingIntegrations.queryPrice">
+                    查詢運費報價
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.queryPriceHint">發貨前自動查詢運費報價。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-box me-1"></i><span data-i18n="shippingIntegrations.defaultSettingsTitle">預設發件設定</span></h6>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.ups.serviceCode">預設服務類型</label>
+                <select class="form-select" id="upsServiceCode">
+                    <option value="03">UPS Ground (03)</option>
+                    <option value="01">UPS Next Day Air (01)</option>
+                    <option value="02">UPS 2nd Day Air (02)</option>
+                    <option value="07">UPS Worldwide Express (07)</option>
+                    <option value="08">UPS Worldwide Expedited (08)</option>
+                    <option value="11">UPS Standard (11)</option>
+                    <option value="65">UPS Saver (65)</option>
+                </select>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testUPSConnection()">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="shippingIntegrations.testConnection">測試連接</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FedEx -->
+    <div class="card mb-4 sp-card" id="fedexCard" data-sp="fedex" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <img src="/static/images/integrations/fedex.png" alt="FedEx" 
+                         class="me-2" style="height: 24px; width: auto;" 
+                         onerror="this.style.display='none'">
+                    <h5 class="mb-0">FedEx</h5>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeShippingProvider('fedex')" data-i18n-title="shippingIntegrations.remove" title="移除"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="shippingIntegrations.fedex.subtitle">連接 FedEx API，支援國際及國內快遞、運費查詢和物流追蹤。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.environment">環境</label>
+                <select class="form-select" id="fedexEnvironment">
+                    <option value="sandbox" data-i18n="shippingIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="shippingIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="shippingIntegrations.sandboxHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client ID (API Key)</label>
+                <input type="text" class="form-control" id="fedexClientId" 
+                       placeholder="FedEx Developer Portal 獲取">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client Secret (Secret Key)</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="fedexClientSecret" 
+                           placeholder="FedEx Developer Portal 獲取">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('fedexClientSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.fedex.accountNo">FedEx 帳號 (Account Number)</label>
+                <input type="text" class="form-control" id="fedexAccountNo" 
+                       placeholder="FedEx 帳號號碼">
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="shippingIntegrations.featuresTitle">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="fedexAutoCreateOrder" checked>
+                <label class="form-check-label" for="fedexAutoCreateOrder" data-i18n="shippingIntegrations.autoCreateOrder">
+                    自動創建運單
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.fedex.autoCreateOrderHint">發貨時自動向 FedEx 創建運單。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="fedexAutoTrack" checked>
+                <label class="form-check-label" for="fedexAutoTrack" data-i18n="shippingIntegrations.autoTrack">
+                    自動追蹤狀態
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.autoTrackHint">定時查詢運單狀態並更新。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="fedexQueryPrice">
+                <label class="form-check-label" for="fedexQueryPrice" data-i18n="shippingIntegrations.queryPrice">
+                    查詢運費報價
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.queryPriceHint">發貨前自動查詢運費報價。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-box me-1"></i><span data-i18n="shippingIntegrations.defaultSettingsTitle">預設發件設定</span></h6>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.fedex.serviceType">預設服務類型</label>
+                <select class="form-select" id="fedexServiceType">
+                    <option value="FEDEX_INTERNATIONAL_PRIORITY">FedEx International Priority</option>
+                    <option value="FEDEX_INTERNATIONAL_ECONOMY">FedEx International Economy</option>
+                    <option value="FEDEX_GROUND">FedEx Ground</option>
+                    <option value="FEDEX_EXPRESS_SAVER">FedEx Express Saver</option>
+                    <option value="FEDEX_2_DAY">FedEx 2Day</option>
+                    <option value="FEDEX_OVERNIGHT">FedEx Overnight</option>
+                    <option value="STANDARD_OVERNIGHT">Standard Overnight</option>
+                    <option value="PRIORITY_OVERNIGHT">Priority Overnight</option>
+                </select>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testFedExConnection()">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="shippingIntegrations.testConnection">測試連接</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Amazon Shipping -->
+    <div class="card mb-4 sp-card" id="amazonCard" data-sp="amazon" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <img src="/static/images/integrations/amazon.png" alt="Amazon Shipping" 
+                         class="me-2" style="height: 24px; width: auto;" 
+                         onerror="this.style.display='none'">
+                    <h5 class="mb-0">Amazon Shipping</h5>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeShippingProvider('amazon')" data-i18n-title="shippingIntegrations.remove" title="移除"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="shippingIntegrations.amazon.subtitle">連接 Amazon SP-API Shipping V2，支援 Amazon 物流配送和追蹤。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.environment">環境</label>
+                <select class="form-select" id="amazonEnvironment">
+                    <option value="sandbox" data-i18n="shippingIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="shippingIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="shippingIntegrations.sandboxHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.amazon.region">區域 (Region)</label>
+                <select class="form-select" id="amazonRegion">
+                    <option value="NA" data-i18n="shippingIntegrations.amazon.regionNA">北美 North America (NA)</option>
+                    <option value="EU" data-i18n="shippingIntegrations.amazon.regionEU">歐洲 Europe (EU)</option>
+                    <option value="FE" data-i18n="shippingIntegrations.amazon.regionFE">遠東 Far East (FE)</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client ID (LWA App ID)</label>
+                <input type="text" class="form-control" id="amazonClientId" 
+                       placeholder="Amazon Developer Console 獲取">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client Secret (LWA App Secret)</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="amazonClientSecret" 
+                           placeholder="Amazon Developer Console 獲取">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('amazonClientSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.amazon.refreshToken">Refresh Token</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="amazonRefreshToken" 
+                           placeholder="SP-API 授權後獲取的 Refresh Token">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('amazonRefreshToken')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+                <small class="text-muted" data-i18n="shippingIntegrations.amazon.refreshTokenHint">透過 Amazon Seller Central 授權 SP-API 應用後獲取。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="shippingIntegrations.featuresTitle">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="amazonAutoCreateOrder" checked>
+                <label class="form-check-label" for="amazonAutoCreateOrder" data-i18n="shippingIntegrations.autoCreateOrder">
+                    自動創建運單
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.amazon.autoCreateOrderHint">發貨時自動向 Amazon Shipping 創建運單。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="amazonAutoTrack" checked>
+                <label class="form-check-label" for="amazonAutoTrack" data-i18n="shippingIntegrations.autoTrack">
+                    自動追蹤狀態
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.autoTrackHint">定時查詢運單狀態並更新。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="amazonQueryPrice">
+                <label class="form-check-label" for="amazonQueryPrice" data-i18n="shippingIntegrations.queryPrice">
+                    查詢運費報價
+                </label>
+                <small class="text-muted d-block" data-i18n="shippingIntegrations.queryPriceHint">發貨前自動查詢運費報價。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-box me-1"></i><span data-i18n="shippingIntegrations.defaultSettingsTitle">預設發件設定</span></h6>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="shippingIntegrations.amazon.serviceType">預設服務類型</label>
+                <select class="form-select" id="amazonServiceType">
+                    <option value="AMAZON_SHIPPING_STANDARD">Amazon Shipping Standard</option>
+                    <option value="AMAZON_SHIPPING_PREMIUM">Amazon Shipping Premium</option>
+                    <option value="AMAZON_SHIPPING_ONE_DAY">Amazon Shipping One Day</option>
+                    <option value="AMAZON_SHIPPING_TWO_DAY">Amazon Shipping Two Day</option>
+                </select>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testAmazonConnection()">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="shippingIntegrations.testConnection">測試連接</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const SHIPPING_PROVIDERS = ['sfexpress', 'lalamove', 'dhl', 'ups', 'fedex', 'amazon'];
+    let visibleProviders = [];
+
+    let originalConfig = {};
+
+    function wdT(key, fallback) {
+        return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback;
+    }
+
+    // ============ Provider visibility management ============
+
+    function getVisibleProvidersKey() {
+        return 'vwork_visible_shipping_providers';
+    }
+
+    function loadVisibleProviders() {
+        try {
+            const saved = localStorage.getItem(getVisibleProvidersKey());
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveVisibleProviders() {
+        try {
+            localStorage.setItem(getVisibleProvidersKey(), JSON.stringify(visibleProviders));
+        } catch (e) {
+            console.warn('Cannot save to localStorage');
+        }
+    }
+
+    function updateProviderVisibility() {
+        SHIPPING_PROVIDERS.forEach(sp => {
+            const card = document.getElementById(sp + 'Card');
+            if (card) {
+                card.style.display = visibleProviders.includes(sp) ? 'block' : 'none';
+            }
+        });
+        updateAddShippingSelect();
+    }
+
+    function updateAddShippingSelect() {
+        const select = document.getElementById('addShippingSelect');
+        if (!select) return;
+        Array.from(select.options).forEach(opt => {
+            if (opt.value && SHIPPING_PROVIDERS.includes(opt.value)) {
+                opt.style.display = visibleProviders.includes(opt.value) ? 'none' : '';
+            }
+        });
+        select.value = '';
+    }
+
+    function addShippingProvider() {
+        const select = document.getElementById('addShippingSelect');
+        const sp = select?.value;
+        if (!sp || !SHIPPING_PROVIDERS.includes(sp)) {
+            App.showAlert(wdT('shippingIntegrations.pleaseSelect', '請選擇一個物流商'), 'warning');
+            return;
+        }
+        if (!visibleProviders.includes(sp)) {
+            visibleProviders.push(sp);
+            saveVisibleProviders();
+            updateProviderVisibility();
+            const card = document.getElementById(sp + 'Card');
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }
+
+    function removeShippingProvider(sp) {
+        if (!confirm(wdT('shippingIntegrations.removeConfirm', '確定要移除此物流商連接嗎？設定將被保留。'))) return;
+        visibleProviders = visibleProviders.filter(p => p !== sp);
+        saveVisibleProviders();
+        updateProviderVisibility();
+    }
+
+    // ============ Load / Save ============
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+        await loadShippingIntegrations();
+    });
+
+    async function loadShippingIntegrations() {
+        try {
+            const response = await App.apiRequest('/api/v1/shipping-integrations');
+            const config = response.data || {};
+            originalConfig = JSON.parse(JSON.stringify(config));
+
+            visibleProviders = loadVisibleProviders();
+
+            // SF Express
+            const sfexpress = config.sfexpress || {};
+            document.getElementById('sfexpressEnvironment').value = sfexpress.environment || 'sandbox';
+            document.getElementById('sfexpressPartnerId').value = sfexpress.partner_id || '';
+            document.getElementById('sfexpressCheckword').value = sfexpress.checkword || '';
+            document.getElementById('sfexpressAutoCreateOrder').checked = sfexpress.auto_create_order !== false;
+            document.getElementById('sfexpressAutoTrack').checked = sfexpress.auto_track !== false;
+            document.getElementById('sfexpressQueryPrice').checked = sfexpress.query_price === true;
+            document.getElementById('sfexpressExpressType').value = sfexpress.express_type || '1';
+            document.getElementById('sfexpressPayMethod').value = sfexpress.pay_method || '1';
+
+            if (sfexpress.enabled || sfexpress.partner_id) {
+                if (!visibleProviders.includes('sfexpress')) {
+                    visibleProviders.push('sfexpress');
+                }
+            }
+
+            // Lalamove
+            const lalamove = config.lalamove || {};
+            document.getElementById('lalamoveEnvironment').value = lalamove.environment || 'sandbox';
+            document.getElementById('lalamoveMarket').value = lalamove.market || 'HK';
+            document.getElementById('lalamoveApiKey').value = lalamove.api_key || '';
+            document.getElementById('lalamoveApiSecret').value = lalamove.api_secret || '';
+            document.getElementById('lalamoveAutoQuote').checked = lalamove.auto_quote !== false;
+            document.getElementById('lalamoveAutoTrack').checked = lalamove.auto_track !== false;
+            document.getElementById('lalamoveServiceType').value = lalamove.service_type || 'MOTORCYCLE';
+            document.getElementById('lalamoveRequireSignature').checked = lalamove.require_signature === true;
+            document.getElementById('lalamovePurchaseService').checked = lalamove.purchase_service === true;
+
+            if (lalamove.enabled || lalamove.api_key) {
+                if (!visibleProviders.includes('lalamove')) {
+                    visibleProviders.push('lalamove');
+                }
+            }
+
+            // DHL Express
+            const dhl = config.dhl || {};
+            document.getElementById('dhlEnvironment').value = dhl.environment || 'sandbox';
+            document.getElementById('dhlApiKey').value = dhl.api_key || '';
+            document.getElementById('dhlApiSecret').value = dhl.api_secret || '';
+            document.getElementById('dhlAccountNo').value = dhl.account_no || '';
+            document.getElementById('dhlAutoCreateOrder').checked = dhl.auto_create_order !== false;
+            document.getElementById('dhlAutoTrack').checked = dhl.auto_track !== false;
+            document.getElementById('dhlQueryPrice').checked = dhl.query_price === true;
+            document.getElementById('dhlProductCode').value = dhl.product_code || 'P';
+
+            if (dhl.enabled || dhl.api_key) {
+                if (!visibleProviders.includes('dhl')) {
+                    visibleProviders.push('dhl');
+                }
+            }
+
+            // UPS
+            const ups = config.ups || {};
+            document.getElementById('upsEnvironment').value = ups.environment || 'sandbox';
+            document.getElementById('upsClientId').value = ups.client_id || '';
+            document.getElementById('upsClientSecret').value = ups.client_secret || '';
+            document.getElementById('upsAccountNo').value = ups.account_no || '';
+            document.getElementById('upsAutoCreateOrder').checked = ups.auto_create_order !== false;
+            document.getElementById('upsAutoTrack').checked = ups.auto_track !== false;
+            document.getElementById('upsQueryPrice').checked = ups.query_price === true;
+            document.getElementById('upsServiceCode').value = ups.service_code || '03';
+
+            if (ups.enabled || ups.client_id) {
+                if (!visibleProviders.includes('ups')) {
+                    visibleProviders.push('ups');
+                }
+            }
+
+            // FedEx
+            const fedex = config.fedex || {};
+            document.getElementById('fedexEnvironment').value = fedex.environment || 'sandbox';
+            document.getElementById('fedexClientId').value = fedex.client_id || '';
+            document.getElementById('fedexClientSecret').value = fedex.client_secret || '';
+            document.getElementById('fedexAccountNo').value = fedex.account_no || '';
+            document.getElementById('fedexAutoCreateOrder').checked = fedex.auto_create_order !== false;
+            document.getElementById('fedexAutoTrack').checked = fedex.auto_track !== false;
+            document.getElementById('fedexQueryPrice').checked = fedex.query_price === true;
+            document.getElementById('fedexServiceType').value = fedex.service_type || 'FEDEX_INTERNATIONAL_PRIORITY';
+
+            if (fedex.enabled || fedex.client_id) {
+                if (!visibleProviders.includes('fedex')) {
+                    visibleProviders.push('fedex');
+                }
+            }
+
+            // Amazon Shipping
+            const amazon = config.amazon || {};
+            document.getElementById('amazonEnvironment').value = amazon.environment || 'sandbox';
+            document.getElementById('amazonRegion').value = amazon.region || 'NA';
+            document.getElementById('amazonClientId').value = amazon.client_id || '';
+            document.getElementById('amazonClientSecret').value = amazon.client_secret || '';
+            document.getElementById('amazonRefreshToken').value = amazon.refresh_token || '';
+            document.getElementById('amazonAutoCreateOrder').checked = amazon.auto_create_order !== false;
+            document.getElementById('amazonAutoTrack').checked = amazon.auto_track !== false;
+            document.getElementById('amazonQueryPrice').checked = amazon.query_price === true;
+            document.getElementById('amazonServiceType').value = amazon.service_type || 'AMAZON_SHIPPING_STANDARD';
+
+            if (amazon.enabled || amazon.client_id) {
+                if (!visibleProviders.includes('amazon')) {
+                    visibleProviders.push('amazon');
+                }
+            }
+
+            saveVisibleProviders();
+            updateProviderVisibility();
+        } catch (error) {
+            console.error('Failed to load shipping integrations:', error);
+            App.showAlert(wdT('shippingIntegrations.loadFailed', '載入配送連接設定失敗：') + error.message, 'danger');
+        }
+    }
+
+    function togglePasswordVisibility(inputId) {
+        const input = document.getElementById(inputId);
+        const button = input.nextElementSibling;
+        const icon = button.querySelector('i');
+        
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+
+    async function testSFExpressConnection() {
+        const partnerId = document.getElementById('sfexpressPartnerId').value.trim();
+        const checkword = document.getElementById('sfexpressCheckword').value.trim();
+        const environment = document.getElementById('sfexpressEnvironment').value;
+
+        if (!partnerId || !checkword) {
+            App.showAlert(wdT('shippingIntegrations.sfexpress.missingCreds', '請先填寫客戶編碼和校驗碼'), 'warning');
+            return;
+        }
+
+        try {
+            App.showAlert(wdT('shippingIntegrations.testing', '正在測試連接...'), 'info');
+            const response = await App.apiRequest('/api/v1/shipping-integrations/sfexpress/test', {
+                method: 'POST',
+                body: JSON.stringify({
+                    partner_id: partnerId,
+                    checkword: checkword,
+                    environment: environment
+                })
+            });
+
+            if (response.success) {
+                App.showAlert(wdT('shippingIntegrations.connectionSuccess', '連接成功！{provider} API 配置正確。').replace('{provider}', 'SF Express'), 'success');
+            } else {
+                App.showAlert(wdT('shippingIntegrations.connectionFailed', '連接失敗：') + (response.message || wdT('shippingIntegrations.connectionCheckCreds', '請檢查 API 憑證')), 'danger');
+            }
+        } catch (error) {
+            App.showAlert(wdT('shippingIntegrations.testFailed', '測試連接失敗：') + error.message, 'danger');
+        }
+    }
+
+    async function testLalamoveConnection() {
+        const apiKey = document.getElementById('lalamoveApiKey').value.trim();
+        const apiSecret = document.getElementById('lalamoveApiSecret').value.trim();
+        const environment = document.getElementById('lalamoveEnvironment').value;
+        const market = document.getElementById('lalamoveMarket').value;
+
+        if (!apiKey || !apiSecret) {
+            App.showAlert(wdT('shippingIntegrations.lalamove.missingCreds', '請先填寫 API Key 和 API Secret'), 'warning');
+            return;
+        }
+
+        try {
+            App.showAlert(wdT('shippingIntegrations.testing', '正在測試連接...'), 'info');
+            const response = await App.apiRequest('/api/v1/shipping-integrations/lalamove/test', {
+                method: 'POST',
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    api_secret: apiSecret,
+                    environment: environment,
+                    market: market
+                })
+            });
+
+            if (response.success) {
+                App.showAlert(wdT('shippingIntegrations.connectionSuccess', '連接成功！{provider} API 配置正確。').replace('{provider}', 'Lalamove'), 'success');
+            } else {
+                App.showAlert(wdT('shippingIntegrations.connectionFailed', '連接失敗：') + (response.message || wdT('shippingIntegrations.connectionCheckCreds', '請檢查 API 憑證')), 'danger');
+            }
+        } catch (error) {
+            App.showAlert(wdT('shippingIntegrations.testFailed', '測試連接失敗：') + error.message, 'danger');
+        }
+    }
+
+    async function testDHLConnection() {
+        const apiKey = document.getElementById('dhlApiKey').value.trim();
+        const apiSecret = document.getElementById('dhlApiSecret').value.trim();
+        const accountNo = document.getElementById('dhlAccountNo').value.trim();
+        const environment = document.getElementById('dhlEnvironment').value;
+
+        if (!apiKey || !apiSecret) {
+            App.showAlert(wdT('shippingIntegrations.dhl.missingCreds', '請先填寫 API Key 和 API Secret'), 'warning');
+            return;
+        }
+
+        if (!accountNo) {
+            App.showAlert(wdT('shippingIntegrations.dhl.missingAccount', '請先填寫 DHL 帳號'), 'warning');
+            return;
+        }
+
+        try {
+            App.showAlert(wdT('shippingIntegrations.testing', '正在測試連接...'), 'info');
+            const response = await App.apiRequest('/api/v1/shipping-integrations/dhl/test', {
+                method: 'POST',
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    api_secret: apiSecret,
+                    account_no: accountNo,
+                    environment: environment
+                })
+            });
+
+            if (response.success) {
+                App.showAlert(wdT('shippingIntegrations.connectionSuccess', '連接成功！{provider} API 配置正確。').replace('{provider}', 'DHL Express'), 'success');
+            } else {
+                App.showAlert(wdT('shippingIntegrations.connectionFailed', '連接失敗：') + (response.message || wdT('shippingIntegrations.connectionCheckCreds', '請檢查 API 憑證')), 'danger');
+            }
+        } catch (error) {
+            App.showAlert(wdT('shippingIntegrations.testFailed', '測試連接失敗：') + error.message, 'danger');
+        }
+    }
+
+    async function testUPSConnection() {
+        const clientId = document.getElementById('upsClientId').value.trim();
+        const clientSecret = document.getElementById('upsClientSecret').value.trim();
+        const accountNo = document.getElementById('upsAccountNo').value.trim();
+        const environment = document.getElementById('upsEnvironment').value;
+
+        if (!clientId || !clientSecret) {
+            App.showAlert(wdT('shippingIntegrations.ups.missingCreds', '請先填寫 Client ID 和 Client Secret'), 'warning');
+            return;
+        }
+
+        if (!accountNo) {
+            App.showAlert(wdT('shippingIntegrations.ups.missingAccount', '請先填寫 UPS 帳號'), 'warning');
+            return;
+        }
+
+        try {
+            App.showAlert(wdT('shippingIntegrations.testing', '正在測試連接...'), 'info');
+            const response = await App.apiRequest('/api/v1/shipping-integrations/ups/test', {
+                method: 'POST',
+                body: JSON.stringify({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    account_no: accountNo,
+                    environment: environment
+                })
+            });
+
+            if (response.success) {
+                App.showAlert(wdT('shippingIntegrations.connectionSuccess', '連接成功！{provider} API 配置正確。').replace('{provider}', 'UPS'), 'success');
+            } else {
+                App.showAlert(wdT('shippingIntegrations.connectionFailed', '連接失敗：') + (response.message || wdT('shippingIntegrations.connectionCheckCreds', '請檢查 API 憑證')), 'danger');
+            }
+        } catch (error) {
+            App.showAlert(wdT('shippingIntegrations.testFailed', '測試連接失敗：') + error.message, 'danger');
+        }
+    }
+
+    async function testFedExConnection() {
+        const clientId = document.getElementById('fedexClientId').value.trim();
+        const clientSecret = document.getElementById('fedexClientSecret').value.trim();
+        const accountNo = document.getElementById('fedexAccountNo').value.trim();
+        const environment = document.getElementById('fedexEnvironment').value;
+
+        if (!clientId || !clientSecret) {
+            App.showAlert(wdT('shippingIntegrations.fedex.missingCreds', '請先填寫 Client ID 和 Client Secret'), 'warning');
+            return;
+        }
+
+        if (!accountNo) {
+            App.showAlert(wdT('shippingIntegrations.fedex.missingAccount', '請先填寫 FedEx 帳號'), 'warning');
+            return;
+        }
+
+        try {
+            App.showAlert(wdT('shippingIntegrations.testing', '正在測試連接...'), 'info');
+            const response = await App.apiRequest('/api/v1/shipping-integrations/fedex/test', {
+                method: 'POST',
+                body: JSON.stringify({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    account_no: accountNo,
+                    environment: environment
+                })
+            });
+
+            if (response.success) {
+                App.showAlert(wdT('shippingIntegrations.connectionSuccess', '連接成功！{provider} API 配置正確。').replace('{provider}', 'FedEx'), 'success');
+            } else {
+                App.showAlert(wdT('shippingIntegrations.connectionFailed', '連接失敗：') + (response.message || wdT('shippingIntegrations.connectionCheckCreds', '請檢查 API 憑證')), 'danger');
+            }
+        } catch (error) {
+            App.showAlert(wdT('shippingIntegrations.testFailed', '測試連接失敗：') + error.message, 'danger');
+        }
+    }
+
+    async function testAmazonConnection() {
+        const clientId = document.getElementById('amazonClientId').value.trim();
+        const clientSecret = document.getElementById('amazonClientSecret').value.trim();
+        const refreshToken = document.getElementById('amazonRefreshToken').value.trim();
+        const region = document.getElementById('amazonRegion').value;
+        const environment = document.getElementById('amazonEnvironment').value;
+
+        if (!clientId || !clientSecret) {
+            App.showAlert(wdT('shippingIntegrations.amazon.missingCreds', '請先填寫 Client ID 和 Client Secret'), 'warning');
+            return;
+        }
+
+        if (!refreshToken) {
+            App.showAlert(wdT('shippingIntegrations.amazon.missingToken', '請先填寫 Refresh Token'), 'warning');
+            return;
+        }
+
+        try {
+            App.showAlert(wdT('shippingIntegrations.testing', '正在測試連接...'), 'info');
+            const response = await App.apiRequest('/api/v1/shipping-integrations/amazon/test', {
+                method: 'POST',
+                body: JSON.stringify({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    refresh_token: refreshToken,
+                    region: region,
+                    environment: environment
+                })
+            });
+
+            if (response.success) {
+                App.showAlert(wdT('shippingIntegrations.connectionSuccess', '連接成功！{provider} API 配置正確。').replace('{provider}', 'Amazon Shipping'), 'success');
+            } else {
+                App.showAlert(wdT('shippingIntegrations.connectionFailed', '連接失敗：') + (response.message || wdT('shippingIntegrations.connectionCheckCreds', '請檢查 API 憑證')), 'danger');
+            }
+        } catch (error) {
+            App.showAlert(wdT('shippingIntegrations.testFailed', '測試連接失敗：') + error.message, 'danger');
+        }
+    }
+
+    async function saveShippingIntegrations() {
+        const btn = document.getElementById('shippingSaveBtn');
+        const config = {
+            sfexpress: {
+                enabled: visibleProviders.includes('sfexpress'),
+                environment: document.getElementById('sfexpressEnvironment').value,
+                partner_id: document.getElementById('sfexpressPartnerId').value.trim(),
+                checkword: document.getElementById('sfexpressCheckword').value.trim(),
+                auto_create_order: document.getElementById('sfexpressAutoCreateOrder').checked,
+                auto_track: document.getElementById('sfexpressAutoTrack').checked,
+                query_price: document.getElementById('sfexpressQueryPrice').checked,
+                express_type: document.getElementById('sfexpressExpressType').value,
+                pay_method: document.getElementById('sfexpressPayMethod').value
+            },
+            lalamove: {
+                enabled: visibleProviders.includes('lalamove'),
+                environment: document.getElementById('lalamoveEnvironment').value,
+                market: document.getElementById('lalamoveMarket').value,
+                api_key: document.getElementById('lalamoveApiKey').value.trim(),
+                api_secret: document.getElementById('lalamoveApiSecret').value.trim(),
+                auto_quote: document.getElementById('lalamoveAutoQuote').checked,
+                auto_track: document.getElementById('lalamoveAutoTrack').checked,
+                service_type: document.getElementById('lalamoveServiceType').value,
+                require_signature: document.getElementById('lalamoveRequireSignature').checked,
+                purchase_service: document.getElementById('lalamovePurchaseService').checked
+            },
+            dhl: {
+                enabled: visibleProviders.includes('dhl'),
+                environment: document.getElementById('dhlEnvironment').value,
+                api_key: document.getElementById('dhlApiKey').value.trim(),
+                api_secret: document.getElementById('dhlApiSecret').value.trim(),
+                account_no: document.getElementById('dhlAccountNo').value.trim(),
+                auto_create_order: document.getElementById('dhlAutoCreateOrder').checked,
+                auto_track: document.getElementById('dhlAutoTrack').checked,
+                query_price: document.getElementById('dhlQueryPrice').checked,
+                product_code: document.getElementById('dhlProductCode').value
+            },
+            ups: {
+                enabled: visibleProviders.includes('ups'),
+                environment: document.getElementById('upsEnvironment').value,
+                client_id: document.getElementById('upsClientId').value.trim(),
+                client_secret: document.getElementById('upsClientSecret').value.trim(),
+                account_no: document.getElementById('upsAccountNo').value.trim(),
+                auto_create_order: document.getElementById('upsAutoCreateOrder').checked,
+                auto_track: document.getElementById('upsAutoTrack').checked,
+                query_price: document.getElementById('upsQueryPrice').checked,
+                service_code: document.getElementById('upsServiceCode').value
+            },
+            fedex: {
+                enabled: visibleProviders.includes('fedex'),
+                environment: document.getElementById('fedexEnvironment').value,
+                client_id: document.getElementById('fedexClientId').value.trim(),
+                client_secret: document.getElementById('fedexClientSecret').value.trim(),
+                account_no: document.getElementById('fedexAccountNo').value.trim(),
+                auto_create_order: document.getElementById('fedexAutoCreateOrder').checked,
+                auto_track: document.getElementById('fedexAutoTrack').checked,
+                query_price: document.getElementById('fedexQueryPrice').checked,
+                service_type: document.getElementById('fedexServiceType').value
+            },
+            amazon: {
+                enabled: visibleProviders.includes('amazon'),
+                environment: document.getElementById('amazonEnvironment').value,
+                region: document.getElementById('amazonRegion').value,
+                client_id: document.getElementById('amazonClientId').value.trim(),
+                client_secret: document.getElementById('amazonClientSecret').value.trim(),
+                refresh_token: document.getElementById('amazonRefreshToken').value.trim(),
+                auto_create_order: document.getElementById('amazonAutoCreateOrder').checked,
+                auto_track: document.getElementById('amazonAutoTrack').checked,
+                query_price: document.getElementById('amazonQueryPrice').checked,
+                service_type: document.getElementById('amazonServiceType').value
+            }
+        };
+
+        try {
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + wdT('shippingIntegrations.saving', '保存中...'); }
+            await App.apiRequest('/api/v1/shipping-integrations', {
+                method: 'PUT',
+                body: JSON.stringify(config)
+            });
+            App.showAlert(wdT('shippingIntegrations.saveSuccess', '配送連接設定已保存'), 'success');
+            originalConfig = JSON.parse(JSON.stringify(config));
+        } catch (error) {
+            App.showAlert(wdT('shippingIntegrations.saveFailed', '保存失敗：') + error.message, 'danger');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-save me-1"></i>' + wdT('shippingIntegrations.saveSettings', '保存設定'); }
+        }
+    }
+</script>
+{{ end }}

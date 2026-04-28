@@ -1,0 +1,383 @@
+{{ define "pages/calendars" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-calendar me-2"></i><span data-i18n="menu.calendars">日曆管理</span></h3>
+        <div class="d-flex gap-2 align-items-center">
+            <button class="btn btn-outline-secondary" onclick="showCalendarDraftList()" title="草稿" data-i18n-title="common.draft">
+                <i class="bi bi-file-earmark-text"></i> <span data-i18n="common.draft">草稿</span>
+                <span class="badge bg-danger" id="calendarDraftCount" style="display: none;">0</span>
+            </button>
+        <a href="/calendars/new" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> <span data-i18n="common.add">新增</span> <span data-i18n="calendars.event">事件</span>
+        </a>
+        </div>
+    </div>
+
+    <!-- 事件類型過濾器 -->
+    <div class="mb-3">
+        <div class="btn-group" role="group" id="eventTypeFilter">
+            <button type="button" class="btn btn-outline-primary active" data-filter="all" data-i18n="calendars.filterAll">全部</button>
+            <button type="button" class="btn btn-outline-primary" data-filter="appointment" data-i18n="calendars.filterAppointment">預約</button>
+            <button type="button" class="btn btn-outline-primary" data-filter="leave" data-i18n="calendars.filterLeave">請假</button>
+            <button type="button" class="btn btn-outline-primary" data-filter="holiday" data-i18n="calendars.filterHoliday">假期</button>
+            <button type="button" class="btn btn-outline-primary" data-filter="other" data-i18n="calendars.filterOther">其他</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <link href="/static/vendor/fullcalendar/core-index.css" rel="stylesheet">
+    <link href="/static/vendor/fullcalendar/daygrid-index.css" rel="stylesheet">
+    <link href="/static/vendor/fullcalendar/timegrid-index.css" rel="stylesheet">
+    <script>
+        let calendar;
+        let retryCount = 0;
+        const maxRetries = 50;
+
+        // 等待 FullCalendar 載入完成
+        function initCalendar() {
+            if (typeof FullCalendar === 'undefined') {
+                retryCount++;
+                if (retryCount < maxRetries) {
+                    console.warn('FullCalendar not loaded yet, retrying...', retryCount);
+                    setTimeout(initCalendar, 100);
+                } else {
+                    console.error('FullCalendar failed to load after', maxRetries, 'retries');
+                    const calendarEl = document.getElementById('calendar');
+                    if (calendarEl) {
+                        calendarEl.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.loadFailed') : '日曆載入失敗，請刷新頁面重試') + '</div>';
+                    }
+                }
+                return;
+            }
+
+            if (!App || !App.checkAuth()) {
+                console.warn('App not available or not authenticated');
+                return;
+            }
+
+            const calendarEl = document.getElementById('calendar');
+            if (!calendarEl) {
+                console.error('Calendar element not found');
+                return;
+            }
+            
+            try {
+                // 檢測是否為移動設備（屏幕寬度小於 768px）
+                const isMobile = window.innerWidth < 768;
+                
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    locale: (typeof I18n !== 'undefined' && I18n.currentLang) ? (I18n.currentLang === 'en' ? 'en' : 'zh-tw') : 'zh-tw',
+                    height: 'auto',
+                    dayCellContent: function(arg) {
+                        return { html: String(arg.date.getDate()) };
+                    },
+                    buttonText: {
+                        today: typeof I18n !== 'undefined' && I18n.t ? I18n.t('calendars.today') : '今天',
+                        month: typeof I18n !== 'undefined' && I18n.t ? I18n.t('calendars.month') : '月',
+                        week: typeof I18n !== 'undefined' && I18n.t ? I18n.t('calendars.week') : '週',
+                        day: typeof I18n !== 'undefined' && I18n.t ? I18n.t('calendars.day') : '日'
+                    },
+                    headerToolbar: {
+                        left: isMobile ? 'prev,next' : 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    events: async function(info, successCallback, failureCallback) {
+                        try {
+                            const start = info.startStr.split('T')[0];
+                            const end = info.endStr.split('T')[0];
+                            const data = await App.apiRequest(`/calendars?start_date=${start}&end_date=${end}&limit=1000`);
+                            const allEvents = (data.data || []).map(event => {
+                                // 判斷事件類型
+                                let eventCategory = 'other';
+                                if (event.event_type === 'project_task') {
+                                    eventCategory = 'project_task';
+                                } else if (event.title && event.title.includes('預約')) {
+                                    eventCategory = 'appointment';
+                                } else if (event.title && event.title.includes('請假')) {
+                                    eventCategory = 'leave';
+                                } else if (event.title && event.title.includes('假期')) {
+                                    eventCategory = 'holiday';
+                                } else if (event.event_type === 'holiday') {
+                                    eventCategory = 'holiday';
+                                } else if (event.event_type) {
+                                    eventCategory = 'other';
+                                }
+                                
+                                const eventObj = {
+                                    id: event.id,
+                                    title: event.title || ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.untitled') : '無標題'),
+                                    allDay: event.all_day || false,
+                                    extendedProps: {
+                                        description: event.description || '',
+                                        eventType: event.event_type || '',
+                                        category: eventCategory,
+                                        holidayId: event.extra_fields?.holiday_id || null,
+                                        appointmentId: event.extra_fields?.appointment_id || null,
+                                        leaveRequestId: event.extra_fields?.leave_request_id || null,
+                                        projectTaskId: event.extra_fields?.project_task_id || null,
+                                        projectId: event.extra_fields?.project_id || null
+                                    }
+                                };
+                                // 處理開始時間
+                                if (event.start_time) {
+                                    eventObj.start = event.start_time;
+                                }
+                                // 處理結束時間
+                                if (event.end_time) {
+                                    eventObj.end = event.end_time;
+                                }
+                                return eventObj;
+                            });
+                            
+                            // 應用過濾器
+                            const activeFilter = window.calendarFilter || 'all';
+                            const filteredEvents = allEvents.filter(event => {
+                                if (activeFilter === 'all') return true;
+                                if (activeFilter === 'other') {
+                                    return event.extendedProps.category === 'other' || event.extendedProps.category === 'project_task';
+                                }
+                                return event.extendedProps.category === activeFilter;
+                            });
+                            
+                            successCallback(filteredEvents);
+                        } catch (error) {
+                            console.error('載入日曆事件失敗:', error);
+                            if (App && App.showAlert) {
+                                App.showAlert((((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.eventsLoadFailed') : '載入日曆事件失敗') + ': ' + error.message), 'danger');
+                            }
+                            failureCallback(error);
+                        }
+                    },
+                    eventClick: function(info) {
+                        const category = info.event.extendedProps.category;
+                        const holidayId = info.event.extendedProps.holidayId;
+                        const appointmentId = info.event.extendedProps.appointmentId;
+                        const leaveRequestId = info.event.extendedProps.leaveRequestId;
+                        const projectId = info.event.extendedProps.projectId;
+                        
+                        // 根據事件類別跳轉到不同頁面
+                        let targetUrl;
+                        if (category === 'appointment' && appointmentId) {
+                            // 預約事件：跳轉到預約編輯頁面
+                            targetUrl = `/appointments/${appointmentId}/edit`;
+                        } else if (category === 'leave' && leaveRequestId) {
+                            // 請假事件：跳轉到請假申請編輯頁面
+                            targetUrl = `/leave-requests/${leaveRequestId}/edit`;
+                        } else if (category === 'holiday' && holidayId) {
+                            // 假期事件：跳轉到該假期的編輯頁面
+                            targetUrl = `/holidays/${holidayId}/edit`;
+                        } else if (category === 'project_task' && projectId) {
+                            // 專案任務：跳轉到專案編輯頁
+                            targetUrl = `/projects/${projectId}/edit`;
+                        } else {
+                            // 其他事件跳轉到日曆編輯頁面
+                            targetUrl = `/calendars/${info.event.id}/edit`;
+                        }
+                        if (typeof Router !== 'undefined' && Router.go) { Router.go(targetUrl); } else { window.location.href = targetUrl; }
+                    },
+                    dateClick: function(info) {
+                        const dateStr = info.dateStr;
+                        const date = new Date(dateStr);
+                        const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                        const dateTimeStr = localDate.toISOString().slice(0, 16);
+                        const newUrl = `/calendars/new?start_time=${encodeURIComponent(dateTimeStr)}`;
+                        if (typeof Router !== 'undefined' && Router.go) { Router.go(newUrl); } else { window.location.href = newUrl; }
+                    }
+                });
+                calendar.render();
+                console.log('Calendar initialized successfully');
+                
+                // 初始化過濾器
+                initEventTypeFilter();
+                
+                // 更新草稿計數
+                updateCalendarDraftCount();
+            } catch (error) {
+                console.error('Failed to initialize calendar:', error);
+                calendarEl.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.initFailed') : '日曆初始化失敗') + ': ' + error.message + '</div>';
+            }
+        }
+
+        // 載入 FullCalendar 腳本（本地化）
+        function loadFullCalendar() {
+            return new Promise((resolve, reject) => {
+                if (typeof FullCalendar !== 'undefined') {
+                    resolve();
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = '/static/vendor/fullcalendar/index.global.min.js';
+                script.onload = () => {
+                    const localeScript = document.createElement('script');
+                    localeScript.src = '/static/vendor/fullcalendar/locales-all.global.min.js';
+                    localeScript.onload = () => resolve();
+                    localeScript.onerror = () => resolve(); // 即使本地化失敗也繼續
+                    document.head.appendChild(localeScript);
+                };
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        // 當 DOM 載入完成後初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                loadFullCalendar().then(() => {
+                    setTimeout(initCalendar, 100);
+                }).catch(error => {
+                    console.error('Failed to load FullCalendar:', error);
+                    const calendarEl = document.getElementById('calendar');
+                    if (calendarEl) {
+                        calendarEl.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.libraryFailedWithNetwork') : '無法載入日曆庫，請檢查網絡連接') + '</div>';
+                    }
+                });
+            });
+        } else {
+            loadFullCalendar().then(() => {
+                setTimeout(initCalendar, 100);
+            }).catch(error => {
+                console.error('Failed to load FullCalendar:', error);
+                const calendarEl = document.getElementById('calendar');
+                if (calendarEl) {
+                    calendarEl.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.libraryFailedWithNetwork') : '無法載入日曆庫，請檢查網絡連接') + '</div>';
+                }
+            });
+        }
+
+        // 更新草稿計數
+        function updateCalendarDraftCount() {
+            const drafts = draftManager.getDraftsForPage('calendars');
+            const count = drafts.length;
+            const badge = document.getElementById('calendarDraftCount');
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        }
+
+        // 顯示草稿列表
+        function showCalendarDraftList() {
+            const pageName = 'calendars';
+            const drafts = draftManager.getDraftsForPage(pageName);
+            
+            const listContent = drafts.length > 0
+                ? drafts.map(d => {
+                    const title = d.data?.title || ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.untitled') : '無標題');
+                    const locale = (typeof I18n !== 'undefined' && I18n.currentLang === 'en') ? 'en-US' : 'zh-TW';
+                    const startTime = d.data?.start_time ? new Date(d.data.start_time).toLocaleString(locale) : '';
+                    const createdAt = new Date(d.createdAt).toLocaleString(locale);
+                    return `
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${title}</div>
+                                ${startTime ? `<small class="text-muted">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.startTime') : '開始時間'}: ${startTime}</small><br>` : ''}
+                                <small class="text-muted">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.savedAt') : '保存時間'}: ${createdAt}</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-primary" onclick="loadCalendarDraft('${d.id}')">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.load') : '載入'}</button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteCalendarDraft('${d.id}', this)">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.delete') : '刪除'}</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')
+                : '<p class="text-muted mb-0">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.noDrafts') : '目前沒有草稿') + '</p>';
+
+            const existingModal = document.getElementById('draftListModal');
+            if (existingModal) existingModal.remove();
+
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'draftListModal';
+            modal.setAttribute('tabindex', '-1');
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" data-i18n="common.draft">草稿</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="list-group">
+                                ${listContent}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.close">關閉</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+            modal.addEventListener('hidden.bs.modal', () => modal.remove());
+        }
+
+        // 載入草稿
+        function loadCalendarDraft(draftId) {
+            // 只使用 draft_id 參數，其他數據由 dynamic-form.js 從 localStorage 載入
+            const draftUrl = `/calendars/new?draft_id=${draftId}`;
+            if (typeof Router !== 'undefined' && Router.go) { Router.go(draftUrl); } else { window.location.href = draftUrl; }
+        }
+
+        // 刪除草稿
+        function deleteCalendarDraft(draftId, button) {
+            if (!confirm((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.confirmDeleteDraft') : '確定要刪除此草稿嗎？')) return;
+            
+            const pageName = 'calendars';
+            draftManager.deleteDraft(pageName, draftId);
+            updateCalendarDraftCount();
+            
+            if (button) {
+                button.closest('.list-group-item').remove();
+                const remainingItems = document.querySelectorAll('#draftListModal .list-group-item');
+                if (remainingItems.length === 0) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('draftListModal'));
+                    if (modal) modal.hide();
+                }
+            }
+            
+            App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.draftDeleted') : '草稿已刪除', 'success');
+        }
+
+        // 初始化事件類型過濾器
+        function initEventTypeFilter() {
+            const filterButtons = document.querySelectorAll('#eventTypeFilter button');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 更新按鈕狀態
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // 設置過濾器
+                    const filter = this.getAttribute('data-filter');
+                    window.calendarFilter = filter;
+                    
+                    // 重新載入日曆事件
+                    if (calendar) {
+                        calendar.refetchEvents();
+                    }
+                });
+            });
+            
+            // 確保 i18n 已初始化後更新文本
+            if (typeof I18n !== 'undefined' && I18n.updatePage) {
+                I18n.updatePage();
+            }
+        }
+
+    </script>
+{{ end }}
+

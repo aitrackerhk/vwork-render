@@ -1,0 +1,206 @@
+{{define "pages/dining_settings"}}
+<div>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h4 class="mb-3" data-i18n="pages.diningSettings.title">餐飲設定</h4>
+      <form id="diningSettingsForm" class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" data-i18n="pages.diningSettings.tableAssignMode">餐桌配對模式</label>
+          <select class="form-select" id="diningAssignMode">
+            <option value="auto" data-i18n="pages.diningSettings.autoAssign">自動配對</option>
+            <option value="manual" data-i18n="pages.diningSettings.manualAssign">手動確認配對</option>
+          </select>
+          <div class="form-text" data-i18n="pages.diningSettings.assignModeHint">手動模式會在餐桌管理彈窗中先自動配好，可手動修改後再確認。</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" data-i18n="pages.diningSettings.tableReleaseMode">餐桌釋放模式</label>
+          <select class="form-select" id="diningReleaseMode">
+            <option value="auto_pay" data-i18n="pages.diningSettings.releaseAutoPay">結帳自動釋放</option>
+            <option value="delay" data-i18n="pages.diningSettings.releaseDelay">結帳後特定時長釋放</option>
+            <option value="manual" data-i18n="pages.diningSettings.releaseManual">手動釋放</option>
+          </select>
+        </div>
+        <div class="col-md-6" id="diningReleaseDelayWrap" style="display:none;">
+          <label class="form-label" data-i18n="pages.diningSettings.releaseDelayMinutes">延遲釋放時間（分鐘）</label>
+          <input type="number" class="form-control" id="diningReleaseDelay" min="0" value="10">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" data-i18n="pages.diningSettings.queuePhone">候位電話</label>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="diningQueueRequirePhone">
+            <label class="form-check-label" for="diningQueueRequirePhone" data-i18n="pages.diningSettings.showPhoneField">顯示電話欄位（顯示即必填）</label>
+          </div>
+          <div class="form-text" data-i18n="pages.diningSettings.phoneFieldHint">關閉則不顯示電話欄位。</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" data-i18n="pages.diningSettings.menuCategory">餐飲特定類別</label>
+          <select class="form-select" id="diningMenuCategory" multiple="multiple" style="width:100%;">
+          </select>
+          <div class="form-text" data-i18n="pages.diningSettings.menuCategoryHint">設定後，特製餐飲頁只顯示此類別（留空則顯示全部產品）。</div>
+        </div>
+        <div class="col-12">
+          <label class="form-label" data-i18n="pages.diningSettings.menuOnlyMessage">只是菜單提示訊息</label>
+          <input type="text" class="form-control" id="diningMenuOnlyMessage" data-i18n-placeholder="pages.diningSettings.menuOnlyMessagePlaceholder" placeholder="此頁面僅供查看菜單，如需點餐請掃描餐桌上的 QR Code">
+          <div class="form-text" data-i18n="pages.diningSettings.menuOnlyMessageHint">訪問 <code>/co/您的公司/menu/</code> 時會顯示的提示訊息。此頁面只供瀏覽菜單，無法下單。</div>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary" type="submit" data-i18n="pages.diningSettings.saveSettings">儲存設定</button>
+        </div>
+      </form>
+      <div class="text-success mt-3" id="diningSettingsSuccess" style="display:none;" data-i18n="pages.diningSettings.settingsSaved">已更新設定</div>
+      <div class="text-danger mt-3" id="diningSettingsError" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- 候位票打印機快速入口 -->
+  <div class="card">
+    <div class="card-body">
+      <h5 class="mb-3">
+        <i class="bi bi-printer me-2"></i><span data-i18n="pages.diningSettings.queuePrinter">候位票打印機</span>
+      </h5>
+      <p class="text-muted small mb-3" data-i18n="pages.diningSettings.printerQuickDescription">設定候位看板取號時自動打印票據。</p>
+      <a href="/dining-ticket-settings" class="btn btn-outline-primary">
+        <i class="bi bi-gear me-1"></i><span data-i18n="pages.diningSettings.goToPrinterSettings">前往設定候位票打印機</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    function initDiningSettings() {
+    const assignEl = document.getElementById('diningAssignMode');
+    const releaseEl = document.getElementById('diningReleaseMode');
+    const delayWrap = document.getElementById('diningReleaseDelayWrap');
+    const delayEl = document.getElementById('diningReleaseDelay');
+    const requirePhoneEl = document.getElementById('diningQueueRequirePhone');
+    const menuCategoryEl = document.getElementById('diningMenuCategory');
+    const menuOnlyMessageEl = document.getElementById('diningMenuOnlyMessage');
+    const form = document.getElementById('diningSettingsForm');
+    const okEl = document.getElementById('diningSettingsSuccess');
+    const errEl = document.getElementById('diningSettingsError');
+
+    // Parse comma/separator-delimited string into array of trimmed non-empty values
+    function parseCategoryString(str) {
+      if (!str) return [];
+      return str.split(/[,，、;\n\t]/).map(s => s.trim()).filter(Boolean);
+    }
+
+    // Initialize Select2 multi-select for menu category
+    async function initMenuCategorySelect2(selectedValues) {
+      if (!menuCategoryEl || typeof $ === 'undefined' || !$.fn.select2) return;
+      const $sel = $(menuCategoryEl);
+
+      // Destroy existing instance if any
+      if ($sel.hasClass('select2-hidden-accessible')) {
+        $sel.select2('destroy');
+      }
+      $sel.empty();
+
+      // Load all categories from API
+      let allCategories = [];
+      try {
+        const resp = await App.apiRequest('/products/categories');
+        allCategories = resp.data || [];
+      } catch (_) { /* ignore */ }
+
+      // Merge: ensure selectedValues that are not in allCategories are still available
+      const catSet = new Set(allCategories);
+      selectedValues.forEach(v => catSet.add(v));
+      const finalList = Array.from(catSet).sort();
+
+      // Populate <option> elements
+      finalList.forEach(cat => {
+        const opt = new Option(cat, cat, false, selectedValues.includes(cat));
+        $sel.append(opt);
+      });
+
+      // Init Select2 multi-select
+      $sel.select2({
+        theme: 'bootstrap-5',
+        placeholder: '選擇類別',
+        allowClear: true,
+        width: '100%',
+        multiple: true,
+        tags: true
+      });
+    }
+
+    // Get selected category values as comma-separated string
+    function getMenuCategoryValue() {
+      if (!menuCategoryEl || typeof $ === 'undefined' || !$.fn.select2) return '';
+      const vals = $(menuCategoryEl).val();
+      if (!vals || !vals.length) return '';
+      return vals.join(',');
+    }
+
+    function syncDelayVisibility() {
+      if (!delayWrap || !releaseEl) return;
+      delayWrap.style.display = releaseEl.value === 'delay' ? '' : 'none';
+    }
+
+    async function loadSettings() {
+      try {
+        const data = await App.apiRequest('/dining-settings');
+        if (assignEl) assignEl.value = data.table_assign_mode || 'auto';
+        if (releaseEl) releaseEl.value = data.table_release_mode || 'manual';
+        if (delayEl) delayEl.value = data.table_release_delay_minutes ?? 10;
+        if (requirePhoneEl) requirePhoneEl.checked = !!data.queue_require_phone;
+        if (menuOnlyMessageEl) menuOnlyMessageEl.value = data.menu_only_message || '';
+        syncDelayVisibility();
+
+        // Initialize Select2 with saved values
+        const savedCategories = parseCategoryString(data.menu_category || '');
+        await initMenuCategorySelect2(savedCategories);
+      } catch (e) {
+        if (errEl) {
+          errEl.textContent = e?.message || '載入設定失敗';
+          errEl.style.display = '';
+        }
+      }
+    }
+
+    if (releaseEl) releaseEl.addEventListener('change', syncDelayVisibility);
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (okEl) okEl.style.display = 'none';
+        if (errEl) errEl.style.display = 'none';
+        try {
+          await App.apiRequest('/dining-settings', {
+            method: 'PUT',
+            body: JSON.stringify({
+              table_assign_mode: assignEl?.value || 'auto',
+              table_release_mode: releaseEl?.value || 'manual',
+              table_release_delay_minutes: Number(delayEl?.value || 0),
+              queue_require_phone: !!requirePhoneEl?.checked,
+              menu_category: getMenuCategoryValue(),
+              menu_only_message: menuOnlyMessageEl?.value || ''
+            })
+          });
+          if (okEl) okEl.style.display = '';
+        } catch (e) {
+          if (errEl) {
+            errEl.textContent = e?.message || '儲存設定失敗';
+            errEl.style.display = '';
+          }
+        }
+      });
+    }
+
+    loadSettings();
+    }
+
+    function waitForAppAndInit() {
+      if (window.App && typeof window.App.apiRequest === 'function') {
+        initDiningSettings();
+        return;
+      }
+      setTimeout(waitForAppAndInit, 50);
+    }
+
+    document.addEventListener('DOMContentLoaded', waitForAppAndInit);
+  })();
+</script>
+{{end}}

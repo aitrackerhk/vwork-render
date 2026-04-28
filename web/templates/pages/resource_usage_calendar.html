@@ -1,0 +1,205 @@
+{{ define "pages/resource_usage_calendar" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-calendar3 me-2"></i><span data-i18n="menu.resourceUsageCalendar">資源使用日曆</span></h3>
+        <div class="d-flex gap-2 align-items-center">
+            <a href="/appointments" class="btn btn-outline-secondary">
+                <i class="bi bi-journal-text"></i> <span data-i18n="menu.appointments">預約</span>
+            </a>
+            <a href="/projects" class="btn btn-outline-secondary">
+                <i class="bi bi-folder2-open"></i> <span data-i18n="menu.projects">項目</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <div class="d-flex flex-wrap gap-2">
+            <div class="btn-group" role="group" id="resourceUsageCategoryFilter">
+                <button type="button" class="btn btn-outline-primary active" data-filter="all" data-i18n="common.all">全部</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="appointment" data-i18n="calendars.filterAppointment">預約</button>
+                <button type="button" class="btn btn-outline-primary" data-filter="reservation" data-i18n="resourceUsageCalendar.reservation">預留</button>
+            </div>
+            <div class="btn-group" role="group" id="resourceUsageTypeFilter">
+                <button type="button" class="btn btn-outline-secondary active" data-resource-type="all" data-i18n="resourceUsageCalendar.allResources">全部資源</button>
+                <button type="button" class="btn btn-outline-secondary" data-resource-type="room" data-i18n="resourceUsageCalendar.room">房間</button>
+                <button type="button" class="btn btn-outline-secondary" data-resource-type="equipment" data-i18n="resourceUsageCalendar.equipment">設備</button>
+                <button type="button" class="btn btn-outline-secondary" data-resource-type="vehicle" data-i18n="resourceUsageCalendar.vehicle">車輛</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="resourceUsageCalendar"></div>
+        </div>
+    </div>
+
+    <link href="/static/vendor/fullcalendar/core-index.css" rel="stylesheet">
+    <link href="/static/vendor/fullcalendar/daygrid-index.css" rel="stylesheet">
+    <link href="/static/vendor/fullcalendar/timegrid-index.css" rel="stylesheet">
+    <script>
+        let resourceCalendar;
+        let resourceRetryCount = 0;
+        const resourceMaxRetries = 50;
+
+        function initResourceUsageFilter() {
+            // 分類過濾器（全部/預約/預留）
+            const categoryGroup = document.getElementById('resourceUsageCategoryFilter');
+            if (categoryGroup) {
+                categoryGroup.querySelectorAll('button[data-filter]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        categoryGroup.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        window.resourceUsageCategoryFilter = this.getAttribute('data-filter') || 'all';
+                        if (resourceCalendar) resourceCalendar.refetchEvents();
+                    });
+                });
+            }
+
+            // 資源類型過濾器（全部資源/房間/設備/車輛）
+            const typeGroup = document.getElementById('resourceUsageTypeFilter');
+            if (typeGroup) {
+                typeGroup.querySelectorAll('button[data-resource-type]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        typeGroup.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        window.resourceUsageTypeFilter = this.getAttribute('data-resource-type') || 'all';
+                        if (resourceCalendar) resourceCalendar.refetchEvents();
+                    });
+                });
+            }
+        }
+
+        function initResourceUsageCalendar() {
+            if (typeof FullCalendar === 'undefined') {
+                resourceRetryCount++;
+                if (resourceRetryCount < resourceMaxRetries) {
+                    setTimeout(initResourceUsageCalendar, 100);
+                } else {
+                    const el = document.getElementById('resourceUsageCalendar');
+                    if (el) el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.loadFailed') : '日曆載入失敗，請刷新頁面重試') + '</div>';
+                }
+                return;
+            }
+
+            if (!App || !App.checkAuth()) return;
+            const el = document.getElementById('resourceUsageCalendar');
+            if (!el) return;
+
+            try {
+                resourceCalendar = new FullCalendar.Calendar(el, {
+                    initialView: 'timeGridWeek',
+                    locale: (typeof I18n !== 'undefined' && I18n.currentLang) ? (I18n.currentLang === 'en' ? 'en' : 'zh-tw') : 'zh-tw',
+                    height: 'auto',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    nowIndicator: true,
+                    events: async function(info, successCallback, failureCallback) {
+                        try {
+                            const start = info.startStr.split('T')[0];
+                            const end = info.endStr.split('T')[0];
+                            const data = await App.apiRequest(`/resource-usage-calendar/events?start_date=${start}&end_date=${end}`);
+                            const allEvents = (data.data || []).map(e => ({
+                                id: e.id,
+                                title: e.title || ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.untitled') : '（無標題）'),
+                                start: e.start,
+                                end: e.end,
+                                allDay: !!e.allDay,
+                                backgroundColor: e.backgroundColor || undefined,
+                                borderColor: e.borderColor || undefined,
+                                textColor: e.textColor || undefined,
+                                extendedProps: e.extendedProps || {}
+                            }));
+
+                            const categoryFilter = window.resourceUsageCategoryFilter || 'all';
+                            const typeFilter = window.resourceUsageTypeFilter || 'all';
+                            
+                            const filtered = allEvents.filter(ev => {
+                                // 分類過濾（全部/預約/預留）
+                                if (categoryFilter !== 'all') {
+                                    const evCategory = ev.extendedProps && ev.extendedProps.category;
+                                    if (evCategory !== categoryFilter) return false;
+                                }
+                                
+                                // 資源類型過濾（全部資源/房間/設備/車輛）
+                                if (typeFilter !== 'all') {
+                                    const evResourceType = ev.extendedProps && ev.extendedProps.resource_type;
+                                    // 對於預約（appointment），需要檢查資源列表
+                                    if (evCategory === 'appointment') {
+                                        const title = ev.title || '';
+                                        // 檢查標題中是否包含對應的資源類型
+                                        if (typeFilter === 'room' && !title.includes('房間:')) return false;
+                                        if (typeFilter === 'equipment' && !title.includes('設備:')) return false;
+                                        if (typeFilter === 'vehicle' && !title.includes('車輛:')) return false;
+                                    } else if (evCategory === 'reservation') {
+                                        // 對於預留（reservation），直接比較 resource_type
+                                        if (evResourceType !== typeFilter) return false;
+                                    } else {
+                                        // 其他類型不匹配
+                                        return false;
+                                    }
+                                }
+                                
+                                return true;
+                            });
+                            successCallback(filtered);
+                        } catch (err) {
+                            if (App && App.showAlert) App.showAlert((((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('resourceUsageCalendar.loadFailed') : '載入資源日曆事件失敗') + ': ' + (err.message || err)), 'danger');
+                            failureCallback(err);
+                        }
+                    },
+                    eventClick: function(info) {
+                        const url = info.event.extendedProps && info.event.extendedProps.url;
+                        if (url) {
+                            if (typeof Router !== 'undefined' && Router.go) { Router.go(url); } else { window.location.href = url; }
+                            return;
+                        }
+                    }
+                });
+
+                resourceCalendar.render();
+                initResourceUsageFilter();
+            } catch (e) {
+                el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.initFailed') : '日曆初始化失敗') + '</div>';
+            }
+        }
+
+        function loadFullCalendarOnce() {
+            return new Promise((resolve, reject) => {
+                if (typeof FullCalendar !== 'undefined') {
+                    resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = '/static/vendor/fullcalendar/index.global.min.js';
+                script.onload = () => {
+                    const localeScript = document.createElement('script');
+                    localeScript.src = '/static/vendor/fullcalendar/locales-all.global.min.js';
+                    localeScript.onload = () => resolve();
+                    localeScript.onerror = () => resolve();
+                    document.head.appendChild(localeScript);
+                };
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                loadFullCalendarOnce().then(() => setTimeout(initResourceUsageCalendar, 100)).catch(() => {
+                    const el = document.getElementById('resourceUsageCalendar');
+                    if (el) el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.libraryFailed') : '無法載入日曆庫') + '</div>';
+                });
+            });
+        } else {
+            loadFullCalendarOnce().then(() => setTimeout(initResourceUsageCalendar, 100)).catch(() => {
+                const el = document.getElementById('resourceUsageCalendar');
+                if (el) el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('calendars.libraryFailed') : '無法載入日曆庫') + '</div>';
+            });
+        }
+    </script>
+{{ end }}
+
+

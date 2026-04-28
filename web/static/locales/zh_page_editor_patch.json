@@ -1,0 +1,299 @@
+{
+  "pageEditor": {
+    "title": "頁面編輯器",
+    "tabs": {
+      "content": "內容設置",
+      "style": "樣式設置"
+    },
+    "align": {
+      "left": "左對齊",
+      "center": "居中",
+      "right": "右對齊",
+      "justify": "兩端對齊"
+    },
+    "sizes": {
+      "sm": "小",
+      "md": "正常",
+      "lg": "大"
+    },
+    "buttonStyles": {
+      "primary": "主要",
+      "secondary": "次要",
+      "success": "成功",
+      "danger": "危險",
+      "warning": "警告",
+      "info": "資訊",
+      "light": "淺色",
+      "dark": "深色"
+    },
+    "common": {
+      "default": "預設"
+    },
+    "messages": {
+      "noEditableProps": "此元件類型暫無可編輯屬性",
+      "noStyleSettings": "此元件暫無樣式設置",
+      "geocodeFailed": "無法找到此地址"
+    },
+    "placeholders": {
+      "menuText": "選單文字",
+      "exampleLink": "例如：/about 或 https://example.com",
+      "exampleFontSize": "例如：16",
+      "exampleLineHeight": "例如：1.8",
+      "exampleGap": "例如：1rem",
+      "exampleWidth": "例如：100%",
+      "examplePadding": "例如：1rem 2rem",
+      "altText": "輸入替代文字",
+      "googleMapAddress": "輸入地址以定位到地圖上"
+    },
+    "padding": {
+      "top": "上",
+      "right": "右",
+      "bottom": "下",
+      "left": "左"
+    },
+    "labels": {
+      "common": {
+        "textColor": "文字顏色",
+        "backgroundColor": "背景顏色",
+        "padding": "內邊距",
+        "minHeight": "最小高度",
+        "textAlign": "文字對齊",
+        "fontSize": "字體大小",
+        "columns": "欄數",
+        "noLink": "不連結"
+      },
+      "hero": {
+        "title": "標題",
+        "subtitle": "副標題",
+        "buttonText": "按鈕文字",
+        "buttonLink": "按鈕連結",
+        "backgroundImage": "背景圖片",
+        "backgroundColorNoImage": "背景顏色（無圖片時使用）"
+      },
+      "text": {
+        "content": "內容",
+        "lineHeight": "行高"
+      },
+      "heading": {
+        "text": "標題文字",
+        "level": "標題級別",
+        "marginY": "上下邊距"
+      },
+      "diningMenu": {
+        "title": "菜單標題",
+        "subtitle": "菜單副標題",
+        "height": "高度",
+        "showTitle": "顯示標題區"
+      },
+      "diningReservation": {
+        "title": "預約標題",
+        "subtitle": "預約副標題",
+        "height": "高度",
+        "showTitle": "顯示標題區",
+        "submit": "送出預約"
+      },
+      "section": {
+        "columns": "欄數 (單行格數)",
+        "children": "子元件",
+        "noChildrenHint": "暫無子元件，將元件拖入區塊容器即可添加",
+        "columnPrefix": "欄"
+      },
+      "nav": {
+        "logoImage": "Logo 圖片",
+        "logoText": "Logo 文字（無圖片時顯示）",
+        "menuItems": "選單項目",
+        "menuHoverColor": "選單懸停顏色"
+      },
+      "productList": {
+        "fullList": "顯示完整列表",
+        "showProductTypeFilter": "顯示產品類型篩選",
+        "showBrandFilter": "顯示品牌篩選",
+        "productDetailPage": "產品詳情頁面",
+        "gap": "產品卡片間距",
+        "metaTitle": "產品元數據",
+        "types": "產品類型",
+        "categories": "產品分類",
+        "attributes": "產品屬性",
+        "noTypes": "無產品類型",
+        "noCategories": "無產品分類",
+        "noAttributes": "無產品屬性"
+      },
+      "productDetail": {
+        "name": "產品名稱",
+        "price": "產品價格",
+        "description": "產品描述"
+      },
+      "footer": {
+        "column1LogoImage": "欄 1 - Logo 圖片",
+        "column1Content": "欄 1 - 文字內容",
+        "column2MenuItems": "欄 2 - 選單項目",
+        "column3MenuItems": "欄 3 - 選單項目",
+        "column4MenuItems": "欄 4 - 選單項目",
+        "copyright": "Copyright 文字"
+      },
+      "orderList": {
+        "perPage": "每頁顯示數量",
+        "showStatusFilter": "顯示狀態篩選",
+        "showDateFilter": "顯示日期篩選"
+      },
+      "blogList": {
+        "displayCount": "顯示數量",
+        "showImage": "顯示圖片",
+        "showExcerpt": "顯示摘要",
+        "categoryFilter": "分類篩選（可選）",
+        "categoryPlaceholder": "留空顯示所有分類"
+      },
+      "cart": {
+        "showCheckoutButton": "顯示結帳按鈕",
+        "showContinueShopping": "顯示繼續購物按鈕",
+        "showCoupon": "顯示優惠券輸入",
+        "showPoints": "顯示積分使用"
+      },
+      "checkout": {
+        "showShippingForm": "顯示運送表單",
+        "showPaymentForm": "顯示付款表單"
+      },
+      "image": {
+        "image": "圖片",
+        "alt": "替代文字",
+        "width": "寬度"
+      },
+      "button": {
+        "text": "按鈕文字",
+        "link": "連結",
+        "style": "按鈕樣式",
+        "customColor": "按鈕顏色（自訂）",
+        "customColorHint": "如果設置了自訂顏色，將覆蓋按鈕樣式",
+        "textColor": "按鈕文字顏色",
+        "size": "按鈕大小",
+        "align": "按鈕對齊"
+      },
+      "serviceList": {
+        "displayCount": "顯示數量",
+        "serviceDetailPage": "服務詳情頁"
+      },
+      "bannerSlider": {
+        "slides": "幻燈片",
+        "noSlides": "暫無幻燈片",
+        "title": "標題",
+        "subtitle": "副標題",
+        "buttonText": "按鈕文字",
+        "buttonLink": "按鈕連結",
+        "height": "高度",
+        "autoplay": "自動播放",
+        "interval": "播放間隔（毫秒）",
+        "showArrows": "顯示箭頭",
+        "showIndicators": "顯示指示器",
+        "overlayColor": "遮罩顏色",
+        "textColor": "文字顏色",
+        "textAlign": "文字對齊"
+      },
+      "googleMap": {
+        "address": "地址",
+        "lat": "緯度",
+        "lng": "經度",
+        "zoom": "縮放級別",
+        "height": "地圖高度",
+        "markerTitle": "標記標題"
+      }
+    },
+    "elementProps": {
+      "backToComponentProperties": "返回元件屬性",
+      "linkUrl": "連結 URL",
+      "fontWeight": "字體粗細",
+      "borderColor": "邊框顏色",
+      "text": { "title": "文字元素屬性" },
+      "button": { "title": "按鈕元素屬性" },
+      "image": { "title": "圖片元素屬性" }
+    },
+    "newPage": "新增頁面",
+    "editPage": "編輯頁面",
+    "back": "返回",
+    "addPage": "加頁面",
+    "pageName": "頁面名稱",
+    "pageNamePlaceholder": "例如：關於我們",
+    "pageSlug": "網址路徑",
+    "pageSlugPlaceholder": "例如：about-us",
+    "slugHint": "輸入頁面名稱後會自動生成，也可手動修改",
+    "pageSettings": "頁面設定",
+    "preview": "預覽",
+    "save": "保存",
+    "loading": "載入中...",
+    "undo": "上一步 (Ctrl+Z)",
+    "redo": "下一步 (Ctrl+Y)",
+    "desktopView": "桌面視圖",
+    "mobileView": "手機視圖",
+    "componentLibrary": "元件庫",
+    "blockLibrary": "區塊庫",
+    "styleSettings": "樣式設定",
+    "close": "關閉",
+    "showMenu": "顯示菜單",
+    "saveBeforePreview": "請先保存頁面",
+    "loadPageFailedRetry": "頁面載入失敗，請重試",
+    "unsavedChangesCreateNew": "您有未保存的更改。是否要保存当前页面并创建新页面？\n\n点击\"确定\"保存并创建新页面\n点击\"取消\"放弃更改并创建新页面",
+    "noPages": "暫無頁面",
+    "deviceLimitTitle": "裝置限制",
+    "deviceLimitDesc": "頁面編輯器需要至少 1000px 寬度的螢幕才能使用。",
+    "backToDashboard": "返回儀表板",
+    "emptyStateHint": "點擊左上角元件庫圖標或 +元件 按鈕添加元件到頁面",
+    "componentProperties": "元件屬性",
+    "selectComponentToEdit": "選擇元件以編輯屬性",
+    "saveAsBlock": "保存為區塊",
+    "blockName": "區塊名稱",
+    "blockNamePlaceholder": "輸入區塊名稱",
+    "saveSuccess": "保存成功",
+    "pageSaved": "頁面已成功保存！",
+    "previewLink": "預覽連結：",
+    "copyLink": "複製連結",
+    "openInNewWindow": "在新視窗開啟",
+    "viewResult": "查看效果",
+    "published": "已發布",
+    "saveSettings": "保存設定",
+    "textSettings": "文字設定",
+    "defaultTitleColor": "標題文字預設顏色",
+    "defaultTitleColorHint": "影響所有元件的標題文字顏色",
+    "defaultContentColor": "內容文字預設顏色",
+    "defaultContentColorHint": "影響所有元件的內容文字顏色",
+    "containerWidthSettings": "容器寬度設定",
+    "containerWidth": "容器寬度",
+    "containerWidth1200": "1200px (預設)",
+    "containerWidthFull": "全寬",
+    "containerWidthCustom": "自訂",
+    "customWidthPx": "自訂寬度 (px)",
+    "customWidthPlaceholder": "例如: 1200",
+    "editBlockName": "編輯區塊名稱",
+    "draftOnlyHint": "頁面狀態為「草稿」，只有您可以看到。如需公開訪問，請在「頁面設定」中將狀態改為「已發布」。",
+    "publishedHint": "頁面狀態為「已發布」，所有人都可以訪問。",
+    "cannotGetPageInfo": "無法獲取頁面資訊",
+    "selectComponentToSaveBlock": "請選擇要保存的元件",
+    "componentNotFound": "元件不存在",
+    "enterBlockName": "請輸入區塊名稱",
+    "blockSaved": "區塊保存成功！",
+    "saveBlockFailed": "保存區塊失敗",
+    "blockDeleted": "區塊刪除成功！",
+    "deleteBlockFailed": "刪除區塊失敗",
+    "noBlocks": "暫無區塊",
+    "editName": "編輯名稱",
+    "deleteBlock": "刪除區塊",
+    "thisBlock": "此區塊",
+    "confirmDeleteBlock": "確定要刪除區塊「{name}」嗎？此操作無法復原。",
+    "linkedBlock": "引用區塊",
+    "linkedBlockHint": "修改此區塊會影響所有使用它的頁面",
+    "linkedBlockLabel": "引用區塊",
+    "linkedBlockWarning": "此元件已連結至共用區塊。按「編輯區塊」可一次過更新所有使用此區塊的頁面；否則需要逐一更新每個頁面。",
+    "unlinkBlock": "取消連結區塊（建立獨立副本）",
+    "confirmUnlink": "確定要取消連結此元件與共用區塊嗎？它將變為獨立副本，不再接收區塊的更新。",
+    "unlinked": "元件已取消連結區塊",
+    "editBlock": "編輯區塊",
+    "unlinkAndEdit": "取消連結",
+    "editingBlock": "正在編輯區塊：",
+    "editBlockReminder": "完成後請記得儲存",
+    "blockUpdated": "區塊已更新 — 所有使用此區塊的頁面將反映變更",
+    "addComponent": "元件",
+    "unknownComponent": "未知元件",
+    "units": {
+      "columns": "欄",
+      "items": "項"
+    }
+  }
+}

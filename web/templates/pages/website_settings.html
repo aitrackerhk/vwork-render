@@ -1,0 +1,501 @@
+{{define "pages/website_settings"}}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0" data-i18n="pages.websiteSettings.title">網站設定</h4>
+                </div>
+                <div class="card-body">
+                    <div id="alertContainer"></div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="websiteEnabled">
+                                <label class="form-check-label" for="websiteEnabled" data-i18n="pages.websiteTheme.enableWebsite">啟用網站功能</label>
+                            </div>
+                            <small class="text-muted d-block mb-2" data-i18n="pages.websiteTheme.enableHint">啟用後，您的網站將對外開放</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label" data-i18n="pages.websiteSettings.allowedCountries">網店開放國家</label>
+                            <select class="form-select w-100" id="allowedCountries" multiple data-placeholder="" data-i18n-placeholder="pages.websiteSettings.countryPlaceholder">
+                                <!-- Select2 會動態載入 -->
+                            </select>
+                            <small class="text-muted" data-i18n="pages.websiteSettings.countryHint">選擇網店開放的國家（可多選，留空表示開放所有國家）</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label" data-i18n="pages.websiteSettings.defaultLanguage">預設網頁語言</label>
+                            <select class="form-select w-100" id="defaultLanguage">
+                                <option value="zh" data-i18n="pages.websiteSettings.traditionalChinese">繁體中文</option>
+                                <option value="zh-CN" data-i18n="pages.websiteSettings.simplifiedChinese">简体中文</option>
+                                <option value="en" data-i18n="pages.websiteSettings.english">English</option>
+                            </select>
+                            <small class="text-muted" data-i18n="pages.websiteSettings.languageHint">設定網站的預設語言（預設為 CMS 已選語言）</small>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label" data-i18n="pages.websiteSettings.faviconLabel">網站圖標（Favicon）</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <div style="position: relative;">
+                                    <img id="iconPreview" src="/static/vworkicon.png" alt="Favicon" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid #dee2e6; display: block;">
+                                    <input type="hidden" id="websiteIcon" value="">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="file" id="iconUpload" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" id="btnUploadIcon" data-i18n="pages.websiteSettings.uploadIcon">上傳圖標</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" id="btnRemoveIcon" style="display: none;" data-i18n="pages.websiteSettings.removeIcon">移除圖標</button>
+                                    <small class="d-block text-muted mt-2" data-i18n="pages.websiteSettings.faviconHint">建議尺寸：1:1 比例，至少 64x64 像素</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="publicChatEnabled">
+                                <label class="form-check-label" for="publicChatEnabled" data-i18n="pages.websiteSettings.publicChatLabel">啟用網站浮動聊天按鈕（租戶網站 /co/...）</label>
+                            </div>
+                            <small class="text-muted" data-i18n="pages.websiteSettings.publicChatHint">開啟後，未登入的訪客也能以匿名 ID 與租戶對話，紀錄會出現在「訊息 /messages」。</small>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" id="btnSave" data-i18n="pages.websiteSettings.saveSettings">保存設置</button>
+                        <button class="btn btn-outline-secondary" id="btnReset" data-i18n="common.reset">重置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Countries: 使用 /api/v1/countries (支援搜尋) + Select2，讓 UI 好看且可快速搜尋
+
+    // API 請求
+    async function apiRequest(url, options = {}) {
+        if (typeof App !== 'undefined' && App.apiRequest) {
+            return await App.apiRequest(url, options);
+        }
+
+        const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }
+        };
+
+        const response = await fetch(url, { ...defaultOptions, ...options });
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.requestFailed') : 'Request failed'));
+        }
+        
+        return data;
+    }
+
+    // 顯示提示訊息
+    function showAlert(message, type = 'success') {
+        const container = document.getElementById('alertContainer');
+        container.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 5000);
+    }
+
+    function initAllowedCountriesSelect2() {
+        const el = document.getElementById('allowedCountries');
+        if (!el || typeof $ === 'undefined' || !$.fn || !$.fn.select2) return;
+
+        const $el = $('#allowedCountries');
+        // 如果已初始化，且不是強制重建，就直接返回
+        if ($el.hasClass('select2-hidden-accessible')) return;
+
+        const PLACEHOLDER_KEY = 'pages.websiteSettings.countryPlaceholder';
+        const resolvePlaceholder = () => {
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                const t = I18n.t(PLACEHOLDER_KEY);
+                // i18n 尚未載入時，I18n.t 會回傳 key 本身
+                if (t && t !== PLACEHOLDER_KEY) return t;
+            }
+            return null;
+        };
+
+        // 不要用 $el.data('placeholder')（可能是 HTML 寫死的中文、且 i18n 不會更新它）
+        // 若翻譯尚未 ready，先用「依語言的後備 placeholder」
+        // 這樣在 zh/zh-CN 不會先閃成英文、讓人誤以為沒翻譯
+        const getInitialLang = () => {
+            // i18n.js 用 u-nai_lang；cms_layout.html 也會設 window.__INITIAL_LANG__
+            if (typeof I18n !== 'undefined' && I18n.currentLang) return I18n.currentLang;
+            try {
+                // cms 常用 language；i18n.js 用 u-nai_lang
+                const cmsLang = localStorage.getItem('language');
+                if (cmsLang) return cmsLang;
+                const saved = localStorage.getItem('u-nai_lang');
+                if (saved) return saved;
+            } catch (e) {
+                // ignore
+            }
+            if (typeof window !== 'undefined' && window.__INITIAL_LANG__) return window.__INITIAL_LANG__;
+            return 'zh';
+        };
+
+        const initialLang = getInitialLang();
+        const fallbackPlaceholder =
+            (initialLang === 'en')
+                ? 'Search or select countries (multiple selection)'
+                : (initialLang === 'zh-CN')
+                    ? '搜索或选择国家（可多选）'
+                    : '搜尋或選擇國家（可多選）';
+
+        const initSelect2 = (placeholder) => {
+            $el.attr('data-placeholder', placeholder);
+
+            // 如果已存在 select2（例如翻譯晚到但已先 init），重建以更新 placeholder
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+
+            $el.select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder,
+                allowClear: true,
+                closeOnSelect: false,
+                ajax: {
+                    url: '/api/v1/countries',
+                    dataType: 'json',
+                    delay: 200,
+                    data: function (params) {
+                        return {
+                            search: params.term || '',
+                            limit: 50,
+                            page: params.page || 1,
+                            lang: getInitialLang()
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        const rows = (data && data.data) ? data.data : [];
+                        return {
+                            results: rows.map(c => ({ id: c.code, text: `${c.name} (${c.code})` })),
+                            pagination: { more: rows.length === 50 }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0
+            });
+        }
+
+        // 先用「翻譯（若已 ready）」否則用英文預設，立刻初始化，避免 placeholder 被中文卡住
+        const initialPlaceholder = resolvePlaceholder() || fallbackPlaceholder;
+        initSelect2(initialPlaceholder);
+
+        // 若翻譯晚到（例如 i18n 檔案載入較慢），再自動重建一次更新 placeholder
+        // 避免依賴 languageChanged（事件可能在本頁 script 掛上 listener 前就已觸發）
+        const upgradeWhenReady = (attempt = 0) => {
+            const translated = resolvePlaceholder();
+            if (!translated) {
+                if (attempt < 100) setTimeout(() => upgradeWhenReady(attempt + 1), 100);
+                return;
+            }
+            if (translated === initialPlaceholder) return;
+
+            try {
+                const prev = ($el.hasClass('select2-hidden-accessible')) ? ($el.val() || []) : [];
+                if ($el.hasClass('select2-hidden-accessible')) $el.select2('destroy');
+                initSelect2(translated);
+                if (prev && prev.length) $el.val(prev).trigger('change');
+            } catch (e) {
+                // ignore
+            }
+        };
+
+        upgradeWhenReady();
+    }
+
+    async function ensureCountryOption(code) {
+        if (!code) return;
+        const $el = $('#allowedCountries');
+        if ($el.find(`option[value="${code}"]`).length > 0) return;
+
+        // 盡量拿到顯示名稱，拿不到就用 code
+        let text = code;
+        try {
+            const lang = getInitialLang();
+            const resp = await apiRequest(`/api/v1/countries?search=${encodeURIComponent(code)}&limit=250&lang=${encodeURIComponent(lang)}`);
+            const rows = (resp && resp.data) ? resp.data : [];
+            const found = rows.find(r => r.code === code);
+            if (found) text = `${found.name} (${found.code})`;
+        } catch (e) {
+            // ignore
+        }
+
+        const opt = new Option(text, code, true, true);
+        $el.append(opt);
+    }
+
+    // 載入當前設置
+    async function loadCurrentSettings() {
+        try {
+            // 獲取 CMS 語言設置（從 localStorage 或 cookie）
+            const cmsLang = localStorage.getItem('language') || 'zh';
+            
+            // 同時獲取網站設定和網站主題（用於獲取 website_enabled）
+            const [settingsResponse, themeResponse] = await Promise.all([
+                apiRequest('/api/v1/tenant/website-settings'),
+                apiRequest('/api/v1/tenant/website-theme')
+            ]);
+            const data = settingsResponse.data;
+            const themeData = themeResponse.data;
+            
+            // 設置啟用網站功能
+            if (themeData.website_enabled !== undefined) {
+                document.getElementById('websiteEnabled').checked = themeData.website_enabled || false;
+            }
+
+            // 設置允許的國家
+            if (data.allowed_countries && Array.isArray(data.allowed_countries)) {
+                // 確保 Select2 有對應選項並設置值
+                for (const code of data.allowed_countries) {
+                    await ensureCountryOption(code);
+                }
+                if (typeof $ !== 'undefined' && $('#allowedCountries').hasClass('select2-hidden-accessible')) {
+                    $('#allowedCountries').val(data.allowed_countries).trigger('change');
+                } else {
+                    // fallback（未載入 select2）
+                    const select = document.getElementById('allowedCountries');
+                    if (select) {
+                        Array.from(select.options).forEach(option => {
+                            option.selected = data.allowed_countries.includes(option.value);
+                        });
+                    }
+                }
+            }
+
+            // 設置預設語言（如果沒有設置，使用 CMS 語言）
+            const defaultLang = data.default_language || cmsLang;
+            document.getElementById('defaultLanguage').value = defaultLang;
+
+            // 設置網站圖標
+            const websiteIcon = data.website_icon || '';
+            const iconPreview = document.getElementById('iconPreview');
+            const iconInput = document.getElementById('websiteIcon');
+            const btnRemoveIcon = document.getElementById('btnRemoveIcon');
+            if (websiteIcon) {
+                iconInput.value = websiteIcon;
+                iconPreview.src = websiteIcon;
+                if (btnRemoveIcon) btnRemoveIcon.style.display = 'inline-block';
+            } else {
+                iconInput.value = '';
+                iconPreview.src = '/static/vworkicon.png';
+                if (btnRemoveIcon) btnRemoveIcon.style.display = 'none';
+            }
+
+            // public chat button
+            const publicChatEnabled = (data.public_chat_enabled === undefined) ? true : !!data.public_chat_enabled;
+            const publicChatEl = document.getElementById('publicChatEnabled');
+            if (publicChatEl) publicChatEl.checked = publicChatEnabled;
+        } catch (error) {
+            console.error('載入設置失敗:', error);
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.loadFailed') : '載入設置失敗') + ': ' + error.message, 'danger');
+        }
+    }
+
+    // 保存設置
+    async function saveSettings() {
+        try {
+            const btnSave = document.getElementById('btnSave');
+            btnSave.disabled = true;
+            btnSave.textContent = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.saving') : '保存中...');
+
+            let selectedCountries = [];
+            if (typeof $ !== 'undefined' && $('#allowedCountries').hasClass('select2-hidden-accessible')) {
+                selectedCountries = $('#allowedCountries').val() || [];
+            } else {
+                const select = document.getElementById('allowedCountries');
+                selectedCountries = select ? Array.from(select.selectedOptions).map(option => option.value) : [];
+            }
+            const defaultLanguage = document.getElementById('defaultLanguage').value;
+            const publicChatEnabled = !!document.getElementById('publicChatEnabled')?.checked;
+            const websiteIcon = document.getElementById('websiteIcon').value || null;
+            const websiteEnabled = !!document.getElementById('websiteEnabled')?.checked;
+
+            // 同時更新網站設定和網站主題（website_enabled）
+            await Promise.all([
+                apiRequest('/api/v1/tenant/website-settings', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        allowed_countries: selectedCountries,
+                        default_language: defaultLanguage,
+                        public_chat_enabled: publicChatEnabled,
+                        website_icon: websiteIcon
+                    })
+                }),
+                apiRequest('/api/v1/tenant/website-theme', {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        website_enabled: websiteEnabled
+                    })
+                })
+            ]);
+
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.settingsSaved') : '設置已保存'), 'success');
+        } catch (error) {
+            console.error('保存設置失敗:', error);
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.saveFailed') : '保存設置失敗') + ': ' + error.message, 'danger');
+        } finally {
+            const btnSave = document.getElementById('btnSave');
+            btnSave.disabled = false;
+            btnSave.textContent = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.saveSettings') : '保存設置');
+        }
+    }
+
+    // 重置設置
+    function resetSettings() {
+        if (typeof $ !== 'undefined' && $('#allowedCountries').hasClass('select2-hidden-accessible')) {
+            $('#allowedCountries').val(null).trigger('change');
+        } else {
+            const select = document.getElementById('allowedCountries');
+            if (select) Array.from(select.options).forEach(option => option.selected = false);
+        }
+        const cmsLang = localStorage.getItem('language') || 'zh';
+        document.getElementById('defaultLanguage').value = cmsLang;
+        document.getElementById('websiteEnabled').checked = false;
+    }
+
+    // 處理圖標上傳
+    function initIconUpload() {
+        const iconUpload = document.getElementById('iconUpload');
+        const btnUploadIcon = document.getElementById('btnUploadIcon');
+        const btnRemoveIcon = document.getElementById('btnRemoveIcon');
+        const iconPreview = document.getElementById('iconPreview');
+        const iconInput = document.getElementById('websiteIcon');
+
+        if (!iconUpload || !btnUploadIcon) return;
+
+        btnUploadIcon.addEventListener('click', () => {
+            iconUpload.click();
+        });
+
+        btnRemoveIcon.addEventListener('click', () => {
+            iconInput.value = '';
+            iconPreview.src = '/static/vworkicon.png';
+            btnRemoveIcon.style.display = 'none';
+        });
+
+        iconUpload.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 檢查是否為圖片
+            if (!file.type.startsWith('image/')) {
+                showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.selectImageFile') : '請選擇圖片文件'), 'danger');
+                iconUpload.value = '';
+                return;
+            }
+
+            try {
+                // 使用 ImageCropper 進行 1:1 裁剪
+                if (typeof ImageCropper === 'undefined') {
+                    showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.cropperNotLoaded') : '圖片裁剪功能未載入，請刷新頁面重試'), 'warning');
+                    iconUpload.value = '';
+                    return;
+                }
+
+                const cropper = new ImageCropper({
+                    aspectRatio: 1, // 1:1 比例
+                    viewMode: 1
+                });
+
+                cropper.showCropModal(file, async (croppedBlob) => {
+                    try {
+                        const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
+                        const formData = new FormData();
+                        formData.append('file', croppedBlob, 'icon.png');
+
+                        const res = await fetch('/api/v1/upload', {
+                            method: 'POST',
+                            headers: { 'Authorization': 'Bearer ' + token },
+                            body: formData
+                        });
+
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.uploadFailed') : '上傳失敗'));
+
+                        let url = data.url || '';
+                        if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                            url = '/' + url;
+                        }
+
+                        iconInput.value = url;
+                        iconPreview.src = url;
+                        btnRemoveIcon.style.display = 'inline-block';
+                        showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.iconUploaded') : '圖標已上傳'), 'success');
+                    } catch (error) {
+                        console.error('Upload icon failed:', error);
+                        showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.uploadIconFailed') : '上傳圖標失敗') + ': ' + error.message, 'danger');
+                    } finally {
+                        iconUpload.value = '';
+                    }
+                }, {
+                    maxWidth: 512,
+                    mimeType: 'image/png',
+                    quality: 0.9,
+                    onCancel: () => {
+                        iconUpload.value = '';
+                    }
+                });
+            } catch (error) {
+                console.error('Crop icon failed:', error);
+                showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSettings.cropIconFailed') : '裁剪圖標失敗') + ': ' + error.message, 'danger');
+                iconUpload.value = '';
+            }
+        });
+    }
+
+    // 綁定事件
+    document.addEventListener('DOMContentLoaded', function() {
+        initAllowedCountriesSelect2();
+        initIconUpload();
+        loadCurrentSettings();
+        document.getElementById('btnSave').addEventListener('click', saveSettings);
+        document.getElementById('btnReset').addEventListener('click', resetSettings);
+    });
+
+    // i18n 載入/切換後，重建 Select2 以更新 placeholder（即使目前切語言會 reload，也保留這個保護）
+    if (typeof window !== 'undefined' && window.addEventListener) {
+        window.addEventListener('languageChanged', () => {
+            try {
+                const $el = (typeof $ !== 'undefined') ? $('#allowedCountries') : null;
+                if ($el && $el.length) {
+                    // 先銷毀再重建，確保 placeholder 更新
+                    if ($el.hasClass('select2-hidden-accessible')) $el.select2('destroy');
+                }
+            } catch (e) {
+                // ignore
+            }
+            // 重新初始化（內部會等待翻譯 ready）
+            initAllowedCountriesSelect2();
+        });
+    }
+</script>
+{{end}}

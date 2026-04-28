@@ -1,0 +1,112 @@
+{{define "pages/vmarket_join_recommendation"}}
+<div class="container py-5" style="max-width: 960px;">
+  <div class="text-center mb-4">
+    <!-- VMarket Logo -->
+    <div class="mb-4">
+      <img src="/static/vmarketlogo.png" alt="VMarket" style="height: 40px;" onerror="this.style.display='none'">
+    </div>
+    <h1 class="fw-semibold" data-i18n="pages.vmarketJoinRecommend.title">完成網站設定！加入 VMarket 讓更多人找到你</h1>
+    <p class="text-muted" data-i18n="pages.vmarketJoinRecommend.subtitle">加入後公司會顯示在 VMarket 公開頁，提升曝光與導流。</p>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title mb-3"><i class="bi bi-lightbulb text-warning me-2"></i>VMarket 如何幫助中小企？</h5>
+      <ul class="list-unstyled mb-0">
+        <li class="d-flex align-items-start mb-2">
+          <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+          <span><strong>免費曝光</strong> — 你的公司與產品將展示在 VMarket 公開頁，讓潛在客戶輕鬆找到你</span>
+        </li>
+        <li class="d-flex align-items-start mb-2">
+          <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+          <span><strong>一站管理</strong> — 在 vWork 更新資料即自動同步到 VMarket，無需重複維護</span>
+        </li>
+        <li class="d-flex align-items-start mb-2">
+          <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+          <span><strong>提升信任</strong> — 官方認證標誌讓客戶更有信心選擇你的服務</span>
+        </li>
+        <li class="d-flex align-items-start">
+          <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
+          <span><strong>擴大商機</strong> — 與其他商家互聯互通，共同拓展客源</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body text-center">
+      <p class="mb-4" data-i18n="pages.vmarketJoinRecommend.benefit">一次同步公司與產品資訊，維護成本更低。</p>
+      <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+        <button class="btn btn-primary btn-lg" id="btnJoinVMarket" data-i18n="pages.vmarketJoinRecommend.joinButton">加入 VMarket</button>
+        <button class="btn btn-outline-secondary btn-lg" id="btnSkipVMarket" data-i18n="pages.vmarketJoinRecommend.skipButton">稍後再說</button>
+      </div>
+      <div class="text-muted small mt-3" id="vmarketJoinStatus"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function updateStatus(joined) {
+    const statusEl = document.getElementById('vmarketJoinStatus');
+    if (!statusEl) return;
+    if (joined) {
+      if (typeof I18n !== 'undefined' && I18n.whenReady) {
+        await I18n.whenReady();
+        statusEl.textContent = I18n.t('pages.vmarketJoinRecommend.joinedHint');
+      } else {
+        statusEl.textContent = '你已加入 VMarket';
+      }
+    } else {
+      statusEl.textContent = '';
+    }
+  }
+
+  async function loadVMarketJoinStatus() {
+    try {
+      const resp = await App.apiRequest('/api/v1/tenant/vmarket-settings');
+      const joined = !!(resp && resp.data && resp.data.vmarket_joined);
+      if (joined) {
+        const joinBtn = document.getElementById('btnJoinVMarket');
+        if (joinBtn) joinBtn.style.display = 'none';
+      }
+      await updateStatus(joined);
+    } catch (error) {
+      console.error('載入 VMarket 狀態失敗:', error);
+    }
+  }
+
+  async function joinVMarket() {
+    const joinBtn = document.getElementById('btnJoinVMarket');
+    if (joinBtn) {
+      joinBtn.disabled = true;
+    }
+    try {
+      await App.apiRequest('/api/v1/tenant/vmarket-settings', {
+        method: 'PUT',
+        body: JSON.stringify({ vmarket_joined: true })
+      });
+      App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.vmarketJoinRecommend.joinSuccess') : '已加入 VMarket', 'success');
+      await updateStatus(true);
+      setTimeout(() => {
+        redirectToProductPage();
+      }, 800);
+    } catch (error) {
+      console.error('加入 VMarket 失敗:', error);
+      App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.vmarketJoinRecommend.joinFailed') : '加入失敗', 'danger');
+      if (joinBtn) joinBtn.disabled = false;
+    }
+  }
+
+  function skipVMarket() {
+    redirectToProductPage();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadVMarketJoinStatus();
+    const joinBtn = document.getElementById('btnJoinVMarket');
+    const skipBtn = document.getElementById('btnSkipVMarket');
+    if (joinBtn) joinBtn.addEventListener('click', joinVMarket);
+    if (skipBtn) skipBtn.addEventListener('click', skipVMarket);
+  });
+</script>
+{{end}}

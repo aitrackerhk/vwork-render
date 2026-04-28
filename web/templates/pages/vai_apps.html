@@ -1,0 +1,49 @@
+{{define "pages/vai_apps"}}
+<!-- vAI Application Center -->
+<div class="vai-apps-page" id="vaiAppsPage">
+    <!-- Header -->
+    <div class="vai-apps-header">
+        <div class="vai-apps-header-inner">
+            <h4 class="mb-1"><i class="bi bi-search-heart me-2"></i><span data-i18n="vai.apps.title">AI 發現</span></h4>
+            <p class="text-muted mb-3" style="font-size: 0.9rem;" data-i18n="vai.apps.subtitle">探索 AI 應用場景，一鍵啟動智能對話</p>
+            <!-- Search -->
+            <div class="vai-apps-search-wrapper">
+                <i class="bi bi-search vai-apps-search-icon"></i>
+                <input type="text" class="form-control vai-apps-search" id="vaiAppsSearch" placeholder="搜尋應用..." data-i18n-placeholder="vai.apps.searchPlaceholder" oninput="VaiApps.search(this.value)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="vai-apps-categories" id="vaiAppsCategories">
+        <div class="vai-apps-categories-inner">
+            <button class="vai-apps-category-btn active" data-category="all" onclick="VaiApps.filterCategory('all')">
+                <i class="bi bi-search-heart"></i> <span data-i18n="vai.apps.categoryAll">全部</span>
+            </button>
+            <!-- Categories rendered by vai-apps.js -->
+        </div>
+    </div>
+
+    <!-- Apps Grid -->
+    <div class="vai-apps-content" id="vaiAppsContent">
+        <div class="vai-apps-grid" id="vaiAppsGrid">
+            <!-- Rendered by vai-apps.js -->
+        </div>
+        <!-- Empty search result -->
+        <div class="vai-apps-empty" id="vaiAppsEmpty" style="display: none;">
+            <i class="bi bi-search" style="font-size: 2.5rem; opacity: 0.3;"></i>
+            <p class="mt-2 mb-0" data-i18n="vai.apps.noResults">找不到相關應用</p>
+            <small class="text-muted" data-i18n="vai.apps.tryOther">請嘗試其他關鍵字</small>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/vai-apps.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof VaiApps !== 'undefined') {
+        VaiApps.init();
+    }
+});
+</script>
+{{end}}

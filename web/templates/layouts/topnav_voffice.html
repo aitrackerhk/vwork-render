@@ -1,0 +1,153 @@
+{{define "layouts/topnav_voffice.html"}}
+<nav class="navbar navbar-expand-lg fixed-top voffice-navbar cms-navbar">
+  <div class="container-fluid px-4">
+    <div class="d-flex align-items-center gap-2">
+      <a class="navbar-brand d-flex align-items-center" href="/?domain=voffice">
+        <img src="/static/vofficelogo.png" alt="vOffice" class="voffice-logo" style="height: 20px;">
+      </a>
+      <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" id="tenantSwitchBtn" type="button" data-bs-toggle="modal" data-bs-target="#tenantSwitchModal" style="display:none;">
+        <i class="bi bi-buildings"></i>
+        <span id="tenantSwitchName">企業</span>
+        <i class="bi bi-chevron-down"></i>
+      </button>
+    </div>
+    <!-- Mobile: App Switcher, Menu Toggle -->
+    <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+      <li class="nav-item dropdown" id="mobileAppSwitcherVoffice">
+        <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+          <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+          <div class="app-switcher-grid">
+            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+              <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+              <span class="app-switcher-label">vAI</span>
+            </a>
+            <a href="/" class="app-switcher-item" data-app="vwork">
+              <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+              <span class="app-switcher-label">vWork</span>
+            </a>
+            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+              <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+              <span class="app-switcher-label">vMarket</span>
+            </a>
+            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+              <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+              <span class="app-switcher-label">vOffice</span>
+            </a>
+          </div>
+        </div>
+      </li>
+      <li class="nav-item" id="goToSystemBtnMobileVoffice">
+        <a class="nav-link" href="/voffice-download" title="進入系統">
+          <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <button class="navbar-toggler" type="button" id="vofficeMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+          <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+        </button>
+      </li>
+    </ul>
+    <!-- Desktop: Full menu -->
+    <div class="collapse navbar-collapse d-none d-lg-block" id="vofficeNavbar">
+      <ul class="navbar-nav me-auto align-items-lg-center gap-lg-2">
+      </ul>
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item">
+          <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+            <div class="dropdown" style="position: relative;">
+              <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+              </a>
+              <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                <div class="app-switcher-grid">
+                  <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                    <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                    <span class="app-switcher-label">vAI</span>
+                  </a>
+                  <a href="/" class="app-switcher-item" data-app="vwork">
+                    <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                    <span class="app-switcher-label">vWork</span>
+                  </a>
+                  <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                    <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                    <span class="app-switcher-label">vMarket</span>
+                  </a>
+                  <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                    <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                    <span class="app-switcher-label">vOffice</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="dropdown" style="position: relative;">
+              <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                <li><a class="dropdown-item" href="/help/voffice" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                <li><a class="dropdown-item" href="/contact?product=voffice" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+              </ul>
+            </div>
+            <div class="dropdown" style="position: relative;">
+              <a class="nav-link dropdown-toggle" href="#" id="vofficeLangDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="vofficeLangDropdown">
+                <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+              </ul>
+            </div>
+            <a class="nav-link" href="/login?product=voffice" id="loginLink" style="padding: 0.25rem 0.5rem;">
+              <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+            </a>
+            <div class="dropdown" style="position: relative;">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li id="publicAICoinsDisplay" style="display: none;">
+                  <a class="dropdown-item" href="/voffice-vcoins">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <span class="fw-bold" id="publicAICoinsBalance">0</span>
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+                <li><a class="dropdown-item" href="/voffice-personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                <li><a class="dropdown-item" href="/voffice-billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Tenant Switch Modal -->
+<div class="modal fade" id="tenantSwitchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="tenantSwitch.title">選擇企業</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-muted mb-2" data-i18n="tenantSwitch.selectHint">請選擇要進入的企業</div>
+                <div id="tenantSwitchList" class="list-group"></div>
+                <div class="text-danger small mt-2" id="tenantSwitchError" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" id="tenantSwitchAddTenant" data-i18n="tenantSwitch.addTenant">新增租戶</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="tenantSwitch.cancel">取消</button>
+                <button type="button" class="btn btn-primary" id="tenantSwitchConfirm" data-i18n="tenantSwitch.confirm">確認</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

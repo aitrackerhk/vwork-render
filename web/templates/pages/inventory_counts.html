@@ -1,0 +1,383 @@
+{{ define "pages/inventory_counts" }}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stats-card.danger {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stats-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .report-period-selector {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .report-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-clipboard-check"></i> <span data-i18n="inventoryCounts.title">庫存盤點</span></h2>
+    </div>
+
+    <!-- 篩選器 -->
+    <div class="report-period-selector">
+        <div class="row align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="accounting.startDate">開始日期</label>
+                <input type="date" class="form-control" id="startDate">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="accounting.endDate">結束日期</label>
+                <input type="date" class="form-control" id="endDate">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="fields.warehouse">倉庫</label>
+                <select class="form-select" id="warehouseFilter" style="width: 100%;">
+                    <option value="" data-i18n="common.all">全部</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="fields.product">產品</label>
+                <select class="form-select" id="productFilter" style="width: 100%;">
+                    <option value="" data-i18n="common.all">全部</option>
+                </select>
+            </div>
+        </div>
+        <div class="row align-items-end mt-3">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary" onclick="loadInventoryReport()">
+                    <i class="bi bi-search"></i> <span data-i18n="inventoryCounts.generateReport">生成報告</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="row mb-4" id="summaryStats">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="inventoryCounts.totalProducts">總產品數</div>
+                        <div class="h3 mb-0" id="totalProducts">0</div>
+                    </div>
+                    <i class="bi bi-box-seam fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card success">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="inventoryCounts.totalReceivingLabel">總入貨數量</div>
+                        <div class="h3 mb-0" id="totalReceiving">0</div>
+                    </div>
+                    <i class="bi bi-arrow-down-circle fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card danger">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="inventoryCounts.totalShippingLabel">總出貨數量</div>
+                        <div class="h3 mb-0" id="totalShipping">0</div>
+                    </div>
+                    <i class="bi bi-arrow-up-circle fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card info">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="inventoryCounts.netChangeLabel">淨變化</div>
+                        <div class="h3 mb-0" id="totalNetChange">0</div>
+                    </div>
+                    <i class="bi bi-graph-up fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 庫存報告表格 -->
+    <div class="report-table">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th data-i18n="inventoryCounts.productCode">產品編號</th>
+                        <th data-i18n="inventoryCounts.productName">產品名稱</th>
+                        <th data-i18n="inventoryCounts.productAttributes">產品屬性</th>
+                        <th data-i18n="fields.warehouse">倉庫</th>
+                        <th data-i18n="inventoryCounts.currentStock">當前庫存</th>
+                        <th data-i18n="inventoryCounts.totalReceiving">入貨數量</th>
+                        <th data-i18n="inventoryCounts.totalShipping">出貨數量</th>
+                        <th data-i18n="inventoryCounts.netChange">淨變化</th>
+                        <th data-i18n="inventoryCounts.lastUpdated">最後更新</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryReportTable">
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4" data-i18n="inventoryCounts.hint">請選擇日期範圍和篩選條件，然後點擊「生成報告」</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    let warehouses = [];
+    let products = [];
+    let reportData = [];
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // 載入倉庫和產品列表
+        try {
+            const [warehousesData, productsData] = await Promise.all([
+                App.apiRequest('/warehouses?limit=1000'),
+                App.apiRequest('/products?limit=1000')
+            ]);
+            warehouses = warehousesData.data || [];
+            products = productsData.data || [];
+
+            // 初始化倉庫選擇器
+            $('#warehouseFilter').select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryCounts.selectWarehouse') : '請選擇倉庫',
+                allowClear: true,
+                data: warehouses.map(w => ({ id: w.id, text: w.name })),
+                width: '100%'
+            });
+
+            // 初始化產品選擇器
+            $('#productFilter').select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryCounts.selectProduct') : '請選擇產品',
+                allowClear: true,
+                data: products.map(p => ({ id: p.id, text: `${p.code || ''} - ${p.name}`.trim() })),
+                width: '100%'
+            });
+        } catch (error) {
+            console.error('Failed to load data:', error);
+        }
+
+        // 設置默認日期範圍（最近30天）
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+        document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+        document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+
+        // 自動載入報告
+        await loadInventoryReport();
+    });
+
+    async function loadInventoryReport() {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const warehouseID = $('#warehouseFilter').val();
+        const productID = $('#productFilter').val();
+
+        if (!startDate || !endDate) {
+            App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryCounts.selectDateRange') : '請選擇開始日期和結束日期', 'warning');
+            return;
+        }
+
+        try {
+            App.showLoading((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryCounts.generating') : '生成報告中...');
+
+            // 獲取所有產品在各倉庫的當前庫存
+            const stocksParams = new URLSearchParams();
+            if (warehouseID) stocksParams.append('warehouse_id', warehouseID);
+            if (productID) stocksParams.append('product_id', productID);
+            
+            const stocksResponse = await App.apiRequest(`/product-warehouse-stocks?${stocksParams.toString()}`);
+            const stocks = stocksResponse.data || [];
+
+            // 獲取出入貨記錄
+            const movementsParams = new URLSearchParams({
+                page: '1',
+                limit: '10000' // 獲取所有記錄
+            });
+            if (startDate) movementsParams.append('start_date', startDate);
+            if (endDate) movementsParams.append('end_date', endDate);
+            if (warehouseID) movementsParams.append('warehouse_id', warehouseID);
+            if (productID) movementsParams.append('product_id', productID);
+
+            const movementsResponse = await App.apiRequest(`/inventory-movements?${movementsParams.toString()}`);
+            const movements = movementsResponse.data || [];
+
+            // 構建報告數據
+            const reportMap = {};
+            
+            // 輔助函數：生成包含產品屬性的 key
+            function generateKey(productId, warehouseId, productAttributes) {
+                const attrsStr = productAttributes ? JSON.stringify(productAttributes) : '';
+                return `${productId}_${warehouseId}_${attrsStr}`;
+            }
+            
+            // 初始化所有產品-倉庫-屬性組合
+            stocks.forEach(stock => {
+                // 注意：stocks 可能沒有 product_attributes，所以使用 null
+                const key = generateKey(stock.product_id, stock.warehouse_id, null);
+                if (!reportMap[key]) {
+                    reportMap[key] = {
+                        product_id: stock.product_id,
+                        product: stock.product,
+                        warehouse_id: stock.warehouse_id,
+                        warehouse: stock.warehouse,
+                        product_attributes: null,
+                        currentStock: stock.quantity || 0,
+                        receiving: 0,
+                        shipping: 0,
+                        lastUpdated: stock.last_updated_at
+                    };
+                } else {
+                    reportMap[key].currentStock = stock.quantity || 0;
+                    reportMap[key].lastUpdated = stock.last_updated_at;
+                }
+            });
+
+            // 計算出入貨
+            movements.forEach(movement => {
+                const productAttributes = movement.product_attributes || null;
+                const key = generateKey(movement.product_id, movement.warehouse_id, productAttributes);
+                if (!reportMap[key]) {
+                    // 如果沒有庫存記錄，創建一個
+                    const product = products.find(p => p.id === movement.product_id);
+                    const warehouse = warehouses.find(w => w.id === movement.warehouse_id);
+                    reportMap[key] = {
+                        product_id: movement.product_id,
+                        product: product,
+                        warehouse_id: movement.warehouse_id,
+                        warehouse: warehouse,
+                        product_attributes: productAttributes,
+                        currentStock: 0,
+                        receiving: 0,
+                        shipping: 0,
+                        lastUpdated: null
+                    };
+                }
+                
+                if (movement.type === 'receiving') {
+                    reportMap[key].receiving += movement.quantity || 0;
+                } else if (movement.type === 'shipping') {
+                    reportMap[key].shipping += movement.quantity || 0;
+                }
+            });
+
+            // 轉換為數組並計算淨變化
+            reportData = Object.values(reportMap).map(item => ({
+                ...item,
+                netChange: item.receiving - item.shipping
+            }));
+
+            App.hideLoading();
+            renderInventoryReport();
+            renderSummaryStats();
+        } catch (error) {
+            App.hideLoading();
+            const failed = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryCounts.generateFailed') : '生成報告失敗';
+            App.showAlert(failed + ': ' + error.message, 'danger');
+        }
+    }
+
+    function renderInventoryReport() {
+        const tbody = document.getElementById('inventoryReportTable');
+        if (!tbody) return;
+
+        if (reportData.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.noData') : '暫無數據') + '</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = reportData.map(item => {
+            const product = item.product || {};
+            const warehouse = item.warehouse || {};
+            const netChangeClass = item.netChange > 0 ? 'text-success' : item.netChange < 0 ? 'text-danger' : '';
+            const lastUpdated = item.lastUpdated ? new Date(item.lastUpdated).toLocaleString('zh-TW') : '-';
+            
+            // 格式化產品屬性
+            let attributesDisplay = '-';
+            if (item.product_attributes) {
+                if (typeof item.product_attributes === 'object') {
+                    const attrs = [];
+                    for (const [key, value] of Object.entries(item.product_attributes)) {
+                        attrs.push(`${key}: ${value}`);
+                    }
+                    attributesDisplay = attrs.length > 0 ? attrs.join(', ') : '-';
+                } else {
+                    attributesDisplay = String(item.product_attributes);
+                }
+            }
+            
+            return `
+                <tr>
+                    <td>${product.code || '-'}</td>
+                    <td>${product.name || item.product_id}</td>
+                    <td>${attributesDisplay}</td>
+                    <td>${warehouse.name || item.warehouse_id}</td>
+                    <td>${item.currentStock}</td>
+                    <td class="text-success">+${item.receiving}</td>
+                    <td class="text-danger">-${item.shipping}</td>
+                    <td class="${netChangeClass}">${item.netChange > 0 ? '+' : ''}${item.netChange}</td>
+                    <td>${lastUpdated}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderSummaryStats() {
+        // 計算唯一產品數
+        const uniqueProducts = new Set(reportData.map(item => item.product_id));
+        const totalProducts = uniqueProducts.size;
+
+        // 計算總入貨、出貨和淨變化
+        const totalReceiving = reportData.reduce((sum, item) => sum + item.receiving, 0);
+        const totalShipping = reportData.reduce((sum, item) => sum + item.shipping, 0);
+        const totalNetChange = totalReceiving - totalShipping;
+
+        document.getElementById('totalProducts').textContent = totalProducts;
+        document.getElementById('totalReceiving').textContent = totalReceiving;
+        document.getElementById('totalShipping').textContent = totalShipping;
+        document.getElementById('totalNetChange').textContent = totalNetChange > 0 ? '+' + totalNetChange : totalNetChange;
+    }
+</script>
+{{ end }}
+

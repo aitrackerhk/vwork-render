@@ -1,0 +1,369 @@
+{{define "pages/vai_sketch"}}
+<!-- vAI Sketch Tool -->
+<div class="vai-sketch-page" id="vaiSketchPage">
+    <!-- Left: Sketch List Sidebar -->
+    <div class="vai-sketch-sidebar" id="vaiSketchSidebar">
+        <div class="vai-sketch-sidebar-header">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="VaiSketch.createNew()">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.sketch.newSketch">新圖片</span>
+                </button>
+                <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="VaiSketch.toggleSidebar()" title="關閉" data-i18n-title="vai.common.close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- Sidebar tabs -->
+            <div class="vai-sidebar-tabs mt-2">
+                <button class="vai-sidebar-tab active" data-tab="sketches" onclick="VaiSketch.switchSidebarTab('sketches')">
+                    <i class="bi bi-brush me-1"></i><span data-i18n="vai.sidebar.mySketches">我的草圖</span>
+                </button>
+                <button class="vai-sidebar-tab" data-tab="chat" onclick="VaiSketch.switchSidebarTab('chat')">
+                    <i class="bi bi-chat-dots me-1"></i><span data-i18n="vai.sidebar.chatGeneration">對話生成</span>
+                </button>
+            </div>
+        </div>
+        <!-- Tab: My Sketches -->
+        <div id="vaiSketchList" class="vai-sketch-list">
+            <!-- Rendered by vai-sketch.js -->
+        </div>
+        <!-- Tab: Chat Generated Images -->
+        <div id="vaiChatGenList" class="vai-sketch-list" style="display: none;">
+            <!-- Rendered by vai-sketch.js -->
+        </div>
+    </div>
+
+    <!-- Right: Canvas + Toolbar Area -->
+    <div class="vai-sketch-main d-flex flex-column flex-grow-1" style="min-width: 0;">
+        <!-- Toolbar -->
+        <div class="vai-sketch-toolbar" id="vaiSketchToolbar">
+            <div class="d-flex align-items-center gap-1 flex-wrap">
+                <!-- Mobile sidebar toggle -->
+                <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="VaiSketch.toggleSidebar()" title="圖片列表" data-i18n-title="vai.sketch.sketchList">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="vr d-md-none mx-1" style="height: 24px;"></div>
+
+                <!-- Tool buttons -->
+                <div class="btn-group btn-group-sm" role="group">
+                    <button class="btn btn-outline-secondary active" data-tool="select" onclick="VaiSketch.setTool('select')" title="選取 (V)" data-i18n-title="vai.sketch.tools.select">
+                        <i class="bi bi-cursor"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" data-tool="pen" onclick="VaiSketch.setTool('pen')" title="沿筆 (P)" data-i18n-title="vai.sketch.tools.pen">
+                        <i class="bi bi-pen"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" data-tool="rect" onclick="VaiSketch.setTool('rect')" title="矩形 (R)" data-i18n-title="vai.sketch.tools.rectangle">
+                        <i class="bi bi-square"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" data-tool="ellipse" onclick="VaiSketch.setTool('ellipse')" title="圓形 (E)" data-i18n-title="vai.sketch.tools.ellipse">
+                        <i class="bi bi-circle"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" data-tool="line" onclick="VaiSketch.setTool('line')" title="直線 (L)" data-i18n-title="vai.sketch.tools.line">
+                        <i class="bi bi-slash-lg"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" data-tool="text" onclick="VaiSketch.setTool('text')" title="文字 (T)" data-i18n-title="vai.sketch.tools.text">
+                        <i class="bi bi-type"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" data-tool="eraser" onclick="VaiSketch.setTool('eraser')" title="橡皮擦 (X)" data-i18n-title="vai.sketch.tools.eraser">
+                        <i class="bi bi-eraser"></i>
+                    </button>
+                </div>
+
+                <div class="vr mx-1" style="height: 24px;"></div>
+
+                <!-- Stroke & Fill (for new objects) -->
+                <div class="d-flex align-items-center gap-1">
+                    <label class="mb-0 small text-muted" style="font-size: 0.75rem;" data-i18n="vai.sketch.strokeColor">筆色</label>
+                    <input type="color" id="vaiSketchStrokeColor" value="#333333" class="form-control form-control-color vai-color-input" title="筆色" data-i18n-title="vai.sketch.strokeColor" onchange="VaiSketch.setStrokeColor(this.value)">
+                    <label class="mb-0 small text-muted" style="font-size: 0.75rem;" data-i18n="vai.sketch.fillColor">填色</label>
+                    <input type="color" id="vaiSketchFillColor" value="#ffffff" class="form-control form-control-color vai-color-input" title="填色" data-i18n-title="vai.sketch.fillColor" onchange="VaiSketch.setFillColor(this.value)">
+                    <label class="mb-0 small text-muted" style="font-size: 0.75rem;" data-i18n="vai.sketch.lineWidth">粗細</label>
+                    <input type="range" id="vaiSketchStrokeWidth" min="1" max="20" value="2" class="form-range vai-stroke-range" style="width: 60px;" oninput="VaiSketch.setStrokeWidth(this.value)">
+                    <span id="vaiSketchStrokeWidthLabel" class="small text-muted" style="font-size: 0.75rem; min-width: 18px;">2</span>
+                </div>
+
+                <div class="vr mx-1" style="height: 24px;"></div>
+
+                <!-- Aspect Ratio -->
+                <div class="d-flex align-items-center gap-1">
+                    <label class="mb-0 small text-muted" style="font-size: 0.75rem;" data-i18n="vai.sketch.ratio">比例</label>
+                    <select id="vaiSketchAspectRatio" class="form-select form-select-sm vai-aspect-select" onchange="VaiSketch.setAspectRatio(this.value)">
+                        <option value="free" data-i18n="vai.sketch.ratioFree">自由</option>
+                        <option value="1:1">1:1</option>
+                        <option value="4:3">4:3</option>
+                        <option value="3:4">3:4</option>
+                        <option value="7:9">7:9</option>
+                        <option value="9:7">9:7</option>
+                        <option value="16:9">16:9</option>
+                        <option value="9:16">9:16</option>
+                        <option value="3:2">3:2</option>
+                        <option value="2:3">2:3</option>
+                    </select>
+                </div>
+
+                <div class="vr mx-1" style="height: 24px;"></div>
+
+                <!-- Image upload -->
+                <button class="btn btn-sm btn-outline-secondary" onclick="VaiSketch.openImagePicker()" title="插入圖片" data-i18n-title="vai.sketch.insertImage">
+                    <i class="bi bi-image"></i>
+                </button>
+                <input type="file" id="vaiSketchImageInput" accept="image/*" style="display: none;" onchange="VaiSketch.handleImageUpload(event)">
+
+                <div class="vr mx-1" style="height: 24px;"></div>
+
+                <!-- Undo / Redo / Clear -->
+                <button class="btn btn-sm btn-outline-secondary" onclick="VaiSketch.undo()" title="復原 (Ctrl+Z)" data-i18n-title="vai.sketch.undoShortcut">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="VaiSketch.redo()" title="重做 (Ctrl+Y)" data-i18n-title="vai.sketch.redoShortcut">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="VaiSketch.clearCanvas()" title="清除畫布" data-i18n-title="vai.sketch.clearCanvas">
+                    <i class="bi bi-x-circle"></i>
+                </button>
+
+                <!-- Spacer -->
+                <div class="flex-grow-1"></div>
+
+                <!-- Delete / Save -->
+                <button class="btn btn-sm btn-outline-danger" onclick="VaiSketch.deleteCurrent()" title="刪除圖片" data-i18n-title="vai.sketch.deleteSketch">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="VaiSketch.save()" title="儲存圖片" data-i18n-title="vai.sketch.saveSketch">
+                    <i class="bi bi-floppy me-1"></i><span class="d-none d-md-inline" data-i18n="vai.sketch.save">儲存</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas + Properties Panel row -->
+        <div class="vai-sketch-canvas-row">
+            <!-- Canvas Area -->
+            <div class="vai-sketch-canvas-wrapper" id="vaiSketchCanvasWrapper">
+                <canvas id="vaiSketchCanvas"></canvas>
+
+                <!-- Image Library Overlay (shown when canvas is empty) -->
+                <div class="vai-sketch-library-overlay" id="vaiSketchLibraryOverlay" style="display: none;">
+                    <div class="vai-sketch-library-inner">
+                        <div class="vai-sketch-library-header">
+                            <h6 class="mb-0"><i class="bi bi-images me-2"></i><span data-i18n="vai.sketch.imageLibrary">圖片範本庫</span></h6>
+                            <small class="text-muted" data-i18n="vai.sketch.imageLibraryHint">選擇一張範本作為參考，或選擇空白開始</small>
+                        </div>
+                        <!-- Category Tabs -->
+                        <div class="vai-sketch-library-tabs" id="vaiSketchLibraryTabs">
+                            <!-- Dynamically rendered by JS -->
+                        </div>
+                        <!-- Image Grid -->
+                        <div class="vai-sketch-library-grid" id="vaiSketchLibraryGrid">
+                            <!-- Dynamically rendered by JS -->
+                        </div>
+                    </div>
+                </div>
+                <!-- Text input overlay (shown when text tool is active and user clicks) -->
+                <textarea id="vaiSketchTextInput" class="vai-sketch-text-input" style="display: none;" placeholder="輸入文字..." data-i18n-placeholder="vai.sketch.textInputPlaceholder"></textarea>
+            </div>
+
+            <!-- Properties Panel (shown when object selected) -->
+            <div class="vai-sketch-props" id="vaiSketchProps" style="display: none;">
+                <div class="vai-sketch-props-header">
+                    <span class="fw-semibold" id="vaiPropsTitle" style="font-size: 0.85rem;" data-i18n="vai.sketch.props.title">屬性</span>
+                    <button class="btn btn-sm btn-link text-muted p-0" onclick="VaiSketch.deselectObject()" title="關閉" data-i18n-title="vai.common.close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="vai-sketch-props-body" id="vaiPropsBody">
+                    <!-- Dynamically populated by vai-sketch.js -->
+                </div>
+                <div class="vai-sketch-props-footer">
+                    <button class="btn btn-sm btn-outline-primary w-100" onclick="VaiSketch.duplicateSelected()">
+                        <i class="bi bi-copy me-1"></i><span data-i18n="vai.sketch.duplicate">複製</span>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger w-100 mt-1" onclick="VaiSketch.deleteSelected()">
+                        <i class="bi bi-trash me-1"></i><span data-i18n="vai.common.delete">刪除</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Generate Bar (bottom) -->
+        <div class="border-top p-3 bg-white" id="vaiSketchAiBar">
+            <!-- Attached reference image previews (up to 2) -->
+            <div id="vaiSketchAttachPreview" class="vai-sketch-attach-preview" style="display: none;">
+            </div>
+            <form onsubmit="event.preventDefault(); VaiSketch.generateWithAI();">
+                <div class="input-group">
+                    <button type="button" class="btn btn-outline-secondary" onclick="VaiSketch.openAttachPicker()" title="附加參考圖片" data-i18n-title="vai.sketch.attachRef">
+                        <i class="bi bi-paperclip"></i>
+                    </button>
+                    <input type="file" id="vaiSketchAttachInput" accept="image/*" style="display:none;" onchange="VaiSketch.handleAttachment(event)">
+                    <textarea class="form-control" id="vaiSketchPrompt" rows="1" placeholder="描述你想要生成的圖片... (例: 將圖片轉換為精美插畫)" data-i18n-placeholder="vai.sketch.promptPlaceholder" style="resize: none; max-height: 120px;"></textarea>
+                    <button type="button" class="btn btn-outline-secondary" id="vaiSketchHistoryBtn" onclick="VaiSketch.toggleGenerationHistory()" title="生成歷史" data-i18n-title="vai.sketch.genHistoryBtn">
+                        <i class="bi bi-clock-history"></i>
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="vaiSketchGenBtn" title="用 AI 生成圖片" data-i18n-title="vai.sketch.generateWithAI" style="display: none;">
+                        <i class="bi bi-stars"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary vai-stt-btn" onclick="VaiSTT.toggle('vaiSketchPrompt', this)" title="Voice Input" data-i18n-title="vai.chat.voiceInput">
+                        <i class="bi bi-mic"></i>
+                    </button>
+                </div>
+            </form>
+            <!-- AI generation result area -->
+            <div id="vaiSketchAiResult" class="vai-sketch-ai-result" style="display: none;">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <small class="text-muted"><i class="bi bi-stars me-1"></i><span data-i18n="vai.sketch.aiGenerateResult">AI 生成結果</span></small>
+                    <button class="btn btn-sm btn-link text-muted p-0" onclick="VaiSketch.closeAiResult()">&times;</button>
+                </div>
+                <div id="vaiSketchAiResultContent"></div>
+            </div>
+            <!-- Generation History Panel -->
+            <div id="vaiSketchGenHistory" class="vai-sketch-gen-history" style="display: none;">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <small class="fw-semibold"><i class="bi bi-clock-history me-1"></i><span data-i18n="vai.sketch.genHistory">生成歷史</span></small>
+                    <button class="btn btn-sm btn-link text-muted p-0" onclick="VaiSketch.toggleGenerationHistory()">&times;</button>
+                </div>
+                <div id="vaiSketchGenHistoryList" class="vai-sketch-gen-history-list">
+                    <div class="text-center text-muted py-3" style="font-size: 0.8rem;">
+                        <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Picker Modal -->
+<div class="modal fade" id="vaiImagePickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title mb-0" data-i18n="vai.sketch.insertImage">插入圖片</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Tabs -->
+                <ul class="nav nav-tabs px-3 pt-2" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#vaiImgTabUpload" type="button">
+                            <i class="bi bi-upload me-1"></i><span data-i18n="vai.common.upload">上傳</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vaiImgTabProducts" type="button">
+                            <i class="bi bi-box-seam me-1"></i><span data-i18n="vai.common.productImages">產品圖片</span>
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <!-- Upload Tab -->
+                    <div class="tab-pane fade show active p-3" id="vaiImgTabUpload">
+                        <div class="vai-upload-dropzone" id="vaiUploadDropzone" onclick="document.getElementById('vaiSketchImageInput').click()">
+                            <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: #adb5bd;"></i>
+                            <p class="mb-1 mt-2" style="font-size: 0.9rem;" data-i18n="vai.common.dropzoneText">點擊或拖拽圖片到這裡</p>
+                            <small class="text-muted" data-i18n="vai.common.supportFormats">支援 JPG, PNG, GIF, WebP</small>
+                        </div>
+                    </div>
+                    <!-- Product Images Tab -->
+                    <div class="tab-pane fade p-3" id="vaiImgTabProducts">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="vaiProductImgSearch" placeholder="搜尋產品名稱..." data-i18n-placeholder="vai.common.searchProducts" oninput="VaiSketch.searchProductImages(this.value)">
+                        </div>
+                        <div id="vaiProductImgGrid" class="vai-product-img-grid">
+                            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入產品圖片...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Aspect Ratio Change Prompt Modal -->
+<div class="modal fade" id="vaiRatioPromptModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content vai-ratio-prompt-content">
+            <div class="modal-body text-center py-4 px-3">
+                <i class="bi bi-aspect-ratio" style="font-size: 2rem; color: #8b5cf6;"></i>
+                <p class="mt-2 mb-1" style="font-size: 0.95rem;" data-i18n="vai.sketch.ratioPromptMsg">圖片比例為</p>
+                <span id="vaiRatioPromptLabel" class="badge bg-primary" style="font-size: 1.1rem; padding: 6px 16px;">3:4</span>
+                <p class="mt-2 mb-0 text-muted" style="font-size: 0.82rem;" data-i18n="vai.sketch.ratioPromptSub">是否調整畫布比例？</p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0 pb-3 gap-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary px-3" id="vaiRatioPromptNo" data-i18n="vai.sketch.ratioKeep">不用</button>
+                <button type="button" class="btn btn-sm btn-primary px-3" id="vaiRatioPromptYes" data-i18n="vai.sketch.ratioChange">調整</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attachment Picker Modal for AI Prompt (3-source: Upload, Sketch History, Product Images) -->
+<div class="modal fade" id="vaiSketchAttachPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title mb-0" data-i18n="vai.sketch.attachRef">附加參考圖片</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <ul class="nav nav-tabs px-3 pt-2" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#vaiSketchAttachTabUpload" type="button">
+                            <i class="bi bi-upload me-1"></i><span data-i18n="vai.common.upload">上傳</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vaiSketchAttachTabHistory" type="button">
+                            <i class="bi bi-brush me-1"></i><span data-i18n="vai.common.sketchImages">圖片</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vaiSketchAttachTabProducts" type="button">
+                            <i class="bi bi-box-seam me-1"></i><span data-i18n="vai.common.productImages">產品圖片</span>
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <!-- Upload Tab -->
+                    <div class="tab-pane fade show active p-3" id="vaiSketchAttachTabUpload">
+                        <div class="vai-upload-dropzone" onclick="document.getElementById('vaiSketchAttachInput').click()">
+                            <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: #adb5bd;"></i>
+                            <p class="mb-1 mt-2" style="font-size: 0.9rem;" data-i18n="vai.common.dropzoneText">點擊或拖拽圖片到這裡</p>
+                            <small class="text-muted">JPG, PNG, GIF, WebP</small>
+                        </div>
+                    </div>
+                    <!-- Sketch History Tab -->
+                    <div class="tab-pane fade p-3" id="vaiSketchAttachTabHistory">
+                        <div id="vaiSketchAttachHistoryGrid" class="vai-product-img-grid">
+                            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入中...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Images Tab -->
+                    <div class="tab-pane fade p-3" id="vaiSketchAttachTabProducts">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="vaiSketchAttachProductSearch" placeholder="搜尋產品名稱..." data-i18n-placeholder="vai.common.searchProducts" oninput="VaiSketch.searchAttachProducts(this.value)">
+                        </div>
+                        <div id="vaiSketchAttachProductGrid" class="vai-product-img-grid">
+                            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入中...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/vai-sketch.js?v=20260319e"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof VaiSketch !== 'undefined') {
+        VaiSketch.init();
+    }
+});
+</script>
+{{end}}

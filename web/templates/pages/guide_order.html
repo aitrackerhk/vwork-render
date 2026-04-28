@@ -1,0 +1,435 @@
+
+<style>
+    /* 使用與登錄頁面相同的背景樣式 */
+    body.guide-order-page {
+        margin: 0;
+        min-height: 100vh;
+        background: linear-gradient(
+            135deg,
+            #ffffff 0%!,(MISSING)
+            #ffffff 40%!,(MISSING)
+            #f8fafc 65%!,(MISSING)
+            #eef2ff 82%!,(MISSING)
+            #ffffff 100%!
+(MISSING)        );
+        background-size: 400%;
+        animation: loginGradientFlow 22s ease infinite;
+        overflow-x: hidden;
+    }
+    @keyframes loginGradientFlow {
+        0%!{(MISSING) background-position: 0%; }
+        25%!{(MISSING) background-position: 100%; }
+        50%!{(MISSING) background-position: 100%; }
+        75%!{(MISSING) background-position: 0%; }
+        100%!{(MISSING) background-position: 0%; }
+    }
+    
+    body.guide-order-page::before,
+    body.guide-order-page::after {
+        content: '';
+        position: fixed;
+        inset: -40%!;(MISSING)
+        pointer-events: none;
+        z-index: 0;
+        background:
+            radial-gradient(circle at 20%, rgba(99, 102, 241, 0.05) 0%!,(MISSING) transparent 50%!)(MISSING),
+            radial-gradient(circle at 80%, rgba(139, 92, 246, 0.05) 0%!,(MISSING) transparent 50%!)(MISSING);
+        animation: loginGlowMove 30s linear infinite;
+        opacity: 1;
+    }
+    body.guide-order-page::after {
+        animation-duration: 42s;
+        opacity: 0.7;
+        filter: blur(2px);
+    }
+    @keyframes loginGlowMove {
+        0%!{(MISSING) transform: translate(0, 0) scale(1) rotate(0deg); }
+        50%!{(MISSING) transform: translate(80px, 60px) scale(1.08) rotate(180deg); }
+        100%!{(MISSING) transform: translate(0, 0) scale(1) rotate(360deg); }
+    }
+    
+    body.guide-order-page > * {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .guide-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 100px 20px 60px;
+    }
+    
+    .guide-header {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+    
+    .guide-icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #fd7e1422 0%!,(MISSING) #fd7e1411 100%!)(MISSING);
+        border-radius: 50%!;(MISSING)
+        margin-bottom: 30px;
+        border: 3px solid #fd7e1433;
+    }
+    
+    .guide-icon-wrapper i {
+        font-size: 48px;
+        color: #fd7e14;
+    }
+    
+    .guide-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 20px;
+        line-height: 1.2;
+    }
+    
+    .guide-header p {
+        font-size: 1.25rem;
+        color: #64748b;
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    .guide-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 30px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+    
+    .guide-card h2 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .guide-card h2::before {
+        content: '';
+        width: 4px;
+        height: 28px;
+        background: #fd7e14;
+        border-radius: 2px;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-item:hover {
+        background: #fd7e140f;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .feature-item i {
+        font-size: 24px;
+        color: #fd7e14;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    
+    .feature-item span {
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .steps-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+    
+    .step-item {
+        display: flex;
+        gap: 20px;
+        padding: 24px;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #ffffff 0%!,(MISSING) #f8f9fa 100%!)(MISSING);
+        border-radius: 16px;
+        border-left: 4px solid #fd7e14;
+        transition: all 0.3s ease;
+    }
+    
+    .step-item:hover {
+        transform: translateX(8px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    .step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background: #fd7e14;
+        color: white;
+        border-radius: 50%!;(MISSING)
+        font-weight: 700;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .step-content h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+    
+    .step-content p {
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+    }
+    
+    .tips-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+    
+    .tip-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #fff9e6 0%!,(MISSING) #fffbf0 100%!)(MISSING);
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+    }
+    
+    .tip-item i {
+        color: #ffc107;
+        font-size: 20px;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+    
+    .tip-item span {
+        color: #856404;
+        line-height: 1.6;
+    }
+    
+    .related-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .related-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #fd7e14;
+        color: white;
+        text-decoration: none;
+        border-radius: 100px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .related-link:hover {
+        background: #fd7e14dd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px #fd7e1444;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .guide-header h1 {
+            font-size: 2rem;
+        }
+        
+        .guide-header p {
+            font-size: 1rem;
+        }
+        
+        .guide-card {
+            padding: 24px;
+        }
+        
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .step-item {
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
+</style>
+
+<div class="guide-container">
+    <div class="guide-header">
+        <div class="guide-icon-wrapper">
+            <i class="bi bi-receipt"></i>
+        </div>
+        <h1>訂單管理</h1>
+        <p>學習如何創建、處理和追蹤訂單，提升訂單處理效率</p>
+    </div>
+    
+    <!-- 功能特點 -->
+    <div class="guide-card">
+        <h2>主要功能</h2>
+        <div class="features-grid">
+            
+            <div class="feature-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>訂單創建與編輯</span>
+            </div>
+            
+            <div class="feature-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>訂單狀態管理</span>
+            </div>
+            
+            <div class="feature-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>訂單搜索與篩選</span>
+            </div>
+            
+            <div class="feature-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>訂單打印與導出</span>
+            </div>
+            
+            <div class="feature-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>訂單統計與報表</span>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- 操作步驟 -->
+    <div class="guide-card">
+        <h2>操作步驟</h2>
+        <ul class="steps-list">
+            
+            <li class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>創建訂單</h3>
+                    <p>進入「訂單管理」，點擊「新增訂單」開始創建</p>
+                </div>
+            </li>
+            
+            <li class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>選擇客戶</h3>
+                    <p>選擇或創建客戶信息</p>
+                </div>
+            </li>
+            
+            <li class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>添加商品</h3>
+                    <p>選擇要訂購的商品，設置數量和價格</p>
+                </div>
+            </li>
+            
+            <li class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>設置訂單信息</h3>
+                    <p>填寫配送地址、備註等信息</p>
+                </div>
+            </li>
+            
+            <li class="step-item">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>提交訂單</h3>
+                    <p>確認信息後提交訂單，系統會自動更新庫存</p>
+                </div>
+            </li>
+            
+        </ul>
+    </div>
+    
+    <!-- 實用提示 -->
+    
+    <div class="guide-card">
+        <h2>實用提示</h2>
+        <ul class="tips-list">
+            
+            <li class="tip-item">
+                <i class="bi bi-lightbulb-fill"></i>
+                <span>及時更新訂單狀態，讓客戶了解訂單進度</span>
+            </li>
+            
+            <li class="tip-item">
+                <i class="bi bi-lightbulb-fill"></i>
+                <span>使用訂單篩選功能快速找到目標訂單</span>
+            </li>
+            
+            <li class="tip-item">
+                <i class="bi bi-lightbulb-fill"></i>
+                <span>定期查看訂單報表，了解業務狀況</span>
+            </li>
+            
+        </ul>
+    </div>
+    
+    
+    <!-- 相關鏈接 -->
+    
+    <div class="guide-card">
+        <h2>相關鏈接</h2>
+        <div class="related-links">
+            
+            <a href="/orders" class="related-link">
+                <i class="bi bi-link-45deg"></i>
+                <span>訂單列表</span>
+            </a>
+            
+            <a href="/help" class="related-link">
+                <i class="bi bi-link-45deg"></i>
+                <span>支援中心</span>
+            </a>
+            
+        </div>
+    </div>
+    
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 添加頁面特定的 body class
+    document.body.classList.add('guide-order-page');
+});
+</script>

@@ -1,0 +1,590 @@
+{{define "layouts/vmarket_layout"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.Title}}</title>
+  {{template "partials/seo_head" .}}
+  <link rel="icon" type="image/png" href="/static/vmarketicon.png">
+  <link rel="apple-touch-icon" href="/static/vmarketicon.png">
+  <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/custom.css">
+  <link rel="stylesheet" href="/static/css/vmarket.css">
+  <style>
+    body.i18n-loading [data-i18n],
+    body.i18n-loading [data-i18n-placeholder],
+    body.i18n-loading [data-i18n-title] {
+      visibility: hidden;
+    }
+  </style>
+  <script>
+    (function() {
+      const savedLang = localStorage.getItem('u-nai_lang');
+      const browserLang = navigator.language || navigator.userLanguage;
+      let currentLang = 'zh';
+
+      if (savedLang) {
+        currentLang = savedLang;
+      } else {
+        if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+          currentLang = 'zh-CN';
+        } else if (browserLang.startsWith('zh')) {
+          currentLang = 'zh';
+        } else {
+          currentLang = 'en';
+        }
+        localStorage.setItem('u-nai_lang', currentLang);
+      }
+
+      window.__INITIAL_LANG__ = currentLang;
+
+      (function checkBody() {
+        if (document.body) {
+          document.body.classList.add('i18n-loading');
+          setTimeout(function() {
+            if (document.body && document.body.classList.contains('i18n-loading')) {
+              document.body.classList.remove('i18n-loading');
+            }
+          }, 5000);
+        } else {
+          requestAnimationFrame(checkBody);
+        }
+      })();
+    })();
+  </script>
+</head>
+<body class="vmarket-body">
+  <nav class="navbar navbar-expand-lg vmarket-navbar fixed-top">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center" href="{{.BasePath}}/" id="vmarketBrandLink">
+        <img src="/static/vmarketlogo.png" alt="VMarket" class="vmarket-logo">
+      </a>
+      <!-- Mobile: App Switcher + Login + Hamburger (right side) -->
+      <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+        <li class="nav-item dropdown" id="mobileAppSwitcherVmarket">
+          <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+            <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+            <div class="app-switcher-grid">
+              <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                <span class="app-switcher-label">vAI</span>
+              </a>
+              <a href="/" class="app-switcher-item" data-app="vwork">
+                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                <span class="app-switcher-label">vWork</span>
+              </a>
+              <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                <span class="app-switcher-label">vMarket</span>
+              </a>
+              <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                <span class="app-switcher-label">vOffice</span>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item" id="goToSystemBtnMobileVmarket">
+          <a class="nav-link" href="/login?product=vmarket" title="登錄">
+            <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <button class="navbar-toggler" type="button" id="vmarketMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+            <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+          </button>
+        </li>
+      </ul>
+      <div class="collapse navbar-collapse" id="vmarketNavbar">
+        <ul class="navbar-nav align-items-lg-center vmarket-nav">
+          <li class="nav-item"><a class="nav-link {{if eq .Active "home"}}active{{end}}" href="{{.BasePath}}/" data-i18n="vmarket.nav.home">首頁</a></li>
+          <li class="nav-item"><a class="nav-link {{if eq .Active "products"}}active{{end}}" href="{{.BasePath}}/products" data-i18n="vmarket.nav.products">商品</a></li>
+          <li class="nav-item"><a class="nav-link {{if eq .Active "services"}}active{{end}}" href="{{.BasePath}}/services" data-i18n="vmarket.nav.services">服務</a></li>
+          <li class="nav-item"><a class="nav-link {{if eq .Active "companies"}}active{{end}}" href="{{.BasePath}}/companies" data-i18n="vmarket.nav.companies">公司</a></li>
+          <li class="nav-item"><a class="nav-link {{if eq .Active "map"}}active{{end}}" href="{{.BasePath}}/map" data-i18n="vmarket.nav.map">地圖</a></li>
+        </ul>
+        <ul class="navbar-nav align-items-lg-center vmarket-nav ms-auto">
+          <li class="nav-item"><a class="btn btn-sm btn-outline-secondary" href="{{.BasePath}}/join" id="vmarketJoinBtn" data-i18n="vmarket.nav.join" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">加入 VMarket</a></li>
+          <li class="nav-item">
+            <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+              <div class="dropdown" style="position: relative;">
+                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                </a>
+                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                    <div class="app-switcher-grid">
+                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                            <span class="app-switcher-label">vAI</span>
+                        </a>
+                        <a href="/" class="app-switcher-item" data-app="vwork">
+                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                            <span class="app-switcher-label">vWork</span>
+                        </a>
+                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                            <span class="app-switcher-label">vMarket</span>
+                        </a>
+                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                            <span class="app-switcher-label">vOffice</span>
+                        </a>
+                    </div>
+                </div>
+              </div>
+              <div class="dropdown" style="position: relative;">
+                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                  <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                  <li><a class="dropdown-item" href="/help/vmarket" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                  <li><a class="dropdown-item" href="/contact?product=vmarket" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                </ul>
+              </div>
+              <div class="dropdown" style="position: relative;">
+                <a class="nav-link dropdown-toggle" href="#" id="vmarketLangDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                  <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="vmarketLangDropdown">
+                  <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                  <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                  <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                </ul>
+              </div>
+              <a class="nav-link" href="/login?product=vmarket" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+              </a>
+              <div class="dropdown" style="position: relative;">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                  <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                  <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li id="publicAICoinsDisplay" style="display: none;">
+                    <a class="dropdown-item" href="/vmarket-vcoins">
+                      <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                      <span class="fw-bold" id="publicAICoinsBalance">0</span>
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+                  <li><a class="dropdown-item" href="/vmarket-personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                  <li><a class="dropdown-item" href="/vmarket-billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-overlay" id="vmarketSidebarOverlay"></div>
+
+  <div class="sidebar" id="vmarketSidebar">
+    <nav class="sidebar-nav">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{{.BasePath}}/">
+            <i class="bi bi-house"></i> <span data-i18n="vmarket.nav.home">首頁</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{.BasePath}}/products">
+            <i class="bi bi-box-seam"></i> <span data-i18n="vmarket.nav.products">商品</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{.BasePath}}/services">
+            <i class="bi bi-tools"></i> <span data-i18n="vmarket.nav.services">服務</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{.BasePath}}/companies">
+            <i class="bi bi-building"></i> <span data-i18n="vmarket.nav.companies">公司</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{.BasePath}}/map">
+            <i class="bi bi-geo-alt"></i> <span data-i18n="vmarket.nav.map">地圖</span>
+          </a>
+        </li>
+        <li class="nav-item" id="vmarketSidebarJoinItem">
+          <a class="nav-link" href="{{.BasePath}}/join" id="vmarketSidebarJoinLink">
+            <i class="bi bi-person-plus" id="vmarketSidebarJoinIcon"></i> <span data-i18n="vmarket.nav.join" id="vmarketSidebarJoinText">加入 VMarket</span>
+          </a>
+        </li>
+        <li class="nav-item nav-group" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+          <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vmarketMobileSupportSubmenu" aria-expanded="false">
+            <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse" id="vmarketMobileSupportSubmenu">
+            <ul class="nav flex-column submenu">
+              <li class="nav-item">
+                <a class="nav-link" href="/help/vmarket" target="_blank">
+                  <i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/contact?product=vmarket" target="_blank">
+                  <i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item nav-group">
+          <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vmarketSidebarLanguageSubmenu" aria-expanded="false">
+            <i class="bi bi-globe2"></i> <span data-i18n="vmarket.nav.language">語言</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse" id="vmarketSidebarLanguageSubmenu">
+            <ul class="nav flex-column submenu">
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="en">English</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <main class="vmarket-main">
+    {{embed}}
+  </main>
+
+  <footer class="site-footer-light">
+    <div class="container-fluid px-4">
+      <div class="row g-4">
+        <div class="col-lg-3 col-md-6">
+          <div class="d-flex align-items-center mb-3">
+            <a href="/" id="footerLogoLink" style="text-decoration: none;">
+              <img src="/static/vlogo.png" alt="vWork Logo" style="height: auto; max-height: 24px; display: block;">
+            </a>
+          </div>
+          <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+          <div class="mt-3">
+            <a href="https://www.vsysai.com" id="vworkFooterWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
+            <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
+            <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
+            <li class="mb-2"><a href="{{.BasePath}}/" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
+            <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="{{.BasePath}}/" class="text-muted text-decoration-none" data-i18n="footer.home">首頁</a></li>
+            <li class="mb-2"><a href="{{.BasePath}}/products" class="text-muted text-decoration-none" target="_blank" data-i18n="footer.vmarketProducts">商品</a></li>
+            <li class="mb-2"><a href="{{.BasePath}}/services" class="text-muted text-decoration-none" target="_blank" data-i18n="footer.vmarketServices">服務</a></li>
+            <li class="mb-2"><a href="{{.BasePath}}/companies" class="text-muted text-decoration-none" target="_blank" data-i18n="footer.vmarketCompanies">公司</a></li>
+            <li class="mb-2"><a href="{{.BasePath}}/map" class="text-muted text-decoration-none" data-i18n="footer.vmarketMap">地圖</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="/help/vmarket" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+            <li class="mb-2"><a href="/contact?product=vmarket" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+            <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+            <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.contact">聯繫我們</h6>
+          <ul class="list-unstyled text-muted">
+            <li class="mb-2">
+              <i class="bi bi-envelope me-2"></i>
+              <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.email">info@vsysai.com</a>
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-geo-alt me-2"></i>
+              <span data-i18n="footer.location">香港</span>
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-clock me-2"></i>
+              <span data-i18n="footer.workingHours">週一至週五 9:00 - 18:00</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <hr class="my-4">
+      <div class="row align-items-center">
+        <div class="col-12 text-center text-muted">
+          <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 V-sys Limited. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/i18n.js"></script>
+  <script src="/static/js/sso.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script>
+    (function() {
+      const nav = document.querySelector('.vmarket-navbar');
+      if (!nav) return;
+      const updateShadow = () => {
+        if (window.scrollY > 12) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+      };
+      updateShadow();
+      window.addEventListener('scroll', updateShadow, { passive: true });
+    })();
+
+    (function() {
+      const menuToggle = document.getElementById('vmarketMobileMenuToggle');
+      const sidebar = document.getElementById('vmarketSidebar');
+      const overlay = document.getElementById('vmarketSidebarOverlay');
+      if (menuToggle && sidebar && overlay) {
+        menuToggle.addEventListener('click', () => {
+          sidebar.classList.toggle('show');
+          overlay.classList.toggle('show');
+        });
+        overlay.addEventListener('click', () => {
+          sidebar.classList.remove('show');
+          overlay.classList.remove('show');
+        });
+      }
+    })();
+
+    // Footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+
+    // === vCoin 餘額載入 ===
+    async function loadPublicAICoinsBalance() {
+        try {
+            const token = localStorage.getItem('auth_token');
+            if (!token || token === 'temp_token') return;
+            const headers = { 'Accept': 'application/json', 'Authorization': 'Bearer ' + token };
+            const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+            if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+            const resp = await fetch('/api/v1/ai-coins/balance', { headers });
+            if (!resp.ok) return;
+            const data = await resp.json();
+            const balanceEl = document.getElementById('publicAICoinsBalance');
+            const displayEl = document.getElementById('publicAICoinsDisplay');
+            const dividerEl = document.getElementById('publicAICoinsDivider');
+            if (balanceEl && data.balance !== undefined) {
+                balanceEl.textContent = Number(data.balance).toLocaleString();
+                if (displayEl) displayEl.style.display = '';
+                if (dividerEl) dividerEl.style.display = '';
+            }
+        } catch (_e) {}
+    }
+
+    // === 登入狀態檢查與 theborderbox 更新 ===
+    (async function checkAuthAndUpdateNav() {
+      const userDropdownNav = document.getElementById('userDropdown');
+      const userNameSpan = document.getElementById('userName');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const loginLink = document.getElementById('loginLink');
+
+      async function fetchCurrentUserSilently() {
+        try {
+          const headers = { 'Accept': 'application/json' };
+          const token = localStorage.getItem('auth_token');
+          if (token && token !== 'temp_token') {
+            headers['Authorization'] = `Bearer ${token}`;
+          } else {
+            return null;
+          }
+          const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+          if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+          const resp = await fetch('/api/v1/user/me', { headers });
+          if (!resp.ok) return null;
+          const user = await resp.json();
+          try {
+            if (user) localStorage.setItem('user', JSON.stringify(user));
+            if (user && user.tenant && user.tenant.subdomain) {
+              localStorage.setItem('tenant_subdomain', String(user.tenant.subdomain));
+            }
+          } catch (_e) {}
+          return user;
+        } catch (_e) {
+          return null;
+        }
+      }
+
+      const user = await fetchCurrentUserSilently();
+      let finalUser = user;
+      if (!finalUser) {
+        // If we had a token but the API rejected it (401 = SSO global logout or token expired),
+        // clear stale localStorage to prevent showing old user data.
+        const hadToken = localStorage.getItem('auth_token');
+        if (hadToken) {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('tenant_subdomain');
+        }
+      }
+      const isLoggedIn = !!(finalUser && finalUser.name);
+
+      // Update app-switcher links based on login state
+      if (typeof App !== 'undefined' && typeof App.updateAppSwitcherLinks === 'function') {
+          App.updateAppSwitcherLinks(isLoggedIn);
+      }
+
+      // Update "加入 VMarket" → "配對服務" when logged in
+      var joinBtn = document.getElementById('vmarketJoinBtn');
+      var sidebarJoinLink = document.getElementById('vmarketSidebarJoinLink');
+      var sidebarJoinIcon = document.getElementById('vmarketSidebarJoinIcon');
+      var sidebarJoinText = document.getElementById('vmarketSidebarJoinText');
+
+      if (isLoggedIn) {
+        // Desktop navbar button
+        if (joinBtn) {
+          joinBtn.href = '/vmarket-search';
+          joinBtn.textContent = '配對服務';
+          joinBtn.setAttribute('data-i18n', 'vmarket.nav.matchService');
+        }
+        // Mobile sidebar link
+        if (sidebarJoinLink) sidebarJoinLink.href = '/vmarket-search';
+        if (sidebarJoinIcon) { sidebarJoinIcon.className = 'bi bi-search'; }
+        if (sidebarJoinText) {
+          sidebarJoinText.textContent = '配對服務';
+          sidebarJoinText.setAttribute('data-i18n', 'vmarket.nav.matchService');
+        }
+
+        // Re-apply i18n translation for dynamically updated elements
+        if (typeof I18n !== 'undefined' && typeof I18n.t === 'function') {
+          var matchLabel = I18n.t('vmarket.nav.matchService');
+          if (matchLabel && matchLabel !== 'vmarket.nav.matchService') {
+            if (joinBtn) joinBtn.textContent = matchLabel;
+            if (sidebarJoinText) sidebarJoinText.textContent = matchLabel;
+          }
+        }
+
+        if (userDropdownNav) userDropdownNav.style.display = '';
+        if (loginLink) loginLink.style.display = 'none';
+        if (userNameSpan && finalUser.name) userNameSpan.textContent = finalUser.name;
+
+        // Mobile login icon: update link when logged in (keep original icon)
+        var goToSystemBtnMobileVmarket = document.getElementById('goToSystemBtnMobileVmarket');
+        if (goToSystemBtnMobileVmarket) {
+          var mobileLink = goToSystemBtnMobileVmarket.querySelector('a');
+          if (mobileLink) { mobileLink.href = '/vmarket-personal-data'; mobileLink.title = '帳戶'; }
+        }
+
+        loadPublicAICoinsBalance();
+
+        const avatarImg = document.getElementById('publicUserAvatar');
+        const avatarIcon = document.getElementById('publicUserIcon');
+        if (avatarImg) {
+          let url = (finalUser && finalUser.profile_pic) ? String(finalUser.profile_pic) : '';
+          if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+          if (url) {
+            avatarImg.src = url;
+            avatarImg.style.display = 'inline-block';
+            if (avatarIcon) avatarIcon.style.display = 'none';
+            avatarImg.onerror = function() {
+              this.style.display = 'none';
+              if (avatarIcon) avatarIcon.style.display = '';
+              this.onerror = null;
+            };
+          } else {
+            avatarImg.style.display = 'none';
+            if (avatarIcon) avatarIcon.style.display = '';
+          }
+        }
+
+        if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+          logoutBtn.setAttribute('data-bound', 'true');
+          logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof App !== 'undefined' && App.logout) {
+              App.logout();
+            } else {
+              fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                .finally(function() {
+                  localStorage.removeItem('auth_token');
+                  localStorage.removeItem('user');
+                  localStorage.removeItem('tenant_subdomain');
+                  window.location.replace(window.location.pathname + '?logged_out=1');
+                });
+            }
+          });
+        }
+      } else {
+        if (userDropdownNav) userDropdownNav.style.display = 'none';
+        if (loginLink) loginLink.style.display = '';
+      }
+    })();
+
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'auth_token' && !e.newValue) {
+        fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+          .finally(function() { location.reload(); });
+      } else if (e.key === null) {
+        fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+          .finally(function() { location.reload(); });
+      } else if (e.key === 'auth_token') {
+        location.reload();
+      }
+    });
+
+    // === VMarket Ad Sidebar: hide for paid subscribers ===
+    (async function initVMarketAd() {
+      var adEls = document.querySelectorAll('.vmarket-ad');
+      if (!adEls.length) return;
+
+      try {
+        var token = localStorage.getItem('auth_token');
+        var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+        if (!token || token === 'temp_token') return; // not logged in, show ads
+
+        var authHeaders = {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ' + token
+        };
+        if (tenantSubdomain) {
+          authHeaders['X-Tenant-Subdomain'] = tenantSubdomain;
+        }
+
+        var resp = await fetch('/api/v1/billing/subscription', { headers: authHeaders });
+        if (!resp.ok) return; // on error, keep ads visible
+
+        var billingData = await resp.json();
+        var plan = (billingData && billingData.tenant && billingData.tenant.plan) || '';
+
+        // Paid plans: hide all vmarket ads
+        var paidPlans = ['vsuite_monthly', 'vsuite_yearly', 'vsuite_pro_monthly', 'vsuite_pro_yearly', 'monthly', 'yearly'];
+        if (paidPlans.indexOf(plan) !== -1) {
+          adEls.forEach(function(el) { el.style.display = 'none'; });
+          return;
+        }
+      } catch (err) {
+        // On error, keep ads visible
+      }
+
+      // Apply i18n translations to ad elements if I18n is available
+      if (typeof I18n !== 'undefined' && typeof I18n.applyTranslations === 'function') {
+        adEls.forEach(function(el) { I18n.applyTranslations(el); });
+      }
+    })();
+  </script>
+</body>
+</html>
+{{end}}

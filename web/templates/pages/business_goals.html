@@ -1,0 +1,1127 @@
+{{ define "pages/business_goals" }}
+<script>
+    if (document.body) {
+        document.body.setAttribute('data-disable-form-button-bar', 'true');
+    }
+</script>
+<!-- Business Goals: AI-Driven Sidebar + Workspace Layout -->
+<div class="bg-goals-page" id="bgGoalsPage">
+    <!-- Mobile: Goal List toggle button (fixed top-left, same as messages page) -->
+    <button id="bgGoalsSidebarToggleBtn" class="btn btn-outline-primary d-md-none position-fixed" style="top: 70px; left: 10px; z-index: 997; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="BGoals.toggleSidebar()">
+        <i class="bi bi-list"></i>
+    </button>
+    <!-- Left: Goal List Sidebar -->
+    <div class="bg-goals-sidebar" id="bgGoalsSidebar">
+        <div class="bg-goals-sidebar-header">
+            <div class="d-flex align-items-center gap-2">
+                <a href="/business-goals/new" class="btn btn-sm btn-outline-primary flex-grow-1">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="businessGoals.addGoal">新增目標</span>
+                </a>
+                <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="BGoals.toggleSidebar()" title="關閉">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- Quick filter tabs -->
+            <div class="d-flex gap-1 mt-2">
+                <button class="btn btn-sm bg-goals-filter-btn active" data-filter="" onclick="BGoals.filterSidebar('')" data-i18n="businessGoals.all">全部</button>
+                <button class="btn btn-sm bg-goals-filter-btn" data-filter="active" onclick="BGoals.filterSidebar('active')" data-i18n="businessGoals.statusActive">進行中</button>
+                <button class="btn btn-sm bg-goals-filter-btn" data-filter="completed" onclick="BGoals.filterSidebar('completed')" data-i18n="businessGoals.statusCompleted">已完成</button>
+            </div>
+        </div>
+        <div id="bgGoalsList" class="bg-goals-list">
+            <div class="text-center py-4 text-muted" style="font-size: 0.85rem;">
+                <div class="spinner-border spinner-border-sm me-1"></div>
+                <span data-i18n="businessGoals.loading">載入中...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Main Workspace -->
+    <div class="bg-goals-main d-flex flex-column flex-grow-1" style="min-width: 0;">
+        <!-- Empty state (when no goal selected) -->
+        <div id="bgGoalsEmpty" class="flex-grow-1 d-flex align-items-center justify-content-center">
+            <div class="text-center p-4 text-muted">
+                <i class="bi bi-bullseye bg-goals-empty-icon"></i>
+                <p class="mt-3 mb-1 text-muted" data-i18n="businessGoals.selectGoalTitle">選擇一個目標</p>
+                <p class="text-muted small" data-i18n="businessGoals.selectGoalDesc">從左側選擇一個目標查看詳情和 AI 分析，或新增一個目標</p>
+                <a href="/business-goals/new" class="btn btn-primary btn-sm mt-2">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="businessGoals.addGoal">新增目標</span>
+                </a>
+                <!-- Mobile toggle -->
+                <div class="d-md-none mt-3">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="BGoals.toggleSidebar()">
+                        <i class="bi bi-list me-1"></i><span data-i18n="businessGoals.viewGoals">查看目標列表</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected goal workspace (hidden initially) -->
+        <div id="bgGoalsWorkspace" class="d-none flex-grow-1 d-flex flex-column" style="min-height: 0;">
+            <!-- Top: Goal Detail Header -->
+            <div class="bg-goals-detail-header" id="bgGoalDetailHeader">
+                <div class="d-flex align-items-start gap-3 mb-2">
+                    <!-- Mobile sidebar toggle -->
+                    <button class="btn btn-sm btn-link text-muted p-0 d-md-none mt-1" onclick="BGoals.toggleSidebar()" title="目標列表">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h5 class="fw-bold mb-0 text-truncate" id="bgGoalTitle"></h5>
+                            <span id="bgGoalStatusBadge"></span>
+                            <span id="bgGoalPriorityBadge"></span>
+                        </div>
+                        <p class="text-muted small mb-0 mt-1 bg-goals-description" id="bgGoalDescription"></p>
+                    </div>
+                    <!-- Actions -->
+                    <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                        <button class="btn btn-sm btn-outline-primary" onclick="BGoals.quickAnalysis()" title="快速 AI 分析" id="bgQuickAnalysisBtn">
+                            <i class="bi bi-stars"></i><span class="d-none d-md-inline ms-1" data-i18n="businessGoals.aiAnalysis">分析</span>
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="javascript:void(0)" id="bgGoalEditLink"><i class="bi bi-pencil me-2"></i><span data-i18n="businessGoals.edit">編輯</span></a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="BGoals.refreshSelected()"><i class="bi bi-arrow-clockwise me-2"></i><span data-i18n="businessGoals.refresh">刷新進度</span></a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="BGoals.showTrackingHistory()"><i class="bi bi-clock-history me-2"></i><span data-i18n="businessGoals.trackingHistory">追蹤歷史</span></a></li>
+                                <li id="bgManualTrackingItem"><a class="dropdown-item" href="javascript:void(0)" onclick="BGoals.openManualTracking()"><i class="bi bi-pencil-square me-2"></i><span data-i18n="businessGoals.updateProgress">更新進度</span></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="BGoals.deleteSelected()"><i class="bi bi-trash me-2"></i><span data-i18n="businessGoals.delete">刪除</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- Progress bar (full width, separate row) -->
+                <div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <small class="text-muted" id="bgGoalProgressLabel"></small>
+                        <div class="d-flex align-items-center gap-2">
+                            <small class="text-muted"><i class="bi bi-calendar3 me-1"></i><span id="bgGoalDateRange"></span></small>
+                            <small id="bgGoalDaysLeft"></small>
+                            <small class="fw-bold" id="bgGoalProgressPct"></small>
+                        </div>
+                    </div>
+                    <div class="progress bg-goals-progress-bar">
+                        <div class="progress-bar" id="bgGoalProgressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle: AI Analysis History (scrollable) -->
+            <div class="bg-goals-ai-history flex-grow-1" id="bgAiHistoryArea">
+                <div class="bg-goals-ai-history-inner" id="bgAiHistoryList">
+                    <!-- Analysis records rendered here -->
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-stars bg-goals-empty-icon-sm"></i>
+                        <p class="mt-2 small" data-i18n="businessGoals.noAnalyses">尚未有 AI 分析記錄</p>
+                        <p class="small text-muted" data-i18n="businessGoals.startAnalysis">使用下方輸入框向 AI 提問，或點擊快速分析按鈕</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom: AI Chat Input Bar -->
+            <div class="border-top p-3 bg-white" id="bgAiInputBar">
+                <form onsubmit="event.preventDefault(); BGoals.sendAiChat();" id="bgAiChatForm">
+                    <div class="input-group">
+                        <textarea class="form-control" id="bgAiChatInput" rows="1" data-i18n-placeholder="businessGoals.aiChatPlaceholder" placeholder="向 AI 詢問關於此目標的問題..."></textarea>
+                        <button type="submit" class="btn btn-primary" id="bgAiSendBtn">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Manual Tracking Modal -->
+<div class="modal fade" id="manualTrackingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="businessGoals.updateProgress">更新進度</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" data-i18n="businessGoals.currentValueLabel">當前值</label>
+                    <input type="number" step="0.01" class="form-control" id="trackingValue">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" data-i18n="businessGoals.noteLabel">備註（選填）</label>
+                    <textarea class="form-control" id="trackingNote" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-i18n="businessGoals.cancel">取消</button>
+                <button type="button" class="btn btn-primary btn-sm" onclick="BGoals.submitManualTracking()" data-i18n="businessGoals.save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tracking History Modal -->
+<div class="modal fade" id="trackingHistoryModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-clock-history me-1"></i><span data-i18n="businessGoals.trackingHistory">追蹤歷史</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="trackingHistoryContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" data-i18n="businessGoals.close">關閉</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+window.BGoals = (() => {
+    let allGoals = [];
+    let selectedGoalId = null;
+    let selectedGoal = null;
+    let sidebarFilter = '';
+    let aiAnalyses = [];
+    let isAiLoading = false;
+
+    function t(key, fallback) {
+        return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(key) : fallback;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function formatNumber(num) {
+        if (num === null || num === undefined) return '0';
+        return parseFloat(num).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+
+    function getProgressColor(pct) {
+        if (pct >= 100) return 'bg-success';
+        if (pct >= 70) return 'bg-info';
+        if (pct >= 40) return 'bg-warning';
+        return 'bg-danger';
+    }
+
+    function getStatusBadge(status) {
+        const map = {
+            active: { cls: 'bg-primary', label: t('businessGoals.statusActive', '進行中') },
+            completed: { cls: 'bg-success', label: t('businessGoals.statusCompleted', '已完成') },
+            failed: { cls: 'bg-danger', label: t('businessGoals.statusFailed', '未達成') },
+            paused: { cls: 'bg-secondary', label: t('businessGoals.statusPaused', '已暫停') },
+        };
+        const s = map[status] || { cls: 'bg-dark', label: status };
+        return `<span class="badge ${s.cls}">${s.label}</span>`;
+    }
+
+    function getPriorityBadge(priority) {
+        const map = {
+            high: { cls: 'text-bg-danger', label: t('businessGoals.priorityHigh', '高') },
+            medium: { cls: 'text-bg-warning', label: t('businessGoals.priorityMedium', '中') },
+            low: { cls: 'text-bg-info', label: t('businessGoals.priorityLow', '低') },
+        };
+        const p = map[priority] || { cls: 'text-bg-secondary', label: priority };
+        return `<span class="badge ${p.cls}">${p.label}</span>`;
+    }
+
+    function getMetricLabel(metricType) {
+        const map = {
+            order_count: t('businessGoals.metricOrderCount', '訂單數量'),
+            revenue: t('businessGoals.metricRevenue', '營收'),
+            customer_count: t('businessGoals.metricCustomerCount', '客戶數量'),
+            product_sales_qty: t('businessGoals.metricProductSales', '產品銷售量'),
+            service_order_count: t('businessGoals.metricServiceOrders', '服務訂單'),
+            custom: t('businessGoals.metricCustom', '自定義'),
+        };
+        return map[metricType] || metricType;
+    }
+
+    function getDaysRemaining(endDate) {
+        const end = new Date(endDate);
+        const now = new Date();
+        return Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+    }
+
+    // ===== Sidebar =====
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('bgGoalsSidebar');
+        if (!sidebar) return;
+        sidebar.classList.toggle('show');
+        let backdrop = document.getElementById('bgSidebarBackdrop');
+        if (sidebar.classList.contains('show')) {
+            if (!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.id = 'bgSidebarBackdrop';
+                backdrop.className = 'bg-goals-sidebar-backdrop';
+                backdrop.onclick = function() { toggleSidebar(); };
+                sidebar.parentElement.appendChild(backdrop);
+            }
+            backdrop.style.display = 'block';
+        } else {
+            if (backdrop) backdrop.style.display = 'none';
+        }
+    }
+
+    function closeSidebarMobile() {
+        const sidebar = document.getElementById('bgGoalsSidebar');
+        if (sidebar) sidebar.classList.remove('show');
+        const backdrop = document.getElementById('bgSidebarBackdrop');
+        if (backdrop) backdrop.style.display = 'none';
+    }
+
+    function filterSidebar(status) {
+        sidebarFilter = status;
+        // Update active button
+        document.querySelectorAll('.bg-goals-filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.filter === status);
+        });
+        renderSidebar();
+    }
+
+    function renderSidebar() {
+        const container = document.getElementById('bgGoalsList');
+        let goals = allGoals;
+        if (sidebarFilter) {
+            goals = goals.filter(g => g.status === sidebarFilter);
+        }
+
+        if (goals.length === 0) {
+            container.innerHTML = `<div class="text-center py-4 text-muted" style="font-size: 0.85rem;">
+                <p class="mb-2">${t('businessGoals.noGoals', '沒有業務目標')}</p>
+            </div>`;
+            return;
+        }
+
+        let html = '';
+        for (const g of goals) {
+            const pct = g.target_value > 0 ? Math.min((g.current_value / g.target_value) * 100, 100) : 0;
+            const isActive = g.id === selectedGoalId ? 'active' : '';
+            const statusDot = g.status === 'active' ? 'bg-primary' :
+                              g.status === 'completed' ? 'bg-success' :
+                              g.status === 'failed' ? 'bg-danger' : 'bg-secondary';
+            html += `<div class="bg-goals-list-item ${isActive}" data-goal-id="${g.id}" onclick="BGoals.selectGoal('${g.id}')">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="bg-goals-status-dot ${statusDot}"></span>
+                    <span class="bg-goals-list-title text-truncate">${escapeHtml(g.title)}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="progress flex-grow-1" style="height: 4px;">
+                        <div class="progress-bar ${getProgressColor(pct)}" style="width: ${pct}%"></div>
+                    </div>
+                    <small class="text-muted" style="font-size: 0.7rem; min-width: 30px; text-align: right;">${Math.round(pct)}%</small>
+                </div>
+            </div>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    async function loadGoals() {
+        try {
+            const res = await App.apiRequest('/business-goals?limit=100');
+            if (res && res.data) {
+                allGoals = res.data;
+            } else {
+                allGoals = [];
+            }
+            renderSidebar();
+
+            // If we had a selected goal, re-select it (or check URL hash)
+            if (selectedGoalId) {
+                const exists = allGoals.find(g => g.id === selectedGoalId);
+                if (exists) {
+                    selectGoal(selectedGoalId);
+                } else {
+                    deselectGoal();
+                }
+            } else {
+                // Check URL hash
+                const hash = window.location.hash.replace('#', '');
+                if (hash) {
+                    const exists = allGoals.find(g => g.id === hash);
+                    if (exists) {
+                        selectGoal(hash);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load goals:', e);
+        }
+    }
+
+    // ===== Goal Selection & Detail =====
+
+    async function selectGoal(goalId) {
+        selectedGoalId = goalId;
+        closeSidebarMobile();
+
+        // Update hash without page reload
+        window.location.hash = goalId;
+
+        // Show workspace, hide empty
+        document.getElementById('bgGoalsEmpty').classList.add('d-none');
+        const ws = document.getElementById('bgGoalsWorkspace');
+        ws.classList.remove('d-none');
+        ws.classList.add('d-flex');
+
+        // Update sidebar active state
+        document.querySelectorAll('.bg-goals-list-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.goalId === goalId);
+        });
+
+        // Load goal detail
+        try {
+            const goal = await App.apiRequest(`/business-goals/${goalId}`);
+            if (!goal || goal.error) {
+                App.showAlert(t('businessGoals.loadError', '載入目標失敗'), 'danger');
+                return;
+            }
+            selectedGoal = goal;
+            renderGoalDetail(goal);
+        } catch (e) {
+            console.error('Failed to load goal:', e);
+        }
+
+        // Load AI analyses
+        loadAiAnalyses(goalId);
+    }
+
+    function deselectGoal() {
+        selectedGoalId = null;
+        selectedGoal = null;
+        window.location.hash = '';
+        document.getElementById('bgGoalsEmpty').classList.remove('d-none');
+        const ws = document.getElementById('bgGoalsWorkspace');
+        ws.classList.add('d-none');
+        ws.classList.remove('d-flex');
+        document.querySelectorAll('.bg-goals-list-item').forEach(item => item.classList.remove('active'));
+    }
+
+    function renderGoalDetail(goal) {
+        const pct = goal.target_value > 0 ? Math.min((goal.current_value / goal.target_value) * 100, 100) : 0;
+        const pctRounded = Math.round(pct * 10) / 10;
+        const daysLeft = getDaysRemaining(goal.end_date);
+
+        document.getElementById('bgGoalTitle').textContent = goal.title;
+        document.getElementById('bgGoalStatusBadge').innerHTML = getStatusBadge(goal.status);
+        document.getElementById('bgGoalPriorityBadge').innerHTML = getPriorityBadge(goal.priority);
+        document.getElementById('bgGoalDescription').textContent = goal.description || '';
+        document.getElementById('bgGoalDescription').style.display = goal.description ? '' : 'none';
+
+        // Progress
+        document.getElementById('bgGoalProgressLabel').textContent = `${formatNumber(goal.current_value)} / ${formatNumber(goal.target_value)} ${goal.unit || ''} (${escapeHtml(getMetricLabel(goal.metric_type))})`;
+        document.getElementById('bgGoalProgressPct').textContent = `${pctRounded}%`;
+        const progressBar = document.getElementById('bgGoalProgressBar');
+        progressBar.style.width = `${pctRounded}%`;
+        progressBar.className = `progress-bar ${getProgressColor(pct)}`;
+
+        // Date and days left
+        const startDate = goal.start_date ? new Date(goal.start_date) : null;
+        const endDate = goal.end_date ? new Date(goal.end_date) : null;
+        const formatDate = (d) => {
+            if (!d) return '';
+            const m = d.getMonth() + 1;
+            const day = d.getDate();
+            const lang = (typeof I18n !== 'undefined' && I18n.currentLang) ? I18n.currentLang : 'zh';
+            if (lang === 'en') {
+                const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                return `${months[d.getMonth()]} ${day}`;
+            }
+            return `${m}月${day}日`;
+        };
+        const startStr = formatDate(startDate);
+        const endStr = formatDate(endDate);
+        const showYear = startDate && endDate && startDate.getFullYear() !== endDate.getFullYear();
+        let dateRangeText = '';
+        if (startStr && endStr) {
+            if (showYear) {
+                dateRangeText = `${startDate.getFullYear()}/${startStr} → ${endDate.getFullYear()}/${endStr}`;
+            } else {
+                dateRangeText = `${startStr} → ${endStr}`;
+            }
+        }
+        document.getElementById('bgGoalDateRange').textContent = dateRangeText;
+
+        let daysHtml = '';
+        if (goal.status === 'active') {
+            if (daysLeft < 0) {
+                daysHtml = `<span class="text-danger fw-bold">${t('businessGoals.expired', '已過期')}</span>`;
+            } else if (daysLeft <= 3) {
+                daysHtml = `<span class="text-danger">${daysLeft} ${t('businessGoals.daysLeft', '天剩餘')}</span>`;
+            } else if (daysLeft <= 7) {
+                daysHtml = `<span class="text-warning">${daysLeft} ${t('businessGoals.daysLeft', '天剩餘')}</span>`;
+            } else {
+                daysHtml = `<span class="text-muted">${daysLeft} ${t('businessGoals.daysLeft', '天剩餘')}</span>`;
+            }
+        }
+        document.getElementById('bgGoalDaysLeft').innerHTML = daysHtml;
+
+        // Edit link
+        document.getElementById('bgGoalEditLink').href = `/business-goals/${goal.id}/edit`;
+
+        // Show/hide manual tracking option
+        document.getElementById('bgManualTrackingItem').style.display = goal.metric_type === 'custom' ? '' : 'none';
+    }
+
+    // ===== AI Analysis History =====
+
+    async function loadAiAnalyses(goalId) {
+        const container = document.getElementById('bgAiHistoryList');
+        try {
+            const res = await App.apiRequest(`/business-goals/${goalId}/ai-analyses`);
+            if (res && res.data) {
+                aiAnalyses = res.data;
+            } else {
+                aiAnalyses = [];
+            }
+            renderAiAnalyses();
+        } catch (e) {
+            console.error('Failed to load AI analyses:', e);
+            container.innerHTML = `<div class="text-center py-4 text-danger small">${t('businessGoals.aiLoadError', '載入 AI 分析記錄失敗')}</div>`;
+        }
+    }
+
+    function renderAiAnalyses() {
+        const container = document.getElementById('bgAiHistoryList');
+
+        if (aiAnalyses.length === 0) {
+            container.innerHTML = `<div class="text-center py-5 text-muted">
+                <i class="bi bi-stars bg-goals-empty-icon-sm"></i>
+                <p class="mt-2 small">${t('businessGoals.noAnalyses', '尚未有 AI 分析記錄')}</p>
+                <p class="small text-muted">${t('businessGoals.startAnalysis', '使用下方輸入框向 AI 提問，或點擊快速分析按鈕')}</p>
+            </div>`;
+            return;
+        }
+
+        let html = '';
+        for (const a of aiAnalyses) {
+            const time = a.created_at ? new Date(a.created_at).toLocaleString() : '';
+            const isChat = a.analysis_type === 'chat';
+            const typeIcon = isChat ? 'bi-chat-dots' : 'bi-stars';
+            const typeLabel = isChat ? t('businessGoals.aiChat', '對話') : t('businessGoals.aiAnalysis', '分析');
+
+            html += `<div class="bg-ai-analysis-item" data-analysis-id="${a.id}">`;
+
+            // User prompt (if chat type)
+            if (isChat && a.user_prompt) {
+                html += `<div class="bg-ai-user-msg">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i class="bi bi-person-circle text-primary"></i>
+                        <small class="text-muted">${time}</small>
+                    </div>
+                    <div class="bg-ai-msg-content">${escapeHtml(a.user_prompt)}</div>
+                </div>`;
+            }
+
+            // AI response
+            html += `<div class="bg-ai-response-msg">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <img src="/static/vaiicon.png" alt="vAI" style="width: 18px; height: 18px;">
+                    <small class="text-muted"><span class="bg-goals-type-badge"><i class="bi ${typeIcon} me-1"></i>${typeLabel}</span> ${isChat ? '' : time}</small>
+                    <div class="flex-grow-1"></div>
+                    <button class="btn btn-sm btn-link text-muted p-0" onclick="BGoals.deleteAnalysis('${a.id}')" title="${t('businessGoals.delete', '刪除')}">
+                        <i class="bi bi-x-lg" style="font-size: 0.75rem;"></i>
+                    </button>
+                </div>
+                <div class="bg-ai-msg-content">${formatAiResponse(a.ai_response)}</div>
+            </div>`;
+
+            html += `</div>`;
+        }
+
+        container.innerHTML = html;
+
+        // Scroll to top (newest first)
+        document.getElementById('bgAiHistoryArea').scrollTop = 0;
+    }
+
+    function formatAiResponse(text) {
+        if (!text) return '';
+        // Basic markdown-like formatting
+        let html = escapeHtml(text);
+        // Bold: **text**
+        html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        // Numbered lists: lines starting with "1. "
+        html = html.replace(/^(\d+)\.\s+/gm, '<span class="text-primary fw-bold">$1.</span> ');
+        // Line breaks
+        html = html.replace(/\n/g, '<br>');
+        return html;
+    }
+
+    // ===== AI Chat =====
+
+    async function quickAnalysis() {
+        if (isAiLoading || !selectedGoalId) return;
+        await sendAnalysis('suggestion', '');
+    }
+
+    async function sendAiChat() {
+        if (isAiLoading || !selectedGoalId) return;
+        const input = document.getElementById('bgAiChatInput');
+        const prompt = input.value.trim();
+        if (!prompt) return;
+        input.value = '';
+        await sendAnalysis('chat', prompt);
+    }
+
+    async function sendAnalysis(type, prompt) {
+        isAiLoading = true;
+        const sendBtn = document.getElementById('bgAiSendBtn');
+        const quickBtn = document.getElementById('bgQuickAnalysisBtn');
+        sendBtn.disabled = true;
+        quickBtn.disabled = true;
+        sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        if (type === 'suggestion') {
+            quickBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+        }
+
+        // Add temporary loading message
+        const container = document.getElementById('bgAiHistoryList');
+        const loadingId = 'ai-loading-' + Date.now();
+
+        let loadingHtml = '';
+        if (type === 'chat' && prompt) {
+            loadingHtml += `<div class="bg-ai-user-msg">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi bi-person-circle text-primary"></i>
+                    <small class="text-muted">${new Date().toLocaleString()}</small>
+                </div>
+                <div class="bg-ai-msg-content">${escapeHtml(prompt)}</div>
+            </div>`;
+        }
+        loadingHtml += `<div class="bg-ai-response-msg" id="${loadingId}">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <img src="/static/vaiicon.png" alt="vAI" style="width: 18px; height: 18px;">
+                <small class="text-muted">${t('businessGoals.aiAnalyzing', 'AI 正在分析中...')}</small>
+            </div>
+            <div class="bg-ai-msg-content">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="spinner-border spinner-border-sm text-primary"></div>
+                    <span class="text-muted">${t('businessGoals.aiAnalyzing', 'AI 正在分析中...')}</span>
+                </div>
+            </div>
+        </div>`;
+
+        // Prepend to container (newest first)
+        container.insertAdjacentHTML('afterbegin', `<div class="bg-ai-analysis-item">${loadingHtml}</div>`);
+        document.getElementById('bgAiHistoryArea').scrollTop = 0;
+
+        try {
+            const res = await App.apiRequest(`/business-goals/${selectedGoalId}/ai-analyses`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    analysis_type: type,
+                    user_prompt: prompt,
+                    locale: (typeof I18n !== 'undefined' && I18n.currentLang) ? I18n.currentLang : 'zh',
+                }),
+            });
+
+            // Remove loading element
+            const loadingEl = document.getElementById(loadingId);
+            if (loadingEl) {
+                loadingEl.closest('.bg-ai-analysis-item').remove();
+            }
+
+            if (res && res.id) {
+                // Add to local list and re-render
+                aiAnalyses.unshift(res);
+                renderAiAnalyses();
+            } else {
+                App.showAlert(t('businessGoals.aiError', '獲取 AI 建議失敗'), 'danger');
+                renderAiAnalyses(); // re-render to remove loading
+            }
+        } catch (e) {
+            console.error('AI analysis failed:', e);
+            const loadingEl = document.getElementById(loadingId);
+            if (loadingEl) {
+                loadingEl.closest('.bg-ai-analysis-item').remove();
+            }
+            App.showAlert(t('businessGoals.aiError', '獲取 AI 建議失敗，請檢查 AI 設定'), 'danger');
+        } finally {
+            isAiLoading = false;
+            sendBtn.disabled = false;
+            quickBtn.disabled = false;
+            sendBtn.innerHTML = '<i class="bi bi-send"></i>';
+            quickBtn.innerHTML = '<i class="bi bi-stars"></i><span class="d-none d-md-inline ms-1">' + t('businessGoals.aiAnalysis', '分析') + '</span>';
+        }
+    }
+
+    async function deleteAnalysis(analysisId) {
+        if (!selectedGoalId || !analysisId) return;
+        if (!confirm(t('businessGoals.confirmDeleteAnalysis', '確定要刪除此 AI 分析記錄？'))) return;
+        try {
+            await App.apiRequest(`/business-goals/${selectedGoalId}/ai-analyses/${analysisId}`, { method: 'DELETE' });
+            aiAnalyses = aiAnalyses.filter(a => a.id !== analysisId);
+            renderAiAnalyses();
+        } catch (e) {
+            App.showAlert(t('businessGoals.deleteError', '刪除失敗'), 'danger');
+        }
+    }
+
+    // ===== Goal Actions =====
+
+    async function refreshSelected() {
+        if (!selectedGoalId || !selectedGoal) return;
+        if (selectedGoal.metric_type === 'custom') {
+            App.showAlert(t('businessGoals.customRefreshNote', '自定義目標需手動更新進度'), 'info');
+            return;
+        }
+        try {
+            await App.apiRequest(`/business-goals/${selectedGoalId}/refresh`, { method: 'POST' });
+            App.showAlert(t('businessGoals.refreshed', '目標進度已刷新'), 'success');
+            // Reload
+            await loadGoals();
+            await selectGoal(selectedGoalId);
+        } catch (e) {
+            App.showAlert(t('businessGoals.refreshError', '刷新進度失敗'), 'danger');
+        }
+    }
+
+    function openManualTracking() {
+        if (!selectedGoal) return;
+        document.getElementById('trackingValue').value = selectedGoal.current_value || 0;
+        document.getElementById('trackingNote').value = '';
+        new bootstrap.Modal(document.getElementById('manualTrackingModal')).show();
+    }
+
+    async function submitManualTracking() {
+        if (!selectedGoalId) return;
+        const value = parseFloat(document.getElementById('trackingValue').value);
+        const note = document.getElementById('trackingNote').value;
+
+        if (isNaN(value)) {
+            App.showAlert(t('businessGoals.invalidValue', '請輸入有效數字'), 'warning');
+            return;
+        }
+
+        try {
+            await App.apiRequest(`/business-goals/${selectedGoalId}/trackings`, {
+                method: 'POST',
+                body: JSON.stringify({ value, note }),
+            });
+            bootstrap.Modal.getInstance(document.getElementById('manualTrackingModal')).hide();
+            App.showAlert(t('businessGoals.trackingAdded', '進度已更新'), 'success');
+            await loadGoals();
+            await selectGoal(selectedGoalId);
+        } catch (e) {
+            App.showAlert(t('businessGoals.trackingError', '更新進度失敗'), 'danger');
+        }
+    }
+
+    async function showTrackingHistory() {
+        if (!selectedGoalId) return;
+        const modal = new bootstrap.Modal(document.getElementById('trackingHistoryModal'));
+        const content = document.getElementById('trackingHistoryContent');
+        content.innerHTML = `<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>`;
+        modal.show();
+
+        try {
+            const res = await App.apiRequest(`/business-goals/${selectedGoalId}/trackings`);
+            if (res && res.data && res.data.length > 0) {
+                let html = `<div class="table-responsive"><table class="table table-sm table-hover">
+                    <thead><tr>
+                        <th>${t('businessGoals.date', '日期')}</th>
+                        <th>${t('businessGoals.value', '數值')}</th>
+                        <th>${t('businessGoals.change', '變化')}</th>
+                        <th>${t('businessGoals.progress', '進度')}</th>
+                        <th>${t('businessGoals.source', '來源')}</th>
+                        <th>${t('businessGoals.note', '備註')}</th>
+                    </tr></thead><tbody>`;
+                for (const tr of res.data) {
+                    const delta = tr.delta_value >= 0 ? `<span class="text-success">+${formatNumber(tr.delta_value)}</span>` : `<span class="text-danger">${formatNumber(tr.delta_value)}</span>`;
+                    const trackedAt = tr.tracked_at ? new Date(tr.tracked_at).toLocaleString() : '-';
+                    const sourceBadge = tr.source === 'auto' ? '<span class="badge text-bg-info">Auto</span>' : '<span class="badge text-bg-secondary">Manual</span>';
+                    html += `<tr>
+                        <td><small>${trackedAt}</small></td>
+                        <td>${formatNumber(tr.tracked_value)}</td>
+                        <td>${delta}</td>
+                        <td>${Math.round(tr.progress_pct * 10) / 10}%</td>
+                        <td>${sourceBadge}</td>
+                        <td><small>${escapeHtml(tr.ai_note || '')}</small></td>
+                    </tr>`;
+                }
+                html += '</tbody></table></div>';
+                content.innerHTML = html;
+            } else {
+                content.innerHTML = `<p class="text-muted text-center py-3">${t('businessGoals.noTrackings', '暫無追蹤記錄')}</p>`;
+            }
+        } catch (e) {
+            content.innerHTML = `<p class="text-danger text-center">${t('businessGoals.trackingLoadError', '載入追蹤歷史失敗')}</p>`;
+        }
+    }
+
+    async function deleteSelected() {
+        if (!selectedGoal) return;
+        if (!confirm(`${t('businessGoals.confirmDelete', '確定要刪除')} "${selectedGoal.title}"?`)) return;
+        try {
+            await App.apiRequest(`/business-goals/${selectedGoalId}`, { method: 'DELETE' });
+            App.showAlert(t('businessGoals.deleted', '目標已刪除'), 'success');
+            deselectGoal();
+            await loadGoals();
+        } catch (e) {
+            App.showAlert(t('businessGoals.deleteError', '刪除目標失敗'), 'danger');
+        }
+    }
+
+    // ===== Auto-resize textarea =====
+    function setupTextareaAutoResize() {
+        const textarea = document.getElementById('bgAiChatInput');
+        if (!textarea) return;
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendAiChat();
+            }
+        });
+    }
+
+    // ===== Init =====
+    async function initPage() {
+        console.log('[BGoals] initPage called');
+        if (!App.checkAuth()) {
+            console.warn('[BGoals] checkAuth failed, aborting init');
+            return;
+        }
+        if (typeof I18n !== 'undefined' && I18n.whenReady) {
+            await I18n.whenReady(5000);
+        }
+        setupTextareaAutoResize();
+        await loadGoals();
+        console.log('[BGoals] initPage complete, goals loaded:', allGoals.length);
+    }
+
+    // Support both fresh page load and SPA navigation
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() { initPage(); });
+    } else {
+        // DOM already ready (SPA navigation or late script execution)
+        initPage();
+    }
+
+    // Re-render on language change
+    window.addEventListener('languageChanged', function() {
+        renderSidebar();
+        if (selectedGoal) {
+            renderGoalDetail(selectedGoal);
+            renderAiAnalyses();
+        }
+    });
+
+    return {
+        toggleSidebar,
+        filterSidebar,
+        selectGoal,
+        quickAnalysis,
+        sendAiChat,
+        deleteAnalysis,
+        refreshSelected,
+        openManualTracking,
+        submitManualTracking,
+        showTrackingHistory,
+        deleteSelected,
+    };
+})();
+</script>
+
+<style>
+/* ===== Business Goals Page Layout ===== */
+.bg-goals-page {
+    display: flex;
+    height: calc(100vh - 60px);
+    background: #f8f9fa;
+}
+
+/* ===== Sidebar ===== */
+.bg-goals-sidebar {
+    width: 270px;
+    min-width: 270px;
+    border-right: 1px solid #dee2e6;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.bg-goals-sidebar-header {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.bg-goals-filter-btn {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    color: #6c757d;
+    border-radius: 1rem;
+    transition: all 0.15s;
+}
+
+.bg-goals-filter-btn:hover:not(.active) {
+    background: #f0f0f0;
+    border-color: #adb5bd;
+    color: #495057;
+}
+
+.bg-goals-filter-btn.active {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+
+.bg-goals-list {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+.bg-goals-list-item {
+    padding: 0.6rem 0.75rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+}
+
+.bg-goals-list-item:hover {
+    background: #f8f9fa;
+}
+
+.bg-goals-list-item.active {
+    background: #e7f1ff;
+    border-left-color: #0d6efd;
+}
+
+.bg-goals-list-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.bg-goals-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.bg-goals-status-dot.bg-primary {
+    animation: bgStatusPulse 2s infinite;
+}
+
+@keyframes bgStatusPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ===== Main Workspace ===== */
+.bg-goals-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Empty state */
+.bg-goals-empty-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+    color: #adb5bd;
+}
+
+.bg-goals-empty-icon-sm {
+    font-size: 3rem;
+    opacity: 0.3;
+    color: #adb5bd;
+}
+
+/* Detail header */
+.bg-goals-detail-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    background: #fff;
+}
+
+.bg-goals-detail-header .badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.25em 0.6em;
+    border-radius: 0.75rem;
+}
+
+.bg-goals-description {
+    max-height: 40px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.bg-goals-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+}
+
+/* ===== AI History Area ===== */
+.bg-goals-ai-history {
+    flex: 1;
+    overflow-y: auto;
+    background: #f8f9fa;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+.bg-goals-ai-history-inner {
+    padding: 1rem 1.25rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.bg-ai-analysis-item {
+    margin-bottom: 1rem;
+}
+
+.bg-ai-user-msg {
+    background: #e7f1ff;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    margin-left: 2rem;
+}
+
+.bg-ai-response-msg {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin-right: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s;
+}
+
+.bg-ai-response-msg:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.bg-ai-response-msg .btn-link.text-muted:hover {
+    color: #dc3545 !important;
+}
+
+.bg-ai-msg-content {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    word-wrap: break-word;
+}
+
+.bg-goals-type-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.15em 0.5em;
+    border-radius: 0.5rem;
+    background: #f0f4ff;
+    color: #0d6efd;
+}
+
+/* ===== Bottom AI Input Bar ===== */
+#bgAiInputBar {
+    flex-shrink: 0;
+}
+
+#bgAiChatInput {
+    resize: none;
+    max-height: 120px;
+    border-right: none;
+    padding: 0.5rem 0.75rem;
+}
+
+#bgAiChatInput:focus {
+    border-color: #86b7fe;
+    box-shadow: none;
+}
+
+#bgQuickAnalysisBtn {
+    transition: all 0.2s;
+}
+
+#bgQuickAnalysisBtn:hover {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+}
+
+#bgAiSendBtn {
+    border-radius: 0 0.375rem 0.375rem 0;
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    border-color: #0b5ed7;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+    transition: all 0.2s;
+}
+
+#bgAiSendBtn:hover {
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    transform: translateY(-1px);
+}
+
+#bgAiSendBtn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(13, 110, 253, 0.2);
+}
+
+/* ===== Sidebar Backdrop (mobile) ===== */
+.bg-goals-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1049;
+}
+
+/* ===== Mobile Responsive ===== */
+@media (max-width: 768px) {
+    .bg-goals-page {
+        height: calc(100vh - 60px);
+    }
+    .bg-goals-sidebar {
+        position: fixed;
+        left: -270px;
+        top: 60px;
+        bottom: 0;
+        z-index: 1050;
+        transition: left 0.3s;
+    }
+    .bg-goals-sidebar.show {
+        left: 0;
+    }
+    .bg-goals-ai-history-inner {
+        padding: 0.75rem;
+    }
+    .bg-ai-user-msg,
+    .bg-ai-response-msg {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .bg-goals-detail-header {
+        padding: 0.6rem 0.75rem;
+    }
+}
+</style>
+{{ end }}

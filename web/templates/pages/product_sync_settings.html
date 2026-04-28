@@ -1,0 +1,751 @@
+{{define "pages/product_sync_settings"}}
+<div class="container py-4">
+  <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+      <h4 class="mb-1" data-i18n="pages.productSyncSettings.title">產品同步設定</h4>
+      <p class="text-muted small mb-0" data-i18n="pages.productSyncSettings.subtitle">設定 vWork 與外部商城的產品同步參數。</p>
+    </div>
+    <button class="btn btn-primary" id="productSyncSaveBtn" data-i18n="common.save">保存</button>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="form-check form-switch">
+        <input class="form-check-input product-sync-toggle" type="checkbox" id="productSyncEnabled">
+        <label class="form-check-label" for="productSyncEnabled" data-i18n="pages.productSyncSettings.masterToggle">啟用產品同步</label>
+      </div>
+      <p class="text-muted small mt-2 mb-0" data-i18n="pages.productSyncSettings.masterHint">啟用後才會與外部商城同步商品、庫存與價格。</p>
+    </div>
+  </div>
+
+  <!-- 選擇商城 -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="mb-3"><i class="bi bi-plus-circle me-2"></i><span data-i18n="pages.productSyncSettings.addTitle">添加商城連接</span></h5>
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-6">
+          <label class="form-label" for="addMarketplaceSelect" data-i18n="pages.productSyncSettings.addSelectLabel">選擇要連接的商城</label>
+          <select class="form-select" id="addMarketplaceSelect">
+            <option value="" data-i18n="pages.productSyncSettings.addSelectPlaceholder">請選擇商城...</option>
+            <option value="shopee">🛒 Shopee</option>
+            <option value="lazada">🛍️ Lazada</option>
+            <option value="amazon">📦 Amazon</option>
+            <option value="rakuten">🌐 Rakuten 樂天</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-6">
+          <button class="btn btn-outline-primary" id="addMarketplaceBtn" onclick="addMarketplace()">
+            <i class="bi bi-plus-lg me-1"></i><span data-i18n="pages.productSyncSettings.addBtn">添加</span>
+          </button>
+        </div>
+      </div>
+      <p class="text-muted small mt-2 mb-0" data-i18n="pages.productSyncSettings.addSupportedHint">只顯示已支援 API 連接的商城平台。</p>
+    </div>
+  </div>
+
+  <!-- HKTVmall - 未實現，暫時隱藏（待官方 API 文檔） -->
+  <div class="card mb-4 mp-card" id="hktvCard" data-mp="hktv" style="display:none;">
+    <div class="card-header bg-light">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h5 class="mb-0"><i class="bi bi-shop me-2"></i>HKTVmall</h5>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="removeMarketplace('hktv')" data-i18n-title="pages.productSyncSettings.removeTitle" title="移除"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3" data-i18n="pages.productSyncSettings.hktvSubtitle">設定 HKTVmall API 金鑰後即可同步。</p>
+      <div class="row g-3">
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="hktvMerchantId">Merchant ID</label>
+          <input class="form-control hktv-input" type="text" id="hktvMerchantId" placeholder="merchant_123">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="hktvShopId">Shop ID</label>
+          <input class="form-control hktv-input" type="text" id="hktvShopId" placeholder="shop_01">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="hktvAppId">App ID</label>
+          <input class="form-control hktv-input" type="text" id="hktvAppId" placeholder="app_abc">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="hktvAppSecret">App Secret</label>
+          <input class="form-control hktv-input" type="password" id="hktvAppSecret" placeholder="••••••••">
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="hktvApiBase">API Base URL</label>
+          <input class="form-control hktv-input" type="text" id="hktvApiBase" placeholder="https://api.hktvmall.com">
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="form-check form-check-inline"><input class="form-check-input hktv-input" type="checkbox" id="hktvSyncProducts"><label class="form-check-label" for="hktvSyncProducts" data-i18n="pages.productSyncSettings.syncProducts">同步商品</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input hktv-input" type="checkbox" id="hktvSyncInventory"><label class="form-check-label" for="hktvSyncInventory" data-i18n="pages.productSyncSettings.syncInventory">同步庫存</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input hktv-input" type="checkbox" id="hktvSyncPrice"><label class="form-check-label" for="hktvSyncPrice" data-i18n="pages.productSyncSettings.syncPrice">同步售價</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopee -->
+  <div class="card mb-4 mp-card" id="shopeeCard" data-mp="shopee" style="display:none;">
+    <div class="card-header bg-light">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h5 class="mb-0"><i class="bi bi-bag me-2" style="color:#ee4d2d;"></i>Shopee</h5>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="removeMarketplace('shopee')" data-i18n-title="pages.productSyncSettings.removeTitle" title="移除"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3" data-i18n="pages.productSyncSettings.shopeeSyncSubtitle">東南亞領先電商平台，支援新加坡、馬來西亞、泰國、台灣等地區。</p>
+      
+      <!-- 連線狀態 -->
+      <div id="shopeeConnectionStatus" class="alert alert-secondary mb-3" style="display:none;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div>
+            <i class="bi bi-circle-fill me-2" id="shopeeStatusIcon"></i>
+            <span id="shopeeStatusText" data-i18n="common.loading">檢查連線中...</span>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-sm btn-outline-primary" id="shopeeTestBtn" onclick="testShopeeConnection()">
+              <i class="bi bi-arrow-repeat me-1"></i><span data-i18n="pages.productSyncSettings.testConnection">測試連線</span>
+            </button>
+            <button class="btn btn-sm btn-outline-warning" id="shopeeRefreshTokenBtn" onclick="refreshShopeeToken()" style="display:none;">
+              <i class="bi bi-key me-1"></i><span data-i18n="pages.productSyncSettings.refreshToken">刷新 Token</span>
+            </button>
+            <button class="btn btn-sm btn-success" id="shopeeManualSyncBtn" onclick="manualShopeeSync()" style="display:none;">
+              <i class="bi bi-cloud-download me-1"></i><span data-i18n="pages.productSyncSettings.manualSync">手動同步</span>
+            </button>
+          </div>
+        </div>
+        <div id="shopeeShopInfo" class="mt-2 small text-muted" style="display:none;"></div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="shopeeAppKey">Partner ID / App Key <span class="text-danger">*</span></label>
+          <input class="form-control shopee-input" type="text" id="shopeeAppKey" placeholder="1234567">
+          <small class="text-muted" data-i18n="pages.productSyncSettings.shopeePartnerIdHint">從 Shopee Partner Center 取得</small>
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="shopeeAppSecret">Partner Key / App Secret <span class="text-danger">*</span></label>
+          <input class="form-control shopee-input" type="password" id="shopeeAppSecret" placeholder="••••••••">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="shopeeRegion"><span data-i18n="pages.productSyncSettings.regionLabel">地區</span> <span class="text-danger">*</span></label>
+          <select class="form-select shopee-input" id="shopeeRegion">
+            <option value="" data-i18n="pages.productSyncSettings.selectRegion">請選擇地區</option>
+            <option value="TW">台灣</option>
+            <option value="SG">新加坡</option>
+            <option value="MY">馬來西亞</option>
+            <option value="TH">泰國</option>
+            <option value="PH">菲律賓</option>
+            <option value="VN">越南</option>
+            <option value="ID">印尼</option>
+            <option value="BR">巴西</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-warning" id="shopeeAuthBtn" onclick="startShopeeOAuth()">
+            <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="pages.productSyncSettings.shopeeConnectBtn">連接 Shopee 帳號</span>
+          </button>
+          <small class="text-muted ms-2" data-i18n="pages.productSyncSettings.shopeeConnectHint">填寫上方資訊後，點擊此按鈕進行 OAuth 授權</small>
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="shopeeShopId">Shop ID <small class="text-muted" data-i18n="pages.productSyncSettings.autoFilled">(授權後自動填入)</small></label>
+          <input class="form-control shopee-input" type="text" id="shopeeShopId" data-i18n-placeholder="pages.productSyncSettings.autoFetchPlaceholder" placeholder="自動取得" readonly>
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="shopeeAccessToken">Access Token <small class="text-muted" data-i18n="pages.productSyncSettings.autoFilled">(授權後自動填入)</small></label>
+          <input class="form-control shopee-input" type="password" id="shopeeAccessToken" data-i18n-placeholder="pages.productSyncSettings.autoFetchPlaceholder" placeholder="自動取得" readonly>
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="form-check form-check-inline"><input class="form-check-input shopee-input" type="checkbox" id="shopeeSyncProducts"><label class="form-check-label" for="shopeeSyncProducts" data-i18n="pages.productSyncSettings.syncProducts">同步商品</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input shopee-input" type="checkbox" id="shopeeSyncInventory"><label class="form-check-label" for="shopeeSyncInventory" data-i18n="pages.productSyncSettings.syncInventory">同步庫存</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input shopee-input" type="checkbox" id="shopeeSyncPrice"><label class="form-check-label" for="shopeeSyncPrice" data-i18n="pages.productSyncSettings.syncPrice">同步售價</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input shopee-input" type="checkbox" id="shopeeSyncOrders"><label class="form-check-label" for="shopeeSyncOrders" data-i18n="pages.productSyncSettings.syncOrders">同步訂單</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lazada -->
+  <div class="card mb-4 mp-card" id="lazadaCard" data-mp="lazada" style="display:none;">
+    <div class="card-header bg-light">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h5 class="mb-0"><i class="bi bi-cart4 me-2" style="color:#0f146d;"></i>Lazada</h5>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="removeMarketplace('lazada')" data-i18n-title="pages.productSyncSettings.removeTitle" title="移除"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3" data-i18n="pages.productSyncSettings.lazadaSyncSubtitle">阿里巴巴旗下東南亞電商，支援新加坡、馬來西亞、泰國、印尼等地區。</p>
+      <div class="row g-3">
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="lazadaShopId">Seller ID</label>
+          <input class="form-control lazada-input" type="text" id="lazadaShopId" placeholder="seller_123">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="lazadaAppKey">App Key</label>
+          <input class="form-control lazada-input" type="text" id="lazadaAppKey" placeholder="app_key">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="lazadaAppSecret">App Secret</label>
+          <input class="form-control lazada-input" type="password" id="lazadaAppSecret" placeholder="••••••••">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="lazadaAccessToken">Access Token</label>
+          <input class="form-control lazada-input" type="password" id="lazadaAccessToken" placeholder="••••••••">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="lazadaRegion" data-i18n="pages.productSyncSettings.regionLabel">地區</label>
+          <select class="form-select lazada-input" id="lazadaRegion">
+            <option value="" data-i18n="pages.productSyncSettings.selectRegion">請選擇地區</option>
+            <option value="SG">新加坡</option>
+            <option value="MY">馬來西亞</option>
+            <option value="TH">泰國</option>
+            <option value="PH">菲律賓</option>
+            <option value="VN">越南</option>
+            <option value="ID">印尼</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="form-check form-check-inline"><input class="form-check-input lazada-input" type="checkbox" id="lazadaSyncProducts"><label class="form-check-label" for="lazadaSyncProducts" data-i18n="pages.productSyncSettings.syncProducts">同步商品</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input lazada-input" type="checkbox" id="lazadaSyncInventory"><label class="form-check-label" for="lazadaSyncInventory" data-i18n="pages.productSyncSettings.syncInventory">同步庫存</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input lazada-input" type="checkbox" id="lazadaSyncPrice"><label class="form-check-label" for="lazadaSyncPrice" data-i18n="pages.productSyncSettings.syncPrice">同步售價</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input lazada-input" type="checkbox" id="lazadaSyncOrders"><label class="form-check-label" for="lazadaSyncOrders" data-i18n="pages.productSyncSettings.syncOrders">同步訂單</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Amazon -->
+  <div class="card mb-4 mp-card" id="amazonCard" data-mp="amazon" style="display:none;">
+    <div class="card-header bg-light">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h5 class="mb-0"><i class="bi bi-box-seam me-2" style="color:#ff9900;"></i>Amazon</h5>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="removeMarketplace('amazon')" data-i18n-title="pages.productSyncSettings.removeTitle" title="移除"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3" data-i18n="pages.productSyncSettings.amazonSyncSubtitle">全球最大電商平台，使用 SP-API (Selling Partner API)。</p>
+      <div class="row g-3">
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="amazonShopId">Seller ID</label>
+          <input class="form-control amazon-input" type="text" id="amazonShopId" placeholder="A1B2C3D4E5">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="amazonAppKey">LWA Client ID</label>
+          <input class="form-control amazon-input" type="text" id="amazonAppKey" placeholder="amzn1.application-oa2-client...">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="amazonAppSecret">LWA Client Secret</label>
+          <input class="form-control amazon-input" type="password" id="amazonAppSecret" placeholder="••••••••">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="amazonAccessToken">Refresh Token</label>
+          <input class="form-control amazon-input" type="password" id="amazonAccessToken" placeholder="••••••••">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="amazonRegion">Marketplace</label>
+          <select class="form-select amazon-input" id="amazonRegion">
+            <option value="" data-i18n="pages.productSyncSettings.addSelectPlaceholder">請選擇 Marketplace</option>
+            <option value="US">美國 (amazon.com)</option>
+            <option value="CA">加拿大 (amazon.ca)</option>
+            <option value="UK">英國 (amazon.co.uk)</option>
+            <option value="DE">德國 (amazon.de)</option>
+            <option value="JP">日本 (amazon.co.jp)</option>
+            <option value="AU">澳洲 (amazon.com.au)</option>
+            <option value="SG">新加坡 (amazon.sg)</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="form-check form-check-inline"><input class="form-check-input amazon-input" type="checkbox" id="amazonSyncProducts"><label class="form-check-label" for="amazonSyncProducts" data-i18n="pages.productSyncSettings.syncProducts">同步商品</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input amazon-input" type="checkbox" id="amazonSyncInventory"><label class="form-check-label" for="amazonSyncInventory" data-i18n="pages.productSyncSettings.syncInventory">同步庫存</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input amazon-input" type="checkbox" id="amazonSyncPrice"><label class="form-check-label" for="amazonSyncPrice" data-i18n="pages.productSyncSettings.syncPrice">同步售價</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input amazon-input" type="checkbox" id="amazonSyncOrders"><label class="form-check-label" for="amazonSyncOrders" data-i18n="pages.productSyncSettings.syncOrders">同步訂單</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rakuten -->
+  <div class="card mb-4 mp-card" id="rakutenCard" data-mp="rakuten" style="display:none;">
+    <div class="card-header bg-light">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div>
+          <h5 class="mb-0"><i class="bi bi-globe me-2" style="color:#bf0000;"></i>Rakuten 樂天</h5>
+        </div>
+        <button class="btn btn-sm btn-outline-danger" onclick="removeMarketplace('rakuten')" data-i18n-title="pages.productSyncSettings.removeTitle" title="移除"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="card-body">
+      <p class="text-muted small mb-3" data-i18n="pages.productSyncSettings.rakutenSyncSubtitle">日本及台灣領先電商平台，使用 Rakuten RMS API。</p>
+      <div class="row g-3">
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="rakutenShopId">Shop ID</label>
+          <input class="form-control rakuten-input" type="text" id="rakutenShopId" placeholder="shop_123">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="rakutenAppKey">Service Secret</label>
+          <input class="form-control rakuten-input" type="text" id="rakutenAppKey" placeholder="service_secret">
+        </div>
+        <div class="col-12 col-lg-4">
+          <label class="form-label" for="rakutenAppSecret">License Key</label>
+          <input class="form-control rakuten-input" type="password" id="rakutenAppSecret" placeholder="••••••••">
+        </div>
+        <div class="col-12 col-lg-6">
+          <label class="form-label" for="rakutenRegion" data-i18n="pages.productSyncSettings.regionLabel">地區</label>
+          <select class="form-select rakuten-input" id="rakutenRegion">
+            <option value="" data-i18n="pages.productSyncSettings.selectRegion">請選擇地區</option>
+            <option value="JP">日本 (rakuten.co.jp)</option>
+            <option value="TW">台灣 (rakuten.com.tw)</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-3">
+        <div class="form-check form-check-inline"><input class="form-check-input rakuten-input" type="checkbox" id="rakutenSyncProducts"><label class="form-check-label" for="rakutenSyncProducts" data-i18n="pages.productSyncSettings.syncProducts">同步商品</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input rakuten-input" type="checkbox" id="rakutenSyncInventory"><label class="form-check-label" for="rakutenSyncInventory" data-i18n="pages.productSyncSettings.syncInventory">同步庫存</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input rakuten-input" type="checkbox" id="rakutenSyncPrice"><label class="form-check-label" for="rakutenSyncPrice" data-i18n="pages.productSyncSettings.syncPrice">同步售價</label></div>
+        <div class="form-check form-check-inline"><input class="form-check-input rakuten-input" type="checkbox" id="rakutenSyncOrders"><label class="form-check-label" for="rakutenSyncOrders" data-i18n="pages.productSyncSettings.syncOrders">同步訂單</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PChome 和 momo 暫未實現 API，不顯示 -->
+
+</div>
+
+<script>
+  // 只包含已實現 API 的商城
+  const MARKETPLACES = ['shopee', 'lazada', 'amazon', 'rakuten'];
+  // 用戶已添加的商城（從 localStorage 和後端設定讀取）
+  let visibleMarketplaces = [];
+
+  function setFieldValue(id, value) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === 'checkbox') {
+      el.checked = !!value;
+    } else {
+      el.value = value || '';
+    }
+  }
+
+  function getFieldValue(id, isCheckbox = false) {
+    const el = document.getElementById(id);
+    if (!el) return isCheckbox ? false : '';
+    return isCheckbox ? el.checked : (el.value || '');
+  }
+
+  // ============ 商城顯示/隱藏管理 ============
+  
+  function getVisibleMarketplacesKey() {
+    // 使用 tenant ID 作為 key（如果可用）
+    return 'vwork_visible_marketplaces';
+  }
+
+  function loadVisibleMarketplaces() {
+    try {
+      const saved = localStorage.getItem(getVisibleMarketplacesKey());
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveVisibleMarketplaces() {
+    try {
+      localStorage.setItem(getVisibleMarketplacesKey(), JSON.stringify(visibleMarketplaces));
+    } catch (e) {
+      console.warn('無法保存到 localStorage');
+    }
+  }
+
+  function updateMarketplaceVisibility() {
+    MARKETPLACES.forEach(mp => {
+      const card = document.getElementById(mp + 'Card');
+      if (card) {
+        card.style.display = visibleMarketplaces.includes(mp) ? 'block' : 'none';
+      }
+    });
+    updateAddMarketplaceSelect();
+  }
+
+  function updateAddMarketplaceSelect() {
+    const select = document.getElementById('addMarketplaceSelect');
+    if (!select) return;
+    
+    // 隱藏已添加的選項
+    Array.from(select.options).forEach(opt => {
+      if (opt.value && MARKETPLACES.includes(opt.value)) {
+        opt.style.display = visibleMarketplaces.includes(opt.value) ? 'none' : '';
+      }
+    });
+    select.value = '';
+  }
+
+  function addMarketplace() {
+    const select = document.getElementById('addMarketplaceSelect');
+    const mp = select?.value;
+    if (!mp || !MARKETPLACES.includes(mp)) {
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.pleaseSelectMarketplace') : '請選擇一個商城', 'warning');
+      return;
+    }
+    
+    if (!visibleMarketplaces.includes(mp)) {
+      visibleMarketplaces.push(mp);
+      saveVisibleMarketplaces();
+      updateMarketplaceVisibility();
+      
+      // 滾動到新添加的卡片
+      const card = document.getElementById(mp + 'Card');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
+  function removeMarketplace(mp) {
+    if (!confirm((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.removeConfirm') : '確定要移除此商城連接嗎？設定將被保留。')) return;
+    
+    visibleMarketplaces = visibleMarketplaces.filter(m => m !== mp);
+    saveVisibleMarketplaces();
+    updateMarketplaceVisibility();
+  }
+
+  function applySyncEnableStates() {
+    const masterEnabled = document.getElementById('productSyncEnabled')?.checked || false;
+
+    // HKTVmall
+    document.querySelectorAll('.hktv-input').forEach(el => el.disabled = !masterEnabled);
+
+    // Other marketplaces
+    MARKETPLACES.forEach(mp => {
+      document.querySelectorAll('.' + mp + '-input').forEach(el => el.disabled = !masterEnabled);
+    });
+  }
+
+  async function loadProductSyncSettings() {
+    try {
+      const resp = await App.apiRequest('/api/v1/tenant/product-sync-settings');
+      const data = resp?.data || {};
+
+      setFieldValue('productSyncEnabled', data.enabled);
+
+      // 載入已保存的可見商城列表
+      visibleMarketplaces = loadVisibleMarketplaces();
+
+      // HKTVmall - 使用特殊欄位名稱
+      const hktv = data.hktv || data.hktvmall || {};
+      setFieldValue('hktvMerchantId', hktv.merchant_id);
+      setFieldValue('hktvShopId', hktv.shop_id);
+      setFieldValue('hktvAppId', hktv.app_id);
+      setFieldValue('hktvAppSecret', hktv.app_secret);
+      setFieldValue('hktvApiBase', hktv.api_base);
+      setFieldValue('hktvSyncProducts', hktv.sync_products !== false);
+      setFieldValue('hktvSyncInventory', hktv.sync_inventory !== false);
+      setFieldValue('hktvSyncPrice', hktv.sync_price !== false);
+      
+      // 如果 HKTVmall 已啟用或有設定，自動添加到可見列表
+      if (hktv.enabled || hktv.app_id || hktv.merchant_id) {
+        if (!visibleMarketplaces.includes('hktv')) {
+          visibleMarketplaces.push('hktv');
+        }
+      }
+
+      // Other marketplaces - 如果後端有設定且已啟用，自動顯示
+      MARKETPLACES.forEach(mp => {
+        if (mp === 'hktv') return; // HKTVmall is handled separately above
+        const mpData = data[mp] || {};
+        const prefix = mp.charAt(0).toUpperCase() + mp.slice(1);
+        setFieldValue(mp + 'ShopId', mpData.shop_id);
+        setFieldValue(mp + 'AppKey', mpData.app_key);
+        setFieldValue(mp + 'AppSecret', mpData.app_secret);
+        setFieldValue(mp + 'AccessToken', mpData.access_token);
+        setFieldValue(mp + 'Region', mpData.region);
+        setFieldValue(mp + 'SyncProducts', mpData.sync_products !== false);
+        setFieldValue(mp + 'SyncInventory', mpData.sync_inventory !== false);
+        setFieldValue(mp + 'SyncPrice', mpData.sync_price !== false);
+        setFieldValue(mp + 'SyncOrders', mpData.sync_orders !== false);
+        
+        // 如果已啟用或有設定，自動添加到可見列表
+        if (mpData.enabled || mpData.app_key || mpData.access_token) {
+          if (!visibleMarketplaces.includes(mp)) {
+            visibleMarketplaces.push(mp);
+          }
+        }
+      });
+
+      // 保存並更新可見性
+      saveVisibleMarketplaces();
+      updateMarketplaceVisibility();
+      applySyncEnableStates();
+    } catch (error) {
+      console.error('載入產品同步設定失敗:', error);
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.loadFailed') : '載入失敗', 'error');
+    }
+  }
+
+  async function saveProductSyncSettings() {
+    const btn = document.getElementById('productSyncSaveBtn');
+    
+    const payload = {
+      enabled: getFieldValue('productSyncEnabled', true),
+      hktvmall: {
+        enabled: visibleMarketplaces.includes('hktv'),
+        merchant_id: getFieldValue('hktvMerchantId'),
+        shop_id: getFieldValue('hktvShopId'),
+        app_id: getFieldValue('hktvAppId'),
+        app_secret: getFieldValue('hktvAppSecret'),
+        api_base: getFieldValue('hktvApiBase'),
+        sync_products: getFieldValue('hktvSyncProducts', true),
+        sync_inventory: getFieldValue('hktvSyncInventory', true),
+        sync_price: getFieldValue('hktvSyncPrice', true)
+      }
+    };
+
+    // Add other marketplaces (skip hktv as it's handled above with special field names)
+    MARKETPLACES.forEach(mp => {
+      if (mp === 'hktv') return; // HKTVmall uses hktvmall key with special fields
+      payload[mp] = {
+        enabled: visibleMarketplaces.includes(mp),
+        shop_id: getFieldValue(mp + 'ShopId'),
+        app_key: getFieldValue(mp + 'AppKey'),
+        app_secret: getFieldValue(mp + 'AppSecret'),
+        access_token: getFieldValue(mp + 'AccessToken'),
+        region: getFieldValue(mp + 'Region'),
+        sync_products: getFieldValue(mp + 'SyncProducts', true),
+        sync_inventory: getFieldValue(mp + 'SyncInventory', true),
+        sync_price: getFieldValue(mp + 'SyncPrice', true),
+        sync_orders: getFieldValue(mp + 'SyncOrders', true)
+      };
+    });
+
+    try {
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.saving') : '保存中...';
+      }
+      await App.apiRequest('/api/v1/tenant/product-sync-settings', {
+        method: 'PUT',
+        body: JSON.stringify(payload)
+      });
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.saveSuccess') : '已保存產品同步設定', 'success');
+    } catch (error) {
+      console.error('保存產品同步設定失敗:', error);
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.saveFailed') : '保存失敗', 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.save') : '保存';
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadProductSyncSettings();
+    checkShopeeConnectionOnLoad();
+
+    document.getElementById('productSyncSaveBtn')?.addEventListener('click', saveProductSyncSettings);
+    document.getElementById('productSyncEnabled')?.addEventListener('change', applySyncEnableStates);
+
+    // 檢查 URL 參數（OAuth 回調）
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('shopee') === 'connected') {
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.shopeeConnectSuccess') : 'Shopee 帳號連接成功！', 'success');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setTimeout(() => {
+        loadProductSyncSettings();
+        checkShopeeConnectionOnLoad();
+      }, 500);
+    }
+  });
+
+  // ============ Shopee 專用函數 ============
+
+  async function startShopeeOAuth() {
+    const appKey = getFieldValue('shopeeAppKey');
+    const appSecret = getFieldValue('shopeeAppSecret');
+    const region = getFieldValue('shopeeRegion');
+
+    if (!appKey || !appSecret || !region) {
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.pleaseSelectMarketplace') : '請先填寫 Partner ID、Partner Key 和地區', 'warning');
+      return;
+    }
+
+    // 先保存設定
+    await saveProductSyncSettings();
+
+    try {
+      const resp = await App.apiRequest('/api/v1/shopee/auth-url');
+      if (resp && resp.auth_url) {
+        // 開啟 Shopee 授權頁面
+        window.location.href = resp.auth_url;
+      } else {
+        showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.shopeeAuthFailed') : '無法取得授權連結', 'error');
+      }
+    } catch (error) {
+      console.error('取得 Shopee 授權連結失敗:', error);
+      showAlert(((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.shopeeConnectFailed') : '取得授權連結失敗') + ': ' + (error.message || ''), 'error');
+    }
+  }
+
+  async function testShopeeConnection() {
+    const btn = document.getElementById('shopeeTestBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.testing') : '測試中...');
+    }
+
+    try {
+      const resp = await App.apiRequest('/api/v1/shopee/test-connection');
+      updateShopeeConnectionUI(resp);
+      
+      if (resp.connected) {
+        showAlert(((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.connected') : 'Shopee 連線正常！') + (resp.shop_name ? ' ' + resp.shop_name : ''), 'success');
+      } else {
+        showAlert(((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.disconnected') : 'Shopee 連線失敗') + ': ' + (resp.error || ''), 'warning');
+      }
+    } catch (error) {
+      console.error('測試 Shopee 連線失敗:', error);
+      updateShopeeConnectionUI({ connected: false, error: error.message });
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.saveFailed') : '測試連線失敗', 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.testConnection') : '測試連線');
+      }
+    }
+  }
+
+  async function refreshShopeeToken() {
+    const btn = document.getElementById('shopeeRefreshTokenBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.refreshing') : '刷新中...');
+    }
+
+    try {
+      await App.apiRequest('/api/v1/shopee/refresh-token', { method: 'POST' });
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.refreshToken') + ' OK' : 'Token 已刷新', 'success');
+      await checkShopeeConnectionOnLoad();
+    } catch (error) {
+      console.error('刷新 Token 失敗:', error);
+      showAlert(((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.refreshToken') : '刷新 Token') + ' ' + (typeof I18n !== 'undefined' && I18n.t ? I18n.t('common.failed') || '失敗' : '失敗') + ': ' + (error.message || ''), 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-key me-1"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.refreshToken') : '刷新 Token');
+      }
+    }
+  }
+
+  async function manualShopeeSync() {
+    const btn = document.getElementById('shopeeManualSyncBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.syncing') : '同步中...');
+    }
+
+    try {
+      const resp = await App.apiRequest('/api/v1/shopee/sync', { method: 'POST' });
+      const status = resp?.status || {};
+      const t = (key, fb) => (typeof I18n !== 'undefined' && I18n.t) ? (I18n.t(key) || fb) : fb;
+      let msg = t('pages.productSyncSettings.syncComplete', '同步完成！');
+      if (status.products_synced) msg += ' ' + t('pages.productSyncSettings.productsLabel', '商品:') + ' ' + status.products_synced;
+      if (status.orders_synced) msg += ' ' + t('pages.productSyncSettings.ordersLabel', '訂單:') + ' ' + status.orders_synced;
+      showAlert(msg, 'success');
+    } catch (error) {
+      console.error('手動同步失敗:', error);
+      showAlert(((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.manualSync') : '手動同步') + ' ' + (typeof I18n !== 'undefined' && I18n.t ? I18n.t('common.failed') || '失敗' : '失敗') + ': ' + (error.message || ''), 'error');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-cloud-download me-1"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.manualSync') : '手動同步');
+      }
+    }
+  }
+
+  async function checkShopeeConnectionOnLoad() {
+    const accessToken = getFieldValue('shopeeAccessToken');
+    const statusContainer = document.getElementById('shopeeConnectionStatus');
+    
+    if (!accessToken) {
+      if (statusContainer) statusContainer.style.display = 'none';
+      return;
+    }
+
+    if (statusContainer) statusContainer.style.display = 'block';
+    
+    try {
+      const resp = await App.apiRequest('/api/v1/shopee/sync-status');
+      updateShopeeConnectionUI({
+        connected: resp.connected,
+        token_needs_refresh: resp.token_needs_refresh,
+        refresh_token_valid: resp.refresh_token_valid,
+        last_sync_time: resp.last_sync_time,
+        last_sync_status: resp.last_sync_status
+      });
+    } catch (error) {
+      console.error('檢查 Shopee 連線狀態失敗:', error);
+      updateShopeeConnectionUI({ connected: false, error: error.message });
+    }
+  }
+
+  function updateShopeeConnectionUI(data) {
+    const statusContainer = document.getElementById('shopeeConnectionStatus');
+    const statusIcon = document.getElementById('shopeeStatusIcon');
+    const statusText = document.getElementById('shopeeStatusText');
+    const shopInfo = document.getElementById('shopeeShopInfo');
+    const refreshBtn = document.getElementById('shopeeRefreshTokenBtn');
+    const syncBtn = document.getElementById('shopeeManualSyncBtn');
+
+    if (statusContainer) statusContainer.style.display = 'block';
+
+    if (data.connected) {
+      if (statusIcon) {
+        statusIcon.className = 'bi bi-circle-fill me-2 text-success';
+      }
+      if (statusText) {
+        statusText.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.connected') : '已連接';
+        if (data.shop_name) {
+          statusText.textContent += ' - ' + data.shop_name;
+        }
+      }
+      if (statusContainer) {
+        statusContainer.className = 'alert alert-success mb-3';
+      }
+      if (refreshBtn) refreshBtn.style.display = data.token_needs_refresh ? 'inline-block' : 'none';
+      if (syncBtn) syncBtn.style.display = 'inline-block';
+
+      // 顯示最後同步時間
+      if (shopInfo && data.last_sync_time) {
+        const lastSync = new Date(data.last_sync_time * 1000);
+        const lastSyncLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.lastSync') : '上次同步:';
+        shopInfo.innerHTML = lastSyncLabel + ' ' + lastSync.toLocaleString() + 
+          ' (' + (data.last_sync_status || 'unknown') + ')';
+        shopInfo.style.display = 'block';
+      }
+    } else {
+      if (statusIcon) {
+        statusIcon.className = 'bi bi-circle-fill me-2 text-danger';
+      }
+      if (statusText) {
+        statusText.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.productSyncSettings.disconnected') : '未連接';
+        if (data.error) {
+          statusText.textContent += ' - ' + data.error;
+        }
+      }
+      if (statusContainer) {
+        statusContainer.className = 'alert alert-warning mb-3';
+      }
+      if (refreshBtn) refreshBtn.style.display = 'none';
+      if (syncBtn) syncBtn.style.display = 'none';
+      if (shopInfo) shopInfo.style.display = 'none';
+    }
+  }
+</script>
+{{end}}

@@ -1,0 +1,157 @@
+{{ define "pages/notification_settings" }}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 id="pageTitle"><i class="bi bi-bell me-2"></i><span data-i18n="pages.notificationSettings.title">系統提示設定</span></h3>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted mb-4" data-i18n="pages.notificationSettings.description">設定各類系統提示資訊的開關。只有當您的行業模板包含對應模組時，相關設定才會顯示。</p>
+            
+            <form id="notificationSettingsForm">
+                <!-- 打卡提示資訊 -->
+                <div class="mb-4" id="attendanceSection" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <label class="form-label fw-bold" data-i18n="pages.notificationSettings.attendance">打卡提示資訊</label>
+                            <small class="text-muted d-block" data-i18n="pages.notificationSettings.attendanceHint">當行業模板包含 HR 模組時顯示</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="attendanceNotificationsEnabled" style="width: 3rem; height: 1.5rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 訂單提示資訊 -->
+                <div class="mb-4" id="orderSection" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <label class="form-label fw-bold" data-i18n="pages.notificationSettings.order">訂單提示資訊</label>
+                            <small class="text-muted d-block" data-i18n="pages.notificationSettings.orderHint">當有訂單模組時顯示</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="orderNotificationsEnabled" style="width: 3rem; height: 1.5rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 服務單提示資訊 -->
+                <div class="mb-4" id="serviceOrderSection" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <label class="form-label fw-bold" data-i18n="pages.notificationSettings.serviceOrder">服務單提示資訊</label>
+                            <small class="text-muted d-block" data-i18n="pages.notificationSettings.serviceOrderHint">當行業模板包含服務單模組時顯示</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="serviceOrderNotificationsEnabled" style="width: 3rem; height: 1.5rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 預約提示資訊 -->
+                <div class="mb-4" id="appointmentSection" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <label class="form-label fw-bold" data-i18n="pages.notificationSettings.appointment">預約提示資訊</label>
+                            <small class="text-muted d-block" data-i18n="pages.notificationSettings.appointmentHint">當行業模板包含服務單模組時顯示</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="appointmentNotificationsEnabled" style="width: 3rem; height: 1.5rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 項目/task 到期提示資訊 -->
+                <div class="mb-4" id="projectDueSection" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <label class="form-label fw-bold" data-i18n="pages.notificationSettings.projectDue">項目/task 到期提示資訊</label>
+                            <small class="text-muted d-block" data-i18n="pages.notificationSettings.projectDueHint">當行業模板包含項目管理模組時顯示</small>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="projectDueNotificationsEnabled" style="width: 3rem; height: 1.5rem;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 form-buttons-container">
+                    <button type="button" class="btn btn-primary" onclick="saveNotificationSettings()">
+                        <i class="bi bi-save"></i> <span data-i18n="pages.notificationSettings.saveButton">保存設定</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+        
+        // 載入設定
+        try {
+            const response = await App.apiRequest('/api/v1/notification-settings');
+            const settings = response.data || {};
+            const modules = response.modules || {};
+
+            // 根據模組狀態顯示/隱藏對應區塊
+            if (modules.has_hr) {
+                document.getElementById('attendanceSection').style.display = 'block';
+                document.getElementById('attendanceNotificationsEnabled').checked = settings.attendance_notifications_enabled;
+            }
+
+            // 訂單提示資訊（所有租戶都有訂單功能）
+            document.getElementById('orderSection').style.display = 'block';
+            document.getElementById('orderNotificationsEnabled').checked = settings.order_notifications_enabled !== false;
+
+            if (modules.has_service_orders) {
+                document.getElementById('serviceOrderSection').style.display = 'block';
+                document.getElementById('serviceOrderNotificationsEnabled').checked = settings.service_order_notifications_enabled;
+                
+                document.getElementById('appointmentSection').style.display = 'block';
+                document.getElementById('appointmentNotificationsEnabled').checked = settings.appointment_notifications_enabled;
+            }
+
+            if (modules.has_projects) {
+                document.getElementById('projectDueSection').style.display = 'block';
+                document.getElementById('projectDueNotificationsEnabled').checked = settings.project_due_notifications_enabled;
+            }
+        } catch (error) {
+            console.error('Failed to load notification settings:', error);
+            App.showAlert('載入設定失敗：' + error.message, 'danger');
+        }
+    });
+    
+    async function saveNotificationSettings() {
+        const settings = {};
+
+        // 只提交已顯示的設定
+        if (document.getElementById('attendanceSection').style.display !== 'none') {
+            settings.attendance_notifications_enabled = document.getElementById('attendanceNotificationsEnabled').checked;
+        }
+        if (document.getElementById('orderSection').style.display !== 'none') {
+            settings.order_notifications_enabled = document.getElementById('orderNotificationsEnabled').checked;
+        }
+        if (document.getElementById('serviceOrderSection').style.display !== 'none') {
+            settings.service_order_notifications_enabled = document.getElementById('serviceOrderNotificationsEnabled').checked;
+        }
+        if (document.getElementById('appointmentSection').style.display !== 'none') {
+            settings.appointment_notifications_enabled = document.getElementById('appointmentNotificationsEnabled').checked;
+        }
+        if (document.getElementById('projectDueSection').style.display !== 'none') {
+            settings.project_due_notifications_enabled = document.getElementById('projectDueNotificationsEnabled').checked;
+        }
+        
+        try {
+            await App.apiRequest('/api/v1/notification-settings', {
+                method: 'PUT',
+                body: JSON.stringify(settings)
+            });
+            App.showAlert('設定已保存', 'success');
+        } catch (error) {
+            App.showAlert('保存失敗：' + error.message, 'danger');
+        }
+    }
+</script>
+{{ end }}
+

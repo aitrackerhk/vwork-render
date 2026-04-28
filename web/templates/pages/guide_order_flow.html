@@ -1,0 +1,459 @@
+
+<style>
+    .guide-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+    }
+    
+    .guide-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    
+    .guide-icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #fd7e1422 0%, #fd7e1411 100%);
+        border-radius: 50%;
+        margin-bottom: 30px;
+        border: 3px solid #fd7e1433;
+    }
+    
+    .guide-icon-wrapper i {
+        font-size: 48px;
+        color: #fd7e14;
+    }
+    
+    .guide-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 16px;
+        line-height: 1.2;
+    }
+    
+    .guide-header p {
+        font-size: 1.15rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    .flow-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+    }
+    
+    .flow-step {
+        display: flex;
+        gap: 24px;
+        position: relative;
+        padding-bottom: 40px;
+    }
+    
+    .flow-step:last-child {
+        padding-bottom: 0;
+    }
+    
+    .flow-step::before {
+        content: '';
+        position: absolute;
+        left: 31px;
+        top: 64px;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, #fd7e14, #fd7e1444);
+    }
+    
+    .flow-step:last-child::before {
+        display: none;
+    }
+    
+    .step-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    
+    .step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #fd7e14 0%, #e56b0a 100%);
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 16px rgba(253, 126, 20, 0.3);
+    }
+    
+    .step-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .step-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    .step-card h3 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .step-card h3 i {
+        color: #fd7e14;
+    }
+    
+    .step-card p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 16px;
+    }
+
+    .step-card ul {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 16px;
+        padding-left: 20px;
+    }
+
+    .step-card ul li {
+        margin-bottom: 6px;
+    }
+
+    .step-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .step-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #fd7e14;
+        color: white;
+        text-decoration: none;
+        border-radius: 100px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .step-action:hover {
+        background: #e56b0a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(253, 126, 20, 0.4);
+        color: white;
+    }
+
+    .step-action.secondary {
+        background: #6c757d;
+    }
+
+    .step-action.secondary:hover {
+        background: #5a6268;
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+    }
+    
+    .step-action i {
+        font-size: 1rem;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 40px;
+        padding: 12px 24px;
+        background: #f8f9fa;
+        color: #475569;
+        text-decoration: none;
+        border-radius: 100px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+        background: #e9ecef;
+        color: #1e293b;
+    }
+
+    .step-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        background: #e9ecef;
+        color: #6c757d;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-left: 8px;
+    }
+
+    .step-badge.optional {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    @media (max-width: 768px) {
+        .guide-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .guide-header p {
+            font-size: 1rem;
+        }
+        
+        .flow-step {
+            flex-direction: column;
+            gap: 16px;
+            padding-left: 0;
+        }
+        
+        .flow-step::before {
+            left: 31px;
+            top: 80px;
+        }
+        
+        .step-indicator {
+            flex-direction: row;
+            gap: 16px;
+        }
+        
+        .step-card {
+            padding: 20px;
+        }
+
+        .step-actions {
+            flex-direction: column;
+        }
+
+        .step-action {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="guide-container">
+    <div class="guide-header">
+        <div class="guide-icon-wrapper">
+            <i class="bi bi-cart-check"></i>
+        </div>
+        <h1 data-i18n="pages.guideOrderFlow.title">訂單流程指南</h1>
+        <p data-i18n="pages.guideOrderFlow.subtitle">完整配置您的訂單管理系統，從客戶管理到訂單追蹤</p>
+    </div>
+    
+    <div class="flow-steps">
+        <!-- Step 1: 產品設定 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">1</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-box-seam"></i> <span data-i18n="pages.guideOrderFlow.step1.title">建立產品</span></h3>
+                <p data-i18n="pages.guideOrderFlow.step1.description">建立您的產品資料，設定價格、庫存、規格等資訊。如需計算稅金，請先設定產品稅率。</p>
+                <ul>
+                    <li data-i18n="pages.guideOrderFlow.step1.item1">新增產品（名稱、SKU、價格、庫存）</li>
+                    <li data-i18n="pages.guideOrderFlow.step1.item2">上傳產品圖片和詳細描述</li>
+                    <li data-i18n="pages.guideOrderFlow.step1.item3">設定產品變體（尺寸、顏色等）</li>
+                    <li data-i18n="pages.guideOrderFlow.step1.item4">配置產品稅率（GST、VAT 等）</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/products" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideOrderFlow.step1.action">前往產品管理</span>
+                    </a>
+                    <a href="/product-taxes" class="step-action secondary">
+                        <i class="bi bi-percent"></i>
+                        <span data-i18n="pages.guideOrderFlow.step1.action2">產品稅設定</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: 付款方式 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">2</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-credit-card"></i> <span data-i18n="pages.guideOrderFlow.step2.title">配置付款方式</span></h3>
+                <p data-i18n="pages.guideOrderFlow.step2.description">設定您接受的付款方式，如現金、信用卡、銀行轉帳、線上支付等，讓客戶可以選擇方便的付款方式。</p>
+                <ul>
+                    <li data-i18n="pages.guideOrderFlow.step2.item1">現金 / 銀行轉帳 / 支票</li>
+                    <li data-i18n="pages.guideOrderFlow.step2.item2">信用卡 / 簽帳卡</li>
+                    <li data-i18n="pages.guideOrderFlow.step2.item3">線上支付（如 PayNow、FPX 等）</li>
+                    <li data-i18n="pages.guideOrderFlow.step2.item4">貨到付款 / 月結帳款</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/payment-methods" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideOrderFlow.step2.action">設定付款方式</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: 建立訂單 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">3</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-plus-circle"></i> <span data-i18n="pages.guideOrderFlow.step3.title">建立訂單</span></h3>
+                <p data-i18n="pages.guideOrderFlow.step3.description">完成產品和付款設定後，您就可以開始建立訂單了。選擇客戶、添加產品、設定付款和配送方式。</p>
+                <ul>
+                    <li data-i18n="pages.guideOrderFlow.step3.item1">選擇或新增客戶</li>
+                    <li data-i18n="pages.guideOrderFlow.step3.item2">添加產品和數量</li>
+                    <li data-i18n="pages.guideOrderFlow.step3.item3">選擇付款和配送方式</li>
+                    <li data-i18n="pages.guideOrderFlow.step3.item4">確認並儲存訂單</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/orders/new" class="step-action">
+                        <i class="bi bi-plus-lg"></i>
+                        <span data-i18n="pages.guideOrderFlow.step3.action">新增訂單</span>
+                    </a>
+                    <a href="/quotations/new" class="step-action secondary">
+                        <i class="bi bi-file-text"></i>
+                        <span data-i18n="pages.guideOrderFlow.step3.action2">新增報價單</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: POS 設定 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">4</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-display"></i> <span data-i18n="pages.guideOrderFlow.step4.title">POS 設定</span></h3>
+                <p data-i18n="pages.guideOrderFlow.step4.description">配置您的銷售點系統設定，包含收銀台設定、快速鍵配置等，讓門市銷售更順暢。</p>
+                <ul>
+                    <li data-i18n="pages.guideOrderFlow.step4.item1">設定預設收款方式</li>
+                    <li data-i18n="pages.guideOrderFlow.step4.item2">配置快速選單和熱門產品</li>
+                    <li data-i18n="pages.guideOrderFlow.step4.item3">設定收據格式</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/pos-settings" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideOrderFlow.step4.action">前往 POS 設定</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: 打印機設定 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">5</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-printer"></i> <span data-i18n="pages.guideOrderFlow.step5.title">打印機設定</span></h3>
+                <p data-i18n="pages.guideOrderFlow.step5.description">設定您的打印機，確保訂單和收據能正確列印。</p>
+                <ul>
+                    <li data-i18n="pages.guideOrderFlow.step5.item1">連接收據打印機</li>
+                    <li data-i18n="pages.guideOrderFlow.step5.item2">設定打印格式和字體大小</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/printer-settings" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideOrderFlow.step5.action">前往打印機設定</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: 物流配送 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">6</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-box2"></i> <span data-i18n="pages.guideOrderFlow.step6.title">設定物流配送</span> <span class="step-badge optional" data-i18n="pages.guideOrderFlow.step6.badge">選配</span></h3>
+                <p data-i18n="pages.guideOrderFlow.step6.description">如需使用第三方物流，可配置物流整合選項，自動獲取運單和追蹤狀態。</p>
+                <ul>
+                    <li data-i18n="pages.guideOrderFlow.step6.item1">自取 / 店內取貨</li>
+                    <li data-i18n="pages.guideOrderFlow.step6.item2">快遞配送（設定運費）</li>
+                    <li data-i18n="pages.guideOrderFlow.step6.item3">第三方物流 API 整合</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/shipping-methods" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideOrderFlow.step6.action">設定物流方式</span>
+                    </a>
+                    <a href="/shipping-integrations" class="step-action secondary">
+                        <i class="bi bi-plugin"></i>
+                        <span data-i18n="pages.guideOrderFlow.step6.action2">物流整合</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center" style="margin-top: 50px;">
+        <button type="button" class="btn btn-success btn-lg px-5 py-3" id="guideCompleteBtn" style="border-radius: 100px; font-weight: 600; font-size: 1.1rem;">
+            <i class="bi bi-check-circle me-2"></i>
+            <span data-i18n="pages.guideOrderFlow.completeSetup">我已完成設定</span>
+        </button>
+        <p class="text-muted mt-3" style="font-size: 0.9rem;" data-i18n="pages.guideOrderFlow.completeSetupHint">完成後此指南將從目錄隱藏，您可在「編輯目錄」中重新開啟</p>
+    </div>
+
+    <div class="text-center">
+        <a href="/help" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            <span data-i18n="pages.guideOrderFlow.backToHelp">返回支援中心</span>
+        </a>
+    </div>
+</div>
+
+<script>
+(function() {
+    var btn = document.getElementById('guideCompleteBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async function() {
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' +
+                ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.saving') : '保存中...');
+            await window.hideGuideFromMenu('guide-order-flow');
+            // Navigate to orders page
+            if (window.App && window.App.navigate) {
+                window.App.navigate('/orders');
+            } else {
+                window.location.href = '/orders';
+            }
+        } catch (e) {
+            console.error('Failed to hide guide:', e);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>' +
+                ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.guideOrderFlow.completeSetup') : '我已完成設定');
+        }
+    });
+})();
+</script>

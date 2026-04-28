@@ -1,0 +1,189 @@
+{{ define "pages/api_tokens" }}
+<div class="container-fluid" style="max-width: 960px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="mb-1"><i class="bi bi-key me-2"></i>API Tokens</h3>
+            <p class="text-muted mb-0 small">Manage system API tokens for external service integrations.</p>
+        </div>
+        <a href="/api-tokens/create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>New Token
+        </a>
+    </div>
+
+    <!-- Token Created Alert (shown via query param after redirect) -->
+    <div class="alert alert-success d-none" id="tokenCreatedAlert">
+        <div class="d-flex align-items-center mb-2">
+            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+            <strong>Token created successfully!</strong>
+        </div>
+        <div class="alert alert-warning py-2 mb-2">
+            <i class="bi bi-exclamation-triangle me-1"></i>
+            Copy this token now. It will <strong>not</strong> be shown again.
+        </div>
+        <div class="input-group mb-2">
+            <input type="text" class="form-control font-monospace bg-white" id="rawTokenValue" readonly>
+            <button class="btn btn-outline-dark" onclick="copyToken()">
+                <i class="bi bi-clipboard"></i> Copy
+            </button>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary" onclick="this.closest('.alert').classList.add('d-none')">Dismiss</button>
+    </div>
+
+    <!-- Token Cards -->
+    <div id="tokenCards">
+        <div class="text-center text-muted py-5">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>Loading tokens...
+        </div>
+    </div>
+</div>
+
+<script>
+    let tokensData = [];
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // Check if a new token was just created (passed via sessionStorage)
+        const newToken = sessionStorage.getItem('_newApiToken');
+        if (newToken) {
+            sessionStorage.removeItem('_newApiToken');
+            document.getElementById('rawTokenValue').value = newToken;
+            document.getElementById('tokenCreatedAlert').classList.remove('d-none');
+        }
+
+        await loadTokens();
+    });
+
+    function copyToken() {
+        const input = document.getElementById('rawTokenValue');
+        input.select();
+        navigator.clipboard.writeText(input.value).then(() => {
+            App.showAlert('Token copied to clipboard.', 'success');
+        }).catch(() => {
+            document.execCommand('copy');
+            App.showAlert('Token copied to clipboard.', 'success');
+        });
+    }
+
+    async function loadTokens() {
+        try {
+            const response = await App.apiRequest('/api/v1/api-tokens');
+            tokensData = response.tokens || [];
+            renderTokens();
+        } catch (error) {
+            console.error('Failed to load API tokens:', error);
+            document.getElementById('tokenCards').innerHTML =
+                '<div class="alert alert-danger">Failed to load tokens: ' + escapeHtml(error.message) + '</div>';
+        }
+    }
+
+    function renderTokens() {
+        const container = document.getElementById('tokenCards');
+
+        if (tokensData.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-key text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3 mb-0">No API tokens yet.</p>
+                    <a href="/api-tokens/create" class="btn btn-primary mt-3"><i class="bi bi-plus-lg me-1"></i>Create your first token</a>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = tokensData.map(t => {
+            const isActive = t.status === 'active';
+            const borderClass = isActive ? 'border-start-success' : 'border-start-secondary';
+            const statusHtml = isActive
+                ? '<span class="badge bg-success">Active</span>'
+                : '<span class="badge bg-secondary">Revoked</span>';
+            const productHtml = getProductBadge(t.product);
+            const scopesHtml = formatScopes(t.scopes);
+            const lastUsed = t.last_used_at ? formatDate(t.last_used_at) : 'Never';
+            const expires = t.expires_at ? formatDate(t.expires_at) : 'Never';
+            const created = formatDate(t.created_at);
+
+            const revokeBtn = isActive
+                ? `<button class="btn btn-sm btn-outline-warning" onclick="revokeToken('${t.id}')"><i class="bi bi-lock me-1"></i>Revoke</button>`
+                : '';
+            const deleteBtn = `<button class="btn btn-sm btn-outline-danger" onclick="deleteToken('${t.id}')"><i class="bi bi-trash me-1"></i>Delete</button>`;
+
+            return `
+            <div class="card mb-3" style="border-left: 4px solid ${isActive ? 'var(--bs-success)' : 'var(--bs-secondary)'};">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-1">${escapeHtml(t.name)}</h5>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                ${productHtml} ${statusHtml}
+                                <code class="small text-muted">${escapeHtml(t.token_prefix)}...</code>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            ${revokeBtn} ${deleteBtn}
+                        </div>
+                    </div>
+                    <div class="row text-muted small mt-1">
+                        <div class="col-auto"><i class="bi bi-shield-lock me-1"></i>Scopes: ${scopesHtml}</div>
+                    </div>
+                    <div class="row text-muted small mt-1">
+                        <div class="col-auto"><i class="bi bi-clock me-1"></i>Created: ${created}</div>
+                        <div class="col-auto"><i class="bi bi-activity me-1"></i>Last used: ${lastUsed}</div>
+                        <div class="col-auto"><i class="bi bi-hourglass-split me-1"></i>Expires: ${expires}</div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function getProductBadge(product) {
+        const colors = { 'vai': 'bg-info', 'vwork': 'bg-primary', 'vmarket': 'bg-warning text-dark', 'voffice': 'bg-secondary' };
+        const labels = { 'vai': 'vAi', 'vwork': 'vWork', 'vmarket': 'vMarket', 'voffice': 'vOffice' };
+        return '<span class="badge ' + (colors[product] || 'bg-dark') + '">' + (labels[product] || product) + '</span>';
+    }
+
+    function formatScopes(scopes) {
+        if (!scopes || scopes === '*') return '<span class="badge bg-dark">Full Access</span>';
+        const items = scopes.split(',').map(s => s.trim());
+        if (items.length <= 4) {
+            return items.map(s => '<span class="badge bg-light text-dark border me-1">' + escapeHtml(s) + '</span>').join('');
+        }
+        return items.slice(0, 3).map(s => '<span class="badge bg-light text-dark border me-1">' + escapeHtml(s) + '</span>').join('')
+             + '<span class="badge bg-light text-dark border">+' + (items.length - 3) + ' more</span>';
+    }
+
+    async function revokeToken(id) {
+        if (!confirm('Revoke this token? It will immediately stop working. This cannot be undone.')) return;
+        try {
+            await App.apiRequest('/api/v1/api-tokens/' + id + '/revoke', { method: 'POST' });
+            App.showAlert('Token revoked.', 'success');
+            await loadTokens();
+        } catch (error) {
+            App.showAlert('Failed to revoke token: ' + error.message, 'danger');
+        }
+    }
+
+    async function deleteToken(id) {
+        if (!confirm('Permanently delete this token? This cannot be undone.')) return;
+        try {
+            await App.apiRequest('/api/v1/api-tokens/' + id, { method: 'DELETE' });
+            App.showAlert('Token deleted.', 'success');
+            await loadTokens();
+        } catch (error) {
+            App.showAlert('Failed to delete token: ' + error.message, 'danger');
+        }
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+</script>
+{{ end }}

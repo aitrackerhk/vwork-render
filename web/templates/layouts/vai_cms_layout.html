@@ -1,0 +1,652 @@
+{{define "layouts/vai_cms_layout"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{if .Title}}{{.Title}} - {{end}}vAI</title>
+    <link rel="icon" type="image/png" href="/static/vaiicon.png">
+    <link rel="apple-touch-icon" href="/static/vaiicon.png">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css?v=20260316c">
+    <link rel="stylesheet" href="/static/css/vai.css?v=20260319d">
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+        /* vAI icon sidebar + content area */
+        .main-content-wrapper.no-sidebar {
+            margin-left: 0 !important;
+        }
+    </style>
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            let currentLang = 'zh';
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) localStorage.setItem('u-nai_lang', currentLang);
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) currentLang = 'zh-CN';
+                else if (browserLang.startsWith('zh')) currentLang = 'zh';
+                else currentLang = 'en';
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            window.__INITIAL_LANG__ = currentLang;
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body>
+    {{template "layouts/topnav.html" .}}
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="vaiMobileSidebarOverlay"></div>
+
+    <!-- vAI Mobile Sidebar Menu (visible on mobile only) -->
+    <div class="sidebar" id="vaiMobileSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <!-- vAI page navigation -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/vai-chat">
+                        <i class="bi bi-chat-dots"></i> <span data-i18n="vai.nav.chat">交談</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/vai-sketch">
+                        <i class="bi bi-brush"></i> <span data-i18n="vai.nav.sketch">圖片</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/vai-video">
+                        <i class="bi bi-camera-video"></i> <span data-i18n="vai.nav.video">影片</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/vai-docs">
+                        <i class="bi bi-file-earmark-text"></i> <span data-i18n="vai.nav.docs">文件</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/vai-apps">
+                        <i class="bi bi-search-heart"></i> <span data-i18n="vai.nav.apps">發現</span>
+                    </a>
+                </li>
+
+                <li class="nav-item"><hr class="dropdown-divider" style="margin: 0.25rem 1rem;"></li>
+                <!-- Support Info -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vaiMobileSupportSubmenu" aria-expanded="false">
+                        <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="vaiMobileSupportSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/help/{{with navPrefix (index . "PageName")}}{{.}}{{else}}vwork{{end}}" target="_blank">
+                                    <i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/contact?product={{with navPrefix (index . "PageName")}}{{.}}{{else}}vwork{{end}}" target="_blank">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Language -->
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vaiMobileLangSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="vaiMobileLangSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- User Account -->
+                <li class="nav-item nav-group" id="vaiMobileUserItem">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vaiMobileUserSubmenu" aria-expanded="false">
+                        <img id="vaiMobileUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                        <i class="bi bi-person-circle" id="vaiMobileUserIcon"></i> <span id="vaiMobileUserName" data-i18n="nav.user">用戶</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="vaiMobileUserSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item" id="vaiMobileAICoinsDisplay" style="display: none;">
+                                <a class="nav-link" href="/vai-vcoins">
+                                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                                    <span class="fw-bold" id="vaiMobileAICoinsBalance">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/vai-personal-data">
+                                    <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/vai-billing">
+                                    <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="vaiMobileLogoutBtn">
+                                    <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- vAI Icon Sidebar -->
+    <aside class="vai-icon-sidebar" id="vaiIconSidebar">
+        <a href="/vai-chat" class="vai-icon-sidebar-item" data-vai-page="vai-chat" title="交談" data-i18n-title="vai.nav.chat">
+            <i class="bi bi-chat-dots"></i>
+            <span data-i18n="vai.nav.chat">交談</span>
+        </a>
+        <a href="/vai-sketch" class="vai-icon-sidebar-item" data-vai-page="vai-sketch" title="圖片" data-i18n-title="vai.nav.sketch">
+            <i class="bi bi-brush"></i>
+            <span data-i18n="vai.nav.sketch">圖片</span>
+        </a>
+        <a href="/vai-video" class="vai-icon-sidebar-item" data-vai-page="vai-video" title="影片" data-i18n-title="vai.nav.video">
+            <i class="bi bi-camera-video"></i>
+            <span data-i18n="vai.nav.video">影片</span>
+        </a>
+        <a href="/vai-docs" class="vai-icon-sidebar-item" data-vai-page="vai-docs" title="文件" data-i18n-title="vai.nav.docs">
+            <i class="bi bi-file-earmark-text"></i>
+            <span data-i18n="vai.nav.docs">文件</span>
+        </a>
+        <a href="/vai-apps" class="vai-icon-sidebar-item" data-vai-page="vai-apps" title="發現" data-i18n-title="vai.nav.apps">
+            <i class="bi bi-search-heart"></i>
+            <span data-i18n="vai.nav.apps">發現</span>
+        </a>
+
+    </aside>
+
+    <div class="main-content-wrapper no-sidebar vai-with-icon-sidebar">
+        <div class="main-content" style="padding: 0; max-width: 100%; margin-left: 0;">
+            <div id="alertContainer" class="position-fixed start-50 translate-middle-x" style="z-index: 9999; max-width: 500px; top: 60px; margin-top: 10px;"></div>
+            {{embed}}
+        </div>
+    </div>
+
+    <script>
+    // Highlight active icon sidebar item
+    (function() {
+        var path = window.location.pathname;
+        document.querySelectorAll('.vai-icon-sidebar-item').forEach(function(item) {
+            var page = item.getAttribute('data-vai-page');
+            if (path === '/' + page) {
+                item.classList.add('active');
+            }
+        });
+    })();
+    </script>
+
+    <!-- jQuery (for ai-chat.js / App dependencies) -->
+    <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/utils.js?v=20260316d"></script>
+    <script src="/static/vendor/marked.min.js"></script>
+    <script src="/static/vendor/purify.min.js"></script>
+    <script src="/static/js/ai-chat.js?v=20260318b"></script>
+    <script>
+        // Auto-load conversations on page ready (ai-chat.js normally loads on modal show)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tenant switcher (same as cms_layout.html)
+            if (typeof App !== 'undefined' && App.initTenantSwitcher) {
+                App.initTenantSwitcher();
+            }
+
+            // ─── Topnav Logout Button ───
+            var logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof App !== 'undefined' && App.logout) { App.logout(); }
+                });
+            }
+
+            // ─── Load user info for topnav dropdown ───
+            async function loadTopnavUserInfo() {
+                try {
+                    var user = await App.apiRequest('/user/me');
+                    if (!user || !user.id || !user.email || !user.name ||
+                        String(user.id).trim() === '' ||
+                        String(user.email).trim() === '' ||
+                        String(user.name).trim() === '') {
+                        if (typeof App !== 'undefined' && App.clearSessionAndRedirect) {
+                            App.clearSessionAndRedirect();
+                        }
+                        return;
+                    }
+                    try { localStorage.setItem('user', JSON.stringify(user)); } catch (e) {}
+
+                    // Update app-switcher links (user is logged in if we reach here)
+                    if (typeof App.updateAppSwitcherLinks === 'function') {
+                        App.updateAppSwitcherLinks(true);
+                    }
+
+                    var userNameEl = document.getElementById('userName');
+                    if (userNameEl && user.name) {
+                        userNameEl.textContent = user.name;
+                        userNameEl.removeAttribute('data-i18n');
+                    }
+
+                    // Topbar avatar
+                    var avatarImg = document.getElementById('topbarUserAvatar');
+                    var avatarIcon = document.getElementById('topbarUserIcon');
+                    if (avatarImg) {
+                        var url = (user && user.profile_pic) ? String(user.profile_pic) : '';
+                        if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                        if (url) {
+                            avatarImg.src = url;
+                            avatarImg.style.display = 'inline-block';
+                            if (avatarIcon) avatarIcon.style.display = 'none';
+                            avatarImg.onerror = function() {
+                                this.style.display = 'none';
+                                if (avatarIcon) avatarIcon.style.display = '';
+                                this.onerror = null;
+                            };
+                        } else {
+                            avatarImg.style.display = 'none';
+                            if (avatarIcon) avatarIcon.style.display = '';
+                        }
+                    }
+
+                    // Load vCoin balance
+                    loadAICoinsBalance();
+                } catch (error) {
+                    console.error('Failed to load user info:', error);
+                    if (error.status === 401 || (error.message && error.message.indexOf('401') !== -1)) {
+                        if (typeof App !== 'undefined' && App.clearSessionAndRedirect) {
+                            App.clearSessionAndRedirect();
+                        }
+                    }
+                }
+            }
+
+            // ─── Prefill from cache for instant display ───
+            function prefillUserFromCache() {
+                try {
+                    var cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        var user = JSON.parse(cachedUser);
+                        if (user && user.name) {
+                            var userNameEl = document.getElementById('userName');
+                            if (userNameEl) {
+                                userNameEl.textContent = user.name;
+                                userNameEl.removeAttribute('data-i18n');
+                            }
+                            var avatarImg = document.getElementById('topbarUserAvatar');
+                            var avatarIcon = document.getElementById('topbarUserIcon');
+                            if (user.profile_pic) {
+                                var url = String(user.profile_pic);
+                                if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                                if (url && avatarImg) {
+                                    avatarImg.src = url;
+                                    avatarImg.style.display = 'inline-block';
+                                    if (avatarIcon) avatarIcon.style.display = 'none';
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // Initialize user info
+            // 支援 cookie-based auth：即使沒有 localStorage auth_token，
+            // 只要有 cookie-auth session 標記或 localStorage user 資料，就嘗試載入
+            if (typeof App !== 'undefined') {
+                var token = localStorage.getItem('auth_token');
+                var cookieAuth = sessionStorage.getItem('_cookie_auth');
+                if (token || cookieAuth === '1') {
+                    prefillUserFromCache();
+                    loadTopnavUserInfo();
+                }
+            }
+
+            // i18n init
+            if (typeof I18n !== 'undefined' && I18n.init) {
+                I18n.init();
+            }
+
+            // ai-chat.js init runs on DOMContentLoaded too, which loads user + settings.
+            // After that, we trigger conversation loading.
+            setTimeout(function() {
+                if (typeof loadAiConversations === 'function') {
+                    loadAiConversations().then(function() {
+                        var handled = false;
+
+                        // Check for ?conv= query param (from search navigation)
+                        var params = new URLSearchParams(window.location.search);
+                        var convParam = params.get('conv');
+                        if (convParam && typeof switchToConversation === 'function') {
+                            switchToConversation(convParam);
+                            // Clean up URL
+                            history.replaceState(null, '', window.location.pathname);
+                            handled = true;
+                        }
+
+                        // Check for vai_app_prompt from Apps page
+                        var appPrompt = sessionStorage.getItem('vai_app_prompt');
+                        if (appPrompt && window.location.pathname === '/vai-chat') {
+                            sessionStorage.removeItem('vai_app_prompt');
+                            // Use vaiQuickSend if available (creates conversation + sends)
+                            if (typeof vaiQuickSend === 'function') {
+                                setTimeout(function() { vaiQuickSend(appPrompt); }, 300);
+                            }
+                            handled = true;
+                        }
+
+                        // Auto-create a new conversation on page entry
+                        if (!handled && window.location.pathname === '/vai-chat' && typeof createNewAiConversation === 'function') {
+                            createNewAiConversation();
+                        }
+                    }).catch(function() {});
+                }
+            }, 500);
+
+            // Load vCoin balance (same logic as cms_layout.html)
+            async function loadAICoinsBalance() {
+                try {
+                    var token = localStorage.getItem('auth_token');
+                    var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                    // 允許 cookie-based auth（無 localStorage token）
+                    if (!tenantSubdomain) return;
+
+                    var headers = {
+                        'Accept': 'application/json',
+                        'X-Tenant-Subdomain': tenantSubdomain
+                    };
+                    if (token) {
+                        headers['Authorization'] = 'Bearer ' + token;
+                    }
+
+                    var resp = await fetch('/api/v1/ai-coins/balance', {
+                        headers: headers,
+                        credentials: 'same-origin'
+                    });
+                    if (!resp.ok) return;
+
+                    var data = await resp.json();
+                    var balance = data.balance || 0;
+                    var aiCoinsDisplay = document.getElementById('userAICoinsDisplay');
+                    var aiCoinsBalance = document.getElementById('userAICoinsBalance');
+                    var aiCoinsDivider = document.getElementById('aiCoinsDivider');
+
+                    if (aiCoinsDisplay && aiCoinsBalance) {
+                        aiCoinsBalance.textContent = balance;
+                        aiCoinsDisplay.style.display = 'block';
+                        if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
+                    }
+
+                    // Also update mobile sidebar vCoin display
+                    var mobileCoinsDisplay = document.getElementById('vaiMobileAICoinsDisplay');
+                    var mobileCoinsBalance = document.getElementById('vaiMobileAICoinsBalance');
+                    if (mobileCoinsDisplay && mobileCoinsBalance) {
+                        mobileCoinsBalance.textContent = balance;
+                        mobileCoinsDisplay.style.display = 'block';
+                    }
+                } catch (e) {
+                    console.error('Failed to load vCoin balance:', e);
+                }
+            }
+            loadAICoinsBalance();
+
+            // ─── vAI Mobile Sidebar ─────────────────────────────────
+            (function initVaiMobileSidebar() {
+                var mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                var mobileSidebar = document.getElementById('vaiMobileSidebar');
+                var mobileSidebarOverlay = document.getElementById('vaiMobileSidebarOverlay');
+
+                function toggleMobileSidebar() {
+                    if (!mobileSidebar) return;
+                    var isOpen = mobileSidebar.classList.contains('show');
+                    if (isOpen) {
+                        mobileSidebar.classList.remove('show');
+                        setTimeout(function() { mobileSidebar.style.display = 'none'; }, 300);
+                    } else {
+                        mobileSidebar.style.display = 'block';
+                        mobileSidebar.offsetHeight; // force reflow
+                        mobileSidebar.classList.add('show');
+                    }
+                    if (mobileSidebarOverlay) mobileSidebarOverlay.classList.toggle('show');
+                }
+
+                function closeMobileSidebar() {
+                    if (mobileSidebar) {
+                        mobileSidebar.classList.remove('show');
+                        setTimeout(function() { mobileSidebar.style.display = 'none'; }, 300);
+                    }
+                    if (mobileSidebarOverlay) mobileSidebarOverlay.classList.remove('show');
+                }
+
+                if (mobileMenuToggle) {
+                    mobileMenuToggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        toggleMobileSidebar();
+                    });
+                }
+
+                if (mobileSidebarOverlay) {
+                    mobileSidebarOverlay.addEventListener('click', closeMobileSidebar);
+                }
+
+                // Close sidebar when clicking nav links (except collapse toggles)
+                document.querySelectorAll('#vaiMobileSidebar .nav-link:not(.nav-group-toggle)').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        if (!this.hasAttribute('data-lang')) {
+                            closeMobileSidebar();
+                        }
+                    });
+                });
+
+                // Sidebar language links
+                document.querySelectorAll('#vaiMobileLangSubmenu .nav-link[data-lang]').forEach(function(link) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var lang = this.getAttribute('data-lang');
+                        if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                            I18n.switchLanguage(lang);
+                        }
+                        closeMobileSidebar();
+                    });
+                });
+
+                // Sidebar logout button
+                var mobileLogoutBtn = document.getElementById('vaiMobileLogoutBtn');
+                if (mobileLogoutBtn) {
+                    mobileLogoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            localStorage.removeItem('auth_token');
+                            window.location.href = '/login?product=vai';
+                        }
+                    });
+                }
+
+                // Sync user info and tenant name to mobile sidebar
+                function syncMobileSidebarUser() {
+                    var topbarName = document.getElementById('userName');
+                    var topbarAvatar = document.getElementById('topbarUserAvatar');
+                    var mobileName = document.getElementById('vaiMobileUserName');
+                    var mobileAvatar = document.getElementById('vaiMobileUserAvatar');
+                    var mobileIcon = document.getElementById('vaiMobileUserIcon');
+
+                    if (topbarName && mobileName && topbarName.textContent) {
+                        mobileName.textContent = topbarName.textContent;
+                    }
+                    if (topbarAvatar && mobileAvatar && topbarAvatar.src && topbarAvatar.style.display !== 'none') {
+                        mobileAvatar.src = topbarAvatar.src;
+                        mobileAvatar.style.display = 'inline';
+                        if (mobileIcon) mobileIcon.style.display = 'none';
+                    }
+                }
+                // Run after a delay so app.js has time to populate user info
+                setTimeout(syncMobileSidebarUser, 1500);
+            })();
+        });
+
+        // ─── vAI Global Search (topnav) ──────────────────────────────
+        (function() {
+            var searchTimer = null;
+            var searchInput = null;
+            var searchDropdown = null;
+            var searchResults = null;
+
+            document.addEventListener('DOMContentLoaded', function() {
+                searchInput = document.getElementById('vaiSearchInput');
+                searchDropdown = document.getElementById('vaiSearchDropdown');
+                searchResults = document.getElementById('vaiSearchResults');
+                if (!searchInput || !searchDropdown || !searchResults) return;
+
+                // Debounced search on input
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimer);
+                    var q = searchInput.value.trim();
+                    if (!q) {
+                        searchDropdown.style.display = 'none';
+                        searchResults.innerHTML = '';
+                        return;
+                    }
+                    searchTimer = setTimeout(function() { doVaiSearch(q); }, 300);
+                });
+
+                // Close dropdown on click outside
+                document.addEventListener('click', function(e) {
+                    if (searchDropdown && !searchDropdown.contains(e.target) && e.target !== searchInput) {
+                        searchDropdown.style.display = 'none';
+                    }
+                });
+
+                // Close dropdown on Escape
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        searchDropdown.style.display = 'none';
+                        searchInput.blur();
+                    }
+                });
+            });
+
+            async function doVaiSearch(q) {
+                try {
+                    if (typeof App === 'undefined' || !App.apiRequest) return;
+                    var resp = await App.apiRequest('/ai/conversations/search?q=' + encodeURIComponent(q));
+                    var items = resp.data || [];
+                    renderVaiSearchResults(items, q);
+                } catch (err) {
+                    console.error('vAI search error:', err);
+                    searchResults.innerHTML = '<div class="vai-search-empty">' + (typeof I18n !== 'undefined' ? I18n.t('vai.search.failed') : 'Search failed') + '</div>';
+                    searchDropdown.style.display = 'block';
+                }
+            }
+
+            function renderVaiSearchResults(items, q) {
+                if (!items.length) {
+                    searchResults.innerHTML = '<div class="vai-search-empty">' + (typeof I18n !== 'undefined' ? I18n.t('vai.search.noResults') : 'No results found') + '</div>';
+                    searchDropdown.style.display = 'block';
+                    return;
+                }
+
+                var html = '';
+                items.forEach(function(item) {
+                    var icon = item.match_type === 'title'
+                        ? '<i class="bi bi-chat-dots text-primary me-2"></i>'
+                        : '<i class="bi bi-chat-text text-secondary me-2"></i>';
+                    var title = highlightMatch(escapeHtml(item.conversation_title), q);
+                    var preview = '';
+                    if (item.message_preview) {
+                        var roleLabel = item.message_role === 'assistant' ? 'AI' : '你';
+                        preview = '<div class="vai-search-preview"><span class="vai-search-role">' + roleLabel + ':</span> ' + highlightMatch(escapeHtml(item.message_preview), q) + '</div>';
+                    }
+                    html += '<a class="vai-search-item" href="#" data-conv-id="' + item.conversation_id + '">'
+                        + icon
+                        + '<div class="vai-search-item-body">'
+                        + '<div class="vai-search-title">' + title + '</div>'
+                        + preview
+                        + '</div>'
+                        + '</a>';
+                });
+
+                searchResults.innerHTML = html;
+                searchDropdown.style.display = 'block';
+
+                // Bind click handlers
+                searchResults.querySelectorAll('.vai-search-item').forEach(function(el) {
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var convId = el.getAttribute('data-conv-id');
+                        if (convId) navigateToConversation(convId);
+                    });
+                });
+            }
+
+            function navigateToConversation(convId) {
+                searchDropdown.style.display = 'none';
+                searchInput.value = '';
+
+                // If already on vai-chat page, switch conversation directly
+                if (window.location.pathname === '/vai-chat') {
+                    if (typeof switchToConversation === 'function') {
+                        switchToConversation(convId);
+                    }
+                } else {
+                    // Navigate to vai-chat with conversation ID
+                    window.location.href = '/vai-chat?conv=' + convId;
+                }
+            }
+
+            function escapeHtml(str) {
+                var div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function highlightMatch(html, q) {
+                if (!q) return html;
+                try {
+                    var escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    return html.replace(new RegExp('(' + escaped + ')', 'gi'), '<mark>$1</mark>');
+                } catch (e) {
+                    return html;
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
+{{end}}

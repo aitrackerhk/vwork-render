@@ -1,0 +1,586 @@
+{{define "pages/dining_ticket_settings"}}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            
+            <!-- vWork Connector 狀態 -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plug me-2"></i>
+                        <span data-i18n="pages.diningTicketSettings.connectorStatus">vWork Connector 狀態</span>
+                    </h5>
+                    <span class="badge" id="connectorStatusBadge">未連接</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label" data-i18n="pages.diningTicketSettings.connectorPort">Connector 端口</label>
+                            <input type="number" class="form-control" id="connectorPort" value="9527" min="1" max="65535">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-outline-primary" id="checkConnectorBtn">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                <span data-i18n="pages.diningTicketSettings.checkConnection">檢查連接</span>
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/api/v1/downloads/connector" class="btn btn-outline-secondary">
+                                <i class="bi bi-download me-1"></i>
+                                <span data-i18n="pages.diningTicketSettings.downloadConnector">下載 vWork Connector</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 候位票打印機設定 -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-printer me-2"></i>
+                        <span data-i18n="pages.diningTicketSettings.title">候位票打印機設定</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4" data-i18n="pages.diningTicketSettings.description">
+                        設定候位票打印機，連接後可在候位看板取號時自動打印票據。
+                    </p>
+                    
+                    <form id="thermalPrinterForm">
+                        <!-- 打印機選擇 -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label" data-i18n="pages.diningTicketSettings.printerType">打印機類型</label>
+                                <select class="form-select" id="printerType" name="printerType">
+                                    <option value="usb">USB 熱敏打印機 (WebUSB)</option>
+                                    <option value="network">網絡打印機</option>
+                                    <option value="connector">系統打印機 (需 vWork Connector)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label" data-i18n="pages.diningTicketSettings.printerStatus">打印機狀態</label>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <span class="badge bg-secondary" id="printerStatusBadge">未連接</span>
+                                    <span class="small text-muted" id="printerName">尚未設定</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- USB 打印機設定 (WebUSB) -->
+                        <div id="usbPrinterSettings">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" data-i18n="pages.diningTicketSettings.paperWidth">紙張寬度</label>
+                                    <select class="form-select" id="printerPaperWidth">
+                                        <option value="58">58mm（小票）</option>
+                                        <option value="80">80mm（標準）</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" id="printerAutoCut" checked>
+                                        <label class="form-check-label" for="printerAutoCut" data-i18n="pages.diningTicketSettings.autoCut">自動切紙</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary" id="connectPrinterBtn">
+                                    <i class="bi bi-usb-plug me-1"></i>
+                                    <span data-i18n="pages.diningTicketSettings.connectPrinter">連接打印機</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="testPrintBtn" style="display:none;">
+                                    <i class="bi bi-printer me-1"></i>
+                                    <span data-i18n="pages.diningTicketSettings.testPrint">測試打印</span>
+                                </button>
+                                <button type="button" class="btn btn-outline-danger btn-sm" id="disconnectPrinterBtn" style="display:none;">
+                                    <span data-i18n="pages.diningTicketSettings.disconnect">斷開連接</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 網絡打印機設定 -->
+                        <div id="networkPrinterSettings" style="display:none;">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" data-i18n="pages.diningTicketSettings.printerIP">打印機 IP 地址</label>
+                                    <input type="text" class="form-control" id="networkPrinterIP" 
+                                           placeholder="192.168.1.200" pattern="^(\d{1,3}\.){3}\d{1,3}$">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" data-i18n="pages.diningTicketSettings.printerPort">打印機端口</label>
+                                    <input type="number" class="form-control" id="networkPrinterPort" value="9100" min="1" max="65535">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary" id="connectNetworkPrinterBtn">
+                                    <i class="bi bi-ethernet me-1"></i>
+                                    <span data-i18n="pages.diningTicketSettings.connectPrinter">連接打印機</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Connector 打印機設定 -->
+                        <div id="connectorPrinterSettings" style="display:none;">
+                            <div class="mb-3">
+                                <label class="form-label" data-i18n="pages.diningTicketSettings.selectPrinter">選擇打印機</label>
+                                <div class="input-group">
+                                    <select class="form-select" id="connectorPrinterSelect">
+                                        <option value="">-- 請選擇打印機 --</option>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary" id="refreshPrintersBtn">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                    <span class="input-group-text d-none" id="printerLoadingSpinner">
+                                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                                        <span data-i18n="common.processing">處理中...</span>
+                                    </span>
+                                </div>
+                                <div class="form-text" data-i18n="pages.diningTicketSettings.connectorPrinterHint">
+                                    從 vWork Connector 獲取系統打印機列表
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary" id="testConnectorPrintBtn">
+                                    <i class="bi bi-printer me-1"></i>
+                                    <span data-i18n="pages.diningTicketSettings.testPrint">測試打印</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <!-- 票據內容設定 -->
+                        <h6 class="mb-3">
+                            <i class="bi bi-file-text me-2"></i>
+                            <span data-i18n="pages.diningTicketSettings.ticketContent">票據內容設定</span>
+                        </h6>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showStoreName" checked>
+                                    <label class="form-check-label" for="showStoreName" data-i18n="pages.diningTicketSettings.showStoreName">顯示店家名稱</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showAreaName" checked>
+                                    <label class="form-check-label" for="showAreaName" data-i18n="pages.diningTicketSettings.showAreaName">顯示區域名稱</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showQueueTime" checked>
+                                    <label class="form-check-label" for="showQueueTime" data-i18n="pages.diningTicketSettings.showQueueTime">顯示取號時間</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showQRCode">
+                                    <label class="form-check-label" for="showQRCode" data-i18n="pages.diningTicketSettings.showQRCode">顯示 QR Code（查詢進度）</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.diningTicketSettings.footerMessage">票據底部訊息</label>
+                            <input type="text" class="form-control" id="ticketFooterMessage" 
+                                   placeholder="感謝您的耐心等候" maxlength="100">
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>
+                                <span data-i18n="common.save">儲存設定</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 支援品牌說明 -->
+            <div class="alert alert-info mb-0">
+                <h6 class="alert-heading">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <span data-i18n="pages.diningTicketSettings.supportedBrands">支援品牌</span>
+                </h6>
+                <p class="mb-0" data-i18n="pages.diningTicketSettings.supportedBrandsHint">
+                    Epson、佳博、芯燁、得力、商米、Star 等使用 ESC/POS 指令的熱敏打印機。
+                    USB 模式需使用 Chrome 或 Edge 瀏覽器。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/thermal-printer.js"></script>
+<script src="/static/js/vwork-connector.js"></script>
+<script>
+(function() {
+    const DINING_TICKET_SETTINGS_KEY = 'vwork_dining_ticket_settings';
+    
+    // 載入設定
+    function loadSettings() {
+        try {
+            const saved = localStorage.getItem(DINING_TICKET_SETTINGS_KEY);
+            return saved ? JSON.parse(saved) : {
+                printerType: 'usb',
+                paperWidth: 58,
+                autoCut: true,
+                showStoreName: true,
+                showAreaName: true,
+                showQueueTime: true,
+                showQRCode: false,
+                footerMessage: ''
+            };
+        } catch (e) {
+            return {};
+        }
+    }
+    
+    // 保存設定
+    function saveSettings(settings) {
+        try {
+            localStorage.setItem(DINING_TICKET_SETTINGS_KEY, JSON.stringify(settings));
+            return true;
+        } catch (e) {
+            console.warn('無法保存設定:', e);
+            return false;
+        }
+    }
+    
+    // 更新 Connector 狀態顯示
+    function updateConnectorStatus(status, error) {
+        const badge = document.getElementById('connectorStatusBadge');
+        
+        if (status === 'connected') {
+            badge.textContent = '已連接';
+            badge.className = 'badge bg-success';
+        } else if (status === 'connecting') {
+            badge.textContent = '連接中...';
+            badge.className = 'badge bg-warning';
+        } else {
+            badge.textContent = error || '未連接';
+            badge.className = 'badge bg-secondary';
+        }
+    }
+    
+    // 更新打印機狀態
+    function updatePrinterStatus(connected, name) {
+        const badge = document.getElementById('printerStatusBadge');
+        const nameEl = document.getElementById('printerName');
+        const testBtn = document.getElementById('testPrintBtn');
+        const disconnectBtn = document.getElementById('disconnectPrinterBtn');
+        const connectBtn = document.getElementById('connectPrinterBtn');
+        
+        if (badge) {
+            badge.textContent = connected ? '已連接' : '未連接';
+            badge.className = 'badge ' + (connected ? 'bg-success' : 'bg-secondary');
+        }
+        if (nameEl) {
+            nameEl.textContent = connected && name ? name : '尚未設定';
+        }
+        if (testBtn) testBtn.style.display = connected ? '' : 'none';
+        if (disconnectBtn) disconnectBtn.style.display = connected ? '' : 'none';
+        if (connectBtn) connectBtn.innerHTML = connected ? 
+            '<i class="bi bi-usb-plug me-1"></i>重新連接' : 
+            '<i class="bi bi-usb-plug me-1"></i>連接打印機';
+    }
+    
+    // 切換打印機類型設定區塊
+    function togglePrinterTypeSettings(type) {
+        document.getElementById('usbPrinterSettings').style.display = type === 'usb' ? '' : 'none';
+        document.getElementById('networkPrinterSettings').style.display = type === 'network' ? '' : 'none';
+        document.getElementById('connectorPrinterSettings').style.display = type === 'connector' ? '' : 'none';
+    }
+    
+    // 從 Connector 刷新打印機列表
+    async function refreshConnectorPrinters() {
+        const select = document.getElementById('connectorPrinterSelect');
+        const refreshBtn = document.getElementById('refreshPrintersBtn');
+        const spinner = document.getElementById('printerLoadingSpinner');
+        const settings = loadSettings();
+        
+        // 顯示處理中狀態
+        refreshBtn.disabled = true;
+        spinner.classList.remove('d-none');
+        
+        try {
+            if (window.VWorkConnector) {
+                const printers = await window.VWorkConnector.getPrinters();
+                
+                // 清空現有選項
+                select.innerHTML = '<option value="">-- 請選擇打印機 --</option>';
+                
+                printers.forEach(printer => {
+                    const option = document.createElement('option');
+                    option.value = printer.name;
+                    option.textContent = printer.name;
+                    if (printer.name === settings.connectorPrinter) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                if (typeof App !== 'undefined' && App.showSuccess) {
+                    App.showSuccess('打印機列表已刷新');
+                }
+            }
+        } catch (e) {
+            if (typeof App !== 'undefined' && App.showError) {
+                App.showError('獲取打印機列表失敗：' + e.message);
+            }
+        } finally {
+            // 隱藏處理中狀態
+            refreshBtn.disabled = false;
+            spinner.classList.add('d-none');
+        }
+    }
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        const settings = loadSettings();
+        
+        // 填充表單
+        document.getElementById('printerType').value = settings.printerType || 'usb';
+        document.getElementById('printerPaperWidth').value = settings.paperWidth || 58;
+        document.getElementById('printerAutoCut').checked = settings.autoCut !== false;
+        document.getElementById('networkPrinterIP').value = settings.networkPrinterIP || '';
+        document.getElementById('networkPrinterPort').value = settings.networkPrinterPort || 9100;
+        document.getElementById('showStoreName').checked = settings.showStoreName !== false;
+        document.getElementById('showAreaName').checked = settings.showAreaName !== false;
+        document.getElementById('showQueueTime').checked = settings.showQueueTime !== false;
+        document.getElementById('showQRCode').checked = settings.showQRCode === true;
+        document.getElementById('ticketFooterMessage').value = settings.footerMessage || '';
+        
+        // 如果有已保存的 connector 打印機，先添加到下拉選單
+        if (settings.connectorPrinter) {
+            const select = document.getElementById('connectorPrinterSelect');
+            const option = document.createElement('option');
+            option.value = settings.connectorPrinter;
+            option.textContent = settings.connectorPrinter + ' (已保存)';
+            option.selected = true;
+            select.appendChild(option);
+        }
+        
+        // 切換設定區塊
+        togglePrinterTypeSettings(settings.printerType || 'usb');
+        
+        // 如果打印機類型是 connector，自動刷新列表
+        if ((settings.printerType || 'usb') === 'connector' && window.VWorkConnector) {
+            setTimeout(() => {
+                refreshConnectorPrinters();
+            }, 500);
+        }
+        
+        // 打印機類型變更
+        document.getElementById('printerType').addEventListener('change', function() {
+            togglePrinterTypeSettings(this.value);
+            // 切換到 connector 類型時自動刷新打印機列表
+            if (this.value === 'connector' && window.VWorkConnector) {
+                refreshConnectorPrinters();
+            }
+        });
+        
+        // Connector 端口設置
+        const portInput = document.getElementById('connectorPort');
+        if (window.VWorkConnector) {
+            portInput.value = window.VWorkConnector.port;
+        }
+        
+        portInput.addEventListener('change', function() {
+            const port = parseInt(this.value, 10);
+            if (port > 0 && port < 65536 && window.VWorkConnector) {
+                window.VWorkConnector.setPort(port);
+            }
+        });
+        
+        // 監聽 Connector 狀態變化
+        if (window.VWorkConnector) {
+            window.VWorkConnector.on('statusChange', function(data) {
+                updateConnectorStatus(data.status, data.error);
+            });
+        }
+        
+        // 檢查 Connector 連接
+        document.getElementById('checkConnectorBtn').addEventListener('click', async function() {
+            this.disabled = true;
+            updateConnectorStatus('connecting');
+            
+            try {
+                if (window.VWorkConnector) {
+                    await window.VWorkConnector.checkConnection();
+                }
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // 刷新 Connector 打印機列表
+        document.getElementById('refreshPrintersBtn').addEventListener('click', refreshConnectorPrinters);
+        
+        // USB 打印機連接（WebUSB）
+        const connectBtn = document.getElementById('connectPrinterBtn');
+        if (connectBtn) {
+            connectBtn.addEventListener('click', async () => {
+                if (typeof ThermalPrinter === 'undefined' || !ThermalPrinter.isSupported()) {
+                    alert('您的瀏覽器不支援 WebUSB，請使用 Chrome 或 Edge 瀏覽器');
+                    return;
+                }
+                
+                connectBtn.disabled = true;
+                try {
+                    const config = {
+                        width: Number(document.getElementById('printerPaperWidth').value || 58),
+                        autoCut: document.getElementById('printerAutoCut').checked
+                    };
+                    
+                    // 先斷開現有連接
+                    if (typeof ThermalPrinterManager !== 'undefined') {
+                        await ThermalPrinterManager.disconnect();
+                    }
+                    
+                    const printer = await ThermalPrinterManager.getPrinter(config);
+                    updatePrinterStatus(true, printer.device?.productName || '熱敏打印機');
+                } catch (e) {
+                    if (e.message !== '未選擇打印機') {
+                        alert('連接失敗: ' + (e.message || '未知錯誤'));
+                    }
+                    updatePrinterStatus(false);
+                } finally {
+                    connectBtn.disabled = false;
+                }
+            });
+        }
+        
+        // 測試打印
+        const testBtn = document.getElementById('testPrintBtn');
+        if (testBtn) {
+            testBtn.addEventListener('click', async () => {
+                testBtn.disabled = true;
+                try {
+                    if (typeof ThermalPrinterManager !== 'undefined') {
+                        await ThermalPrinterManager.printQueueTicket({
+                            ticketNumber: 'A-001',
+                            partySize: 4,
+                            areaName: '大廳區',
+                            storeName: '測試店家'
+                        });
+                    }
+                } catch (e) {
+                    alert('打印失敗: ' + (e.message || '未知錯誤'));
+                    updatePrinterStatus(false);
+                } finally {
+                    testBtn.disabled = false;
+                }
+            });
+        }
+        
+        // 斷開連接
+        const disconnectBtn = document.getElementById('disconnectPrinterBtn');
+        if (disconnectBtn) {
+            disconnectBtn.addEventListener('click', async () => {
+                if (typeof ThermalPrinterManager !== 'undefined') {
+                    await ThermalPrinterManager.disconnect();
+                }
+                updatePrinterStatus(false);
+            });
+        }
+        
+        // Connector 測試打印
+        document.getElementById('testConnectorPrintBtn').addEventListener('click', async function() {
+            const printerName = document.getElementById('connectorPrinterSelect').value;
+            if (!printerName) {
+                if (typeof App !== 'undefined' && App.showError) {
+                    App.showError('請選擇打印機');
+                }
+                return;
+            }
+            
+            this.disabled = true;
+            try {
+                if (window.VWorkConnector) {
+                    await window.VWorkConnector.printThermalTicket(printerName, {
+                        ticketNumber: 'A-001',
+                        partySize: 4,
+                        areaName: '大廳區',
+                        storeName: '測試店家',
+                        time: new Date().toLocaleString()
+                    });
+                    
+                    if (typeof App !== 'undefined' && App.showSuccess) {
+                        App.showSuccess('測試打印已發送');
+                    }
+                }
+            } catch (e) {
+                if (typeof App !== 'undefined' && App.showError) {
+                    App.showError('打印失敗：' + e.message);
+                }
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // 表單提交
+        document.getElementById('thermalPrinterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newSettings = {
+                printerType: document.getElementById('printerType').value,
+                paperWidth: parseInt(document.getElementById('printerPaperWidth').value, 10),
+                autoCut: document.getElementById('printerAutoCut').checked,
+                networkPrinterIP: document.getElementById('networkPrinterIP').value.trim(),
+                networkPrinterPort: parseInt(document.getElementById('networkPrinterPort').value, 10),
+                connectorPrinter: document.getElementById('connectorPrinterSelect').value,
+                showStoreName: document.getElementById('showStoreName').checked,
+                showAreaName: document.getElementById('showAreaName').checked,
+                showQueueTime: document.getElementById('showQueueTime').checked,
+                showQRCode: document.getElementById('showQRCode').checked,
+                footerMessage: document.getElementById('ticketFooterMessage').value.trim()
+            };
+            
+            if (saveSettings(newSettings)) {
+                if (typeof App !== 'undefined' && App.showSuccess) {
+                    App.showSuccess('設定已保存');
+                }
+            } else {
+                if (typeof App !== 'undefined' && App.showError) {
+                    App.showError('保存失敗');
+                }
+            }
+        });
+        
+        // 初始檢查 Connector
+        if (window.VWorkConnector) {
+            window.VWorkConnector.checkConnection();
+        }
+        
+        // 檢查 WebUSB 支援
+        if (typeof ThermalPrinter !== 'undefined' && ThermalPrinter.isSupported()) {
+            // 嘗試自動重連
+            (async function tryAutoConnect() {
+                try {
+                    const devices = await ThermalPrinter.getDevices();
+                    if (devices.length > 0) {
+                        const config = {
+                            width: Number(document.getElementById('printerPaperWidth').value || 58),
+                            autoCut: document.getElementById('printerAutoCut').checked
+                        };
+                        await ThermalPrinterManager.getPrinter(config);
+                        updatePrinterStatus(true, devices[0].productName || '熱敏打印機');
+                    }
+                } catch (e) {
+                    // 忽略自動連接錯誤
+                }
+            })();
+        }
+    });
+})();
+</script>
+{{end}}

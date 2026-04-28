@@ -1,0 +1,83 @@
+{{ define "pages/dynamic_list" }}
+<div id="dynamicListContainer">
+    <!-- 內容將由 JavaScript 動態生成 -->
+</div>
+
+<script>
+    // 確保所有依賴都已載入
+    function initDynamicList() {
+        // 檢查必要的依賴
+        if (typeof DynamicList === 'undefined') {
+            console.error('DynamicList 類未定義');
+            return;
+        }
+        if (typeof getPageConfig === 'undefined') {
+            console.error('getPageConfig 函數未定義');
+            return;
+        }
+        
+        // 從 URL 獲取頁面名稱
+        // 優先使用服務器傳遞的 PageName，否則從 URL 解析
+        let pageName = null;
+        
+        // 檢查是否有服務器傳遞的 PageName（通過 meta tag 或其他方式）
+        const pageNameMeta = document.querySelector('meta[name="page-name"]');
+        if (pageNameMeta) {
+            pageName = pageNameMeta.getAttribute('content');
+        }
+        
+        // 如果沒有，從 URL 解析
+        if (!pageName) {
+            const pathParts = window.location.pathname.split('/').filter(p => p);
+            // 處理特殊路徑，如 /inventory/low-stock -> low-stock
+            if (pathParts.length >= 2 && pathParts[0] === 'inventory' && pathParts[1] === 'low-stock') {
+                pageName = 'low-stock';
+            } else if (pathParts.length >= 1) {
+                pageName = pathParts[pathParts.length - 1]; // 使用最後一部分作為 pageName
+            } else {
+                pageName = 'customers';
+            }
+        }
+        
+        let config = getPageConfig(pageName);
+        
+        // 如果找不到配置，嘗試將下劃線轉換為連字符，或將連字符轉換為下劃線
+        if (!config) {
+            const altPageName = pageName.includes('_') ? pageName.replace(/_/g, '-') : pageName.replace(/-/g, '_');
+            config = getPageConfig(altPageName);
+            if (config) {
+                pageName = altPageName; // 更新 pageName 為找到的配置 key
+            }
+        }
+        
+        if (!config) {
+            const container = document.getElementById('dynamicListContainer');
+            if (container) {
+                container.innerHTML = '<div class="alert alert-danger">頁面配置未找到: ' + pageName + '</div>';
+            }
+            return;
+        }
+        
+        // 初始化動態列表
+        try {
+            window.dynamicList = new DynamicList(config);
+        } catch (error) {
+            console.error('初始化動態列表失敗:', error);
+            const container = document.getElementById('dynamicListContainer');
+            if (container) {
+                container.innerHTML = '<div class="alert alert-danger">初始化失敗: ' + error.message + '</div>';
+            }
+        }
+    }
+    
+    // 如果 DOM 已載入，直接執行；否則等待 DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待所有腳本載入完成
+            setTimeout(initDynamicList, 100);
+        });
+    } else {
+        setTimeout(initDynamicList, 100);
+    }
+</script>
+{{ end }}

@@ -1,0 +1,21 @@
+{
+  "name": "customization_demo",
+  "title": "網站與頁面自定義",
+  "version": 1,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/pages" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "a[data-i18n=\"common.add\"][href$=\"/pages/new\"]", "text": { "zh": "建立新頁面", "zh-CN": "创建新页面", "en": "Create a new page" } },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "click", "selector": "a[data-i18n=\"common.add\"][href$=\"/pages/new\"]" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#pebar", "text": { "zh": "進入拖放式編輯器", "zh-CN": "进入拖放式编辑器", "en": "Open the drag-and-drop editor" } },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "goto", "url": "/website-settings" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#websiteName", "text": { "zh": "設定網站基本資訊", "zh-CN": "设置网站基本信息", "en": "Set website basics" } },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "done" }
+  ]
+}

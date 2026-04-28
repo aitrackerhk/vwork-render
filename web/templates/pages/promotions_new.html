@@ -1,0 +1,539 @@
+{{ define "pages/promotions_new" }}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">
+        <i class="bi bi-megaphone me-2"></i>
+        <span data-i18n-field="新增推廣發送">新增推廣發送</span>
+    </h3>
+    <a href="/promotions" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span>
+    </a>
+</div>
+
+<form id="promotionForm" class="needs-validation" novalidate>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i><span data-i18n-field="基本資訊">基本資訊</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label" data-i18n-field="標題">標題</label>
+                        <input type="text" class="form-control" id="title" required maxlength="100" placeholder="例如：週末限定優惠" data-i18n-placeholder="placeholders.enterTitle">
+                        <div class="invalid-feedback" data-i18n-field="請填寫標題">請填寫標題</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" data-i18n-field="發送模式">發送模式</label>
+                        <select class="form-select" id="promotionType" required>
+                            <option value="message" selected>Message (發送給客戶)</option>
+                            <option value="email">Email (EDM 電郵推廣)</option>
+                            <option value="whatsapp">Whatsapp (稍後連接 API)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="emailSubjectRow" style="display: none;">
+                        <label class="form-label" data-i18n-field="電郵主旨">電郵主旨</label>
+                        <input type="text" class="form-control" id="emailSubject" maxlength="200" placeholder="例如：本週限定優惠 — 全場8折">
+                        <div class="form-text">留空則使用標題作為電郵主旨</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-people me-2"></i><span data-i18n-field="目標受眾">目標受眾</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" data-i18n-field="受眾類型">受眾類型</label>
+                            <select class="form-select" id="audienceMode">
+                                <option value="all" selected>全部客戶</option>
+                                <option value="label">依客戶標籤</option>
+                                <option value="member_level">依會員等級</option>
+                                <option value="lead_list">Lead 列表（自動搵客）</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" data-i18n-field="客戶狀態">客戶狀態</label>
+                            <select class="form-select" id="audienceStatus">
+                                <option value="all" selected data-i18n="common.all">全部</option>
+                                <option value="active" data-i18n="common.active">活躍</option>
+                                <option value="inactive" data-i18n="common.inactive">非活躍</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-3" id="labelAudienceRow" style="display: none;">
+                        <label class="form-label" data-i18n-field="客戶標籤">客戶標籤</label>
+                        <select class="form-select" id="labelIds" multiple></select>
+                        <div class="form-text" data-i18n-field="可多選">可多選</div>
+                    </div>
+
+                    <div class="mt-3" id="memberLevelAudienceRow" style="display: none;">
+                        <label class="form-label" data-i18n-field="會員等級">會員等級</label>
+                        <select class="form-select" id="memberLevelIds" multiple></select>
+                        <div class="form-text" data-i18n-field="可多選">可多選</div>
+                    </div>
+
+                    <div class="mt-3" id="leadListAudienceRow" style="display: none;">
+                        <label class="form-label" data-i18n-field="選擇 Leads">選擇 Leads</label>
+                        <select class="form-select" id="leadResultIds" multiple></select>
+                        <div class="form-text">從自動搵客結果中選擇發送對象（可多選）</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-chat-left-text me-2"></i><span data-i18n-field="發送內容">發送內容</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <label class="form-label" data-i18n-field="內容">內容</label>
+                        <textarea class="form-control" id="content" rows="6" required placeholder="輸入要發送的內容，可添加 emoji 😊"></textarea>
+                        <div class="invalid-feedback" data-i18n-field="請填寫內容">請填寫內容</div>
+                        <div class="d-flex justify-content-between mt-1">
+                            <small class="text-muted" data-i18n-field="建議內容簡短清晰">建議內容簡短清晰</small>
+                            <small class="text-muted" id="contentCount">0 字</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-info" id="aiGenerateBtn" onclick="generatePromotionContent()">
+                        <i class="bi bi-stars me-1"></i><span data-i18n-field="AI 自動生成內容">AI 自動生成內容</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clock me-2"></i><span data-i18n-field="發送時間">發送時間</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" data-i18n-field="發送方式">發送方式</label>
+                            <select class="form-select" id="sendMode">
+                                <option value="immediate" selected>即時發送</option>
+                                <option value="scheduled">排程發送</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="scheduleAtRow" style="display: none;">
+                            <label class="form-label" data-i18n-field="排程時間">排程時間</label>
+                            <input type="datetime-local" class="form-control" id="scheduledAt">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4" style="position: sticky; top: 1rem;">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i><span data-i18n-field="發送摘要">發送摘要</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted" data-i18n-field="預估收件人">預估收件人</span>
+                        <span class="fs-4 fw-semibold" id="recipientCount">0</span>
+                    </div>
+                    <div class="text-muted" id="audienceSummary">全部客戶</div>
+                </div>
+            </div>
+
+            <!-- Email 配額警告區域 -->
+            <div id="emailQuotaWarning" class="d-none">
+                <div class="card border-danger mb-4">
+                    <div class="card-header bg-danger text-white">
+                        <h6 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Email 配額已超出</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2">你已發送超過限額的 email，請以 WhatsApp 聯絡管理員。</p>
+                        <div id="quotaUsageText" class="small text-muted mb-3"></div>
+                        <a id="quotaWhatsAppBtn" href="#" target="_blank" class="btn btn-success w-100" style="background-color: #25D366; border-color: #25D366;">
+                            <i class="bi bi-whatsapp me-2"></i>WhatsApp 聯絡管理員
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="form-buttons-container d-flex gap-2 mt-4">
+        <a href="/promotions" class="btn btn-outline-secondary" id="cancelPromotionBtn">
+            <i class="bi bi-x-circle"></i> <span data-i18n-field="取消">取消</span>
+        </a>
+        <button type="button" class="btn btn-outline-secondary" id="saveDraftBtn">
+            <i class="bi bi-save"></i> <span data-i18n-field="儲存草稿">儲存草稿</span>
+        </button>
+        <button type="button" class="btn btn-primary" id="saveSendBtn">
+            <i class="bi bi-send"></i> <span data-i18n-field="儲存並立即發送">儲存並立即發送</span>
+        </button>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const labelSelect = document.getElementById('labelIds');
+        const memberLevelSelect = document.getElementById('memberLevelIds');
+        const leadResultSelect = document.getElementById('leadResultIds');
+        const audienceMode = document.getElementById('audienceMode');
+        const audienceStatus = document.getElementById('audienceStatus');
+        const sendMode = document.getElementById('sendMode');
+        const scheduledAtRow = document.getElementById('scheduleAtRow');
+        const labelAudienceRow = document.getElementById('labelAudienceRow');
+        const memberLevelAudienceRow = document.getElementById('memberLevelAudienceRow');
+        const leadListAudienceRow = document.getElementById('leadListAudienceRow');
+        const content = document.getElementById('content');
+        const contentCount = document.getElementById('contentCount');
+        const recipientCount = document.getElementById('recipientCount');
+        const audienceSummary = document.getElementById('audienceSummary');
+        const promotionType = document.getElementById('promotionType');
+        const emailSubjectRow = document.getElementById('emailSubjectRow');
+
+        function initSelect2(selectEl, placeholder) {
+            if (typeof $ === 'undefined') return;
+            $(selectEl).select2({
+                theme: 'bootstrap-5',
+                placeholder: placeholder,
+                width: '100%',
+                allowClear: true
+            });
+        }
+
+        async function loadOptions(apiPath, selectEl, labelKey = 'name', valueKey = 'id') {
+            try {
+                const response = await App.apiRequest(apiPath);
+                const items = response && response.data ? response.data : [];
+                selectEl.innerHTML = '';
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item[valueKey];
+                    option.textContent = item[labelKey] || item[valueKey];
+                    selectEl.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load options', error);
+            }
+        }
+
+        function getMultiValues(selectEl) {
+            if (typeof $ !== 'undefined' && $(selectEl).hasClass('select2-hidden-accessible')) {
+                return $(selectEl).val() || [];
+            }
+            return Array.from(selectEl.selectedOptions || []).map(opt => opt.value);
+        }
+
+        function updateContentCount() {
+            contentCount.textContent = `${content.value.length} 字`;
+        }
+
+        function updateAudienceUI() {
+            const mode = audienceMode.value;
+            labelAudienceRow.style.display = mode === 'label' ? '' : 'none';
+            memberLevelAudienceRow.style.display = mode === 'member_level' ? '' : 'none';
+            leadListAudienceRow.style.display = mode === 'lead_list' ? '' : 'none';
+            // 當選 lead_list 模式時，隱藏客戶狀態（不適用）
+            document.getElementById('audienceStatus').closest('.col-md-6').style.display = mode === 'lead_list' ? 'none' : '';
+            updateAudienceSummary();
+            updateRecipientEstimate();
+        }
+
+        function updateSendModeUI() {
+            const mode = sendMode.value;
+            scheduledAtRow.style.display = mode === 'scheduled' ? '' : 'none';
+        }
+
+        function updatePromotionTypeUI() {
+            const type = promotionType.value;
+            emailSubjectRow.style.display = type === 'email' ? '' : 'none';
+        }
+
+        function updateAudienceSummary() {
+            const status = audienceStatus.value;
+            const _t = (key, fallback) => (typeof I18n !== 'undefined' && I18n.t) ? (I18n.t(key) || fallback) : fallback;
+            const statusLabel = status === 'all' ? _t('common.allStatuses', '全部狀態') : (status === 'active' ? _t('common.active', '活躍') : _t('common.inactive', '非活躍'));
+            let modeLabel = '全部客戶';
+            if (audienceMode.value === 'label') {
+                const labels = getMultiValues(labelSelect);
+                modeLabel = labels.length ? `標籤 ${labels.length} 個` : '指定標籤';
+            } else if (audienceMode.value === 'member_level') {
+                const levels = getMultiValues(memberLevelSelect);
+                modeLabel = levels.length ? `等級 ${levels.length} 個` : '指定等級';
+            } else if (audienceMode.value === 'lead_list') {
+                const leads = getMultiValues(leadResultSelect);
+                modeLabel = leads.length ? `Lead ${leads.length} 個` : 'Lead 列表';
+                audienceSummary.textContent = modeLabel;
+                return;
+            }
+            audienceSummary.textContent = `${modeLabel} · ${statusLabel}`;
+        }
+
+        async function updateRecipientEstimate() {
+            // Lead list 模式：直接使用已選數量
+            if (audienceMode.value === 'lead_list') {
+                const leads = getMultiValues(leadResultSelect);
+                recipientCount.textContent = leads.length.toString();
+                return;
+            }
+
+            const params = new URLSearchParams();
+            if (audienceStatus.value && audienceStatus.value !== 'all') {
+                params.set('status', audienceStatus.value);
+            }
+            if (audienceMode.value === 'label') {
+                const labelIds = getMultiValues(labelSelect);
+                if (labelIds.length) {
+                    params.set('label_id', labelIds.join(','));
+                }
+            }
+            if (audienceMode.value === 'member_level') {
+                const levelIds = getMultiValues(memberLevelSelect);
+                if (levelIds.length) {
+                    params.set('member_level_id', levelIds.join(','));
+                }
+            }
+            params.set('limit', '1');
+
+            try {
+                const response = await App.apiRequest(`/customers?${params.toString()}`);
+                const total = response && typeof response.total === 'number' ? response.total : 0;
+                recipientCount.textContent = total.toString();
+            } catch (error) {
+                recipientCount.textContent = '0';
+            }
+        }
+
+        async function handleSave(action) {
+            const form = document.getElementById('promotionForm');
+            if (!form.checkValidity()) {
+                form.classList.add('was-validated');
+                return;
+            }
+
+            if (sendMode.value === 'scheduled' && !document.getElementById('scheduledAt').value) {
+                App.showError('請選擇排程時間');
+                return;
+            }
+
+            // Email quota check — block sending if exceeded (only for email type, not draft)
+            if (action !== 'draft' && document.getElementById('promotionType').value === 'email') {
+                try {
+                    const quotaRes = await App.apiRequest('/email-quota');
+                    if (quotaRes && quotaRes.exceeded) {
+                        showEmailQuotaWarning(quotaRes);
+                        App.showError('Email 每日配額已超出，無法發送。請以 WhatsApp 聯絡管理員。');
+                        return;
+                    }
+                } catch (e) {
+                    console.error('Email quota check failed:', e);
+                    // Allow send to proceed if quota check fails (graceful degradation)
+                }
+            }
+
+            const targetAudience = {
+                mode: audienceMode.value,
+                status: audienceStatus.value
+            };
+
+            if (audienceMode.value === 'label') {
+                targetAudience.label_ids = getMultiValues(labelSelect);
+            }
+            if (audienceMode.value === 'member_level') {
+                targetAudience.member_level_ids = getMultiValues(memberLevelSelect);
+            }
+            if (audienceMode.value === 'lead_list') {
+                targetAudience.lead_result_ids = getMultiValues(leadResultSelect);
+            }
+
+            const payload = {
+                title: document.getElementById('title').value.trim(),
+                promotion_type: document.getElementById('promotionType').value,
+                email_subject: document.getElementById('emailSubject').value.trim(),
+                content: document.getElementById('content').value.trim(),
+                target_audience: targetAudience,
+                scheduled_at: sendMode.value === 'scheduled' ? document.getElementById('scheduledAt').value : null,
+                status: action === 'draft' ? 'draft' : 'scheduled'
+            };
+
+            try {
+                const created = await App.apiRequest('/promotions', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+
+                if (action === 'send-now' && sendMode.value === 'immediate') {
+                    await App.apiRequest(`/promotions/${created.id}/send`, {
+                        method: 'PUT'
+                    });
+                }
+
+                App.showSuccess('推廣發送已儲存');
+                if (typeof Router !== 'undefined' && Router.go) { Router.go('/promotions'); } else { window.location.href = '/promotions'; }
+            } catch (error) {
+                App.showError(error?.error || '保存失敗');
+            }
+        }
+
+        content.addEventListener('input', function() {
+            updateContentCount();
+        });
+        audienceMode.addEventListener('change', updateAudienceUI);
+        promotionType.addEventListener('change', function() {
+            updatePromotionTypeUI();
+            checkEmailQuota();
+        });
+        audienceStatus.addEventListener('change', function() {
+            updateAudienceSummary();
+            updateRecipientEstimate();
+        });
+        sendMode.addEventListener('change', updateSendModeUI);
+
+        if (typeof $ !== 'undefined') {
+            $(labelSelect).on('change', function() {
+                updateAudienceSummary();
+                updateRecipientEstimate();
+            });
+            $(memberLevelSelect).on('change', function() {
+                updateAudienceSummary();
+                updateRecipientEstimate();
+            });
+            $(leadResultSelect).on('change', function() {
+                updateAudienceSummary();
+                updateRecipientEstimate();
+            });
+        }
+
+        document.getElementById('saveDraftBtn').addEventListener('click', function() {
+            handleSave('draft');
+        });
+        document.getElementById('saveSendBtn').addEventListener('click', function() {
+            handleSave('send-now');
+        });
+
+        loadOptions('/customer-labels', labelSelect).then(() => {
+            initSelect2(labelSelect, '選擇客戶標籤');
+        });
+        loadOptions('/member-levels', memberLevelSelect).then(() => {
+            initSelect2(memberLevelSelect, '選擇會員等級');
+        });
+
+        // 載入 Lead Finder 結果
+        (async function loadLeadResults() {
+            try {
+                const response = await App.apiRequest('/lead-finder/results?limit=500&hide_duplicates=true');
+                const items = response && response.data ? response.data : [];
+                leadResultSelect.innerHTML = '';
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+                    const contactInfo = item.email || item.phone || '';
+                    const company = item.company_name || '';
+                    option.textContent = `${company} - ${item.contact_name || 'N/A'} (${contactInfo})`;
+                    leadResultSelect.appendChild(option);
+                });
+                if (typeof $ !== 'undefined') {
+                    $(leadResultSelect).select2({
+                        theme: 'bootstrap-5',
+                        placeholder: '選擇 Leads',
+                        width: '100%',
+                        allowClear: true
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load lead results', error);
+            }
+        })();
+
+        updateContentCount();
+        updateSendModeUI();
+        updatePromotionTypeUI();
+        updateAudienceUI();
+        checkEmailQuota();
+    });
+
+function showEmailQuotaWarning(quotaData) {
+    const warning = document.getElementById('emailQuotaWarning');
+    if (!warning) return;
+    warning.classList.remove('d-none');
+
+    const usageText = document.getElementById('quotaUsageText');
+    if (usageText) {
+        usageText.textContent = `今日已發送 ${quotaData.daily_usage || 0} / ${quotaData.daily_limit || 300}，剩餘 ${quotaData.remaining || 0}`;
+    }
+
+    const whatsappBtn = document.getElementById('quotaWhatsAppBtn');
+    if (whatsappBtn) {
+        const phone = quotaData.whatsapp_phone || '85246237234';
+        whatsappBtn.href = `https://wa.me/${phone}?text=${encodeURIComponent('你好，我的 vWork Email 配額已超出，需要協助。')}`;
+    }
+}
+
+function hideEmailQuotaWarning() {
+    const warning = document.getElementById('emailQuotaWarning');
+    if (warning) warning.classList.add('d-none');
+}
+
+async function checkEmailQuota() {
+    const promotionType = document.getElementById('promotionType');
+    if (!promotionType || promotionType.value !== 'email') {
+        hideEmailQuotaWarning();
+        return;
+    }
+    try {
+        const quotaRes = await App.apiRequest('/email-quota');
+        if (quotaRes && quotaRes.exceeded) {
+            showEmailQuotaWarning(quotaRes);
+        } else {
+            hideEmailQuotaWarning();
+        }
+    } catch (e) {
+        console.error('Email quota check failed:', e);
+        hideEmailQuotaWarning();
+    }
+}
+
+async function generatePromotionContent() {
+    var btn = document.getElementById('aiGenerateBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>生成中...';
+
+    var channel = document.getElementById('promotionType').value;
+    // Map promotion_type to auto-outreach channel format
+    if (channel === 'message') channel = 'whatsapp';
+
+    var title = document.getElementById('title').value.trim();
+    var payload = {
+        channel: channel,
+        keywords: title,
+        tone: 'professional'
+    };
+
+    try {
+        var res = await App.apiRequest('/auto-outreach/generate-content', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        if (res.email_subject) {
+            var subjectEl = document.getElementById('emailSubject');
+            if (subjectEl && !subjectEl.value.trim()) {
+                subjectEl.value = res.email_subject;
+            }
+        }
+        var contentEl = document.getElementById('content');
+        if (channel === 'whatsapp') {
+            contentEl.value = res.whatsapp_content || '';
+        } else {
+            contentEl.value = res.email_content || '';
+        }
+        // Update character count
+        document.getElementById('contentCount').textContent = contentEl.value.length + ' 字';
+        App.showSuccess('AI 內容已生成');
+    } catch (err) {
+        App.showError(err.error || 'AI 生成失敗');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-stars me-1"></i>AI 自動生成內容';
+    }
+}
+</script>
+{{ end }}

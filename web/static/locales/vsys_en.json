@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact Us",
+    "language": "Language",
+    "supportInfo": "Support",
+    "supportCenter": "Support Center",
+    "login": "Login",
+    "accountSettings": "Account Settings",
+    "billing": "Subscription",
+    "logout": "Logout"
+  },
+  "home": {
+    "title": "V-sys",
+    "heroTitle": "Intelligentize Your Work and Life",
+    "products": {
+      "vai": "Intelligent AI Assistant",
+      "vwork": "AI Enterprise Management System",
+      "vmarket": "AI E-Commerce Platform",
+      "voffice": "AI Office Suite"
+    },
+    "vai": {
+      "greeting": "Hi,",
+      "subtitle": "I'm vAi, your intelligent assistant",
+      "slogan": "AI-Driven, Infinite Intelligence",
+      "placeholder": "Enter your question...",
+      "send": "Send",
+      "suggestions": {
+        "1": "Help me write a work report",
+        "2": "Analyze market trends",
+        "3": "Translate this text",
+        "4": "Generate creative ideas"
+      }
+    },
+    "vwork": {
+      "title": "vWork",
+      "subtitle": "Full-Featured AI Enterprise Management System",
+      "description": "One-stop solution for enterprise management needs, making team collaboration more efficient and decision-making smarter",
+      "features": {
+        "1": {
+          "title": "Intelligent Automation",
+          "desc": "Automate workflows to improve efficiency"
+        },
+        "2": {
+          "title": "Data Analytics",
+          "desc": "Real-time data analysis and report generation"
+        },
+        "3": {
+          "title": "Team Collaboration",
+          "desc": "Seamless collaboration and task management"
+        }
+      },
+      "cta": "Get Started"
+    }
+  },
+  "about": {
+    "title": "Using Technology to Help Humanity",
+    "subtitle": "Making work and life simpler and more efficient",
+    "intro": "V-sys is an all-AI company dedicated to improving human life and work through advanced AI technology. We believe technology can illuminate the path forward for humanity and become the most reliable partner.",
+    "products": "Our products include the intelligent assistant vAI, enterprise management system vWork, e-commerce platform vMarket, and office suite vOffice, providing a one-stop digital solution for businesses and individuals."
+  },
+  "contact": {
+    "title": "Contact Us",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "addressValue": "Unit 505, 5/F, Core 3, Cyberport, 100 Cyberport Road, Pokfulam, Hong Kong Island"
+  },
+  "footer": {
+    "description": "V-sys uses technology to help humanity, making work and life simpler and more efficient. We believe technology can help everyone improve efficiency and optimize life.",
+    "info": "Information",
+    "products": "Products",
+    "productList": {
+      "vai": "vAI",
+      "vwork": "vWork",
+      "vmarket": "vMarket",
+      "voffice": "vOffice"
+    },
+    "support": "Support",
+    "documentation": "Support Center",
+    "contactSupport": "Contact Us",
+    "salesPartnerJoin": "Sales Partner",
+    "contactUs": "Contact Us",
+    "hours": "Monday to Friday 9:00 - 18:00",
+    "location": "Hong Kong",
+    "copyright": "© 2025 V-sys Limited. All rights reserved."
+  }
+}

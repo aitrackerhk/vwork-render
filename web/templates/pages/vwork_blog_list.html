@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-TW" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.PageTitle}}</title>
+    {{template "partials/seo_head" .}}
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+        body { background: #f8f9fa; }
+        .blog-hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 5rem 0 3rem;
+        }
+        .blog-hero h1 { font-weight: 700; font-size: 2.5rem; }
+        .blog-hero p { opacity: 0.85; font-size: 1.15rem; }
+        .blog-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .blog-card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #e9ecef;
+        }
+        .blog-card-body {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .blog-card-category {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #0f3460;
+            background: #e8f0fe;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+        }
+        .blog-card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        .blog-card-title a { color: inherit; text-decoration: none; }
+        .blog-card-title a:hover { color: #0f3460; }
+        .blog-card-excerpt {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            flex: 1;
+        }
+        .blog-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #adb5bd;
+            margin-top: 1rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #f0f0f0;
+        }
+        .blog-filter-bar {
+            padding: 1.5rem 0;
+        }
+        .blog-filter-bar .btn-filter {
+            border: 1px solid #dee2e6;
+            background: #fff;
+            color: #495057;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .blog-filter-bar .btn-filter:hover,
+        .blog-filter-bar .btn-filter.active {
+            background: #0f3460;
+            color: #fff;
+            border-color: #0f3460;
+        }
+        .blog-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        .blog-empty {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #6c757d;
+        }
+        .blog-empty i { font-size: 3rem; opacity: 0.3; }
+    </style>
+    <script>
+        (function() {
+            var savedLang = localStorage.getItem('u-nai_lang');
+            var browserLang = navigator.language || navigator.userLanguage;
+            var currentLang = 'zh';
+            if (savedLang === 'zh' || savedLang === 'zh-CN' || savedLang === 'en') {
+                currentLang = savedLang;
+            } else {
+                if (browserLang && (browserLang.startsWith('zh') || browserLang.startsWith('en'))) {
+                    currentLang = browserLang.startsWith('zh') ? 'zh' : 'en';
+                } else {
+                    currentLang = 'en';
+                }
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            window.__INITIAL_LANG__ = currentLang;
+            var htmlLangMap = { 'zh': 'zh-TW', 'zh-CN': 'zh-CN', 'en': 'en' };
+            document.documentElement.lang = htmlLangMap[currentLang] || 'zh-TW';
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body class="home-page has-promo-topbar">
+    <div class="promo-topbar"><span data-i18n="promoTopbar.main">一個系統取代 8 個工具</span> <span class="d-none promo-topbar-sub" data-i18n="promoTopbar.sub">40+ 功能模組 · 不限用戶 · 低至 $250/月</span></div>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100">
+        <div class="container-fluid px-3 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-end" href="/">
+                <img src="/static/logo3.png" alt="vWork">
+            </a>
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcher">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai"><span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span><span class="app-switcher-label">vAI</span></a>
+                            <a href="/" class="app-switcher-item" data-app="vwork"><span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span><span class="app-switcher-label">vWork</span></a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket"><span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span><span class="app-switcher-label">vMarket</span></a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice"><span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span><span class="app-switcher-label">vOffice</span></a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item" id="goToSystemBtnMobile"><a class="nav-link" href="/dashboard" title="進入系統"><i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i></a></li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="homeMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;"><i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i></button>
+                </li>
+            </ul>
+            <div class="collapse navbar-collapse d-none d-lg-block" id="navbarNav">
+                <ul class="navbar-nav align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/" data-i18n="nav.home">首頁</a></li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.industries">行業</a><ul class="dropdown-menu"><li><a class="dropdown-item" href="/industry/catering" data-i18n="nav.industryCatering">餐飲</a></li><li><a class="dropdown-item" href="/industry/retail" data-i18n="nav.industryRetail">零售</a></li><li><a class="dropdown-item" href="/industry/ecommerce" data-i18n="nav.industryEcommerce">電商</a></li><li><a class="dropdown-item" href="/industry/services" data-i18n="nav.industryServices">服務業</a></li><li><a class="dropdown-item" href="/industry/wholesale" data-i18n="nav.industryWholesale">批發/製造</a></li><li><a class="dropdown-item" href="/industry/sme" data-i18n="nav.industrySme">中小企業</a></li></ul></li>
+                    <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-i18n="nav.customization">客制化</a><ul class="dropdown-menu"><li><a class="dropdown-item" href="/custom/website" data-i18n="nav.customWebsite">客制化網站</a></li><li><a class="dropdown-item" href="/custom/features" data-i18n="nav.customFeatures">客制化功能</a></li></ul></li>
+                    <li class="d-none nav-item"><a style="display: none !important;" class="nav-link" href="/#pricing" data-i18n="nav.pricing">定價</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/vwork-events" data-i18n="nav.events">活動</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/vwork-blog">Blog</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item" id="tryFreeBtn"><a class="btn btn-sm btn-outline-secondary" href="/login" data-i18n="nav.tryFree" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">免費試用</a></li>
+                    <li class="nav-item" id="goToSystemBtn" style="display: none;"><a class="btn btn-sm btn-outline-secondary" href="/dashboard" data-i18n="nav.goToSystem" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">前往系統</a></li>
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications"><i class="bi bi-grid-3x3-gap-fill"></i></a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai"><span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span><span class="app-switcher-label">vAI</span></a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork"><span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span><span class="app-switcher-label">vWork</span></a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket"><span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span><span class="app-switcher-label">vMarket</span></a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice"><span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span><span class="app-switcher-label">vOffice</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;"><i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span></a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help/vwork" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=vwork" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;"><i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span></a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                </ul>
+                            </div>
+                            <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;"><i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span></a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;"><img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);"><i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span></a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li id="publicAICoinsDisplay" style="display: none;"><a class="dropdown-item" href="/vcoins"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <span class="fw-bold" id="publicAICoinsBalance">0</span></a></li>
+                                    <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+                                    <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                    <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="sidebar-overlay" id="homeSidebarOverlay"></div>
+    <div class="sidebar" id="homeSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span></a></li>
+                <li class="nav-item nav-group"><a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeMobileIndustrySubmenu" aria-expanded="false"><i class="bi bi-building"></i> <span data-i18n="nav.industries">行業</span><i class="bi bi-chevron-down ms-auto"></i></a><div class="collapse" id="homeMobileIndustrySubmenu"><ul class="nav flex-column submenu"><li class="nav-item"><a class="nav-link" href="/industry/catering"><i class="bi bi-cup-hot"></i> <span data-i18n="nav.industryCatering">餐飲</span></a></li><li class="nav-item"><a class="nav-link" href="/industry/retail"><i class="bi bi-shop"></i> <span data-i18n="nav.industryRetail">零售</span></a></li><li class="nav-item"><a class="nav-link" href="/industry/ecommerce"><i class="bi bi-cart3"></i> <span data-i18n="nav.industryEcommerce">電商</span></a></li><li class="nav-item"><a class="nav-link" href="/industry/services"><i class="bi bi-briefcase"></i> <span data-i18n="nav.industryServices">服務業</span></a></li><li class="nav-item"><a class="nav-link" href="/industry/wholesale"><i class="bi bi-building"></i> <span data-i18n="nav.industryWholesale">批發/製造</span></a></li><li class="nav-item"><a class="nav-link" href="/industry/sme"><i class="bi bi-buildings"></i> <span data-i18n="nav.industrySme">中小企業</span></a></li></ul></div></li>
+                <li class="nav-item nav-group"><a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeMobileCustomSubmenu" aria-expanded="false"><i class="bi bi-palette"></i> <span data-i18n="nav.customization">客制化</span><i class="bi bi-chevron-down ms-auto"></i></a><div class="collapse" id="homeMobileCustomSubmenu"><ul class="nav flex-column submenu"><li class="nav-item"><a class="nav-link" href="/custom/website"><i class="bi bi-globe"></i> <span data-i18n="nav.customWebsite">客制化網站</span></a></li><li class="nav-item"><a class="nav-link" href="/custom/features"><i class="bi bi-gear"></i> <span data-i18n="nav.customFeatures">客制化功能</span></a></li></ul></div></li>
+                <li class="d-none nav-item"><a style="display: none !important;" class="nav-link" href="/#pricing"><i class="bi bi-tag"></i> <span data-i18n="nav.pricing">定價</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="/vwork-events"><i class="bi bi-calendar-event"></i> <span data-i18n="nav.events">活動</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="/vwork-blog"><i class="bi bi-journal-text"></i> <span>Blog</span></a></li>
+                <li class="nav-item nav-group" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeMobileSupportSubmenu" aria-expanded="false"><i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span><i class="bi bi-chevron-down ms-auto"></i></a>
+                    <div class="collapse" id="homeMobileSupportSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="/help/vwork" target="_blank"><i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                            <li class="nav-item"><a class="nav-link" href="/contact?product=vwork" target="_blank"><i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span></a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeLanguageSubmenu" aria-expanded="false"><i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span><i class="bi bi-chevron-down ms-auto"></i></a>
+                    <div class="collapse" id="homeLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item nav-group" id="homeUserDropdownItem" style="display: none;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#homeUserSubmenu" aria-expanded="false"><img id="homeUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);"><i class="bi bi-person-circle" id="homeUserIcon"></i> <span id="homeUserName" data-i18n="nav.user">用戶</span><i class="bi bi-chevron-down ms-auto"></i></a>
+                    <div class="collapse" id="homeUserSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                            <li class="nav-item"><a class="nav-link" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" id="homeLogoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item" id="homeLoginItem"><a class="nav-link" href="/login"><i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">登錄</span></a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Hero -->
+    <section class="blog-hero">
+        <div class="container-fluid px-3">
+            <h1>vWork Blog</h1>
+            <p>產品更新、使用技巧、行業洞察</p>
+        </div>
+    </section>
+
+    {{if .Error}}
+    <div class="container-fluid px-3 py-4">
+        <div class="alert alert-warning">{{.Error}}</div>
+    </div>
+    {{end}}
+
+    <!-- Filter Bar -->
+    <div class="blog-filter-bar">
+        <div class="container-fluid px-3">
+            <div class="d-flex flex-wrap gap-2" id="filterBar">
+                <button class="btn-filter active" data-category="">全部</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog Grid -->
+    <section class="pb-5">
+        <div class="container-fluid px-3">
+            <div class="row g-4" id="blogGrid">
+                <div class="col-12 blog-empty">
+                    <i class="bi bi-journal-text d-block mb-2"></i>
+                    <p>載入中...</p>
+                </div>
+            </div>
+            <div class="blog-pagination" id="blogPagination"></div>
+        </div>
+    </section>
+
+    <footer class="site-footer-light">
+        <div class="container-fluid px-3">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="vWork Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                    <div class="mt-3">
+                        <a href="#" id="vworkFooterWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
+                        <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/#features" class="text-muted text-decoration-none" data-i18n="footer.features">功能</a></li>
+                        <li class="d-none mb-2"><a style="display: none !important;" href="/#pricing" class="text-muted text-decoration-none" data-i18n="footer.pricing">定價</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contact">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="bi bi-envelope me-2"></i><a href="mailto:info@vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.email">info@vsysai.com</a></li>
+                        <li class="mb-2"><i class="bi bi-geo-alt me-2"></i><span data-i18n="footer.location">香港</span></li>
+                        <li class="mb-2"><i class="bi bi-clock me-2"></i><span data-i18n="footer.workingHours">週一至週五 9:00 - 18:00</span></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <!-- Blog lang switch handler MUST register before i18n.js to prevent
+         I18n.bindLangSwitcher from calling switchLanguage → reload(). -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var homeMobileMenuToggle = document.getElementById('homeMobileMenuToggle');
+            var homeSidebar = document.getElementById('homeSidebar');
+            var homeSidebarOverlay = document.getElementById('homeSidebarOverlay');
+            var toggleHomeSidebar = function() {
+                if (homeSidebar) homeSidebar.classList.toggle('show');
+                if (homeSidebarOverlay) homeSidebarOverlay.classList.toggle('show');
+            };
+            if (homeMobileMenuToggle) {
+                homeMobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleHomeSidebar();
+                });
+            }
+            if (homeSidebarOverlay) {
+                homeSidebarOverlay.addEventListener('click', function() {
+                    if (homeSidebar) homeSidebar.classList.remove('show');
+                    homeSidebarOverlay.classList.remove('show');
+                });
+            }
+            document.querySelectorAll('[data-lang]').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // stopImmediatePropagation prevents i18n.js bindLangSwitcher
+                    // from calling switchLanguage → window.location.reload()
+                    e.stopImmediatePropagation();
+                    var lang = this.getAttribute('data-lang');
+                    try { localStorage.setItem('u-nai_lang', lang); } catch(_e) {}
+                    // Update <html lang> attribute
+                    var htmlLangMap = { 'zh': 'zh-TW', 'zh-CN': 'zh-CN', 'en': 'en' };
+                    document.documentElement.lang = htmlLangMap[lang] || 'zh-TW';
+                    if (typeof I18n !== 'undefined') {
+                        I18n.currentLang = lang;
+                        // loadLanguage fetches the new locale JSON and re-renders all data-i18n elements
+                        if (I18n.loadLanguage) {
+                            I18n.loadLanguage(lang);
+                        } else if (I18n.applyTranslations) {
+                            I18n.applyTranslations(document);
+                        }
+                    }
+                    currentBlogLang = normalizeBlogLang(lang);
+                    currentPage = 1;
+                    syncBlogLangInUrl();
+                    loadBlogs();
+                });
+            });
+        });
+    </script>
+    <script src="/static/js/i18n.js?v=20260119"></script>
+    <script src="/static/js/sso.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthAndUpdateNav();
+            // Footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+        });
+
+        async function checkAuthAndUpdateNav() {
+            const tryFreeBtn = document.getElementById('tryFreeBtn');
+            const userDropdownNav = document.getElementById('userDropdown');
+            const userNameSpan = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginLink = document.getElementById('loginLink');
+            const goToSystemBtnMobile = document.getElementById('goToSystemBtnMobile');
+            const homeUserDropdownItem = document.getElementById('homeUserDropdownItem');
+            const homeLoginItem = document.getElementById('homeLoginItem');
+            let finalUser = null;
+            try {
+                const headers = { 'Accept': 'application/json' };
+                const token = localStorage.getItem('auth_token');
+                if (token && token !== 'temp_token') headers['Authorization'] = 'Bearer ' + token;
+                const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+                if (token && token !== 'temp_token') {
+                    const resp = await fetch('/api/v1/user/me', { headers });
+                    if (resp.ok) finalUser = await resp.json();
+                }
+            } catch (_e) {}
+            const isLoggedIn = !!(finalUser && finalUser.name);
+            if (isLoggedIn) {
+                if (tryFreeBtn) tryFreeBtn.style.display = 'none';
+                const goToSystemBtn = document.getElementById('goToSystemBtn');
+                if (goToSystemBtn) goToSystemBtn.style.display = 'list-item';
+                if (goToSystemBtnMobile) goToSystemBtnMobile.style.display = 'list-item';
+                if (userDropdownNav) userDropdownNav.style.display = '';
+                if (homeUserDropdownItem) homeUserDropdownItem.style.display = 'block';
+                if (homeLoginItem) homeLoginItem.style.display = 'none';
+                if (loginLink) loginLink.style.display = 'none';
+                if (userNameSpan) userNameSpan.textContent = finalUser.name;
+                const homeUserName = document.getElementById('homeUserName');
+                if (homeUserName) homeUserName.textContent = finalUser.name;
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' }).finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace('/?logged_out=1');
+                            });
+                        }
+                    });
+                }
+            } else {
+                if (tryFreeBtn) tryFreeBtn.style.display = 'list-item';
+                const goToSystemBtn = document.getElementById('goToSystemBtn');
+                if (goToSystemBtn) goToSystemBtn.style.display = 'none';
+                if (goToSystemBtnMobile) goToSystemBtnMobile.style.display = 'list-item';
+                if (userDropdownNav) userDropdownNav.style.display = 'none';
+                if (homeUserDropdownItem) homeUserDropdownItem.style.display = 'none';
+                if (homeLoginItem) homeLoginItem.style.display = 'block';
+                if (loginLink) loginLink.style.display = '';
+            }
+        }
+
+        const SUPPORTED_BLOG_LANGS = new Set(['zh', 'zh-CN', 'en']);
+        let currentPage = 1;
+        let currentCategory = '';
+        let currentBlogLang = getInitialBlogLang();
+        const limit = 12;
+
+        function normalizeBlogLang(lang) {
+            const raw = (lang || '').trim();
+            if (SUPPORTED_BLOG_LANGS.has(raw)) return raw;
+            if (raw.toLowerCase() === 'zh-cn') return 'zh-CN';
+            if (raw.toLowerCase().startsWith('zh')) return 'zh';
+            if (raw.toLowerCase().startsWith('en')) return 'en';
+            return 'zh';
+        }
+
+        function getInitialBlogLang() {
+            const q = new URLSearchParams(window.location.search).get('lang');
+            if (q) return normalizeBlogLang(q);
+            const savedLang = localStorage.getItem('u-nai_lang');
+            return normalizeBlogLang(savedLang || 'zh');
+        }
+
+        function syncBlogLangInUrl() {
+            const u = new URL(window.location.href);
+            u.searchParams.set('lang', currentBlogLang);
+            window.history.replaceState({}, '', u.toString());
+        }
+
+        async function loadBlogs() {
+            const grid = document.getElementById('blogGrid');
+            grid.innerHTML = `<div class="col-12 blog-empty"><i class="bi bi-journal-text d-block mb-2"></i><p>載入中...</p></div>`;
+
+            let url = `/api/v1/platform-blogs?page=${currentPage}&limit=${limit}&lang=${encodeURIComponent(currentBlogLang)}`;
+            if (currentCategory) url += `&category=${encodeURIComponent(currentCategory)}`;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('Failed to load');
+                const json = await res.json();
+                const blogs = json.data || [];
+                const total = json.total || 0;
+
+                // Collect categories for filter
+                buildCategoryFilters(blogs);
+
+                if (blogs.length === 0) {
+                    grid.innerHTML = `<div class="col-12 blog-empty"><i class="bi bi-journal-text d-block mb-2"></i><p>暫無文章</p></div>`;
+                    document.getElementById('blogPagination').innerHTML = '';
+                    return;
+                }
+
+                let html = '';
+                blogs.forEach(b => {
+                    const imgHtml = b.featured_image
+                        ? `<img class="blog-card-img" src="${esc(b.featured_image)}" alt="${esc(b.title)}">`
+                        : `<div class="blog-card-img d-flex align-items-center justify-content-center"><i class="bi bi-journal-text" style="font-size:3rem; color:#dee2e6;"></i></div>`;
+                    const cat = b.category ? `<span class="blog-card-category">${esc(b.category)}</span>` : '';
+                    const excerpt = b.excerpt ? `<p class="blog-card-excerpt">${esc(b.excerpt)}</p>` : '';
+                    const dateLocale = currentBlogLang === 'en' ? 'en-US' : (currentBlogLang === 'zh-CN' ? 'zh-CN' : 'zh-Hant');
+                    const date = b.published_at ? new Date(b.published_at).toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+                    const blogLink = `/vwork-blog/${encodeURIComponent(b.slug)}?lang=${encodeURIComponent(currentBlogLang)}`;
+
+                    html += `
+                    <div class="col-lg-4 col-md-6">
+                        <div class="blog-card">
+                            <a href="${blogLink}">${imgHtml}</a>
+                            <div class="blog-card-body">
+                                ${cat}
+                                <h3 class="blog-card-title"><a href="${blogLink}">${esc(b.title)}</a></h3>
+                                ${excerpt}
+                                <div class="blog-card-meta">
+                                    <span><i class="bi bi-person me-1"></i>${esc(b.author || 'V-sys')}</span>
+                                    <span><i class="bi bi-calendar me-1"></i>${date}</span>
+                                    <span><i class="bi bi-eye me-1"></i>${b.view_count || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                grid.innerHTML = html;
+
+                // Pagination
+                const totalPages = Math.ceil(total / limit);
+                renderPagination(totalPages);
+            } catch (e) {
+                grid.innerHTML = `<div class="col-12 blog-empty"><i class="bi bi-exclamation-triangle d-block mb-2" style="color:#dc3545;"></i><p>載入失敗</p></div>`;
+            }
+        }
+
+        function buildCategoryFilters(blogs) {
+            // Only build once from first load (all categories)
+            if (document.querySelectorAll('#filterBar .btn-filter').length > 1) return;
+
+            const cats = new Set();
+            blogs.forEach(b => { if (b.category) cats.add(b.category); });
+            const bar = document.getElementById('filterBar');
+            cats.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-filter';
+                btn.dataset.category = cat;
+                btn.textContent = cat;
+                btn.addEventListener('click', () => filterByCategory(cat));
+                bar.appendChild(btn);
+            });
+
+            // Bind "all" button
+            bar.querySelector('[data-category=""]').addEventListener('click', () => filterByCategory(''));
+        }
+
+        function filterByCategory(cat) {
+            currentCategory = cat;
+            currentPage = 1;
+            document.querySelectorAll('#filterBar .btn-filter').forEach(b => {
+                b.classList.toggle('active', b.dataset.category === cat);
+            });
+            loadBlogs();
+        }
+
+        function renderPagination(totalPages) {
+            const el = document.getElementById('blogPagination');
+            if (totalPages <= 1) { el.innerHTML = ''; return; }
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="btn btn-sm ${i === currentPage ? 'btn-primary' : 'btn-outline-secondary'}" style="border-radius:20px; min-width:36px;" onclick="goToPage(${i})">${i}</button>`;
+            }
+            el.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadBlogs();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function esc(s) {
+            if (!s) return '';
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        // Load on page ready
+        syncBlogLangInUrl();
+        loadBlogs();
+    </script>
+    <script>
+        (function() {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            function handleScroll() {
+                if (window.scrollY > 60) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            }
+            handleScroll();
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
+    </script>
+    <script>
+        (function() {
+            const promo = document.querySelector('.promo-topbar');
+            const body = document.body;
+            if (!promo || !body) return;
+            function handlePromoScroll() {
+                const shouldHide = window.scrollY > 20;
+                promo.classList.toggle('is-hidden', shouldHide);
+                if (body.classList.contains('has-promo-topbar')) {
+                    body.classList.toggle('promo-topbar-hidden', shouldHide);
+                }
+            }
+            handlePromoScroll();
+            window.addEventListener('scroll', handlePromoScroll, { passive: true });
+        })();
+    </script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

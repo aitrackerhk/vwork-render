@@ -1,0 +1,97 @@
+{{define "layouts/embed_layout"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.Title}}</title>
+  <link rel="icon" type="image/png" href="/static/vworkicon.png">
+  <link rel="apple-touch-icon" href="/static/vworkicon.png">
+  <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/custom.css">
+  <!-- i18n 防闪烁样式 -->
+  <style>
+    body { padding-top: 0 !important; background: transparent !important; }
+    .container-fluid { padding: 1rem; }
+    /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
+    body.i18n-loading [data-i18n],
+    body.i18n-loading [data-i18n-placeholder],
+    body.i18n-loading [data-i18n-title],
+    body.i18n-loading [data-i18n-field] {
+        visibility: hidden;
+    }
+  </style>
+  <!-- i18n 初始化脚本 - 在页面渲染前执行，避免闪烁 -->
+  <script>
+    (function() {
+        const params = new URLSearchParams(location.search);
+        const qLang = params.get('lang');
+        const forceLang = (qLang === 'zh' || qLang === 'zh-CN' || qLang === 'en') ? qLang : null;
+
+        // 立即读取语言设置（不等待 DOMContentLoaded）
+        const savedLang = localStorage.getItem('u-nai_lang');
+        const cmsLang = localStorage.getItem('language');
+        const browserLang = navigator.language || navigator.userLanguage;
+        
+        let currentLang = 'zh'; // 默认中文
+        
+        if (forceLang) {
+            currentLang = forceLang;
+        } else
+        if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+            currentLang = cmsLang;
+            if (savedLang !== currentLang) {
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+        } else if (savedLang) {
+            currentLang = savedLang;
+        } else {
+            // 检测浏览器语言
+            if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+                currentLang = 'zh-CN';
+            } else if (browserLang.startsWith('zh')) {
+                currentLang = 'zh';
+            } else {
+                currentLang = 'en';
+            }
+            localStorage.setItem('u-nai_lang', currentLang);
+        }
+        
+        // 将语言设置存储到全局变量，供 i18n.js 使用
+        window.__INITIAL_LANG__ = currentLang;
+        
+        // 无论什么语言，都在 body 渲染后立即添加 i18n-loading 类来隐藏内容
+        // 这样可以防止在翻译应用前显示原始内容（避免繁简切换时的闪烁）
+        (function checkBody() {
+            if (document.body) {
+                document.body.classList.add('i18n-loading');
+                
+                // 添加超时保护：如果 5 秒后 i18n-loading 类还在，自动移除
+                setTimeout(function() {
+                    if (document.body && document.body.classList.contains('i18n-loading')) {
+                        console.warn('i18n-loading class still present after 5 seconds, removing it to prevent blank page');
+                        document.body.classList.remove('i18n-loading');
+                    }
+                }, 5000);
+            } else {
+                requestAnimationFrame(checkBody);
+            }
+        })();
+    })();
+  </script>
+</head>
+<body>
+  <div class="container-fluid">
+    {{embed}}
+  </div>
+
+  <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/i18n.js"></script>
+  {{ if not .IsTutorialRun }}
+  <script src="/static/js/app.js"></script>
+  {{ end }}
+</body>
+</html>
+{{end}}

@@ -1,0 +1,18 @@
+{{define "partials/vmarket_category_sidebar"}}
+<div class="vmarket-sidebar">
+  <div class="vmarket-sidebar-title" data-i18n="vmarket.categories.title">分類</div>
+  <div class="list-group vmarket-sidebar-list">
+    <a class="list-group-item list-group-item-action {{if or (eq .SelectedCategory "") (eq .SelectedCategory "all")}}active{{end}}" href="{{.CategoryBasePath}}" data-i18n="vmarket.categories.all">全部</a>
+    {{if .Categories}}
+      {{range .Categories}}
+        <a class="list-group-item list-group-item-action {{if eq $.SelectedCategory .Name}}active{{end}}" href="{{$.CategoryBasePath}}?category={{urlquery .Name}}">
+          <span>{{.Name}}</span>
+          <span class="badge rounded-pill">{{.Count}}</span>
+        </a>
+      {{end}}
+    {{else}}
+      <div class="vmarket-sidebar-empty" data-i18n="vmarket.categories.empty">暫無分類</div>
+    {{end}}
+  </div>
+</div>
+{{end}}

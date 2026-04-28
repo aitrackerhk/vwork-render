@@ -1,0 +1,89 @@
+{
+  "nav": {
+    "home": "首页",
+    "about": "关于",
+    "contact": "联系我们",
+    "language": "语言",
+    "supportInfo": "支援信息",
+    "supportCenter": "支援中心",
+    "login": "登录",
+    "accountSettings": "账户设置",
+    "billing": "订阅",
+    "logout": "登出"
+  },
+  "home": {
+    "title": "V-sys",
+    "heroTitle": "智能化您的工作与生活",
+    "products": {
+      "vai": "智能 AI 助手",
+      "vwork": "AI 企业管理系统",
+      "vmarket": "AI 电商平台",
+      "voffice": "AI 办公套件"
+    },
+    "vai": {
+      "greeting": "Hi,",
+      "subtitle": "我是 vAi，您的智能助手",
+      "slogan": "AI 驱动，智能无限",
+      "placeholder": "输入您的问题...",
+      "send": "发送",
+      "suggestions": {
+        "1": "帮我写一份工作报告",
+        "2": "分析市场趋势",
+        "3": "翻译这段文字",
+        "4": "生成创意想法"
+      }
+    },
+    "vwork": {
+      "title": "vWork",
+      "subtitle": "全功能 AI 企业管理系统",
+      "description": "一站式解决企业管理需求，让团队协作更高效、决策更智能",
+      "features": {
+        "1": {
+          "title": "智能自动化",
+          "desc": "工作流程自动化，提升效率"
+        },
+        "2": {
+          "title": "数据分析",
+          "desc": "实时数据分析与报告生成"
+        },
+        "3": {
+          "title": "团队协作",
+          "desc": "无缝协作与任务管理"
+        }
+      },
+      "cta": "开始使用"
+    }
+  },
+  "about": {
+    "title": "以科技帮助人类",
+    "subtitle": "让工作和生活更简单高效",
+    "intro": "V-sys 是一间全人工智能公司，致力于通过先进的 AI 技术改善人类的生活与工作方式。我们相信科技能够照亮人类前进的道路，成为最可靠的伙伴。",
+    "products": "我们的产品涵盖智能助手 vAI、企业管理系统 vWork、电商平台 vMarket 以及办公套件 vOffice，为企业和个人提供一站式的数字化解决方案。"
+  },
+  "contact": {
+    "title": "联系我们",
+    "phone": "电话",
+    "email": "电邮",
+    "address": "地址",
+    "addressValue": "数码港道 100 号 数码港 3 座区 5 楼 505 室 薄扶林, 香港岛"
+  },
+  "footer": {
+    "description": "V-sys 以科技帮助人类，让工作和生活更简单高效。我们相信科技能够帮助每个人提升效率，优化生活。",
+    "info": "资讯",
+    "products": "产品",
+    "productList": {
+      "vai": "vAI",
+      "vwork": "vWork",
+      "vmarket": "vMarket",
+      "voffice": "vOffice"
+    },
+    "support": "支援信息",
+    "documentation": "支援中心",
+    "contactSupport": "联络客服",
+    "salesPartnerJoin": "销售商加盟",
+    "contactUs": "联系我们",
+    "hours": "周一至周五 9:00 - 18:00",
+    "location": "香港",
+    "copyright": "© 2025 V-sys Limited. All rights reserved."
+  }
+}

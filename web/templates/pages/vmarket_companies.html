@@ -1,0 +1,20 @@
+{{define "pages/vmarket_companies"}}
+<section class="container">
+  <div class="vmarket-hero vmarket-hero-companies">
+    <div class="vmarket-pill mb-3"><i class="bi bi-building"></i> <span data-i18n="vmarket.nav.companies">公司</span></div>
+    <h1 class="display-6 fw-semibold mb-3" data-i18n="vmarket.companies.heroTitle">VMarket 公司總覽</h1>
+    <p class="lead text-muted mb-0" data-i18n="vmarket.companies.heroSubtitle">探索優質企業夥伴</p>
+  </div>
+</section>
+
+<section class="container mt-4">
+  <div class="row g-4">
+    <aside class="col-12 col-lg-2">
+      {{template "partials/vmarket_category_sidebar" .}}
+    </aside>
+    <div class="col-12 col-lg-10">
+      {{template "partials/vmarket_company_grid" .}}
+    </div>
+  </div>
+</section>
+{{end}}

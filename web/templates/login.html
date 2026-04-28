@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="login.title">Login - V-sys</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/login.css">
+    <!-- Google Sign-In SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="login-page">
+    <div id="alertContainer" class="position-fixed start-50 translate-middle-x" style="z-index: 9999; max-width: 500px; top: 24px;"></div>
+
+    <!-- Hidden top buttons for auth.js compatibility -->
+    <a href="#" id="topRegisterBtn" class="vlogin-hidden"></a>
+    <a href="#" id="topLoginBtn" class="vlogin-hidden"></a>
+
+    <div class="vlogin-wrapper">
+        <!-- ===== Main Content (Card) ===== -->
+        <div class="vlogin-main">
+            <div class="vlogin-card">
+                <!-- Card Left: Logo + Title + Product Selector -->
+                <div class="vlogin-card-left">
+                    <img src="/static/vicon.png" alt="V-sys" class="vlogin-logo">
+
+                    <!-- ===== LOGIN HEADER ===== -->
+                    <div id="loginHeader">
+                        <h1 class="vlogin-title" data-i18n="login.loginTitle">Log in</h1>
+                        <p class="vlogin-subtitle" data-i18n="login.loginSubtitle">Use your V-sys Account</p>
+                        <a href="/login?reg=1" class="badge bg-info text-dark vlogin-promo" data-i18n="login.loginPromo">Free register vSuite, get 50 vcoin</a>
+                    </div>
+
+                    <!-- ===== REGISTER HEADER ===== -->
+                    <div id="registerHeader" style="display: none;">
+                        <h1 class="vlogin-title" data-i18n="login.registerTitle">Create account</h1>
+                        <p class="vlogin-subtitle" data-i18n="login.registerSubtitle">Sign up for V-sys</p>
+                    </div>
+
+                    <!-- ===== FORGOT PASSWORD HEADER ===== -->
+                    <div id="forgotPasswordHeader" style="display: none;">
+                        <h1 class="vlogin-title" data-i18n="login.forgotPasswordTitle">Reset password</h1>
+                        <p class="vlogin-subtitle" data-i18n="login.forgotSubtitle">Enter your email to reset</p>
+                    </div>
+
+                    <!-- Product Selector -->
+                    <div class="vlogin-product-selector-wrap">
+                        <div class="vlogin-product-selector" id="productSelector" onclick="toggleProductDropdown()">
+                            <span class="product-label" data-i18n="login.signingInto">You are signing into</span>
+                            <img src="/static/vworkicon.png" alt="" class="product-icon" id="productIcon">
+                            <span class="product-name" id="productName">vWork</span>
+                            <i class="bi bi-chevron-down product-chevron"></i>
+
+                            <div class="vlogin-product-dropdown" id="productDropdown">
+                                <div class="vlogin-product-option active" data-product="vwork" onclick="selectProduct('vwork', event)">
+                                    <img src="/static/vworkicon.png" alt="vWork">
+                                    <span>vWork</span>
+                                </div>
+                                <div class="vlogin-product-option" data-product="vai" onclick="selectProduct('vai', event)">
+                                    <img src="/static/vaiicon.png" alt="vAI">
+                                    <span>vAI</span>
+                                </div>
+                                <div class="vlogin-product-option" data-product="voffice" onclick="selectProduct('voffice', event)">
+                                    <img src="/static/vofficeicon.png" alt="vOffice">
+                                    <span>vOffice</span>
+                                </div>
+                                <div class="vlogin-product-option" data-product="vmarket" onclick="selectProduct('vmarket', event)">
+                                    <img src="/static/vmarketicon.png" alt="vMarket">
+                                    <span>vMarket</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Right: Form Area -->
+                <div class="vlogin-card-right">
+
+                    <!-- ===== LOGIN FORM ===== -->
+                    <form id="loginForm">
+                        <div class="vlogin-form-group">
+                            <label for="email" data-i18n="login.email">Email</label>
+                            <input type="email" id="email" name="email" required placeholder="">
+                        </div>
+
+                        <div class="vlogin-form-group">
+                            <label for="password" data-i18n="login.password">Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="password" name="password" required>
+                                <button class="toggle-password" type="button" id="togglePassword">
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 8px;">
+                            <a href="#" class="vlogin-link" id="showForgotPassword" data-i18n="login.forgotPasswordLink">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="vlogin-btn vlogin-btn-primary vlogin-submit-btn" data-i18n="login.loginButton">
+                            Login
+                        </button>
+
+                        <div class="vlogin-divider">
+                            <span data-i18n="login.or">or</span>
+                        </div>
+
+                        <!-- Google Login -->
+                        <button type="button" class="vlogin-btn vlogin-btn-social" id="btnGoogleLogin">
+                            <span class="btn-icon">
+                                <svg width="18" height="18" viewBox="0 0 18 18">
+                                    <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                                    <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                                    <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.348 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/>
+                                    <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/>
+                                </svg>
+                            </span>
+                            <span data-i18n="login.googleLogin">Login with Google</span>
+                        </button>
+
+                        <!-- Apple Login (placeholder for future) -->
+                        <button type="button" class="vlogin-btn vlogin-btn-social" id="btnAppleLogin" style="display: none;">
+                            <span class="btn-icon"><i class="bi bi-apple"></i></span>
+                            <span data-i18n="login.appleLogin">Login with Apple</span>
+                        </button>
+
+                        <div class="vlogin-actions">
+                            <div class="vlogin-signup-link">
+                                <a href="#" id="showRegister" class="vlogin-btn vlogin-btn-outline" data-i18n="login.signUpLink">Create account</a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- ===== REGISTER FORM ===== -->
+                    <div id="registerForm" style="display: none;">
+                        <form id="registerFormData">
+                            <div class="vlogin-form-group">
+                                <label for="regName" data-i18n="login.yourName">Your name</label>
+                                <input type="text" id="regName" name="name" required>
+                            </div>
+
+                            <div class="vlogin-form-group">
+                                <label for="regEmail" data-i18n="login.email">Email</label>
+                                <input type="email" id="regEmail" name="email" required>
+                            </div>
+
+                            <div class="vlogin-form-group">
+                                <label for="regPhoneCode" data-i18n="login.phoneCode">Phone country code</label>
+                                <select id="regPhoneCode" name="phone_country_code"></select>
+                            </div>
+
+                            <div class="vlogin-form-group">
+                                <label for="regPhone" data-i18n="login.phone">Phone</label>
+                                <input type="text" id="regPhone" name="phone" data-i18n-placeholder="login.phonePlaceholder" placeholder="Phone number">
+                            </div>
+
+                            <div class="vlogin-form-group">
+                                <label for="regBirthDate" data-i18n="fields.birthDate">Date of birth</label>
+                                <input type="date" id="regBirthDate" name="birth_date">
+                            </div>
+
+                            <div class="vlogin-form-group">
+                                <label for="regPassword" data-i18n="login.password">Password</label>
+                                <input type="password" id="regPassword" name="password" required>
+                            </div>
+
+                            <button type="submit" class="vlogin-btn vlogin-btn-primary vlogin-submit-btn" data-i18n="login.registerButton">
+                                Sign up
+                            </button>
+
+                            <div class="vlogin-divider">
+                                <span data-i18n="login.or">or</span>
+                            </div>
+
+                            <button type="button" class="vlogin-btn vlogin-btn-social" id="btnGoogleRegister">
+                                <span class="btn-icon">
+                                    <svg width="18" height="18" viewBox="0 0 18 18">
+                                        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                                        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                                        <path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.348 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/>
+                                        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/>
+                                    </svg>
+                                </span>
+                                <span data-i18n="login.googleRegister">Sign up with Google</span>
+                            </button>
+
+                            <div class="vlogin-actions">
+                                <div class="vlogin-signup-link">
+                                    <a href="#" id="showLogin" class="vlogin-btn vlogin-btn-outline" data-i18n="login.loginLink">Log in instead</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- ===== FORGOT PASSWORD FORM ===== -->
+                    <div id="forgotPasswordForm" style="display: none;">
+                        <form id="forgotPasswordFormData">
+                            <div class="vlogin-form-group">
+                                <label for="forgotEmail" data-i18n="login.email">Email</label>
+                                <input type="email" id="forgotEmail" name="email" data-i18n-placeholder="login.forgotEmailPlaceholder" placeholder="Enter your email" required>
+                                <div class="vlogin-help-text" data-i18n="login.forgotHelpText">We will send a password reset link to your email</div>
+                            </div>
+
+                            <div class="vlogin-actions" style="justify-content: space-between;">
+                                <a href="#" class="vlogin-link" id="showLoginFromForgot" data-i18n="login.forgotBackToLogin">Back to login</a>
+                                <button type="submit" class="vlogin-btn vlogin-btn-primary" data-i18n="login.forgotSendResetLinkButton">
+                                    Send reset link
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== Page Footer (outside card, like Google) ===== -->
+        <div class="vlogin-page-footer">
+            <div class="vlogin-footer-left">
+                <div class="vlogin-lang-switcher dropdown">
+                    <a class="vlogin-lang-btn dropdown-toggle" href="#" role="button" id="loginLangDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">Language</span> <i class="bi bi-chevron-down" style="font-size: 10px;"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="loginLangDropdown">
+                        <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="vlogin-footer-right">
+                <a href="/terms" data-i18n="login.termsOfService">Terms</a>
+                <a href="/privacy" data-i18n="login.privacyPolicy">Privacy</a>
+                <span data-i18n="footer.copyright">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fallback: if JS fails or takes too long, reveal the page after 2s -->
+    <script>setTimeout(function(){var w=document.querySelector('.vlogin-wrapper');if(w&&!w.classList.contains('vlogin-ready'))w.classList.add('vlogin-ready');},2000);</script>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <link href="/static/vendor/select2/select2.min.css" rel="stylesheet" />
+    <link href="/static/vendor/select2-bootstrap5/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <script src="/static/vendor/select2/select2.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/page-configs.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        // Ensure I18n is initialized before Select2 (DOMContentLoaded hasn't fired yet)
+        if (typeof I18n !== 'undefined' && typeof I18n.init === 'function') {
+            I18n.init();
+        }
+
+        // ===== Product Selector =====
+        const PRODUCT_CONFIG = {
+            vwork: { name: 'vWork', icon: '/static/vworkicon.png', bg: '/static/login_bg_vwork.png' },
+            vai: { name: 'vAI', icon: '/static/vaiicon.png', bg: '/static/login_bg_vwork.png' },
+            voffice: { name: 'vOffice', icon: '/static/vofficeicon.png', bg: '/static/login_bg_voffice.png' },
+            vmarket: { name: 'vMarket', icon: '/static/vmarketicon.png', bg: '/static/login_bg_vmarket.png' }
+        };
+
+        // Detect current product from URL param > localStorage > hostname > default
+        let currentProduct = 'vwork';
+        (function detectProduct() {
+            // 0. vOffice Desktop App: ?redirect_uri=http://localhost:PORT/oauth/callback
+            //    Store in sessionStorage so auth.js can redirect back with SSO ticket after login
+            const params = new URLSearchParams(window.location.search);
+            const redirectUri = params.get('redirect_uri');
+            if (redirectUri && /^https?:\/\/localhost[:/]/.test(redirectUri)) {
+                sessionStorage.setItem('voffice_redirect_uri', redirectUri);
+                // Force product to voffice
+                currentProduct = 'voffice';
+                localStorage.setItem('vlogin_product', 'voffice');
+                // Clean redirect_uri from URL (keep other params)
+                params.delete('redirect_uri');
+            }
+
+            // 1. URL query param ?product=voffice (highest priority, set by source pages)
+            const paramProduct = (params.get('product') || '').toLowerCase();
+            if (paramProduct && PRODUCT_CONFIG[paramProduct]) {
+                currentProduct = paramProduct;
+                localStorage.setItem('vlogin_product', currentProduct);
+                // Clean up URL param
+                params.delete('product');
+                const clean = window.location.pathname +
+                    (params.toString() ? '?' + params.toString() : '') +
+                    window.location.hash;
+                window.history.replaceState({}, '', clean);
+                updateProductUI(currentProduct);
+                return;
+            }
+
+            // Clean URL if redirect_uri was removed
+            if (redirectUri) {
+                const clean = window.location.pathname +
+                    (params.toString() ? '?' + params.toString() : '') +
+                    window.location.hash;
+                window.history.replaceState({}, '', clean);
+                updateProductUI(currentProduct);
+                return;
+            }
+            // 2. localStorage (user's previous selection)
+            const saved = (localStorage.getItem('vlogin_product') || '').toLowerCase();
+            if (saved && PRODUCT_CONFIG[saved]) {
+                currentProduct = saved;
+                updateProductUI(currentProduct);
+                return;
+            }
+            // 3. Hostname / path detection (prod domains)
+            const host = window.location.hostname;
+            const path = window.location.pathname;
+            if (host.includes('voffice') || path.includes('voffice')) currentProduct = 'voffice';
+            else if (host.includes('vmarket') || path.includes('vmarket')) currentProduct = 'vmarket';
+            else if (host.includes('vai') || path.includes('vai')) currentProduct = 'vai';
+            // Update UI
+            updateProductUI(currentProduct);
+        })();
+
+        function updateProductUI(product) {
+            const config = PRODUCT_CONFIG[product];
+            if (!config) return;
+            document.getElementById('productName').textContent = config.name;
+            document.getElementById('productIcon').src = config.icon;
+            // Update active state in dropdown
+            document.querySelectorAll('.vlogin-product-option').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.product === product);
+            });
+        }
+
+        function toggleProductDropdown() {
+            const selector = document.getElementById('productSelector');
+            const dropdown = document.getElementById('productDropdown');
+            selector.classList.toggle('open');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectProduct(product, event) {
+            event.stopPropagation();
+            currentProduct = product;
+            updateProductUI(product);
+            // Close dropdown
+            document.getElementById('productSelector').classList.remove('open');
+            document.getElementById('productDropdown').classList.remove('show');
+            // Store preference
+            localStorage.setItem('vlogin_product', product);
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const selector = document.getElementById('productSelector');
+            if (selector && !selector.contains(e.target)) {
+                selector.classList.remove('open');
+                document.getElementById('productDropdown').classList.remove('show');
+            }
+        });
+
+        // ===== Section Switching =====
+        // Note: auth.js handles the main show/hide of loginForm, registerForm,
+        // loginHeader, registerHeader via showRegister/showLogin click handlers.
+        // We only handle the forgot password switching here since auth.js
+        // delegates that to the inline script via setupForgotPassword().
+
+        const showForgotBtn = document.getElementById('showForgotPassword');
+        const showLoginFromForgotBtn = document.getElementById('showLoginFromForgot');
+
+        if (showForgotBtn) {
+            showForgotBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const loginForm = document.getElementById('loginForm');
+                const loginHeader = document.getElementById('loginHeader');
+                const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+                const forgotPasswordHeader = document.getElementById('forgotPasswordHeader');
+                if (loginForm) loginForm.style.display = 'none';
+                if (loginHeader) loginHeader.style.display = 'none';
+                if (forgotPasswordForm) forgotPasswordForm.style.display = 'block';
+                if (forgotPasswordHeader) forgotPasswordHeader.style.display = 'block';
+            });
+        }
+
+        if (showLoginFromForgotBtn) {
+            showLoginFromForgotBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const loginForm = document.getElementById('loginForm');
+                const loginHeader = document.getElementById('loginHeader');
+                const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+                const forgotPasswordHeader = document.getElementById('forgotPasswordHeader');
+                if (forgotPasswordForm) forgotPasswordForm.style.display = 'none';
+                if (forgotPasswordHeader) forgotPasswordHeader.style.display = 'none';
+                if (loginForm) loginForm.style.display = 'block';
+                if (loginHeader) loginHeader.style.display = 'block';
+            });
+        }
+
+        // When showing register (triggered by auth.js), init phone code
+        const showRegisterBtn = document.getElementById('showRegister');
+        if (showRegisterBtn) {
+            showRegisterBtn.addEventListener('click', async function() {
+                // Re-initialize phone code default when showing register
+                setTimeout(async () => {
+                    await setPhoneCodeDefault(true);
+                }, 300);
+            });
+        }
+
+        // Initialize phone code Select2
+        initRegisterPhoneCodeSelect2();
+
+        // Setup forgot password
+        setupForgotPassword();
+
+        // ===== Phone Code Detection & Select2 =====
+        function detectCountryFromLanguage() {
+            const languages = navigator.languages || [navigator.language || navigator.userLanguage || ''];
+            for (let lang of languages) {
+                if (!lang) continue;
+                const langParts = lang.split('-');
+                const langCode = langParts[0].toLowerCase();
+                const countryCode = langParts.length > 1 ? langParts[1].toUpperCase() : null;
+
+                if (langCode === 'zh') {
+                    if (langParts[1] === 'HK' || langParts[1] === 'hk') return 'HK';
+                    if (langParts[1] === 'TW' || langParts[1] === 'tw') return 'TW';
+                    if (langParts[1] === 'CN' || langParts[1] === 'cn') return 'CN';
+                    if (langParts[1] === 'MO' || langParts[1] === 'mo') return 'MO';
+                    if (langParts[1] === 'Hant' || langParts[1] === 'hant') {
+                        const tzCountry = detectCountryFromTimezone();
+                        if (tzCountry === 'HK' || tzCountry === 'TW') return tzCountry;
+                        return 'HK';
+                    }
+                    if (langParts[1] === 'Hans' || langParts[1] === 'hans') return 'CN';
+                    return 'HK';
+                }
+
+                if (countryCode && COUNTRY_TO_PHONE_CODE[countryCode]) return countryCode;
+            }
+            return null;
+        }
+
+        function detectCountryFromTimezone() {
+            try {
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                if (TIMEZONE_TO_COUNTRY[timezone]) return TIMEZONE_TO_COUNTRY[timezone];
+                const tl = timezone.toLowerCase();
+                if (tl.includes('hong_kong') || tl.includes('hongkong')) return 'HK';
+                if (tl.includes('taipei') || tl.includes('taiwan')) return 'TW';
+                if (tl.includes('shanghai') || tl.includes('beijing') || tl.includes('chongqing')) return 'CN';
+                if (tl.includes('macau') || tl.includes('macao')) return 'MO';
+                return null;
+            } catch (e) { return null; }
+        }
+
+        async function detectCountryFromIP() {
+            try {
+                const v = (typeof window !== 'undefined' && window.__IP_COUNTRY) ? String(window.__IP_COUNTRY).trim().toUpperCase() : '';
+                if (v && v.length === 2 && v !== 'XX') return v;
+            } catch (e) { /* ignore */ }
+            return null;
+        }
+
+        async function getDefaultPhoneCode() {
+            // Check saved preference
+            try {
+                const saved = localStorage.getItem('u-nai_reg_phone_code');
+                if (saved && typeof COUNTRY_PHONE_CODES === 'object' && COUNTRY_PHONE_CODES[saved]) return saved;
+            } catch (e) { /* ignore */ }
+
+            let lang = '';
+            try { lang = String((navigator.language || navigator.userLanguage || '')).toLowerCase(); } catch (e) { lang = ''; }
+
+            const isTraditionalZh = lang.includes('zh-hant') || lang.includes('zh-tw') || lang.includes('zh-hk') || lang.includes('zh-mo') || (lang.startsWith('zh') && !lang.includes('zh-hans') && !lang.includes('zh-cn') && !lang.includes('zh-sg'));
+            const isSimplifiedZh = lang.includes('zh-hans') || lang.includes('zh-cn') || lang.includes('zh-sg');
+
+            if (isTraditionalZh) return '+852';
+            if (isSimplifiedZh) return '+86';
+            return '+1';
+        }
+
+        async function setPhoneCodeDefault(force = false) {
+            const select = document.getElementById('regPhoneCode');
+            if (!select || typeof $ === 'undefined') return;
+            if (!force && $(select).val()) return;
+
+            const defaultCode = await getDefaultPhoneCode();
+            if (!$(select).hasClass('select2-hidden-accessible')) return;
+
+            if (defaultCode) {
+                $(select).val(defaultCode).trigger('change');
+                setTimeout(() => {
+                    if ($(select).val() !== defaultCode) {
+                        $(select).val('+852').trigger('change');
+                    }
+                }, 100);
+            } else {
+                $(select).val('+852').trigger('change');
+            }
+        }
+
+        async function initRegisterPhoneCodeSelect2() {
+            const select = document.getElementById('regPhoneCode');
+            if (!select || typeof $ === 'undefined') return;
+
+            // Wait for i18n to load before initializing select2 (so placeholder gets translated)
+            if (typeof I18n !== 'undefined' && typeof I18n.whenReady === 'function') {
+                await I18n.whenReady(3000);
+            }
+
+            const defaultCode = await getDefaultPhoneCode();
+
+            const phoneCodeFormatter = (data) => {
+                try {
+                    if (!data || data.loading) return data && data.text ? data.text : '';
+                    const code = String(data.id || data.text || '').trim();
+                    if (!code) return data && data.text ? data.text : '';
+                    let name = '';
+                    if (typeof I18n !== 'undefined' && I18n.t) {
+                        const k = `phoneCountryCodes.names.${code}`;
+                        const t = I18n.t(k);
+                        if (t && t !== k) name = t;
+                    }
+                    if (!name && typeof COUNTRY_PHONE_CODES !== 'undefined' && COUNTRY_PHONE_CODES && COUNTRY_PHONE_CODES[code]) {
+                        name = COUNTRY_PHONE_CODES[code];
+                    }
+                    return name ? `${name} (${code})` : code;
+                } catch (e) { return data && data.text ? data.text : ''; }
+            };
+
+            const localOptions = [];
+            try {
+                if (typeof COUNTRY_PHONE_CODES === 'object' && COUNTRY_PHONE_CODES) {
+                    Object.keys(COUNTRY_PHONE_CODES).forEach(code => {
+                        localOptions.push({ id: code, text: code, name: COUNTRY_PHONE_CODES[code] || '' });
+                    });
+                }
+            } catch (e) { /* ignore */ }
+
+            $(select).select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? (I18n.t('login.searchPhoneCode') || 'Search phone code...') : 'Search phone code...',
+                allowClear: true,
+                width: '100%',
+                templateResult: phoneCodeFormatter,
+                templateSelection: phoneCodeFormatter,
+                data: localOptions,
+                minimumInputLength: 0,
+                matcher: function(params, data) {
+                    const term = (params.term || '').toLowerCase().trim();
+                    if (!term) return data;
+                    const code = String(data.id || '').toLowerCase();
+                    const name = String(data.name || '').toLowerCase();
+                    if (code.includes(term) || name.includes(term)) return data;
+                    return null;
+                }
+            });
+
+            // Save user's manual selection
+            try {
+                if (!select.dataset.uNaiPhoneCodeSaved) {
+                    select.dataset.uNaiPhoneCodeSaved = '1';
+                    $(select).on('change', function() {
+                        try {
+                            const v = $(select).val();
+                            if (v) localStorage.setItem('u-nai_reg_phone_code', v);
+                        } catch (e) { /* ignore */ }
+                    });
+                }
+            } catch (e) { /* ignore */ }
+
+            // Set default value
+            setTimeout(() => {
+                if (defaultCode) {
+                    $(select).val(defaultCode).trigger('change');
+                    setTimeout(() => {
+                        if ($(select).val() !== defaultCode) {
+                            $(select).val('+852').trigger('change');
+                        }
+                    }, 100);
+                } else {
+                    $(select).val('+852').trigger('change');
+                }
+            }, 100);
+        }
+
+        // ===== Forgot Password =====
+        function setupForgotPassword() {
+            const t = (key, fallback) => {
+                try {
+                    if (typeof I18n !== 'undefined' && typeof I18n.t === 'function') {
+                        const v = I18n.t(key);
+                        if (v && v !== key) return v;
+                    }
+                } catch (e) { /* ignore */ }
+                return fallback;
+            };
+
+            const forgotPasswordFormData = document.getElementById('forgotPasswordFormData');
+
+            if (forgotPasswordFormData) {
+                forgotPasswordFormData.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const submitBtn = forgotPasswordFormData.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> ' + t('login.forgotSending', 'Sending...');
+
+                    const email = document.getElementById('forgotEmail').value.trim();
+
+                    if (!email) {
+                        App.showAlert(t('login.forgotEnterEmail', 'Please enter your email'), 'warning');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/v1/auth/forgot-password', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: email })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            App.showAlert(t('login.forgotSuccess', 'Password reset link has been sent to your email'), 'success');
+                            document.getElementById('forgotEmail').value = '';
+                            setTimeout(() => {
+                                // Switch back to login
+                                const loginForm = document.getElementById('loginForm');
+                                const loginHeader = document.getElementById('loginHeader');
+                                const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+                                const forgotPasswordHeader = document.getElementById('forgotPasswordHeader');
+                                if (forgotPasswordForm) forgotPasswordForm.style.display = 'none';
+                                if (forgotPasswordHeader) forgotPasswordHeader.style.display = 'none';
+                                if (loginForm) loginForm.style.display = 'block';
+                                if (loginHeader) loginHeader.style.display = 'block';
+                            }, 2000);
+                        } else {
+                            App.showAlert(t('login.forgotFailed', 'Failed to send, please try again later'), 'danger');
+                        }
+
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    } catch (error) {
+                        App.showAlert(t('login.forgotNetworkError', 'Network error, please try again later'), 'danger');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

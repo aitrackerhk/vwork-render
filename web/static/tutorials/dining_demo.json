@@ -1,0 +1,23 @@
+{
+  "name": "dining_demo",
+  "title": "餐飲管理系統演示",
+  "version": 4,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/dining-tables/board" },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "highlight", "selector": "#tableBoardContent", "text": { "zh": "餐桌看板：即時查看所有餐桌狀態", "zh-CN": "餐桌看板：实时查看所有餐桌状态", "en": "Table board: real-time view of all table status" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "#tableBoardStore", "text": { "zh": "切換店舖查看不同分店餐桌", "zh-CN": "切换店铺查看不同分店餐桌", "en": "Switch store to view different branch tables" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "#tableBoardAutoGenerate", "text": { "zh": "自動生成餐桌，快速建立桌位", "zh-CN": "自动生成餐桌，快速建立桌位", "en": "Auto-generate tables for quick setup" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "goto", "url": "/dining-queue/board" },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "highlight", "selector": "#queueBoardAreas", "text": { "zh": "候位看板：各桌區等待人數一目了然", "zh-CN": "候位看板：各桌区等待人数一目了然", "en": "Queue board: waiting count per area at a glance" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "#queueForm", "text": { "zh": "候位取號：選擇人數即可取票排隊", "zh-CN": "候位取号：选择人数即可取票排队", "en": "Queue ticket: select party size to join queue" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "done" }
+  ]
+}

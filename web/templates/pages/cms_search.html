@@ -1,0 +1,39 @@
+{{define "pages/cms_search"}}
+<div>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="mb-0">
+            <i class="bi bi-search"></i>
+            <span data-i18n="cms.globalSearch.pageTitle">全站搜尋</span>
+        </h4>
+    </div>
+
+    <div id="cmsGlobalSearchPage" class="cms-global-search cms-global-search-page" style="position: relative;">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input id="cmsGlobalSearchPageInput" type="text" class="form-control" placeholder="搜尋客戶/項目/使用者/單據..." data-i18n-placeholder="cms.globalSearch.placeholder" autocomplete="off">
+        </div>
+         <div id="cmsGlobalSearchPageDropdown" class="list-group shadow-sm"
+             style="position: relative; display: none; max-height: 65vh; overflow: auto; border-radius: 12px; margin-top: 10px;">
+        </div>
+        <div class="text-muted small mt-2" data-i18n="cms.globalSearch.pageHint">輸入關鍵字後顯示結果</div>
+    </div>
+</div>
+
+<script>
+    function initCmsSearchPage() {
+        if (typeof window.initCmsGlobalSearchByIds === 'function') {
+            window.initCmsGlobalSearchByIds('cmsGlobalSearchPage', 'cmsGlobalSearchPageInput', 'cmsGlobalSearchPageDropdown', {
+                showPageLink: false,
+                hideOnOutsideClick: false,
+                hideOnEscape: false
+            });
+            return;
+        }
+        setTimeout(initCmsSearchPage, 50);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initCmsSearchPage();
+    });
+</script>
+{{end}}

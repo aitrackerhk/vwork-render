@@ -1,0 +1,461 @@
+
+<style>
+    .guide-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px 60px;
+    }
+    
+    .guide-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    
+    .guide-icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #8b5cf622 0%, #8b5cf611 100%);
+        border-radius: 50%;
+        margin-bottom: 30px;
+        border: 3px solid #8b5cf633;
+    }
+    
+    .guide-icon-wrapper i {
+        font-size: 48px;
+        color: #8b5cf6;
+    }
+    
+    .guide-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 16px;
+        line-height: 1.2;
+    }
+    
+    .guide-header p {
+        font-size: 1.15rem;
+        color: #64748b;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+    
+    .flow-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+    }
+    
+    .flow-step {
+        display: flex;
+        gap: 24px;
+        position: relative;
+        padding-bottom: 40px;
+    }
+    
+    .flow-step:last-child {
+        padding-bottom: 0;
+    }
+    
+    .flow-step::before {
+        content: '';
+        position: absolute;
+        left: 31px;
+        top: 64px;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, #8b5cf6, #8b5cf644);
+    }
+    
+    .flow-step:last-child::before {
+        display: none;
+    }
+    
+    .step-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    
+    .step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 1.5rem;
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+    }
+    
+    .step-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+    
+    .step-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    .step-card h3 {
+        font-size: 1.35rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .step-card h3 i {
+        color: #8b5cf6;
+    }
+    
+    .step-card p {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 16px;
+    }
+
+    .step-card ul {
+        color: #64748b;
+        line-height: 1.7;
+        margin-bottom: 16px;
+        padding-left: 20px;
+    }
+
+    .step-card ul li {
+        margin-bottom: 6px;
+    }
+
+    .step-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .step-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: #8b5cf6;
+        color: white;
+        text-decoration: none;
+        border-radius: 100px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+    
+    .step-action:hover {
+        background: #7c3aed;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        color: white;
+    }
+
+    .step-action.secondary {
+        background: #6c757d;
+    }
+
+    .step-action.secondary:hover {
+        background: #5a6268;
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+    }
+    
+    .step-action i {
+        font-size: 1rem;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 40px;
+        padding: 12px 24px;
+        background: #f8f9fa;
+        color: #475569;
+        text-decoration: none;
+        border-radius: 100px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .back-link:hover {
+        background: #e9ecef;
+        color: #1e293b;
+    }
+
+    .step-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        background: #e9ecef;
+        color: #6c757d;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-left: 8px;
+    }
+
+    .step-badge.optional {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    @media (max-width: 768px) {
+        .guide-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .guide-header p {
+            font-size: 1rem;
+        }
+        
+        .flow-step {
+            flex-direction: column;
+            gap: 16px;
+            padding-left: 0;
+        }
+        
+        .flow-step::before {
+            left: 31px;
+            top: 80px;
+        }
+        
+        .step-indicator {
+            flex-direction: row;
+            gap: 16px;
+        }
+        
+        .step-card {
+            padding: 20px;
+        }
+
+        .step-actions {
+            flex-direction: column;
+        }
+
+        .step-action {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="guide-container">
+    <div class="guide-header">
+        <div class="guide-icon-wrapper">
+            <i class="bi bi-cup-hot"></i>
+        </div>
+        <h1 data-i18n="pages.guideDiningFlow.title">餐飲流程指南</h1>
+        <p data-i18n="pages.guideDiningFlow.subtitle">完整配置您的餐飲管理系統，從環境設定到開始營業</p>
+    </div>
+    
+    <div class="flow-steps">
+        <!-- Step 1: 餐飲基本設定 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">1</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-gear"></i> <span data-i18n="pages.guideDiningFlow.step1.title">餐飲基本設定</span></h3>
+                <p data-i18n="pages.guideDiningFlow.step1.description">配置餐廳的營業時間、點餐流程，並規劃用餐區域。</p>
+                <ul>
+                    <li data-i18n="pages.guideDiningFlow.step1.item1">設定營業時間和點餐流程</li>
+                    <li data-i18n="pages.guideDiningFlow.step1.item2">新增用餐區域（室內、戶外、包廂等）</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/dining-settings" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideDiningFlow.step1.action">前往餐飲設定</span>
+                    </a>
+                    <a href="/dining-areas" class="step-action secondary">
+                        <i class="bi bi-grid-3x3-gap"></i>
+                        <span data-i18n="pages.guideDiningFlow.step1.action2">設定餐桌區域</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: 建立餐桌 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">2</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-grid-3x3"></i> <span data-i18n="pages.guideDiningFlow.step2.title">建立餐桌</span></h3>
+                <p data-i18n="pages.guideDiningFlow.step2.description">在各個區域中建立餐桌，設定桌號、座位數和桌型。</p>
+                <ul>
+                    <li data-i18n="pages.guideDiningFlow.step2.item1">新增餐桌並設定桌號、座位數</li>
+                    <li data-i18n="pages.guideDiningFlow.step2.item2">標記桌型（方桌、圓桌、長桌）</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/dining-tables" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideDiningFlow.step2.action">管理餐桌</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: 設定菜單 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">3</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-book"></i> <span data-i18n="pages.guideDiningFlow.step3.title">設定菜單</span></h3>
+                <p data-i18n="pages.guideDiningFlow.step3.description">建立您的菜單項目，包含餐點名稱、價格、分類和圖片。如需計算稅金，請設定產品稅率。</p>
+                <ul>
+                    <li data-i18n="pages.guideDiningFlow.step3.item1">新增餐點（名稱、價格、分類）</li>
+                    <li data-i18n="pages.guideDiningFlow.step3.item2">上傳餐點圖片和描述</li>
+                    <li data-i18n="pages.guideDiningFlow.step3.item3">配置產品稅率（GST、VAT 等）</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/products" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideDiningFlow.step3.action">前往產品管理</span>
+                    </a>
+                    <a href="/product-taxes" class="step-action secondary">
+                        <i class="bi bi-percent"></i>
+                        <span data-i18n="pages.guideDiningFlow.step3.action2">產品稅設定</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: 付款與 POS 設定 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">4</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-credit-card"></i> <span data-i18n="pages.guideDiningFlow.step4.title">付款與 POS 設定</span></h3>
+                <p data-i18n="pages.guideDiningFlow.step4.description">配置餐廳接受的付款方式，並設定 POS 收銀台的操作和出單格式。</p>
+                <ul>
+                    <li data-i18n="pages.guideDiningFlow.step4.item1">設定付款方式（現金、信用卡、電子支付等）</li>
+                    <li data-i18n="pages.guideDiningFlow.step4.item2">配置 POS 介面和收據格式</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/payment-methods" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideDiningFlow.step4.action">設定付款方式</span>
+                    </a>
+                    <a href="/pos-settings" class="step-action secondary">
+                        <i class="bi bi-display"></i>
+                        <span data-i18n="pages.guideDiningFlow.step4.action2">POS 設定</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: 開始接待顧客 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">5</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-shop"></i> <span data-i18n="pages.guideDiningFlow.step5.title">開始接待顧客</span></h3>
+                <p data-i18n="pages.guideDiningFlow.step5.description">完成上述設定後，您就可以開始營業了！使用 POS 收銀台為客人點餐和結帳。</p>
+                <ul>
+                    <li data-i18n="pages.guideDiningFlow.step5.item1">使用 POS 收銀台點餐和結帳</li>
+                    <li data-i18n="pages.guideDiningFlow.step5.item2">在餐桌看板追蹤各桌用餐狀態</li>
+                    <li data-i18n="pages.guideDiningFlow.step5.item3">查看訂單列表和營業報表</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/pos" class="step-action">
+                        <i class="bi bi-display"></i>
+                        <span data-i18n="pages.guideDiningFlow.step5.action">開啟 POS 收銀台</span>
+                    </a>
+                    <a href="/dining-tables/board" class="step-action secondary">
+                        <i class="bi bi-kanban"></i>
+                        <span data-i18n="pages.guideDiningFlow.step5.action2">餐桌看板</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: 候位與出單設定 -->
+        <div class="flow-step">
+            <div class="step-indicator">
+                <div class="step-number">6</div>
+            </div>
+            <div class="step-card">
+                <h3><i class="bi bi-people-fill"></i> <span data-i18n="pages.guideDiningFlow.step6.title">候位與出單設定</span> <span class="step-badge optional" data-i18n="common.optional">選填</span></h3>
+                <p data-i18n="pages.guideDiningFlow.step6.description">如需候位系統，可在此管理排隊客人。您也可以自訂訂單和候位的出單格式。</p>
+                <ul>
+                    <li data-i18n="pages.guideDiningFlow.step6.item1">登記候位客人和發送通知</li>
+                    <li data-i18n="pages.guideDiningFlow.step6.item2">自訂訂單出單和候位出單格式</li>
+                </ul>
+                <div class="step-actions">
+                    <a href="/dining-queues" class="step-action">
+                        <i class="bi bi-arrow-right"></i>
+                        <span data-i18n="pages.guideDiningFlow.step6.action">候位管理</span>
+                    </a>
+                    <a href="/diningorder-ticket-settings" class="step-action secondary">
+                        <i class="bi bi-printer"></i>
+                        <span data-i18n="pages.guideDiningFlow.step6.action2">出單設定</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center" style="margin-top: 50px;">
+        <button type="button" class="btn btn-success btn-lg px-5 py-3" id="guideCompleteBtn" style="border-radius: 100px; font-weight: 600; font-size: 1.1rem;">
+            <i class="bi bi-check-circle me-2"></i>
+            <span data-i18n="pages.guideDiningFlow.completeSetup">我已完成設定</span>
+        </button>
+        <p class="text-muted mt-3" style="font-size: 0.9rem;" data-i18n="pages.guideDiningFlow.completeSetupHint">完成後此指南將從目錄隱藏，您可在「編輯目錄」中重新開啟</p>
+    </div>
+
+    <div class="text-center">
+        <a href="/help" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            <span data-i18n="pages.guideDiningFlow.backToHelp">返回支援中心</span>
+        </a>
+    </div>
+</div>
+
+<script>
+(function() {
+    var btn = document.getElementById('guideCompleteBtn');
+    if (!btn) return;
+    btn.addEventListener('click', async function() {
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>' +
+                ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.saving') : '保存中...');
+            await window.hideGuideFromMenu('guide-dining-flow');
+            // Navigate to dining tables board
+            if (window.App && window.App.navigate) {
+                window.App.navigate('/dining-tables/board');
+            } else {
+                window.location.href = '/dining-tables/board';
+            }
+        } catch (e) {
+            console.error('Failed to hide guide:', e);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-circle me-2"></i>' +
+                ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.guideDiningFlow.completeSetup') : '我已完成設定');
+        }
+    });
+})();
+</script>

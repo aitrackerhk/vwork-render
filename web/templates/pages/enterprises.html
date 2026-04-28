@@ -1,0 +1,847 @@
+{{ define "pages/enterprises" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 data-i18n="pages.enterprises.title">企業設置</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-building"></i> <span data-i18n="pages.enterprises.enterpriseInfo">企業資料</span></h5>
+                </div>
+                <div class="card-body">
+                    <div id="alertContainer"></div>
+                    <form id="enterpriseForm">
+                        <input type="hidden" id="enterpriseId">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.enterprises.enterpriseName">企業名稱 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.enterprises.enterpriseCode">企業代碼（網址子域名）</label>
+                            <input type="text" class="form-control" id="code" data-i18n-placeholder="pages.enterprises.optional" placeholder="例如：admin60">
+                            <div class="form-text" data-i18n="pages.enterprises.codeUpdateHint">更新後會同步更新企業網址；系統會檢查是否已被其他租戶使用。</div>
+                            <label class="form-label mt-2" data-i18n="pages.enterprises.domainLabel">域名</label>
+                            <input type="text" class="form-control" id="domain" readonly>
+                            <div class="form-text" data-i18n="pages.enterprises.domainHint">對應域名，例如 test => https://www.{{.BaseDomain}}/co/test/。僅供參考。</div>
+                            <label class="form-label mt-2" data-i18n="pages.enterprises.tenantIdLabel">租戶 ID</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control font-monospace" id="tenantId" readonly style="background-color: #f8f9fa;">
+                                <button class="btn btn-outline-secondary" type="button" id="copyTenantIdBtn" title="複製租戶 ID">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                            <div class="form-text" data-i18n="pages.enterprises.tenantIdHint">此 ID 用於技術支援，可提供給客服人員以便協助。</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.enterprises.enterpriseLogo">企業 Logo</label>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="logo-pic-preview" style="width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 2px solid #dee2e6; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                    <img id="logoImage" src="" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; display: none;">
+                                    <i class="bi bi-building fs-1 text-muted" id="logoPlaceholder"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="file" class="form-control" id="logoFile" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="uploadLogoBtn">
+                                        <i class="bi bi-upload"></i> <span data-i18n="pages.enterprises.uploadLogo">上傳 Logo</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="removeLogoBtn" style="display: none;">
+                                        <i class="bi bi-trash"></i> <span data-i18n="pages.enterprises.removeLogo">移除 Logo</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="text-muted" data-i18n="pages.enterprises.logoHint">支援 JPG, PNG, GIF 格式，建議尺寸 200x200px</small>
+                            <input type="hidden" id="logoUrl">
+                        </div>
+                        <div class="mb-3">
+                            <div class="row g-2">
+                                <div class="col-12 col-md-4">
+                                    <label class="form-label mb-1" data-i18n="pages.enterprises.phoneCountryCode">企業電話區號</label>
+                                    <select class="form-select" id="phoneCountryCode">
+                                        <option value="" data-i18n="pages.enterprises.selectCountryCode">請選擇區號</option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-8">
+                                    <label class="form-label mb-1" data-i18n="pages.enterprises.enterprisePhone">企業電話</label>
+                                    <input type="text" class="form-control" id="phone" data-i18n-placeholder="pages.enterprises.enterprisePhonePlaceholder" placeholder="請輸入企業電話">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.enterprises.enterpriseEmail">企業電郵</label>
+                            <input type="email" class="form-control" id="email" data-i18n-placeholder="pages.enterprises.enterpriseEmailPlaceholder" placeholder="請輸入企業電郵">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.enterprises.enterpriseAddress">企業地址</label>
+                            <textarea class="form-control" id="address" rows="3" data-i18n-placeholder="pages.enterprises.enterpriseAddressPlaceholder" placeholder="請輸入企業地址"></textarea>
+                        </div>
+                        <!-- 網域顯示已移到「企業代碼」下面，避免分散 -->
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.enterprises.timezone">時區</label>
+                            <select class="form-select" id="timezone">
+                                <!-- Asia -->
+                                <optgroup label="亞洲" data-i18n-label="pages.enterprises.timezoneGroups.asia">
+                                    <option value="Asia/Hong_Kong" data-i18n="pages.enterprises.timezoneOptions.asiaHongKong">香港 (Asia/Hong_Kong)</option>
+                                    <option value="Asia/Shanghai" data-i18n="pages.enterprises.timezoneOptions.asiaShanghai">中國 (Asia/Shanghai)</option>
+                                    <option value="Asia/Taipei" data-i18n="pages.enterprises.timezoneOptions.asiaTaipei">台灣 (Asia/Taipei)</option>
+                                    <option value="Asia/Macau" data-i18n="pages.enterprises.timezoneOptions.asiaMacau">澳門 (Asia/Macau)</option>
+                                    <option value="Asia/Tokyo" data-i18n="pages.enterprises.timezoneOptions.asiaTokyo">日本 (Asia/Tokyo)</option>
+                                    <option value="Asia/Seoul" data-i18n="pages.enterprises.timezoneOptions.asiaSeoul">韓國 (Asia/Seoul)</option>
+                                    <option value="Asia/Singapore" data-i18n="pages.enterprises.timezoneOptions.asiaSingapore">新加坡 (Asia/Singapore)</option>
+                                    <option value="Asia/Kuala_Lumpur" data-i18n="pages.enterprises.timezoneOptions.asiaKualaLumpur">馬來西亞 (Asia/Kuala_Lumpur)</option>
+                                    <option value="Asia/Bangkok" data-i18n="pages.enterprises.timezoneOptions.asiaBangkok">泰國 (Asia/Bangkok)</option>
+                                    <option value="Asia/Jakarta" data-i18n="pages.enterprises.timezoneOptions.asiaJakarta">印尼 (Asia/Jakarta)</option>
+                                    <option value="Asia/Manila" data-i18n="pages.enterprises.timezoneOptions.asiaManila">菲律賓 (Asia/Manila)</option>
+                                    <option value="Asia/Ho_Chi_Minh" data-i18n="pages.enterprises.timezoneOptions.asiaHoChiMinh">越南 (Asia/Ho_Chi_Minh)</option>
+                                    <option value="Asia/Kolkata" data-i18n="pages.enterprises.timezoneOptions.asiaKolkata">印度 (Asia/Kolkata)</option>
+                                    <option value="Asia/Dhaka" data-i18n="pages.enterprises.timezoneOptions.asiaDhaka">孟加拉 (Asia/Dhaka)</option>
+                                    <option value="Asia/Colombo" data-i18n="pages.enterprises.timezoneOptions.asiaColombo">斯里蘭卡 (Asia/Colombo)</option>
+                                    <option value="Asia/Dubai" data-i18n="pages.enterprises.timezoneOptions.asiaDubai">阿聯酋 (Asia/Dubai)</option>
+                                    <option value="Asia/Riyadh" data-i18n="pages.enterprises.timezoneOptions.asiaRiyadh">沙地阿拉伯 (Asia/Riyadh)</option>
+                                    <option value="Asia/Tehran" data-i18n="pages.enterprises.timezoneOptions.asiaTehran">伊朗 (Asia/Tehran)</option>
+                                    <option value="Asia/Karachi" data-i18n="pages.enterprises.timezoneOptions.asiaKarachi">巴基斯坦 (Asia/Karachi)</option>
+                                    <option value="Asia/Kathmandu" data-i18n="pages.enterprises.timezoneOptions.asiaKathmandu">尼泊爾 (Asia/Kathmandu)</option>
+                                    <option value="Asia/Yangon" data-i18n="pages.enterprises.timezoneOptions.asiaYangon">緬甸 (Asia/Yangon)</option>
+                                    <option value="Asia/Phnom_Penh" data-i18n="pages.enterprises.timezoneOptions.asiaPhnomPenh">柬埔寨 (Asia/Phnom_Penh)</option>
+                                    <option value="Asia/Vientiane" data-i18n="pages.enterprises.timezoneOptions.asiaVientiane">老撾 (Asia/Vientiane)</option>
+                                    <option value="Asia/Brunei" data-i18n="pages.enterprises.timezoneOptions.asiaBrunei">文萊 (Asia/Brunei)</option>
+                                    <option value="Asia/Makassar" data-i18n="pages.enterprises.timezoneOptions.asiaMakassar">印尼中部 (Asia/Makassar)</option>
+                                    <option value="Asia/Jayapura" data-i18n="pages.enterprises.timezoneOptions.asiaJayapura">印尼東部 (Asia/Jayapura)</option>
+                                </optgroup>
+                                <!-- America -->
+                                <optgroup label="美洲" data-i18n-label="pages.enterprises.timezoneGroups.america">
+                                    <option value="America/New_York" data-i18n="pages.enterprises.timezoneOptions.americaNewYork">美國東部 (America/New_York)</option>
+                                    <option value="America/Chicago" data-i18n="pages.enterprises.timezoneOptions.americaChicago">美國中部 (America/Chicago)</option>
+                                    <option value="America/Denver" data-i18n="pages.enterprises.timezoneOptions.americaDenver">美國山地 (America/Denver)</option>
+                                    <option value="America/Los_Angeles" data-i18n="pages.enterprises.timezoneOptions.americaLosAngeles">美國西部 (America/Los_Angeles)</option>
+                                    <option value="America/Toronto" data-i18n="pages.enterprises.timezoneOptions.americaToronto">加拿大東部 (America/Toronto)</option>
+                                    <option value="America/Vancouver" data-i18n="pages.enterprises.timezoneOptions.americaVancouver">加拿大西部 (America/Vancouver)</option>
+                                    <option value="America/Mexico_City" data-i18n="pages.enterprises.timezoneOptions.americaMexicoCity">墨西哥 (America/Mexico_City)</option>
+                                    <option value="America/Sao_Paulo" data-i18n="pages.enterprises.timezoneOptions.americaSaoPaulo">巴西 (America/Sao_Paulo)</option>
+                                    <option value="America/Buenos_Aires" data-i18n="pages.enterprises.timezoneOptions.americaBuenosAires">阿根廷 (America/Buenos_Aires)</option>
+                                    <option value="America/Santiago" data-i18n="pages.enterprises.timezoneOptions.americaSantiago">智利 (America/Santiago)</option>
+                                    <option value="America/Lima" data-i18n="pages.enterprises.timezoneOptions.americaLima">秘魯 (America/Lima)</option>
+                                    <option value="America/Bogota" data-i18n="pages.enterprises.timezoneOptions.americaBogota">哥倫比亞 (America/Bogota)</option>
+                                    <option value="America/Caracas" data-i18n="pages.enterprises.timezoneOptions.americaCaracas">委內瑞拉 (America/Caracas)</option>
+                                </optgroup>
+                                <!-- Europe -->
+                                <optgroup label="歐洲" data-i18n-label="pages.enterprises.timezoneGroups.europe">
+                                    <option value="Europe/London" data-i18n="pages.enterprises.timezoneOptions.europeLondon">英國 (Europe/London)</option>
+                                    <option value="Europe/Paris" data-i18n="pages.enterprises.timezoneOptions.europeParis">法國 (Europe/Paris)</option>
+                                    <option value="Europe/Berlin" data-i18n="pages.enterprises.timezoneOptions.europeBerlin">德國 (Europe/Berlin)</option>
+                                    <option value="Europe/Rome" data-i18n="pages.enterprises.timezoneOptions.europeRome">意大利 (Europe/Rome)</option>
+                                    <option value="Europe/Madrid" data-i18n="pages.enterprises.timezoneOptions.europeMadrid">西班牙 (Europe/Madrid)</option>
+                                    <option value="Europe/Amsterdam" data-i18n="pages.enterprises.timezoneOptions.europeAmsterdam">荷蘭 (Europe/Amsterdam)</option>
+                                    <option value="Europe/Brussels" data-i18n="pages.enterprises.timezoneOptions.europeBrussels">比利時 (Europe/Brussels)</option>
+                                    <option value="Europe/Zurich" data-i18n="pages.enterprises.timezoneOptions.europeZurich">瑞士 (Europe/Zurich)</option>
+                                    <option value="Europe/Vienna" data-i18n="pages.enterprises.timezoneOptions.europeVienna">奧地利 (Europe/Vienna)</option>
+                                    <option value="Europe/Stockholm" data-i18n="pages.enterprises.timezoneOptions.europeStockholm">瑞典 (Europe/Stockholm)</option>
+                                    <option value="Europe/Oslo" data-i18n="pages.enterprises.timezoneOptions.europeOslo">挪威 (Europe/Oslo)</option>
+                                    <option value="Europe/Copenhagen" data-i18n="pages.enterprises.timezoneOptions.europeCopenhagen">丹麥 (Europe/Copenhagen)</option>
+                                    <option value="Europe/Helsinki" data-i18n="pages.enterprises.timezoneOptions.europeHelsinki">芬蘭 (Europe/Helsinki)</option>
+                                    <option value="Europe/Warsaw" data-i18n="pages.enterprises.timezoneOptions.europeWarsaw">波蘭 (Europe/Warsaw)</option>
+                                    <option value="Europe/Prague" data-i18n="pages.enterprises.timezoneOptions.europePrague">捷克 (Europe/Prague)</option>
+                                    <option value="Europe/Budapest" data-i18n="pages.enterprises.timezoneOptions.europeBudapest">匈牙利 (Europe/Budapest)</option>
+                                    <option value="Europe/Bucharest" data-i18n="pages.enterprises.timezoneOptions.europeBucharest">羅馬尼亞 (Europe/Bucharest)</option>
+                                    <option value="Europe/Athens" data-i18n="pages.enterprises.timezoneOptions.europeAthens">希臘 (Europe/Athens)</option>
+                                    <option value="Europe/Lisbon" data-i18n="pages.enterprises.timezoneOptions.europeLisbon">葡萄牙 (Europe/Lisbon)</option>
+                                    <option value="Europe/Dublin" data-i18n="pages.enterprises.timezoneOptions.europeDublin">愛爾蘭 (Europe/Dublin)</option>
+                                    <option value="Europe/Moscow" data-i18n="pages.enterprises.timezoneOptions.europeMoscow">俄羅斯 (Europe/Moscow)</option>
+                                </optgroup>
+                                <!-- Pacific -->
+                                <optgroup label="大洋洲" data-i18n-label="pages.enterprises.timezoneGroups.oceania">
+                                    <option value="Australia/Sydney" data-i18n="pages.enterprises.timezoneOptions.australiaSydney">澳洲悉尼 (Australia/Sydney)</option>
+                                    <option value="Australia/Melbourne" data-i18n="pages.enterprises.timezoneOptions.australiaMelbourne">澳洲墨爾本 (Australia/Melbourne)</option>
+                                    <option value="Australia/Brisbane" data-i18n="pages.enterprises.timezoneOptions.australiaBrisbane">澳洲布里斯班 (Australia/Brisbane)</option>
+                                    <option value="Australia/Perth" data-i18n="pages.enterprises.timezoneOptions.australiaPerth">澳洲珀斯 (Australia/Perth)</option>
+                                    <option value="Pacific/Auckland" data-i18n="pages.enterprises.timezoneOptions.pacificAuckland">新西蘭 (Pacific/Auckland)</option>
+                                    <option value="Pacific/Fiji" data-i18n="pages.enterprises.timezoneOptions.pacificFiji">斐濟 (Pacific/Fiji)</option>
+                                </optgroup>
+                                <!-- Other -->
+                                <optgroup label="其他" data-i18n-label="pages.enterprises.timezoneGroups.other">
+                                    <option value="UTC" data-i18n="pages.enterprises.timezoneOptions.utc">UTC</option>
+                                    <option value="Africa/Johannesburg" data-i18n="pages.enterprises.timezoneOptions.africaJohannesburg">南非 (Africa/Johannesburg)</option>
+                                    <option value="Africa/Cairo" data-i18n="pages.enterprises.timezoneOptions.africaCairo">埃及 (Africa/Cairo)</option>
+                                    <option value="Africa/Lagos" data-i18n="pages.enterprises.timezoneOptions.africaLagos">尼日利亞 (Africa/Lagos)</option>
+                                    <option value="Africa/Nairobi" data-i18n="pages.enterprises.timezoneOptions.africaNairobi">肯尼亞 (Africa/Nairobi)</option>
+                                </optgroup>
+                            </select>
+                            <div class="form-text" data-i18n="pages.enterprises.timezoneHint">系統將使用此時區進行時間計算和顯示</div>
+                        </div>
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> <span data-i18n="pages.enterprises.saveSettings">保存設置</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> <span data-i18n="pages.enterprises.description">說明</span></h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small" data-i18n="pages.enterprises.descriptionText">
+                        每個帳戶只能設置一個企業。企業信息將用於系統中的各種業務流程。
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-grid"></i> <span data-i18n="pages.enterprises.industryTemplate">行業模板</span></h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3" data-i18n="pages.enterprises.templateDescription">
+                        選擇行業模板可以自動配置相關業務模塊，讓系統更適合您的業務需求。
+                    </p>
+                    <div id="currentTemplateInfo" class="mb-3">
+                        <small class="text-muted" data-i18n="pages.enterprises.loading">載入中...</small>
+                    </div>
+                    <a href="/industry-template-selector?skip_website_guide=true" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-arrow-repeat"></i> <span data-i18n="pages.enterprises.reSelectTemplate">重新選擇行業模板</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        const apiPath = '/enterprises/me';
+        
+        // 全世界電話區號列表（硬編碼）
+        const countryCodes = [
+            { code: '+1', name: '美國/加拿大', country: 'US/CA' },
+            { code: '+7', name: '俄羅斯/哈薩克', country: 'RU/KZ' },
+            { code: '+20', name: '埃及', country: 'EG' },
+            { code: '+27', name: '南非', country: 'ZA' },
+            { code: '+30', name: '希臘', country: 'GR' },
+            { code: '+31', name: '荷蘭', country: 'NL' },
+            { code: '+32', name: '比利時', country: 'BE' },
+            { code: '+33', name: '法國', country: 'FR' },
+            { code: '+34', name: '西班牙', country: 'ES' },
+            { code: '+36', name: '匈牙利', country: 'HU' },
+            { code: '+39', name: '意大利', country: 'IT' },
+            { code: '+40', name: '羅馬尼亞', country: 'RO' },
+            { code: '+41', name: '瑞士', country: 'CH' },
+            { code: '+43', name: '奧地利', country: 'AT' },
+            { code: '+44', name: '英國', country: 'GB' },
+            { code: '+45', name: '丹麥', country: 'DK' },
+            { code: '+46', name: '瑞典', country: 'SE' },
+            { code: '+47', name: '挪威', country: 'NO' },
+            { code: '+48', name: '波蘭', country: 'PL' },
+            { code: '+49', name: '德國', country: 'DE' },
+            { code: '+51', name: '秘魯', country: 'PE' },
+            { code: '+52', name: '墨西哥', country: 'MX' },
+            { code: '+53', name: '古巴', country: 'CU' },
+            { code: '+54', name: '阿根廷', country: 'AR' },
+            { code: '+55', name: '巴西', country: 'BR' },
+            { code: '+56', name: '智利', country: 'CL' },
+            { code: '+57', name: '哥倫比亞', country: 'CO' },
+            { code: '+58', name: '委內瑞拉', country: 'VE' },
+            { code: '+60', name: '馬來西亞', country: 'MY' },
+            { code: '+61', name: '澳洲', country: 'AU' },
+            { code: '+62', name: '印尼', country: 'ID' },
+            { code: '+63', name: '菲律賓', country: 'PH' },
+            { code: '+64', name: '新西蘭', country: 'NZ' },
+            { code: '+65', name: '新加坡', country: 'SG' },
+            { code: '+66', name: '泰國', country: 'TH' },
+            { code: '+81', name: '日本', country: 'JP' },
+            { code: '+82', name: '韓國', country: 'KR' },
+            { code: '+84', name: '越南', country: 'VN' },
+            { code: '+86', name: '中國', country: 'CN' },
+            { code: '+852', name: '香港', country: 'HK' },
+            { code: '+853', name: '澳門', country: 'MO' },
+            { code: '+886', name: '台灣', country: 'TW' },
+            { code: '+90', name: '土耳其', country: 'TR' },
+            { code: '+91', name: '印度', country: 'IN' },
+            { code: '+92', name: '巴基斯坦', country: 'PK' },
+            { code: '+93', name: '阿富汗', country: 'AF' },
+            { code: '+94', name: '斯里蘭卡', country: 'LK' },
+            { code: '+95', name: '緬甸', country: 'MM' },
+            { code: '+98', name: '伊朗', country: 'IR' },
+            { code: '+212', name: '摩洛哥', country: 'MA' },
+            { code: '+213', name: '阿爾及利亞', country: 'DZ' },
+            { code: '+216', name: '突尼斯', country: 'TN' },
+            { code: '+218', name: '利比亞', country: 'LY' },
+            { code: '+220', name: '岡比亞', country: 'GM' },
+            { code: '+221', name: '塞內加爾', country: 'SN' },
+            { code: '+222', name: '毛里塔尼亞', country: 'MR' },
+            { code: '+223', name: '馬里', country: 'ML' },
+            { code: '+224', name: '幾內亞', country: 'GN' },
+            { code: '+225', name: '科特迪瓦', country: 'CI' },
+            { code: '+226', name: '布基納法索', country: 'BF' },
+            { code: '+227', name: '尼日爾', country: 'NE' },
+            { code: '+228', name: '多哥', country: 'TG' },
+            { code: '+229', name: '貝寧', country: 'BJ' },
+            { code: '+230', name: '毛里求斯', country: 'MU' },
+            { code: '+231', name: '利比里亞', country: 'LR' },
+            { code: '+232', name: '塞拉利昂', country: 'SL' },
+            { code: '+233', name: '加納', country: 'GH' },
+            { code: '+234', name: '尼日利亞', country: 'NG' },
+            { code: '+235', name: '乍得', country: 'TD' },
+            { code: '+236', name: '中非', country: 'CF' },
+            { code: '+237', name: '喀麥隆', country: 'CM' },
+            { code: '+238', name: '佛得角', country: 'CV' },
+            { code: '+239', name: '聖多美和普林西比', country: 'ST' },
+            { code: '+240', name: '赤道幾內亞', country: 'GQ' },
+            { code: '+241', name: '加蓬', country: 'GA' },
+            { code: '+242', name: '剛果共和國', country: 'CG' },
+            { code: '+243', name: '剛果民主共和國', country: 'CD' },
+            { code: '+244', name: '安哥拉', country: 'AO' },
+            { code: '+245', name: '幾內亞比紹', country: 'GW' },
+            { code: '+246', name: '英屬印度洋領地', country: 'IO' },
+            { code: '+248', name: '塞舌爾', country: 'SC' },
+            { code: '+249', name: '蘇丹', country: 'SD' },
+            { code: '+250', name: '盧旺達', country: 'RW' },
+            { code: '+251', name: '埃塞俄比亞', country: 'ET' },
+            { code: '+252', name: '索馬里', country: 'SO' },
+            { code: '+253', name: '吉布提', country: 'DJ' },
+            { code: '+254', name: '肯尼亞', country: 'KE' },
+            { code: '+255', name: '坦桑尼亞', country: 'TZ' },
+            { code: '+256', name: '烏干達', country: 'UG' },
+            { code: '+257', name: '布隆迪', country: 'BI' },
+            { code: '+258', name: '莫桑比克', country: 'MZ' },
+            { code: '+260', name: '贊比亞', country: 'ZM' },
+            { code: '+261', name: '馬達加斯加', country: 'MG' },
+            { code: '+262', name: '留尼汪', country: 'RE' },
+            { code: '+263', name: '津巴布韋', country: 'ZW' },
+            { code: '+264', name: '納米比亞', country: 'NA' },
+            { code: '+265', name: '馬拉維', country: 'MW' },
+            { code: '+266', name: '萊索托', country: 'LS' },
+            { code: '+267', name: '博茨瓦納', country: 'BW' },
+            { code: '+268', name: '斯威士蘭', country: 'SZ' },
+            { code: '+269', name: '科摩羅', country: 'KM' },
+            { code: '+290', name: '聖赫勒拿', country: 'SH' },
+            { code: '+291', name: '厄立特里亞', country: 'ER' },
+            { code: '+297', name: '阿魯巴', country: 'AW' },
+            { code: '+298', name: '法羅群島', country: 'FO' },
+            { code: '+299', name: '格陵蘭', country: 'GL' },
+            { code: '+350', name: '直布羅陀', country: 'GI' },
+            { code: '+351', name: '葡萄牙', country: 'PT' },
+            { code: '+352', name: '盧森堡', country: 'LU' },
+            { code: '+353', name: '愛爾蘭', country: 'IE' },
+            { code: '+354', name: '冰島', country: 'IS' },
+            { code: '+355', name: '阿爾巴尼亞', country: 'AL' },
+            { code: '+356', name: '馬耳他', country: 'MT' },
+            { code: '+357', name: '塞浦路斯', country: 'CY' },
+            { code: '+358', name: '芬蘭', country: 'FI' },
+            { code: '+359', name: '保加利亞', country: 'BG' },
+            { code: '+370', name: '立陶宛', country: 'LT' },
+            { code: '+371', name: '拉脫維亞', country: 'LV' },
+            { code: '+372', name: '愛沙尼亞', country: 'EE' },
+            { code: '+373', name: '摩爾多瓦', country: 'MD' },
+            { code: '+374', name: '亞美尼亞', country: 'AM' },
+            { code: '+375', name: '白俄羅斯', country: 'BY' },
+            { code: '+376', name: '安道爾', country: 'AD' },
+            { code: '+377', name: '摩納哥', country: 'MC' },
+            { code: '+378', name: '聖馬力諾', country: 'SM' },
+            { code: '+380', name: '烏克蘭', country: 'UA' },
+            { code: '+381', name: '塞爾維亞', country: 'RS' },
+            { code: '+382', name: '黑山', country: 'ME' },
+            { code: '+383', name: '科索沃', country: 'XK' },
+            { code: '+385', name: '克羅地亞', country: 'HR' },
+            { code: '+386', name: '斯洛文尼亞', country: 'SI' },
+            { code: '+387', name: '波黑', country: 'BA' },
+            { code: '+389', name: '北馬其頓', country: 'MK' },
+            { code: '+420', name: '捷克', country: 'CZ' },
+            { code: '+421', name: '斯洛伐克', country: 'SK' },
+            { code: '+423', name: '列支敦士登', country: 'LI' },
+            { code: '+500', name: '福克蘭群島', country: 'FK' },
+            { code: '+501', name: '伯利茲', country: 'BZ' },
+            { code: '+502', name: '危地馬拉', country: 'GT' },
+            { code: '+503', name: '薩爾瓦多', country: 'SV' },
+            { code: '+504', name: '洪都拉斯', country: 'HN' },
+            { code: '+505', name: '尼加拉瓜', country: 'NI' },
+            { code: '+506', name: '哥斯達黎加', country: 'CR' },
+            { code: '+507', name: '巴拿馬', country: 'PA' },
+            { code: '+508', name: '聖皮埃爾和密克隆', country: 'PM' },
+            { code: '+509', name: '海地', country: 'HT' },
+            { code: '+590', name: '瓜德羅普', country: 'GP' },
+            { code: '+591', name: '玻利維亞', country: 'BO' },
+            { code: '+592', name: '圭亞那', country: 'GY' },
+            { code: '+593', name: '厄瓜多爾', country: 'EC' },
+            { code: '+594', name: '法屬圭亞那', country: 'GF' },
+            { code: '+595', name: '巴拉圭', country: 'PY' },
+            { code: '+596', name: '馬提尼克', country: 'MQ' },
+            { code: '+597', name: '蘇里南', country: 'SR' },
+            { code: '+598', name: '烏拉圭', country: 'UY' },
+            { code: '+599', name: '荷屬安的列斯', country: 'AN' },
+            { code: '+670', name: '東帝汶', country: 'TL' },
+            { code: '+672', name: '南極洲', country: 'AQ' },
+            { code: '+673', name: '文萊', country: 'BN' },
+            { code: '+674', name: '瑙魯', country: 'NR' },
+            { code: '+675', name: '巴布亞新幾內亞', country: 'PG' },
+            { code: '+676', name: '湯加', country: 'TO' },
+            { code: '+677', name: '所羅門群島', country: 'SB' },
+            { code: '+678', name: '瓦努阿圖', country: 'VU' },
+            { code: '+679', name: '斐濟', country: 'FJ' },
+            { code: '+680', name: '帕勞', country: 'PW' },
+            { code: '+681', name: '瓦利斯和富圖納', country: 'WF' },
+            { code: '+682', name: '庫克群島', country: 'CK' },
+            { code: '+683', name: '紐埃', country: 'NU' },
+            { code: '+685', name: '薩摩亞', country: 'WS' },
+            { code: '+686', name: '基里巴斯', country: 'KI' },
+            { code: '+687', name: '新喀里多尼亞', country: 'NC' },
+            { code: '+688', name: '圖瓦盧', country: 'TV' },
+            { code: '+689', name: '法屬波利尼西亞', country: 'PF' },
+            { code: '+690', name: '托克勞', country: 'TK' },
+            { code: '+691', name: '密克羅尼西亞', country: 'FM' },
+            { code: '+692', name: '馬紹爾群島', country: 'MH' },
+            { code: '+850', name: '朝鮮', country: 'KP' },
+            { code: '+855', name: '柬埔寨', country: 'KH' },
+            { code: '+856', name: '老撾', country: 'LA' },
+            { code: '+880', name: '孟加拉', country: 'BD' },
+            { code: '+960', name: '馬爾代夫', country: 'MV' },
+            { code: '+961', name: '黎巴嫩', country: 'LB' },
+            { code: '+962', name: '約旦', country: 'JO' },
+            { code: '+963', name: '敘利亞', country: 'SY' },
+            { code: '+964', name: '伊拉克', country: 'IQ' },
+            { code: '+965', name: '科威特', country: 'KW' },
+            { code: '+966', name: '沙特阿拉伯', country: 'SA' },
+            { code: '+967', name: '也門', country: 'YE' },
+            { code: '+968', name: '阿曼', country: 'OM' },
+            { code: '+970', name: '巴勒斯坦', country: 'PS' },
+            { code: '+971', name: '阿聯酋', country: 'AE' },
+            { code: '+972', name: '以色列', country: 'IL' },
+            { code: '+973', name: '巴林', country: 'BH' },
+            { code: '+974', name: '卡塔爾', country: 'QA' },
+            { code: '+975', name: '不丹', country: 'BT' },
+            { code: '+976', name: '蒙古', country: 'MN' },
+            { code: '+977', name: '尼泊爾', country: 'NP' },
+            { code: '+992', name: '塔吉克斯坦', country: 'TJ' },
+            { code: '+993', name: '土庫曼斯坦', country: 'TM' },
+            { code: '+994', name: '阿塞拜疆', country: 'AZ' },
+            { code: '+995', name: '格魯吉亞', country: 'GE' },
+            { code: '+996', name: '吉爾吉斯斯坦', country: 'KG' },
+            { code: '+998', name: '烏茲別克斯坦', country: 'UZ' }
+        ];
+        
+        // 初始化電話區號 Select2（只顯示區號，不顯示國家名，與 customers 頁面一致）
+        function initPhoneCountryCodeSelect2() {
+            const select = $('#phoneCountryCode');
+            if (select.length && typeof $ !== 'undefined') {
+                const placeholderKey = 'pages.enterprises.selectCountryCode';
+                const fallbackText = (document.querySelector('#phoneCountryCode option[value=""]')?.textContent || '請選擇區號').trim();
+                const translated = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(placeholderKey) : '';
+                const placeholderText = (translated && translated !== placeholderKey) ? translated : fallbackText;
+
+                if (select.hasClass('select2-hidden-accessible')) {
+                    select.select2('destroy');
+                }
+                select.select2({
+                    theme: 'bootstrap-5',
+                    placeholder: placeholderText,
+                    allowClear: true,
+                    width: '100%',
+                    data: countryCodes.map(item => ({
+                        id: item.code,
+                        text: item.code  // 只顯示區號，不顯示國家名
+                    })),
+                    minimumInputLength: 0
+                });
+            }
+        }
+
+        if (typeof window !== 'undefined') {
+            window.addEventListener('languageChanged', initPhoneCountryCodeSelect2);
+        }
+        
+        // 載入當前行業模板信息
+        async function loadCurrentTemplate() {
+            try {
+                const template = await App.apiRequest('/api/v1/tenant/industry-template');
+                const templateInfo = document.getElementById('currentTemplateInfo');
+                if (templateInfo) {
+                    if (template.data && template.data.id) {
+                        const tpl = template.data || {};
+                        const lang = (typeof I18n !== 'undefined' && I18n.currentLang) ? I18n.currentLang : 'zh';
+                        const unknownKey = 'industryTemplate.unknown';
+                        const unknownName = (typeof I18n !== 'undefined' && I18n.t && I18n.t(unknownKey) !== unknownKey)
+                            ? I18n.t(unknownKey)
+                            : '不清楚';
+                        const isUnknown = (tpl.code || '').toString().toLowerCase() === 'unknown';
+                        const displayName = isUnknown
+                            ? unknownName
+                            : (lang === 'en'
+                                ? (tpl.name_en || tpl.name || '未命名模板')
+                                : (tpl.name || tpl.name_en || '未命名模板'));
+                        const displayDesc = (lang === 'en')
+                            ? (tpl.description_en || tpl.description || '')
+                            : (tpl.description || tpl.description_en || '');
+                        templateInfo.innerHTML = `
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi ${tpl.icon || 'bi-building'}" style="color: #0d6efd;"></i>
+                                <strong>${displayName}</strong>
+                            </div>
+                            <small class="text-muted">${displayDesc}</small>
+                        `;
+                    } else {
+                        const noTemplateText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.noTemplate') : '尚未選擇行業模板';
+                        templateInfo.innerHTML = `
+                            <div class="alert alert-warning py-2 mb-0">
+                                <small><i class="bi bi-exclamation-triangle"></i> ${noTemplateText}</small>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('載入行業模板失敗:', error);
+                const templateInfo = document.getElementById('currentTemplateInfo');
+                if (templateInfo) {
+                    const loadFailedText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.templateLoadFailed') : '無法載入模板信息';
+                    templateInfo.innerHTML = `
+                        <small class="text-muted">${loadFailedText}</small>
+                    `;
+                }
+            }
+        }
+        
+        // 載入企業信息
+        async function loadEnterprise() {
+            try {
+                const enterprise = await App.apiRequest(apiPath);
+                
+                if (enterprise.id) {
+                    document.getElementById('enterpriseId').value = enterprise.id;
+                    document.getElementById('name').value = enterprise.name || '';
+                    // 企業代碼代表子域名：優先用 enterprise.domain，其次才用 enterprise.code
+                    document.getElementById('code').value = enterprise.domain || enterprise.code || '';
+                    
+                    // 處理電話號碼：如果有區號，分離區號和號碼
+                    const phoneValue = enterprise.phone || '';
+                    if (phoneValue) {
+                        // 嘗試從電話號碼中提取區號
+                        let countryCode = '';
+                        let phoneNumber = phoneValue;
+                        
+                        // 查找匹配的區號
+                        for (const item of countryCodes) {
+                            if (phoneValue.startsWith(item.code)) {
+                                countryCode = item.code;
+                                phoneNumber = phoneValue.substring(item.code.length).trim();
+                                break;
+                            }
+                        }
+                        
+                        // 如果找到區號，設置 Select2
+                        if (countryCode) {
+                            setTimeout(() => {
+                                $('#phoneCountryCode').val(countryCode).trigger('change');
+                            }, 100);
+                        }
+                        document.getElementById('phone').value = phoneNumber;
+                    }
+                    
+                    document.getElementById('email').value = enterprise.email || '';
+                    document.getElementById('address').value = enterprise.address || '';
+                    document.getElementById('timezone').value = enterprise.timezone || 'Asia/Hong_Kong';
+                    // 載入 Logo
+                    if (enterprise.logo_url) {
+                        document.getElementById('logoUrl').value = enterprise.logo_url;
+                        const logoImg = document.getElementById('logoImage');
+                        const logoPlaceholder = document.getElementById('logoPlaceholder');
+                        const removeLogoBtn = document.getElementById('removeLogoBtn');
+                        logoImg.src = enterprise.logo_url;
+                        logoImg.style.display = 'block';
+                        logoImg.style.cursor = 'pointer';
+                        logoImg.onclick = () => { window.open(enterprise.logo_url, '_blank'); };
+                        logoImg.onerror = function() {
+                            this.style.display = 'none';
+                            logoPlaceholder.style.display = 'block';
+                            if (removeLogoBtn) removeLogoBtn.style.display = 'none';
+                        };
+                        if (logoPlaceholder) logoPlaceholder.style.display = 'none';
+                        if (removeLogoBtn) removeLogoBtn.style.display = 'inline-block';
+                    }
+                    
+                    // 載入網域（從 enterprise.domain 獲取，如果沒有則從 tenant subdomain 獲取）
+                    const domainInput = document.getElementById('domain');
+                    if (domainInput) {
+                        // enterprise.domain 應該已經從 tenant.subdomain 同步
+                        const dom = enterprise.domain || '';
+                        const baseDomain = window.baseDomain || 'vworkai.com';
+                        // 顯示格式：https://www.vworkai.com/co/tednv88/
+                        domainInput.value = dom ? `https://www.${baseDomain}/co/${dom}/` : '';
+                    }
+                    
+                    // 載入租戶 ID
+                    const tenantIdInput = document.getElementById('tenantId');
+                    if (tenantIdInput && enterprise.tenant_id) {
+                        tenantIdInput.value = enterprise.tenant_id;
+                    }
+                } else {
+                    // 如果企業不存在，嘗試從租戶獲取 subdomain 顯示
+                    try {
+                        const user = await App.apiRequest('/user/me');
+                        if (user.tenant_subdomain) {
+                            const domainInput = document.getElementById('domain');
+                            if (domainInput) {
+                                const baseDomain = window.baseDomain || 'vworkai.com';
+                                // 顯示格式：https://www.vworkai.com/co/tednv88/
+                                domainInput.value = `https://www.${baseDomain}/co/${user.tenant_subdomain}/`;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('無法獲取租戶子域名:', e);
+                    }
+                }
+            } catch (error) {
+                console.error('載入企業信息失敗:', error);
+                // 如果不存在，表單保持空白，允許創建
+            }
+        }
+
+        // 當企業代碼（子域名）變更時，立即更新下方網址顯示
+        const codeEl = document.getElementById('code');
+        const domainEl = document.getElementById('domain');
+        if (codeEl && domainEl) {
+            codeEl.addEventListener('input', function() {
+                const baseDomain = window.baseDomain || 'vworkai.com';
+                const v = (codeEl.value || '').trim();
+                domainEl.value = v ? `https://www.${baseDomain}/co/${v}/` : '';
+            });
+        }
+
+        // 保存企業信息
+        document.getElementById('enterpriseForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // 組合電話號碼：區號 + 號碼
+            const countryCode = $('#phoneCountryCode').val() || '';
+            const phoneNumber = document.getElementById('phone').value || '';
+            const fullPhone = countryCode && phoneNumber ? `${countryCode} ${phoneNumber}` : (phoneNumber || null);
+            
+            const data = {
+                name: document.getElementById('name').value,
+                code: document.getElementById('code').value || null,
+                // 讓後端同步更新 tenants.subdomain + enterprises.domain，並做唯一性檢查
+                subdomain: (document.getElementById('code').value || '').trim(),
+                phone: fullPhone,
+                email: document.getElementById('email').value || null,
+                // 兼容/保險：同時保存到 extra_fields，避免後端只讀 extra_fields 的情況
+                // 後端會 merge（不覆蓋其他 keys）
+                extra_fields: {
+                    phone: fullPhone,
+                    phone_country_code: countryCode || null,
+                    phone_number: phoneNumber || null,
+                    email: document.getElementById('email').value || null
+                },
+                address: document.getElementById('address').value || null,
+                logo_url: document.getElementById('logoUrl').value || null,
+                timezone: document.getElementById('timezone').value || 'Asia/Hong_Kong'
+            };
+
+            if (!data.name) {
+                const msg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.fillEnterpriseName') : '請填寫企業名稱';
+                App.showAlert(msg, 'warning');
+                return;
+            }
+
+            try {
+                // 保存企業信息（包含 subdomain）
+                await App.apiRequest(apiPath, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+
+                // 同步更新 tenantSwitchBtn 的顯示名稱 + localStorage
+                if (data.name) {
+                    const tenantSwitchName = document.getElementById('tenantSwitchName');
+                    if (tenantSwitchName) {
+                        tenantSwitchName.textContent = data.name;
+                    }
+                    // Update localStorage so page reload / other pages stay in sync
+                    try { localStorage.setItem('tenant_name', data.name); } catch(e) {}
+                }
+                if (data.subdomain) {
+                    try { localStorage.setItem('tenant_subdomain', data.subdomain); } catch(e) {}
+                }
+
+                const successMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.settingsSaved') : '企業設置已保存';
+                App.showAlert(successMsg, 'success');
+                loadEnterprise();
+            } catch (error) {
+                const errorMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.saveFailed') : '保存失敗';
+                App.showAlert(errorMsg + ': ' + error.message, 'danger');
+            }
+        });
+
+        // Logo 上傳處理
+        const logoFileInput = document.getElementById('logoFile');
+        const uploadLogoBtn = document.getElementById('uploadLogoBtn');
+        const removeLogoBtn = document.getElementById('removeLogoBtn');
+        const logoImage = document.getElementById('logoImage');
+        const logoPlaceholder = document.getElementById('logoPlaceholder');
+
+        uploadLogoBtn.addEventListener('click', function() {
+            logoFileInput.click();
+        });
+
+        logoFileInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 驗證文件類型
+            if (!file.type.startsWith('image/')) {
+                const msg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.selectImageFile') : '請選擇圖片文件';
+                App.showAlert(msg, 'warning');
+                return;
+            }
+
+            // 驗證文件大小（限制 10MB）
+            if (file.size > 10 * 1024 * 1024) {
+                const msg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.imageSizeExceeded') : '圖片大小不能超過 10MB';
+                App.showAlert(msg, 'warning');
+                return;
+            }
+
+            try {
+                // 創建 FormData 並上傳
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/api/v1/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || ''),
+                        'X-Tenant-Subdomain': localStorage.getItem('tenant_subdomain') || ''
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || '上傳失敗');
+                }
+
+                const result = await response.json();
+                if (result.url) {
+                    let imageUrl = result.url;
+                    if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                        imageUrl = '/' + imageUrl;
+                    }
+
+                    document.getElementById('logoUrl').value = imageUrl;
+                    logoImage.src = imageUrl;
+                    logoImage.style.display = 'block';
+                    logoImage.style.cursor = 'pointer';
+                    logoImage.onclick = () => { window.open(imageUrl, '_blank'); };
+                    logoImage.onerror = function() {
+                        this.style.display = 'none';
+                        logoPlaceholder.style.display = 'block';
+                        removeLogoBtn.style.display = 'none';
+                    };
+                    logoPlaceholder.style.display = 'none';
+                    removeLogoBtn.style.display = 'inline-block';
+
+                    // 立即將 logo_url 保存到 DB（避免用戶忘記點保存按鈕）
+                    try {
+                        await App.apiRequest(apiPath, {
+                            method: 'PUT',
+                            body: JSON.stringify({ name: document.getElementById('name').value || 'Enterprise', logo_url: imageUrl })
+                        });
+                    } catch (saveErr) {
+                        console.warn('Auto-save logo_url failed:', saveErr);
+                    }
+
+                    const successMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.logoUploadSuccess') : 'Logo 上傳成功';
+                    App.showAlert(successMsg, 'success');
+                } else {
+                    throw new Error('未收到文件 URL');
+                }
+            } catch (error) {
+                console.error('Logo 上傳失敗:', error);
+                const errorMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.logoUploadFailed') : 'Logo 上傳失敗';
+                App.showAlert(errorMsg + ': ' + error.message, 'danger');
+            }
+        });
+
+        removeLogoBtn.addEventListener('click', async function() {
+            document.getElementById('logoUrl').value = '';
+            logoImage.src = '';
+            logoImage.style.display = 'none';
+            logoImage.style.cursor = '';
+            logoImage.onclick = null;
+            logoPlaceholder.style.display = 'block';
+            removeLogoBtn.style.display = 'none';
+            logoFileInput.value = '';
+
+            // 立即將 logo_url 清除保存到 DB
+            try {
+                await App.apiRequest(apiPath, {
+                    method: 'PUT',
+                    body: JSON.stringify({ name: document.getElementById('name').value || 'Enterprise', logo_url: '' })
+                });
+            } catch (saveErr) {
+                console.warn('Auto-save logo removal failed:', saveErr);
+            }
+
+            const msg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.enterprises.logoRemoved') : 'Logo 已移除';
+            App.showAlert(msg, 'info');
+        });
+        
+        // 初始化電話區號 Select2
+        initPhoneCountryCodeSelect2();
+        
+        // 翻譯 optgroup 標籤
+        function translateOptgroupLabels() {
+            const timezoneSelect = document.getElementById('timezone');
+            if (timezoneSelect && typeof I18n !== 'undefined' && I18n.t) {
+                const optgroups = timezoneSelect.querySelectorAll('optgroup[data-i18n-label]');
+                optgroups.forEach(optgroup => {
+                    const key = optgroup.getAttribute('data-i18n-label');
+                    if (key) {
+                        const translated = I18n.t(key);
+                        if (translated && translated !== key) {
+                            optgroup.label = translated;
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 等待 i18n 準備好後翻譯 optgroup
+        if (typeof I18n !== 'undefined' && I18n.whenReady) {
+            I18n.whenReady().then(() => {
+                translateOptgroupLabels();
+            });
+        } else {
+            // 如果沒有 whenReady，直接嘗試翻譯
+            setTimeout(translateOptgroupLabels, 500);
+        }
+        
+        // 初始載入
+        loadEnterprise();
+        loadCurrentTemplate();
+        
+        // 複製租戶 ID 按鈕功能
+        const copyTenantIdBtn = document.getElementById('copyTenantIdBtn');
+        if (copyTenantIdBtn) {
+            copyTenantIdBtn.addEventListener('click', async function() {
+                const tenantIdInput = document.getElementById('tenantId');
+                if (tenantIdInput && tenantIdInput.value) {
+                    try {
+                        await navigator.clipboard.writeText(tenantIdInput.value);
+                        const icon = this.querySelector('i');
+                        icon.classList.remove('bi-clipboard');
+                        icon.classList.add('bi-check');
+                        setTimeout(() => {
+                            icon.classList.remove('bi-check');
+                            icon.classList.add('bi-clipboard');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('複製失敗:', err);
+                    }
+                }
+            });
+        }
+    });
+</script>
+{{ end }}

@@ -1,0 +1,361 @@
+{{ define "pages/appointment_calendar" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-calendar3 me-2"></i><span data-i18n="menu.appointmentCalendar" id="apptCalTitle">預約日曆</span></h3>
+        <div class="d-flex gap-2 align-items-center">
+            <a href="/appointments" class="btn btn-outline-secondary">
+                <i class="bi bi-journal-text"></i> <span data-i18n="menu.appointments">預約列表</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 篩選器 -->
+    <div class="mb-3">
+        <div class="d-flex flex-wrap gap-2 align-items-end">
+            <div style="min-width: 220px;">
+                <label class="form-label small mb-1" data-i18n="menu.serviceTypes">服務種類</label>
+                <select id="apptCalServiceType" class="form-select form-select-sm">
+                </select>
+            </div>
+            <div style="min-width: 220px;">
+                <label class="form-label small mb-1" data-i18n="menu.serviceStaffs">服務員</label>
+                <select id="apptCalStaff" class="form-select form-select-sm">
+                </select>
+            </div>
+            <div style="min-width: 220px;">
+                <label class="form-label small mb-1" data-i18n="common.customer">客戶</label>
+                <select id="apptCalCustomer" class="form-select form-select-sm">
+                </select>
+            </div>
+            <div class="btn-group" role="group" id="apptCalStatusFilter">
+                <button type="button" class="btn btn-outline-primary btn-sm active" data-filter="all" data-i18n="common.all">全部</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-filter="confirmed" data-i18n="dashboard.appointmentStatuses.confirmed">已確認</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-filter="completed" data-i18n="dashboard.appointmentStatuses.completed">已完成</button>
+                <button type="button" class="btn btn-outline-primary btn-sm" data-filter="cancelled" data-i18n="dashboard.appointmentStatuses.cancelled">已取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="appointmentCalendar"></div>
+        </div>
+    </div>
+
+    <link href="/static/vendor/fullcalendar/core-index.css" rel="stylesheet">
+    <link href="/static/vendor/fullcalendar/daygrid-index.css" rel="stylesheet">
+    <link href="/static/vendor/fullcalendar/timegrid-index.css" rel="stylesheet">
+    <script>
+        let apptCalendar;
+        let apptCalRetryCount = 0;
+        const apptCalMaxRetries = 50;
+
+        // 當前篩選狀態
+        window.apptCalFilters = {
+            service_type_id: '',
+            staff_id: '',
+            customer_id: '',
+            status: 'all'
+        };
+
+        // 從 URL 讀取 service_type_code 參數
+        const apptCalParams = new URLSearchParams(window.location.search || '');
+        const apptCalServiceTypeCode = apptCalParams.get('service_type_code') || '';
+
+        function getApptCalAuthHeaders() {
+            return {
+                'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || ''),
+                'X-Tenant-Subdomain': localStorage.getItem('tenant_subdomain') || ''
+            };
+        }
+
+        function initSelect2Filters() {
+            if (typeof $ === 'undefined') return;
+
+            // ---- 服務種類 Select2 (AJAX) ----
+            const $stSelect = $('#apptCalServiceType');
+            $stSelect.select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.allServiceTypes') : '全部服務種類',
+                allowClear: true,
+                width: '100%',
+                ajax: {
+                    url: '/api/v1/service-types',
+                    dataType: 'json',
+                    delay: 200,
+                    headers: getApptCalAuthHeaders(),
+                    data: function(params) {
+                        return { search: params.term || '', limit: 50, page: params.page || 1 };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: (data.data || []).map(function(st) {
+                                return { id: st.id, text: st.name, code: st.code };
+                            }),
+                            pagination: { more: (data.data || []).length === 50 }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0,
+                language: { noResults: function() { return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.noServiceTypes') : '沒有符合的服務種類'; }, searching: function() { return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.searching') : '搜尋中...'; } }
+            });
+            $stSelect.on('select2:select', function(e) {
+                window.apptCalFilters.service_type_id = e.params.data.id;
+                if (apptCalendar) apptCalendar.refetchEvents();
+            });
+            $stSelect.on('select2:clear', function() {
+                window.apptCalFilters.service_type_id = '';
+                if (apptCalendar) apptCalendar.refetchEvents();
+            });
+
+            // 如果 URL 有 service_type_code，預載選中
+            if (apptCalServiceTypeCode && App && App.apiRequest) {
+                App.apiRequest('/service-types?limit=100').then(function(res) {
+                    const match = (res.data || []).find(st => st.code === apptCalServiceTypeCode);
+                    if (match) {
+                        const opt = new Option(match.name, match.id, true, true);
+                        $stSelect.append(opt).trigger('change');
+                        window.apptCalFilters.service_type_id = match.id;
+                        if (apptCalendar) apptCalendar.refetchEvents();
+                    }
+                }).catch(function() {});
+            }
+
+            // ---- 服務員 Select2 (AJAX) ----
+            const $staffSelect = $('#apptCalStaff');
+            $staffSelect.select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.allStaffs') : '全部服務員',
+                allowClear: true,
+                width: '100%',
+                ajax: {
+                    url: '/api/v1/service-staffs',
+                    dataType: 'json',
+                    delay: 200,
+                    headers: getApptCalAuthHeaders(),
+                    data: function(params) {
+                        return { search: params.term || '', limit: 50, page: params.page || 1 };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: (data.data || []).map(function(s) {
+                                return { id: s.id, text: s.name };
+                            }),
+                            pagination: { more: (data.data || []).length === 50 }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0,
+                language: { noResults: function() { return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.noStaffs') : '沒有符合的服務員'; }, searching: function() { return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.searching') : '搜尋中...'; } }
+            });
+            $staffSelect.on('select2:select', function(e) {
+                window.apptCalFilters.staff_id = e.params.data.id;
+                if (apptCalendar) apptCalendar.refetchEvents();
+            });
+            $staffSelect.on('select2:clear', function() {
+                window.apptCalFilters.staff_id = '';
+                if (apptCalendar) apptCalendar.refetchEvents();
+            });
+
+            // ---- 客戶 Select2 (AJAX) ----
+            const $custSelect = $('#apptCalCustomer');
+            $custSelect.select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.allCustomers') : '全部客戶',
+                allowClear: true,
+                width: '100%',
+                ajax: {
+                    url: '/api/v1/customers',
+                    dataType: 'json',
+                    delay: 250,
+                    headers: getApptCalAuthHeaders(),
+                    data: function(params) {
+                        return { search: params.term || '', limit: 50, page: params.page || 1 };
+                    },
+                    processResults: function(data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: (data.data || []).map(function(c) {
+                                const name = c.name || ((c.first_name || '') + ' ' + (c.last_name || '')).trim();
+                                return { id: c.id, text: name + (c.phone ? ' (' + c.phone + ')' : '') };
+                            }),
+                            pagination: { more: (data.data || []).length === 50 }
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0,
+                language: { noResults: function() { return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.noCustomers') : '沒有符合的客戶'; }, searching: function() { return (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.searching') : '搜尋中...'; } }
+            });
+            $custSelect.on('select2:select', function(e) {
+                window.apptCalFilters.customer_id = e.params.data.id;
+                if (apptCalendar) apptCalendar.refetchEvents();
+            });
+            $custSelect.on('select2:clear', function() {
+                window.apptCalFilters.customer_id = '';
+                if (apptCalendar) apptCalendar.refetchEvents();
+            });
+        }
+
+        function initApptCalFilters() {
+            // 狀態篩選
+            const statusGroup = document.getElementById('apptCalStatusFilter');
+            if (statusGroup) {
+                statusGroup.querySelectorAll('button[data-filter]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        statusGroup.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        window.apptCalFilters.status = this.getAttribute('data-filter') || 'all';
+                        if (apptCalendar) apptCalendar.refetchEvents();
+                    });
+                });
+            }
+        }
+
+        // 根據 service_type_code 動態更新標題
+        function updateApptCalTitle() {
+            if (apptCalServiceTypeCode === 'course') {
+                const titleEl = document.getElementById('apptCalTitle');
+                if (titleEl) {
+                    const translated = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('menu.courseCalendar') : null;
+                    titleEl.textContent = (translated && translated !== 'menu.courseCalendar') ? translated : ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.courseCalendarFallback') : '課程日曆');
+                }
+            }
+        }
+
+        function initAppointmentCalendar() {
+            if (typeof FullCalendar === 'undefined') {
+                apptCalRetryCount++;
+                if (apptCalRetryCount < apptCalMaxRetries) {
+                    setTimeout(initAppointmentCalendar, 100);
+                } else {
+                    const el = document.getElementById('appointmentCalendar');
+                    if (el) el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.loadFailed') : '日曆載入失敗，請刷新頁面重試') + '</div>';
+                }
+                return;
+            }
+
+            if (!App || !App.checkAuth()) return;
+            const el = document.getElementById('appointmentCalendar');
+            if (!el) return;
+
+            try {
+                const statusColors = {
+                    confirmed: { bg: '#198754', border: '#157347', text: '#fff' },
+                    completed: { bg: '#0d6efd', border: '#0b5ed7', text: '#fff' },
+                    cancelled: { bg: '#6c757d', border: '#5c636a', text: '#fff' },
+                    pending:   { bg: '#ffc107', border: '#e0a800', text: '#000' }
+                };
+
+                apptCalendar = new FullCalendar.Calendar(el, {
+                    initialView: 'timeGridWeek',
+                    locale: (typeof I18n !== 'undefined' && I18n.currentLang) ? (I18n.currentLang === 'en' ? 'en' : 'zh-tw') : 'zh-tw',
+                    height: 'auto',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                    },
+                    nowIndicator: true,
+                    slotMinTime: '06:00:00',
+                    slotMaxTime: '23:00:00',
+                    events: async function(info, successCallback, failureCallback) {
+                        try {
+                            const start = info.startStr.split('T')[0];
+                            const end = info.endStr.split('T')[0];
+                            const filters = window.apptCalFilters || {};
+
+                            let url = `/appointment-calendar/events?start_date=${start}&end_date=${end}`;
+                            if (filters.service_type_id) url += `&service_type_id=${filters.service_type_id}`;
+                            if (filters.staff_id) url += `&staff_id=${filters.staff_id}`;
+                            if (filters.customer_id) url += `&customer_id=${filters.customer_id}`;
+                            if (filters.status && filters.status !== 'all') url += `&status=${filters.status}`;
+                            // 傳遞 service_type_code（如果有的話）
+                            if (apptCalServiceTypeCode && !filters.service_type_id) {
+                                url += `&service_type_code=${apptCalServiceTypeCode}`;
+                            }
+
+                            const data = await App.apiRequest(url);
+                            const events = (data.data || []).map(e => ({
+                                id: e.id,
+                                title: e.title || ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.noTitle') : '（無標題）'),
+                                start: e.start,
+                                end: e.end,
+                                allDay: !!e.allDay,
+                                backgroundColor: e.backgroundColor || undefined,
+                                borderColor: e.borderColor || undefined,
+                                textColor: e.textColor || undefined,
+                                extendedProps: e.extendedProps || {}
+                            }));
+                            successCallback(events);
+                        } catch (err) {
+                            if (App && App.showAlert) App.showAlert(((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.loadEventsFailed') : '載入預約日曆事件失敗') + ': ' + (err.message || err), 'danger');
+                            failureCallback(err);
+                        }
+                    },
+                    eventClick: function(info) {
+                        const apptId = info.event.id;
+                        if (apptId) {
+                            const url = `/appointments/${apptId}/edit`;
+                            if (typeof Router !== 'undefined' && Router.go) { Router.go(url); } else { window.location.href = url; }
+                        }
+                    },
+                    eventDidMount: function(info) {
+                        // 添加 tooltip
+                        const props = info.event.extendedProps || {};
+                        let tip = info.event.title;
+                        if (props.customer_name) tip += '\n' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.tooltipCustomer') : '客戶') + ': ' + props.customer_name;
+                        if (props.staff_name) tip += '\n' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.tooltipStaff') : '服務員') + ': ' + props.staff_name;
+                        if (props.service_type_name) tip += '\n' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.tooltipCategory') : '類別') + ': ' + props.service_type_name;
+                        info.el.title = tip;
+                    }
+                });
+
+                apptCalendar.render();
+                initApptCalFilters();
+                updateApptCalTitle();
+            } catch (e) {
+                el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.initFailed') : '日曆初始化失敗') + '</div>';
+            }
+        }
+
+        function loadFullCalendarOnce() {
+            return new Promise((resolve, reject) => {
+                if (typeof FullCalendar !== 'undefined') {
+                    resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = '/static/vendor/fullcalendar/index.global.min.js';
+                script.onload = () => {
+                    const localeScript = document.createElement('script');
+                    localeScript.src = '/static/vendor/fullcalendar/locales-all.global.min.js';
+                    localeScript.onload = () => resolve();
+                    localeScript.onerror = () => resolve();
+                    document.head.appendChild(localeScript);
+                };
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                initSelect2Filters();
+                loadFullCalendarOnce().then(() => setTimeout(initAppointmentCalendar, 100)).catch(() => {
+                    const el = document.getElementById('appointmentCalendar');
+                    if (el) el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.libLoadFailed') : '無法載入日曆庫') + '</div>';
+                });
+            });
+        } else {
+            initSelect2Filters();
+            loadFullCalendarOnce().then(() => setTimeout(initAppointmentCalendar, 100)).catch(() => {
+                const el = document.getElementById('appointmentCalendar');
+                if (el) el.innerHTML = '<div class="alert alert-danger">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('apptCalendar.libLoadFailed') : '無法載入日曆庫') + '</div>';
+            });
+        }
+    </script>
+{{ end }}

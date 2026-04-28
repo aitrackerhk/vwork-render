@@ -1,0 +1,482 @@
+{
+    "nav": {
+        "language": "语言",
+        "billing": "订阅",
+        "aiCoins": "vCoin",
+        "contact": "联系客服",
+        "user": "用户",
+        "accountSettings": "账户设置",
+        "logout": "登出",
+        "supportInfo": "支援信息",
+        "supportCenter": "支援中心",
+        "login": "登录",
+        "tryFree": "免费试用",
+        "goToSystem": "前往系统",
+        "home": "首页",
+        "about": "关于我们"
+    },
+    "voffice": {
+        "nav": {
+            "features": "功能",
+            "download": "下载",
+            "support": "支持",
+            "pricing": "定价"
+        },
+        "hero": {
+            "badge": "vOffice 企业版",
+            "badge2": "免费办公软件",
+            "title": "AI 驱动的智慧办公软件",
+            "subtitle": "整合文档、表格与简报，支持团队协作与离线工作。",
+            "primaryCta": "立即下载",
+            "secondaryCta": "看看功能",
+            "stat1": "3 大平台支持",
+            "stat2": "100% 离线可用",
+            "stat3": "企业级安全"
+        },
+        "features": {
+            "title": "为企业打造的重点功能",
+            "subtitle": "让文档协作、版本管控与安全管理更轻松。",
+            "items": {
+                "1": {
+                    "title": "免费使用",
+                    "desc": "所有办公功能完全免费，仅 AI 功能需额外付费。"
+                },
+                "2": {
+                    "title": "支持 PDF",
+                    "desc": "完整支持 PDF 查看、编辑与转换，轻松处理各种文档格式。"
+                },
+                "3": {
+                    "title": "离线下载",
+                    "desc": "支持 Windows 离线安装。"
+                }
+            }
+        },
+        "ai": {
+            "badge": "AI 助手",
+            "title": "内建 AI，让办公更聪明",
+            "subtitle": "vOffice 内建 AI 助手，直接在文档中为你撰写、翻译、摘要与分析，不用切换工具。",
+            "nav": "AI 功能",
+            "demo": {
+                "status": "随时待命",
+                "userMsg": "帮我把这段报告翻译成英文",
+                "aiMsg": "好的，我已将选取的段落翻译成英文并保持原始格式。需要我调整语气或用词吗？",
+                "userMsg2": "帮我摘要这份 20 页的合同重点",
+                "aiMsg2": "已为您提取 5 个关键条款摘要，包含付款条件、违约责任与保密条款。",
+                "placeholder": "输入指令，让 AI 帮你完成..."
+            },
+            "features": {
+                "write": {
+                    "title": "AI 撰写",
+                    "desc": "自动生成信件、报告与文案，快速完成初稿。"
+                },
+                "translate": {
+                    "title": "AI 翻译",
+                    "desc": "支持多语言即时翻译，保留原始排版格式。"
+                },
+                "summary": {
+                    "title": "AI 摘要",
+                    "desc": "一键生成文档摘要与重点提取，节省阅读时间。"
+                },
+                "analysis": {
+                    "title": "AI 分析",
+                    "desc": "智能分析表格数据，自动生成图表与洞察建议。"
+                }
+            },
+            "pricingNote": "办公功能完全免费，AI 功能以 vCoin 按量计费，灵活无负担。",
+            "learnMore": "了解 vCoin"
+        },
+        "vcoinModal": {
+            "title": "vCoin",
+            "whatIsTitle": "vCoin 是什么？",
+            "whatIsDesc": "vCoin 是 V-sys 的 AI 使用代币。办公功能完全免费，当你使用 AI 助手（撰写、翻译、摘要、分析等）时，会消耗 vCoin。每天有 5 次免费查询额度。",
+            "usageTitle": "消耗说明",
+            "simpleQuery": "简单查询",
+            "simpleQueryDesc": "基本问答、资料查询",
+            "contentGen": "内容生成",
+            "contentGenDesc": "文件生成、邮件撰写",
+            "dailyFreeTip": "每天有 5 次免费查询（交谈及图片生成），每日重置。不包含视频和文件生成。",
+            "buyTitle": "购买 vCoin",
+            "planSmall": "Small",
+            "planMedium": "Medium",
+            "popular": "最热门",
+            "planMega": "Mega",
+            "save17": "省 17%",
+            "save30": "省 30%",
+            "save38": "省 38%",
+            "loginToBuy": "登录购买",
+            "close": "关闭"
+        },
+        "pricing": {
+            "title": "vSuite 定价方案",
+            "subtitle": "订阅 vSuite 即可解锁 vOffice 完整功能，包含 AI 助手与更多产品。",
+            "welcomeBonus": "注册即送 50 vCoin，立即体验 AI 功能！",
+            "monthlyBilling": "月付",
+            "yearlyBilling": "年付",
+            "perMonth": "/月",
+            "yearlySaveTag": "省 34%",
+            "noDiscount": "没有优惠",
+            "free": {
+                "name": "免费方案",
+                "price": "免费",
+                "badge": "免费",
+                "features": {
+                    "0": "基本办公功能",
+                    "1": "文档、表格、简报编辑",
+                    "2": "PDF 查看",
+                    "3": "AI 每日 5 问",
+                    "4": "可随时升级"
+                },
+                "button": "免费下载使用"
+            },
+            "vsuite": {
+                "name": "vSuite",
+                "monthlyPrice": "$380",
+                "yearlyPrice": "",
+                "yearlyTotal": "年付 $3,000",
+                "yearlySavings": "节省 $1,560/年",
+                "badge": "热门",
+                "features": {
+                    "0": "所有功能",
+                    "1": "无限记录",
+                    "2": "无广告",
+                    "3": "每月 500 vCoins",
+                    "4": "vOffice - AI 智慧办公",
+                    "5": "vMarket - 商品市集",
+                    "6": "支持服务",
+                    "4a": "文档、表格、简报编辑",
+                    "4b": "PDF 查看、编辑与转换",
+                    "4c": "离线桌面版（Windows）",
+                    "4d": "AI 撰写、翻译、摘要、分析"
+                },
+                "button": "立即订阅"
+            },
+            "vsuite_pro": {
+                "name": "vSuite Pro",
+                "monthlyPrice": "$880",
+                "yearlyPrice": "$800",
+                "yearlyTotal": "年付 $9,600",
+                "yearlySavings": "节省 $960/年",
+                "badge": "最优惠",
+                "features": {
+                    "0": "所有 vSuite 功能",
+                    "1": "无广告",
+                    "2": "每月 1,000 vCoins",
+                    "3": "vOffice - AI 智慧办公",
+                    "4": "vMarket - 商品市集",
+                    "5": "企业支持服务",
+                    "6": "数据丢失防护",
+                    "7": "安全管控服务",
+                    "3a": "文档、表格、简报编辑",
+                    "3b": "PDF 查看、编辑与转换",
+                    "3c": "离线桌面版（Windows）",
+                    "3d": "AI 撰写、翻译、摘要、分析"
+                },
+                "button": "立即订阅"
+            },
+            "vsuite_pro_plus": {
+                "name": "vSuite Pro+",
+                "monthlyPrice": "$2,500",
+                "yearlyPrice": "$2,200",
+                "yearlyTotal": "年付 $26,400",
+                "yearlySavings": "节省 $3,600/年",
+                "badge": "企业级",
+                "features": {
+                    "0": "所有 vSuite Pro 功能",
+                    "1": "每月 3,000 vCoins",
+                    "2": "每月 3,000 vCoins",
+                    "3": "vOffice - AI 智慧办公",
+                    "4": "vMarket - 商品市集",
+                    "5": "vAi 视频生成",
+                    "6": "自动找客 Lead Finder",
+                    "7": "企业支持服务",
+                    "8": "数据丢失防护",
+                    "9": "安全管控服务"
+                },
+                "button": "立即订阅"
+            },
+            "custom": {
+                "name": "自定方案",
+                "price": "客制化",
+                "badge": "专属定制",
+                "features": {
+                    "0": "完全定制系统",
+                    "1": "专属技术支持",
+                    "2": "个性化功能开发",
+                    "3": "专属顾问服务"
+                },
+                "button": "联系我们"
+            }
+        },
+        "download": {
+            "title": "下载 vOffice",
+            "subtitle": "下载 Windows 版本并开始使用。",
+            "subtitleComingSoon": "即将推出，敬请期待。",
+            "windows": "Windows - 即将推出",
+            "mac": "macOS - 即将推出",
+            "linux": "Linux - 即将推出",
+            "cardTitle": "最新版 vOffice",
+            "cardSubtitle": "完整离线安装包，支持企业部署。",
+            "cardSubtitleComingSoon": "即将推出，敬请期待。",
+            "macDesc": "适用于 macOS 11 及以上版本",
+            "linuxDesc": "适用于主流 Linux 发行版",
+            "comingSoon": "即将推出",
+            "pageTitle": "软件下载",
+            "pageSubtitle": "下载 vOffice 桌面应用，在本地使用完整的办公套件功能。",
+            "windowsDesc": "适用于 Windows 10 及以上版本",
+            "featuresTitle": "vOffice 功能亮点",
+            "feature1Title": "文字处理",
+            "feature1Desc": "创建和编辑文档，支持 .docx 格式。",
+            "feature2Title": "电子表格",
+            "feature2Desc": "数据分析和计算，支持 .xlsx 格式。",
+            "feature3Title": "演示文稿",
+            "feature3Desc": "制作专业演示文稿，支持 .pptx 格式。",
+            "feature4Title": "AI 助手",
+            "feature4Desc": "内置 AI 助手，协助文档编辑与分析。"
+        },
+        "menu": {
+            "download": "软件下载"
+        }
+    },
+    "footer": {
+        "description": "V-sys 以科技帮助人类，让工作和生活更简单高效。我们相信科技能够帮助每个人提升效率，优化生活。",
+        "products": "产品",
+        "productList": {
+            "vwork": "vWork",
+            "vmarket": "vMarket",
+            "voffice": "vOffice"
+        },
+        "info": "资讯",
+        "support": "支援资讯",
+        "documentation": "支援中心",
+        "contactSupport": "联络客服",
+        "features": "功能",
+        "pricing": "定价",
+        "login": "登录",
+        "salesPartnerJoin": "销售商加盟",
+        "contact": "联系我们",
+        "contactUs": "联系我们",
+        "email": "info@vsysai.com",
+        "founded": "创立于 2025年12月7日",
+        "location": "香港",
+        "home": "首页",
+        "workingHours": "周一至周五 9:00 - 18:00",
+        "hours": "周一至周五 9:00 - 18:00",
+        "copyright": "© 2025 V-sys Limited. All rights reserved."
+    },
+    "aiCoins": {
+        "title": "vCoin",
+        "balance": "当前余额",
+        "totalAvailable": "总可用",
+        "monthlyQuota": "月配额",
+        "dailyFree": "每日免费",
+        "purchased": "已购买余额",
+        "totalUsed": "累计使用",
+        "usageInfo": "消耗说明",
+        "operation": "操作类型",
+        "coinsPerUse": "每次消耗",
+        "description": "说明",
+        "simpleQuery": "简单查询",
+        "simpleQueryDesc": "基本问答、资料查询",
+        "analysis": "数据分析",
+        "analysisDesc": "报表分析、趋势预测",
+        "generate": "内容生成",
+        "generateDesc": "文件生成、邮件撰写",
+        "export": "数据导出",
+        "exportDesc": "Excel/PDF 导出",
+        "automation": "自动化任务",
+        "automationDesc": "批量处理、自动化流程",
+        "dailyFreeTip": "每天有 5 次免费查询（交谈及图片生成），每日重置。不包含视频和文件生成。",
+        "buyCoins": "购买 vCoin",
+        "buy": "购买",
+        "popular": "最受欢迎",
+        "transactionHistory": "交易记录",
+        "allTypes": "全部类型",
+        "typeConsume": "使用",
+        "typePurchase": "购买",
+        "typeMonthlyReset": "月配额",
+        "typeBonus": "赠送",
+        "noTransactions": "暂无交易记录",
+        "resetsOn": "重置于",
+        "loadBalanceFailed": "载入余额失败",
+        "purchaseComingSoon": "购买功能即将推出",
+        "purchaseFailed": "购买失败",
+        "planSmall": "小包",
+        "planMedium": "中包",
+        "planMega": "超值包",
+        "save17": "省 17%",
+        "save30": "省 30%",
+        "save38": "省 38%",
+        "imageGen": "图片生成",
+        "imageGenDesc": "AI 图片生成",
+        "sketchGen": "草图生成",
+        "sketchGenDesc": "AI 草图生成",
+        "docGen": "文档生成",
+        "docGenDesc": "每 15 页 5 vCoin，最低 5 vCoin（最终由资料决定）",
+        "videoGen": "视频生成",
+        "videoGenDesc": "AI 视频生成（每 5 秒为单位）",
+        "videoExtend": "视频延伸",
+        "videoExtendDesc": "AI 视频延伸（每 5 秒为单位）",
+        "ocr": "OCR 文字识别",
+        "ocrDesc": "图片文字识别",
+        "stt": "语音转文字",
+        "sttDesc": "语音转文字",
+        "matchFields": "字段匹配",
+        "matchFieldsDesc": "AI 自动匹配字段",
+        "aiSuggestion": "AI 建议/分析",
+        "aiSuggestionDesc": "AI 智能建议与分析"
+    },
+    "billing": {
+        "title": "订阅",
+        "currentSubscription": "当前订阅",
+        "selectPlan": "选择计划",
+        "paymentHistoryTitle": "付款历史",
+        "loading": "加载中...",
+        "monthlyBilling": "月付",
+        "yearlyBilling": "年付",
+        "yearlySaveTag": "省 34%",
+        "noDiscount": "没有优惠",
+        "checkoutSuccess": "订阅成功！您的订阅已激活。",
+        "checkoutCancel": "订阅已取消。您可以随时重新订阅。",
+        "paymentHistoryError": "加载付款历史失败",
+        "paymentHistory": {
+            "date": "日期",
+            "invoice": "发票号",
+            "amount": "金额",
+            "period": "期间",
+            "status": "状态",
+            "actions": "操作"
+        },
+        "trial": {
+            "title": "试用期",
+            "desc": "您目前正在使用免费试用版",
+            "quotaDesc": "您目前正在使用免费试用，以下为您的配额使用状况",
+            "daysLeft": "剩余天数",
+            "days": "天",
+            "expired": "试用期结束后，请选择订阅计划以继续使用服务",
+            "expiredWithDate": "试用期将于 {date} 结束，届时请选择订阅计划以继续使用服务",
+            "orderQuota": "vWork 订单配额",
+            "remainOrders": "还剩 {n} 张",
+            "quotaFull": "已达上限，7 天后需订阅"
+        },
+        "salesPartnerTrial": {
+            "title": "合作伙伴试用期",
+            "desc": "您正在使用由 {partner} 提供的试用服务",
+            "expiredWithDate": "试用期将于 {date} 结束，届时请联络您的合作伙伴以订阅服务"
+        },
+        "vsuite": {
+            "badge": "热门",
+            "name": "vSuite",
+            "monthlyPrice": "$380/月",
+            "yearlyPrice": "",
+            "yearlyTotal": "年付 $3,000",
+            "yearlySavings": "节省 $1,560/年",
+            "features": {
+                "0": "所有功能",
+                "1": "无限记录",
+                "2": "无广告",
+                "3": "vCoins/月",
+                "4": "vOffice - AI 智慧办公",
+                "5": "vMarket - 商品市集",
+                "6": "支援服务"
+            },
+            "button": "立即订阅"
+        },
+        "vsuite_pro": {
+            "badge": "最优惠",
+            "name": "vSuite Pro",
+            "monthlyPrice": "$880/月",
+            "yearlyPrice": "$800/月",
+            "yearlyTotal": "年付 $9,600",
+            "yearlySavings": "节省 $960/年",
+            "features": {
+                "0": "所有 vSuite 功能",
+                "1": "无广告",
+                "2": "vCoins/月",
+                "3": "vOffice - AI 智慧办公",
+                "4": "vMarket - 商品市集",
+                "5": "企业支援服务",
+                "6": "数据丢失防护",
+                "7": "安全管控服务"
+            },
+            "button": "立即订阅"
+        },
+        "vsuite_pro_plus": {
+            "badge": "企业级",
+            "name": "vSuite Pro+",
+            "monthlyPrice": "$2,500/月",
+            "yearlyPrice": "$2,200/月",
+            "yearlyTotal": "年付 $26,400",
+            "yearlySavings": "节省 $3,600/年",
+            "features": {
+                "0": "所有 vSuite Pro 功能",
+                "1": "每月 3,000 vCoins",
+                "2": "每月 3,000 vCoins",
+                "3": "vOffice - AI 智慧办公",
+                "4": "vMarket - 商品市集",
+                "5": "vAi 视频生成",
+                "6": "自动找客 Lead Finder",
+                "7": "企业支持服务",
+                "8": "数据丢失防护",
+                "9": "安全管控服务"
+            },
+            "button": "立即订阅"
+        },
+        "custom": {
+            "badge": "专属定制",
+            "name": "自定义方案",
+            "price": "定制化",
+            "features": {
+                "0": "完全定制系统",
+                "1": "专属技术支持",
+                "2": "个性化功能开发",
+                "3": "专属顾问服务"
+            },
+            "button": "联系我们"
+        },
+        "subscribed": "已订阅",
+        "nextRenewal": "下次续费",
+        "cancelAtPeriodEnd": "将在周期结束时取消",
+        "cancelSubscription": "取消订阅",
+        "noPlan": "您尚未订阅任何计划，请选择一个计划开始使用",
+        "noPaymentHistory": "暂无付款记录",
+        "loadError": "加载订阅信息失败",
+        "processing": "正在处理订阅请求...",
+        "subscribeError": "订阅失败",
+        "cancelConfirm": "确定要取消订阅吗？订阅将在当前计费周期结束时取消。",
+        "cancelSuccess": "订阅已设置为在周期结束时取消",
+        "cancelError": "取消订阅失败",
+        "perMonth": "/月",
+        "year": "年",
+        "month": "月",
+        "yearlySavingsAmount": "节省"
+    },
+    "menu": {
+        "billingCenter": "费用中心",
+        "backToHome": "返回首页"
+    },
+    "tenantSwitch": {
+        "title": "选择企业",
+        "selectHint": "请选择要进入的企业",
+        "addTenant": "新增租户",
+        "cancel": "取消",
+        "confirm": "确认",
+        "pleaseSelect": "请选择企业",
+        "switchFailed": "切换租户失败"
+    },
+    "login": {
+        "selectTenant": "选择租户",
+        "selectTenantHint": "请选择要进入的租户",
+        "selectTenantRequired": "请选择租户",
+        "noTenants": "没有可用租户"
+    },
+    "helpVoffice": {
+        "breadcrumb": {
+            "supportCenter": "支持中心"
+        },
+        "title": "vOffice 支持中心",
+        "description": "vOffice 是 V-sys 旗下的在线文档编辑协作平台，支持文档、电子表格和演示文稿。",
+        "underConstruction": "vOffice 的支持文档正在建设中，敬请期待。",
+        "contactPrompt": "如有任何问题，欢迎",
+        "contactLink": "联系客服"
+    }
+}

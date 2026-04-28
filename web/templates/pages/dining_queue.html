@@ -1,0 +1,154 @@
+{{define "pages/dining_queue"}}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h3 class="mb-3" data-i18n="pages.diningQueue.title">候位取號</h3>
+        <p class="text-muted" data-i18n="pages.diningQueue.subtitle">填寫人數即可取得票號（姓名可選）。</p>
+        <form id="queueForm" class="mb-3">
+          <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningQueue.name">姓名（可選）</label>
+            <input type="text" class="form-control" id="queueName">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningQueue.phone">電話</label>
+            <input type="tel" class="form-control" id="queuePhone">
+          </div>
+          <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningQueue.partySize">人數</label>
+            <input type="number" class="form-control" id="queuePartySize" min="1" value="1" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningQueue.reservationTime">預約時間</label>
+            <input type="datetime-local" class="form-control" id="queueReservationAt">
+            <div class="form-text" data-i18n="pages.diningQueue.reservationHint">如需候位取號可不填。</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningQueue.store">店舖</label>
+            <select class="form-select" id="queueStoreId">
+              <option value="" data-i18n="pages.diningQueue.noStore">不指定店舖</option>
+              {{range .Stores}}
+                {{$sid := printf "%v" .ID}}
+                <option value="{{$sid}}" {{if eq $sid $.StoreID}}selected{{end}}>{{.Name}}</option>
+              {{end}}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningQueue.area">桌區（可選）</label>
+            <select class="form-select" id="queueAreaId">
+              <option value="" data-i18n="pages.diningQueue.noArea">不指定桌區</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningQueue.notes">備註</label>
+            <textarea class="form-control" id="queueNotes" rows="2"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary w-100" data-i18n="pages.diningQueue.getTicket">取得票號</button>
+        </form>
+
+        <div id="queueResult" class="border rounded p-3 bg-light" style="display:none;">
+          <div class="fw-bold mb-1" data-i18n="pages.diningQueue.yourTicket">您的候位票號</div>
+          <div class="display-6" id="queueTicketNumber">-</div>
+          <div class="text-muted mt-2" data-i18n="pages.diningQueue.orderLink">點餐連結（自動帶入候位資訊）</div>
+          <input type="text" class="form-control form-control-sm mt-1" id="queueOrderLink" readonly>
+          <a class="btn btn-outline-secondary btn-sm mt-2 w-100" id="queueOrderOpen" target="_blank" data-i18n="pages.diningQueue.openOrderPage">開啟點餐頁</a>
+        </div>
+
+        <div class="text-danger mt-2" id="queueError" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const subdomain = "{{.Subdomain}}";
+    const form = document.getElementById('queueForm');
+    const resultBox = document.getElementById('queueResult');
+    const errorBox = document.getElementById('queueError');
+    const ticketEl = document.getElementById('queueTicketNumber');
+    const linkInput = document.getElementById('queueOrderLink');
+    const linkOpen = document.getElementById('queueOrderOpen');
+    const storeSelect = document.getElementById('queueStoreId');
+    const areaSelect = document.getElementById('queueAreaId');
+
+    function setError(msg) {
+      if (!errorBox) return;
+      errorBox.textContent = msg || '';
+      errorBox.style.display = msg ? '' : 'none';
+    }
+
+    async function loadAreas() {
+      if (!areaSelect) return;
+      const storeId = storeSelect ? storeSelect.value : '';
+      const qs = storeId ? `?store_id=${encodeURIComponent(storeId)}` : '';
+      try {
+        const resp = await fetch(`/api/v1/public/${encodeURIComponent(subdomain)}/dining/areas${qs}`);
+        const data = await resp.json().catch(() => ({}));
+        const items = Array.isArray(data.data) ? data.data : [];
+        areaSelect.innerHTML = '<option value="">不指定桌區</option>' + items.map(a => {
+          return `<option value="${a.id}">${a.name}</option>`;
+        }).join('');
+      } catch (err) {
+        areaSelect.innerHTML = '<option value="">不指定桌區</option>';
+      }
+    }
+
+    if (storeSelect) {
+      storeSelect.addEventListener('change', loadAreas);
+    }
+    loadAreas();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setError('');
+      if (resultBox) resultBox.style.display = 'none';
+
+      const payload = {
+        name: document.getElementById('queueName')?.value || '',
+        phone: document.getElementById('queuePhone')?.value || '',
+        party_size: Number(document.getElementById('queuePartySize')?.value || 1),
+        reservation_at: document.getElementById('queueReservationAt')?.value || '',
+        store_id: document.getElementById('queueStoreId')?.value || '',
+        area_id: document.getElementById('queueAreaId')?.value || '',
+        notes: document.getElementById('queueNotes')?.value || ''
+      };
+
+      try {
+        const resp = await fetch(`/api/v1/public/${encodeURIComponent(subdomain)}/dining/queues`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.error || '建立候位失敗');
+
+        const ticket = data.ticket_number || '';
+        if (ticketEl) ticketEl.textContent = ticket || '-';
+
+        const reservationAt = data.reservation_at || payload.reservation_at || '';
+        if (reservationAt && resultBox) {
+          const existing = document.getElementById('queueReservationDisplay');
+          const display = existing || document.createElement('div');
+          display.id = 'queueReservationDisplay';
+          display.className = 'text-muted mt-2';
+          display.textContent = `預約時間：${reservationAt}`;
+          if (!existing) resultBox.appendChild(display);
+        }
+
+        const params = new URLSearchParams();
+        if (data.id) params.set('dining_queue_id', data.id);
+        if (ticket) params.set('dining_ticket_number', ticket);
+        if (payload.store_id) params.set('store_id', payload.store_id);
+        const link = `/co/${subdomain}/` + (params.toString() ? `?${params.toString()}` : '');
+
+        if (linkInput) linkInput.value = link;
+        if (linkOpen) linkOpen.href = link;
+        if (resultBox) resultBox.style.display = '';
+      } catch (err) {
+        setError(err?.message || '建立候位失敗');
+      }
+    });
+  })();
+</script>
+{{end}}

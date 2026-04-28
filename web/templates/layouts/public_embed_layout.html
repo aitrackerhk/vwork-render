@@ -1,0 +1,27 @@
+{{define "layouts/public_embed_layout"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.Title}}</title>
+  <link rel="icon" type="image/png" href="/static/vworkicon.png">
+  <link rel="apple-touch-icon" href="/static/vworkicon.png">
+  <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/custom.css">
+  <style>
+    body { padding-top: 0 !important; background: transparent !important; }
+    .container { padding: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    {{embed}}
+  </div>
+
+  <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{{end}}

@@ -1,0 +1,428 @@
+{{define "pages/printer_settings"}}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            
+            <!-- vWork Connector 狀態 -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plug me-2"></i>
+                        <span data-i18n="pages.printerSettings.connectorStatus">vWork Connector 狀態</span>
+                    </h5>
+                    <span class="badge" id="connectorStatusBadge">未連接</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label" data-i18n="pages.printerSettings.connectorPort">Connector 端口</label>
+                            <input type="number" class="form-control" id="connectorPort" value="9527" min="1" max="65535">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-outline-primary" id="checkConnectorBtn">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                <span data-i18n="pages.printerSettings.checkConnection">檢查連接</span>
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/api/v1/downloads/connector" class="btn btn-outline-secondary">
+                                <i class="bi bi-download me-1"></i>
+                                <span data-i18n="pages.printerSettings.downloadConnector">下載 vWork Connector</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-printer me-2"></i>
+                        <span data-i18n="pages.printerSettings.title">打印機設定</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4" data-i18n="pages.printerSettings.description">
+                        設定預設打印機後，打印時將直接使用此打印機，無需每次選擇。
+                    </p>
+                    
+                    <form id="printerSettingsForm">
+                        <div class="mb-3">
+                            <label for="defaultPrinter" class="form-label" data-i18n="pages.printerSettings.defaultPrinter">預設打印機</label>
+                            <div class="input-group">
+                                <select class="form-select" id="defaultPrinter" name="defaultPrinter">
+                                    <option value="" data-i18n="pages.printerSettings.noPrinterSelected">-- 每次選擇 --</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-secondary" id="refreshPrintersBtn" data-i18n-title="pages.printerSettings.refreshPrinters" title="刷新打印機列表">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <div class="form-text" data-i18n="pages.printerSettings.printerHint">
+                                設定後打印時將直接使用此打印機，無需每次選擇
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="silentPrint" name="silentPrint">
+                                <label class="form-check-label" for="silentPrint" data-i18n="pages.printerSettings.silentPrint">
+                                    靜默打印（不顯示預覽）
+                                </label>
+                            </div>
+                            <div class="form-text" data-i18n="pages.printerSettings.silentPrintHint">
+                                啟用後將直接發送到打印機，不顯示打印預覽
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>
+                                <span data-i18n="pages.printerSettings.savePrinterSettings">保存設定</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 手動添加打印機 -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        <span data-i18n="pages.printerSettings.addPrinterManually">手動添加打印機</span>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3" data-i18n="pages.printerSettings.addPrinterHint">
+                        瀏覽器無法自動偵測打印機，請手動輸入打印機名稱。打印機名稱需與系統中顯示的名稱完全一致。
+                    </p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="customPrinterName" 
+                               data-i18n-placeholder="pages.printerSettings.enterPrinterName"
+                               placeholder="輸入打印機名稱...">
+                        <button type="button" class="btn btn-outline-primary" id="addCustomPrinterBtn">
+                            <i class="bi bi-plus-lg me-1"></i>
+                            <span data-i18n="common.add">添加</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 已保存的打印機列表 -->
+            <div class="card shadow-sm mt-4" id="savedPrintersCard" style="display: none;">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-list-ul me-2"></i>
+                        <span data-i18n="pages.printerSettings.savedPrinters">已保存的打印機</span>
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush" id="savedPrintersList">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/vwork-connector.js"></script>
+<script>
+(function() {
+    const PRINTER_SETTINGS_KEY = 'vwork_printer_settings';
+    const KNOWN_PRINTERS_KEY = 'vwork_known_printers';
+    
+    // 載入已知打印機列表
+    function getKnownPrinters() {
+        try {
+            const saved = localStorage.getItem(KNOWN_PRINTERS_KEY);
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+    
+    // 保存已知打印機列表
+    function saveKnownPrinters(printers) {
+        try {
+            localStorage.setItem(KNOWN_PRINTERS_KEY, JSON.stringify(printers));
+        } catch (e) {
+            console.warn('無法保存打印機列表:', e);
+        }
+    }
+    
+    // 載入打印機設定
+    function loadPrinterSettings() {
+        try {
+            const saved = localStorage.getItem(PRINTER_SETTINGS_KEY);
+            return saved ? JSON.parse(saved) : { defaultPrinter: '', silentPrint: false };
+        } catch (e) {
+            return { defaultPrinter: '', silentPrint: false };
+        }
+    }
+    
+    // 保存打印機設定
+    function savePrinterSettings(settings) {
+        try {
+            localStorage.setItem(PRINTER_SETTINGS_KEY, JSON.stringify(settings));
+            return true;
+        } catch (e) {
+            console.warn('無法保存打印機設定:', e);
+            return false;
+        }
+    }
+    
+    // 刷新打印機下拉選單
+    function refreshPrinterSelect() {
+        const select = document.getElementById('defaultPrinter');
+        const settings = loadPrinterSettings();
+        const knownPrinters = getKnownPrinters();
+        
+        // 清空現有選項（保留第一個預設選項）
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+        
+        // 添加已知打印機
+        knownPrinters.forEach(printer => {
+            const option = document.createElement('option');
+            option.value = printer;
+            option.textContent = printer;
+            if (printer === settings.defaultPrinter) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+        
+        // 更新已保存打印機列表
+        updateSavedPrintersList();
+    }
+    
+    // 更新已保存打印機列表顯示
+    function updateSavedPrintersList() {
+        const knownPrinters = getKnownPrinters();
+        const card = document.getElementById('savedPrintersCard');
+        const list = document.getElementById('savedPrintersList');
+        
+        if (knownPrinters.length === 0) {
+            card.style.display = 'none';
+            return;
+        }
+        
+        card.style.display = 'block';
+        list.innerHTML = '';
+        
+        knownPrinters.forEach(printer => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.innerHTML = `
+                <span><i class="bi bi-printer me-2"></i>${escapeHtml(printer)}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePrinter('${escapeHtml(printer)}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            list.appendChild(li);
+        });
+    }
+    
+    // 輔助：HTML escape
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // 移除打印機
+    window.removePrinter = function(printerName) {
+        const knownPrinters = getKnownPrinters();
+        const index = knownPrinters.indexOf(printerName);
+        if (index > -1) {
+            knownPrinters.splice(index, 1);
+            saveKnownPrinters(knownPrinters);
+            
+            // 如果移除的是當前選中的打印機，重置設定
+            const settings = loadPrinterSettings();
+            if (settings.defaultPrinter === printerName) {
+                settings.defaultPrinter = '';
+                savePrinterSettings(settings);
+            }
+            
+            refreshPrinterSelect();
+            
+            if (typeof App !== 'undefined' && App.showSuccess) {
+                App.showSuccess((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.printerSettings.printerRemoved') : '打印機已移除');
+            }
+        }
+    };
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        const settings = loadPrinterSettings();
+        
+        // 設定 silentPrint checkbox
+        const silentPrintCheckbox = document.getElementById('silentPrint');
+        if (silentPrintCheckbox) {
+            silentPrintCheckbox.checked = settings.silentPrint || false;
+        }
+        
+        // 刷新打印機列表
+        refreshPrinterSelect();
+        
+        // 刷新按鈕
+        document.getElementById('refreshPrintersBtn').addEventListener('click', function() {
+            refreshPrinterSelect();
+            if (typeof App !== 'undefined' && App.showSuccess) {
+                App.showSuccess((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.printerSettings.printersRefreshed') : '打印機列表已刷新');
+            }
+        });
+        
+        // 添加自定義打印機
+        document.getElementById('addCustomPrinterBtn').addEventListener('click', function() {
+            const input = document.getElementById('customPrinterName');
+            const printerName = input.value.trim();
+            
+            if (!printerName) {
+                if (typeof App !== 'undefined' && App.showError) {
+                    App.showError((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.printerSettings.enterPrinterNameError') : '請輸入打印機名稱');
+                }
+                return;
+            }
+            
+            const knownPrinters = getKnownPrinters();
+            if (knownPrinters.includes(printerName)) {
+                if (typeof App !== 'undefined' && App.showWarning) {
+                    App.showWarning((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.printerSettings.printerExists') : '此打印機已存在');
+                }
+                return;
+            }
+            
+            knownPrinters.push(printerName);
+            saveKnownPrinters(knownPrinters);
+            input.value = '';
+            refreshPrinterSelect();
+            
+            if (typeof App !== 'undefined' && App.showSuccess) {
+                App.showSuccess((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.printerSettings.printerAdded') : '打印機已添加');
+            }
+        });
+        
+        // 支持按 Enter 添加打印機
+        document.getElementById('customPrinterName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('addCustomPrinterBtn').click();
+            }
+        });
+        
+        // 保存表單
+        document.getElementById('printerSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const settings = {
+                defaultPrinter: document.getElementById('defaultPrinter').value,
+                silentPrint: document.getElementById('silentPrint').checked
+            };
+            
+            if (savePrinterSettings(settings)) {
+                if (typeof App !== 'undefined' && App.showSuccess) {
+                    App.showSuccess((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.printerSettings.printerSettingsSaved') : '打印機設定已保存');
+                }
+            } else {
+                if (typeof App !== 'undefined' && App.showError) {
+                    App.showError((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.saveFailed') : '保存失敗');
+                }
+            }
+        });
+        
+        // ===== vWork Connector 相關 =====
+        function updateConnectorStatus(status, error) {
+            const badge = document.getElementById('connectorStatusBadge');
+            
+            if (status === 'connected') {
+                badge.textContent = '已連接';
+                badge.className = 'badge bg-success';
+            } else if (status === 'connecting') {
+                badge.textContent = '連接中...';
+                badge.className = 'badge bg-warning';
+            } else {
+                badge.textContent = error || '未連接';
+                badge.className = 'badge bg-secondary';
+            }
+        }
+        
+        // 從 Connector 獲取系統打印機列表
+        async function fetchPrintersFromConnector() {
+            try {
+                if (window.VWorkConnector) {
+                    const printers = await window.VWorkConnector.getPrinters();
+                    
+                    if (printers && printers.length > 0) {
+                        const knownPrinters = getKnownPrinters();
+                        let addedCount = 0;
+                        
+                        printers.forEach(function(printer) {
+                            const name = printer.name || printer;
+                            if (!knownPrinters.includes(name)) {
+                                knownPrinters.push(name);
+                                addedCount++;
+                            }
+                        });
+                        
+                        saveKnownPrinters(knownPrinters);
+                        refreshPrinterSelect();
+                        
+                        if (addedCount > 0 && typeof App !== 'undefined' && App.showSuccess) {
+                            App.showSuccess('已獲取 ' + printers.length + ' 台打印機，新增 ' + addedCount + ' 台');
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('從 Connector 獲取打印機列表失敗:', e);
+            }
+        }
+        
+        // Connector 端口設置
+        const portInput = document.getElementById('connectorPort');
+        if (window.VWorkConnector) {
+            portInput.value = window.VWorkConnector.port;
+            
+            // 監聽狀態變化
+            window.VWorkConnector.on('statusChange', function(data) {
+                updateConnectorStatus(data.status, data.error);
+                // 連接成功時自動獲取打印機列表
+                if (data.status === 'connected') {
+                    fetchPrintersFromConnector();
+                }
+            });
+        }
+        
+        portInput.addEventListener('change', function() {
+            const port = parseInt(this.value, 10);
+            if (port > 0 && port < 65536 && window.VWorkConnector) {
+                window.VWorkConnector.setPort(port);
+            }
+        });
+        
+        // 檢查 Connector 連接
+        document.getElementById('checkConnectorBtn').addEventListener('click', async function() {
+            this.disabled = true;
+            updateConnectorStatus('connecting');
+            
+            try {
+                if (window.VWorkConnector) {
+                    await window.VWorkConnector.checkConnection();
+                }
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // 初始檢查 Connector
+        if (window.VWorkConnector) {
+            window.VWorkConnector.checkConnection();
+        }
+    });
+})();
+</script>
+{{end}}

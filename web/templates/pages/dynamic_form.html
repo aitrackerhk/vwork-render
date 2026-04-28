@@ -1,0 +1,65 @@
+{{ define "pages/dynamic_form" }}
+<div id="dynamicFormContainer">
+    <!-- 內容將由 JavaScript 動態生成 -->
+</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Helper: get i18n text with fallback
+        function getI18nText(key, fallback) {
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                var t = I18n.t(key);
+                if (t && t !== key) return t;
+            }
+            return fallback;
+        }
+
+        // 等待 DynamicForm 類加載完成
+        function initDynamicForm() {
+            if (typeof DynamicForm === 'undefined') {
+                console.error('DynamicForm is not defined. Please check if dynamic-form.js is loaded.');
+                document.getElementById('dynamicFormContainer').innerHTML = '<div class="alert alert-danger">' + getI18nText('common.dynamicFormNotLoaded', 'Dynamic form class not loaded. Please refresh the page and try again.') + '</div>';
+                return;
+            }
+            
+            if (typeof getPageConfig === 'undefined') {
+                console.error('getPageConfig is not defined. Please check if page-configs.js is loaded.');
+                document.getElementById('dynamicFormContainer').innerHTML = '<div class="alert alert-danger">' + getI18nText('common.pageConfigNotLoaded', 'Page configuration function not loaded. Please refresh the page and try again.') + '</div>';
+                return;
+            }
+            
+            // 從 URL 獲取頁面名稱（例如 /customers/new -> customers）
+            const pathParts = window.location.pathname.split('/').filter(p => p);
+            const pageName = pathParts[0] || 'customers';
+            
+            const config = getPageConfig(pageName);
+            if (!config) {
+                document.getElementById('dynamicFormContainer').innerHTML = '<div class="alert alert-danger">' + getI18nText('common.pageConfigNotFound', 'Page configuration not found: ') + pageName + '</div>';
+                return;
+            }
+            
+            // 初始化動態表單
+            window.dynamicForm = new DynamicForm(config);
+        }
+        
+        // 如果腳本已經加載，立即執行；否則等待一下再試
+        if (typeof DynamicForm !== 'undefined' && typeof getPageConfig !== 'undefined') {
+            initDynamicForm();
+        } else {
+            // 等待腳本加載完成（最多等待2秒）
+            let attempts = 0;
+            const maxAttempts = 20;
+            const checkInterval = setInterval(function() {
+                attempts++;
+                if (typeof DynamicForm !== 'undefined' && typeof getPageConfig !== 'undefined') {
+                    clearInterval(checkInterval);
+                    initDynamicForm();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    initDynamicForm(); // 最後一次嘗試
+                }
+            }, 100);
+        }
+    });
+</script>
+{{ end }}

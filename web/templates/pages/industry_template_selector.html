@@ -1,0 +1,731 @@
+{{define "pages/industry_template_selector"}}
+<style>
+    /* 重置 body margin */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .template-guide-wrapper {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        min-height: calc(100vh - 60px);
+    }
+
+    .template-guide-container {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    /* 左側說明區域 */
+    .guide-content {
+        position: sticky;
+        top: 80px;
+    }
+
+    .guide-content .welcome-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+
+    .guide-content h1 {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 2.5rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+
+    .guide-content .subtitle {
+        color: #64748b;
+        font-size: 1.125rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .guide-content .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 2rem 0;
+    }
+
+    .guide-content .features-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        color: #475569;
+        font-size: 0.9375rem;
+    }
+
+    .guide-content .features-list li i {
+        color: #0d6efd;
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+
+    .guide-content .help-text {
+        background: #f8f9fa;
+        border-left: 3px solid #0d6efd;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-top: 2rem;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    /* 右側選擇區域 */
+    .template-selection {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Mobile */
+    @media (max-width: 767.98px) {
+        .template-guide-wrapper {
+            padding: 1rem;
+        }
+        /* mobile：右側選擇區塊不要卡片樣式 */
+        .template-selection {
+            background: transparent;
+            box-shadow: none;
+            border: none;
+            padding: 0;
+            border-radius: 0;
+        }
+    }
+
+    .template-selection h2 {
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .template-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .template-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .template-card:hover {
+        border-color: #0d6efd;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .template-card.selected {
+        border-color: #0d6efd;
+        background: rgba(13, 110, 253, 0.05);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+    }
+
+    .template-card .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .template-card .icon {
+        font-size: 2.5rem;
+        color: #0d6efd;
+        flex-shrink: 0;
+    }
+    .template-card .icon.icon-unknown {
+        color: #6c757d;
+    }
+
+    .template-card h3 {
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 1.25rem;
+        margin: 0;
+        flex: 1;
+    }
+
+    .template-card .description {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .template-card .modules {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .template-card .modules-label {
+        color: #94a3b8;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .template-card .modules-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .template-card .module-tag {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 0.25rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .template-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn-apply {
+        flex: 1;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-apply:hover:not(:disabled) {
+        background: #0b5ed7;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-apply:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-skip {
+        background: transparent;
+        color: #64748b;
+        border: 1px solid #e5e7eb;
+        padding: 0.875rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-skip:hover {
+        background: #f8f9fa;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .loading.show {
+        display: block;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    /* Mobile: action buttons less padding */
+    @media (max-width: 767.98px) {
+        .template-actions {
+            gap: 0.5rem;
+            padding-top: 1rem;
+        }
+        .btn-apply,
+        .btn-skip {
+            padding: 0.75rem 1rem;
+            font-size: 0.9375rem;
+        }
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 992px) {
+        .template-guide-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .guide-content {
+            position: static;
+        }
+
+        .guide-content h1 {
+            font-size: 2rem;
+        }
+
+        .guide-content img[src="/static/logo3.png"] {
+            height: 18px !important;
+            max-height: 18px !important;
+        }
+    }
+</style>
+
+<div class="template-guide-wrapper">
+    <div class="template-guide-container">
+        <!-- 左側說明區域 -->
+        <div class="guide-content">
+            <div class="mb-4">
+                <img src="/static/logo3.png" alt="V-sys" style="height: 24px; margin-bottom: 1.5rem;">
+            </div>
+            <div class="welcome-badge" data-i18n="pages.industryTemplateSelector.welcome">👋 歡迎使用 V-sys</div>
+            <h1 data-i18n="pages.industryTemplateSelector.title">選擇您的行業模板</h1>
+            <p class="subtitle" data-i18n="pages.industryTemplateSelector.subtitle">
+                選擇最適合您業務的行業模板，我們將為您自動配置相關模塊，讓您快速開始使用系統。
+            </p>
+
+            <ul class="features-list">
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.industryTemplateSelector.feature1">自動配置相關業務模塊</span>
+                </li>
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.industryTemplateSelector.feature2">預設適合行業的字段和設置</span>
+                </li>
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.industryTemplateSelector.feature3">節省初始設置時間</span>
+                </li>
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.industryTemplateSelector.feature4">隨時可以在設置中修改</span>
+                </li>
+            </ul>
+
+            <div class="help-text">
+                <strong>💡 <span data-i18n="common.tip">提示</span>：</strong> <span data-i18n="pages.industryTemplateSelector.tip">如果您不確定選擇哪個模板，可以先選擇最底的「不清楚」，先試用所有功能，之後可在系統設置中隨時調整模塊配置。</span>
+            </div>
+        </div>
+
+        <!-- 右側選擇區域 -->
+        <div class="template-selection">
+            <h2 data-i18n="pages.industryTemplateSelector.selectTemplate">選擇模板</h2>
+
+            <div id="alertContainer"></div>
+
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden" data-i18n="pages.industryTemplateSelector.loading">載入中...</span>
+                </div>
+            </div>
+
+            <div class="template-cards" id="templateCards">
+                <!-- 模板卡片將通過 JavaScript 動態生成 -->
+            </div>
+
+            <div class="template-actions">
+                <button class="btn-apply" id="btnApply" disabled data-i18n="pages.industryTemplateSelector.applyTemplate">應用模板</button>
+                <button class="btn-skip" id="btnSkip" data-i18n="pages.industryTemplateSelector.skipSelection">稍後選擇</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedTemplateId = null;
+    let templates = [];
+    const t = (key, fallback) => {
+        if (typeof I18n !== 'undefined' && I18n.t) {
+            const translated = I18n.t(key);
+            if (translated && translated !== key) {
+                return translated;
+            }
+        }
+        return fallback ?? key;
+    };
+    const tSafe = (key) => {
+        if (typeof I18n !== 'undefined' && I18n.t) {
+            const translated = I18n.t(key);
+            if (translated && translated !== key) {
+                return translated;
+            }
+        }
+        return null;
+    };
+
+    // 獲取認證 token
+    function getAuthToken() {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'auth_token') {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    // API 請求（使用 App.apiRequest 如果可用，否則使用 fetch）
+    async function apiRequest(url, options = {}) {
+        if (typeof App !== 'undefined' && App.apiRequest) {
+            return await App.apiRequest(url, options);
+        }
+
+        const token = getAuthToken();
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }
+        };
+
+        const response = await fetch(url, { ...defaultOptions, ...options });
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || t('common.requestFailed', 'Request failed'));
+        }
+        
+        return data;
+    }
+
+    // 顯示提示訊息
+    function showAlert(message, type = 'success') {
+        const container = document.getElementById('alertContainer');
+        container.innerHTML = `
+            <div class="alert alert-${type}">
+                ${message}
+            </div>
+        `;
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 5000);
+    }
+
+    // 載入行業模板
+    async function loadTemplates() {
+        try {
+            document.getElementById('loadingIndicator').classList.add('show');
+            const response = await apiRequest('/api/v1/industry-templates?is_active=true');
+            templates = response.data || [];
+            console.log('載入的模板列表:', templates);
+            console.log('「不清楚」模板:', templates.find(t => {
+                const name = (t.name || '') + ' ' + (t.name_en || '');
+                return (t.code && t.code.toLowerCase() === 'unknown') || name.includes('不清楚');
+            }));
+            renderTemplates();
+        } catch (error) {
+            console.error('載入模板失敗:', error);
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.loadFailed') : '載入行業模板失敗') + ': ' + error.message, 'error');
+        } finally {
+            document.getElementById('loadingIndicator').classList.remove('show');
+        }
+    }
+
+    // 渲染模板卡片
+    function renderTemplates() {
+        const container = document.getElementById('templateCards');
+        const currentLang = (typeof I18n !== 'undefined' && I18n.currentLang) ? I18n.currentLang : 'zh';
+        const isEn = currentLang === 'en';
+        
+        if (templates.length === 0) {
+            const noTemplatesText = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.noTemplates') : '暫無可用的行業模板');
+            container.innerHTML = '<p style="text-align: center; color: #64748b; padding: 2rem;">' + noTemplatesText + '</p>';
+            return;
+        }
+
+        const moduleNameFallbacks = {
+            inventory: { zh: '庫存管理', 'zh-CN': '库存管理', en: 'Inventory' },
+            pos: { zh: 'POS 收銀', 'zh-CN': 'POS 收银', en: 'POS' },
+            customers: { zh: '客戶管理', 'zh-CN': '客户管理', en: 'Customers' },
+            orders: { zh: '訂單管理', 'zh-CN': '订单管理', en: 'Orders' },
+            products: { zh: '產品管理', 'zh-CN': '产品管理', en: 'Products' },
+            member: { zh: '會員管理', 'zh-CN': '会员管理', en: 'Membership' },
+            coupons: { zh: '優惠券', 'zh-CN': '优惠券', en: 'Coupons' },
+            points: { zh: '積分系統', 'zh-CN': '积分系统', en: 'Points' },
+            service: { zh: '服務管理', 'zh-CN': '服务管理', en: 'Services' },
+            appointments: { zh: '預約管理', 'zh-CN': '预约管理', en: 'Appointments' },
+            service_orders: { zh: '服務單', 'zh-CN': '服务单', en: 'Service Orders' },
+            users: { zh: '員工管理', 'zh-CN': '员工管理', en: 'Users' },
+            calendars: { zh: '日曆', 'zh-CN': '日历', en: 'Calendars' },
+            reminders: { zh: '提醒', 'zh-CN': '提醒', en: 'Reminders' },
+            purchase: { zh: '採購管理', 'zh-CN': '采购管理', en: 'Purchasing' },
+            suppliers: { zh: '供應商管理', 'zh-CN': '供应商管理', en: 'Suppliers' },
+            warehouses: { zh: '倉庫管理', 'zh-CN': '仓库管理', en: 'Warehouses' },
+            warehouse: { zh: '倉庫', 'zh-CN': '仓库', en: 'Warehouse' },
+            logistics: { zh: '物流', 'zh-CN': '物流', en: 'Logistics' },
+            projects: { zh: '項目管理', 'zh-CN': '项目管理', en: 'Projects' },
+            accounting: { zh: '會計', 'zh-CN': '会计', en: 'Accounting' },
+            invoices: { zh: '發票', 'zh-CN': '发票', en: 'Invoices' },
+            payments: { zh: '付款', 'zh-CN': '付款', en: 'Payments' },
+            hr: { zh: '人力資源', 'zh-CN': '人力资源', en: 'HR' },
+            vehicles: { zh: '車輛管理', 'zh-CN': '车辆管理', en: 'Vehicles' },
+            dining: { zh: '餐飲', 'zh-CN': '餐饮', en: 'Dining' },
+            courses: { zh: '課程管理', 'zh-CN': '课程管理', en: 'Courses' }
+        };
+
+        function getModuleLabel(code) {
+            const fromPages = tSafe(`pages.industryTemplateSelector.moduleNames.${code}`);
+            if (fromPages) return fromPages;
+            const fromLegacy = tSafe(`industryTemplateSelector.moduleNames.${code}`);
+            if (fromLegacy) return fromLegacy;
+
+            const fallback = moduleNameFallbacks[code] || {};
+            if (currentLang === 'zh-CN') return fallback['zh-CN'] || fallback.zh || code;
+            if (currentLang === 'en') return fallback.en || code;
+            return fallback.zh || fallback['zh-CN'] || fallback.en || code;
+        }
+
+        const isUnclear = (t) => {
+            const name = (t.name || '') + ' ' + (t.name_en || '');
+            return (t.code && t.code.toLowerCase() === 'unknown') || name.includes('不清楚') || name.toLowerCase().includes('unsure') || name.toLowerCase().includes('uncertain');
+        };
+
+        const sorted = [...templates].sort((a, b) => {
+            const ua = isUnclear(a) ? 1 : 0;
+            const ub = isUnclear(b) ? 1 : 0;
+            if (ua === ub) return 0;
+            return ua - ub; // 不清楚排最後
+        });
+
+        // 注意：如果 API 未提供「不清楚」模板，會顯示錯誤
+        // 請確保 migration 125_insert_unknown_industry_template.sql 已執行
+
+        container.innerHTML = sorted.map(template => {
+            const rawModules = Array.isArray(template.enabled_modules) 
+                ? template.enabled_modules 
+                : (template.enabled_modules?._data || []);
+            const modules = Array.from(new Set([
+                ...rawModules.map(m => String(m || '').trim()).filter(Boolean),
+                'accounting',
+                'hr'
+            ]));
+            
+            // 系統提示（依行業模板模塊判斷）
+            // 規則（依需求）：
+            // - HR -> 打卡提示
+            // - 服務單 -> 服務單提示
+            // - 服務單 -> 預約提示（即便模板未列出 appointments 也視為需要）
+            // - 項目管理 -> 項目/task 到期提示
+            const moduleSet = new Set((modules || []).map(m => String(m || '').trim()).filter(Boolean));
+            const hasHR = moduleSet.has('hr');
+            const hasServiceOrders = moduleSet.has('service_orders');
+            const hasAppointments = moduleSet.has('appointments') || hasServiceOrders;
+            const hasProjects = moduleSet.has('projects') || moduleSet.has('project');
+
+            const yn = (v) => v ? 'Yes' : 'No';
+            const ynZh = (v) => v ? '是' : '否';
+            const yesNo = (v) => isEn ? yn(v) : ynZh(v);
+            
+            const modulesList = modules.slice(0, 6).map(code => {
+                return `<span class="module-tag">${getModuleLabel(code)}</span>`;
+            }).join('');
+            
+            const modulesText = t(
+                'pages.industryTemplateSelector.modules',
+                t('industryTemplateSelector.modules', isEn ? 'modules' : '個模塊')
+            );
+            const moreModules = modules.length > 6 ? ` +${modules.length - 6} ` + modulesText : '';
+
+            const icon = isUnclear(template) ? 'bi-question-circle-fill' : (template.icon || 'bi-building');
+            const displayName = isEn ? (template.name_en || template.name || '') : (template.name || template.name_en || '');
+            const description = isEn ? (template.description_en || template.description || '') : (template.description || template.description_en || '');
+
+            return `
+                <div class="template-card" data-template-id="${template.id}" onclick="selectTemplate('${template.id}')">
+                    <div class="card-header">
+                        <div class="icon ${isUnclear(template) ? 'icon-unknown' : ''}">
+                            <i class="bi ${icon}"></i>
+                        </div>
+                        <h3>${displayName}</h3>
+                    </div>
+                    <p class="description">${description}</p>
+                    ${modules.length > 0 ? `
+                        <div class="modules">
+                            <div class="modules-label">${t('pages.industryTemplateSelector.modulesLabel', t('industryTemplateSelector.modulesLabel', isEn ? 'Modules' : '包含模塊'))}：</div>
+                            <div class="modules-list">${modulesList}${moreModules ? `<span class="module-tag">${moreModules}</span>` : ''}</div>
+                        </div>
+                    ` : ''}
+                    <div class="modules">
+                        <div class="modules-label">${isEn ? 'System alerts' : '系統提示'}：</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="module-tag">${isEn ? 'Attendance alerts' : '打卡提示'}: ${yesNo(hasHR)}</span>
+                            <span class="module-tag">${isEn ? 'Service order alerts' : '服務單提示'}: ${yesNo(hasServiceOrders)}</span>
+                            <span class="module-tag">${isEn ? 'Appointment alerts' : '預約提示'}: ${yesNo(hasAppointments)}</span>
+                            <span class="module-tag">${isEn ? 'Project/Task due alerts' : '項目/任務到期提示'}: ${yesNo(hasProjects)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 選擇模板
+    function selectTemplate(templateId) {
+        selectedTemplateId = templateId;
+        
+        // 更新 UI
+        document.querySelectorAll('.template-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.querySelector(`[data-template-id="${templateId}"]`).classList.add('selected');
+        
+        document.getElementById('btnApply').disabled = false;
+    }
+
+    // 應用模板
+    async function applyTemplate() {
+        if (!selectedTemplateId) {
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.selectFirst') : '請先選擇一個行業模板'), 'error');
+            return;
+        }
+
+        try {
+            document.getElementById('btnApply').disabled = true;
+            document.getElementById('btnApply').textContent = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.applying') : '應用中...');
+
+            // 檢查是否跳過網站設置引導（從 enterprises 頁面重新選擇時）
+            const skipWebsiteGuide = new URLSearchParams(window.location.search).get('skip_website_guide') === 'true';
+            console.log('重新選擇模板流程 - skipWebsiteGuide:', skipWebsiteGuide);
+
+            // 重新選擇時，始終提示用戶：切換模板會清除菜單並更新已啟用模塊
+            if (skipWebsiteGuide) {
+                const confirmMsg = (typeof I18n !== 'undefined' && I18n.t)
+                    ? I18n.t('pages.industryTemplateSelector.clearMenuConfirm', '切換行業模板將重置側邊欄菜單並更新已啟用的模塊，是否繼續？')
+                    : '切換行業模板將重置側邊欄菜單並更新已啟用的模塊，是否繼續？';
+                if (!confirm(confirmMsg)) {
+                    document.getElementById('btnApply').disabled = false;
+                    document.getElementById('btnApply').textContent = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.applyTemplate') : '應用模板');
+                    return;
+                }
+                // 清除菜單設定
+                try {
+                    await apiRequest('/api/v1/user/menu-settings', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ menu_config: [] })
+                    });
+                    console.log('菜單設定已清除');
+                } catch (e) {
+                    console.warn('清除菜單設定失敗:', e);
+                }
+            }
+
+            await apiRequest(`/api/v1/tenant/apply-template/${selectedTemplateId}`, {
+                method: 'POST'
+            });
+
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.applySuccess') : '模板應用成功！正在跳轉...'), 'success');
+            
+            // 記錄已選擇模板（避免再次彈出）
+            localStorage.setItem('industry_template_selected', 'true');
+            
+            // 檢查是否為電商模板
+            const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+            const isEcommerce = selectedTemplate && selectedTemplate.code === 'ecommerce';
+            
+            if (isEcommerce) {
+                // 電商模板：直接導入默認頁面，跳轉到對應產品頁面
+                setTimeout(() => {
+                    redirectToProductPage();
+                }, 1500);
+            } else if (skipWebsiteGuide) {
+                // 如果是重新選擇（從 enterprises 頁面），直接跳轉到對應產品頁面
+                setTimeout(() => {
+                    redirectToProductPage();
+                }, 1500);
+            } else {
+                // 非電商模板且是第一次設置：跳轉到網站設置引導頁面
+                setTimeout(() => {
+                    if (typeof Router !== 'undefined' && Router.go) { Router.go('/website-setup-guide'); } else { window.location.href = '/website-setup-guide'; }
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('應用模板失敗:', error);
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.applyFailed') : '應用模板失敗') + ': ' + error.message, 'error');
+            document.getElementById('btnApply').disabled = false;
+            document.getElementById('btnApply').textContent = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.industryTemplateSelector.applyTemplate') : '應用模板');
+        }
+    }
+
+    // 跳過選擇（標記為已跳過，避免循環重定向）
+    async function skipSelection() {
+        try {
+            // 記錄已跳過（避免再次彈出）
+            localStorage.setItem('industry_template_skipped', 'true');
+            // 跳轉到對應產品頁面（vWork 需帶 skip_template 參數避免循環重定向）
+            var skipUrl = getProductRedirectUrl();
+            var product = (localStorage.getItem('vlogin_product') || 'vwork').toLowerCase();
+            if (product === 'vwork') {
+                // vWork stays on current domain with skip_template param
+                var vworkPath = '/dashboard?skip_template=true';
+                if (typeof Router !== 'undefined' && Router.go) { Router.go(vworkPath); } else { window.location.href = vworkPath; }
+            } else {
+                // Cross-domain products — must use full page navigation
+                window.location.href = skipUrl;
+            }
+        } catch (error) {
+            console.error('跳過選擇失敗:', error);
+            localStorage.setItem('industry_template_skipped', 'true');
+            var skipUrlFallback = getProductRedirectUrl();
+            // Fallback: always use window.location.href for safety
+            window.location.href = skipUrlFallback;
+        }
+    }
+
+    // 綁定事件
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('btnApply').addEventListener('click', applyTemplate);
+        document.getElementById('btnSkip').addEventListener('click', skipSelection);
+        loadTemplates();
+    });
+</script>
+{{end}}

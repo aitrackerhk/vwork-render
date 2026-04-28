@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 620" width="1440" height="620">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="50%" style="stop-color:#14b8a6"/>
+      <stop offset="100%" style="stop-color:#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#34d399;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#22d3ee;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6ee7b7;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#67e8f9;stop-opacity:0.2"/>
+    </linearGradient>
+    <linearGradient id="gearGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="laptopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background gradient -->
+  <rect width="1440" height="620" fill="url(#bgGrad)"/>
+
+  <!-- Decorative waves -->
+  <path d="M0,520 Q180,460 360,490 T720,470 T1080,500 T1440,460 L1440,620 L0,620Z" fill="url(#wave1)"/>
+  <path d="M0,560 Q200,510 400,540 T800,520 T1200,550 T1440,510 L1440,620 L0,620Z" fill="url(#wave2)"/>
+
+  <!-- Large floating circles -->
+  <circle cx="120" cy="100" r="80" fill="#fbbf24" opacity="0.15"/>
+  <circle cx="1350" cy="140" r="100" fill="#a78bfa" opacity="0.12"/>
+  <circle cx="700" cy="80" r="50" fill="#f472b6" opacity="0.18"/>
+  <circle cx="1100" cy="500" r="65" fill="#fbbf24" opacity="0.1"/>
+  <circle cx="200" cy="480" r="45" fill="#60a5fa" opacity="0.12"/>
+
+  <!-- Small sparkle dots -->
+  <circle cx="300" cy="150" r="4" fill="#fff" opacity="0.6"/>
+  <circle cx="500" cy="100" r="3" fill="#fff" opacity="0.5"/>
+  <circle cx="900" cy="120" r="5" fill="#fff" opacity="0.55"/>
+  <circle cx="1200" cy="180" r="3.5" fill="#fff" opacity="0.5"/>
+  <circle cx="150" cy="300" r="3" fill="#fff" opacity="0.45"/>
+  <circle cx="1300" cy="350" r="4" fill="#fff" opacity="0.5"/>
+  <circle cx="650" cy="500" r="3" fill="#fff" opacity="0.4"/>
+  <circle cx="1050" cy="250" r="3.5" fill="#fff" opacity="0.5"/>
+  <circle cx="400" cy="420" r="2.5" fill="#fff" opacity="0.45"/>
+
+  <!-- Left side: Gear/wrench illustration -->
+  <g transform="translate(100, 210)">
+    <!-- Large gear -->
+    <g transform="translate(60, 60)">
+      <circle cx="0" cy="0" r="55" fill="url(#gearGrad)" opacity="0.85"/>
+      <circle cx="0" cy="0" r="20" fill="#10b981" opacity="0.6"/>
+      <!-- Gear teeth -->
+      <rect x="-8" y="-62" width="16" height="18" rx="4" fill="url(#gearGrad)" opacity="0.85"/>
+      <rect x="-8" y="44" width="16" height="18" rx="4" fill="url(#gearGrad)" opacity="0.85"/>
+      <rect x="-62" y="-8" width="18" height="16" rx="4" fill="url(#gearGrad)" opacity="0.85"/>
+      <rect x="44" y="-8" width="18" height="16" rx="4" fill="url(#gearGrad)" opacity="0.85"/>
+      <rect x="32" y="-46" width="16" height="18" rx="4" fill="url(#gearGrad)" opacity="0.85" transform="rotate(45, 40, -37)"/>
+      <rect x="-48" y="28" width="16" height="18" rx="4" fill="url(#gearGrad)" opacity="0.85" transform="rotate(45, -40, 37)"/>
+      <rect x="-48" y="-46" width="16" height="18" rx="4" fill="url(#gearGrad)" opacity="0.85" transform="rotate(-45, -40, -37)"/>
+      <rect x="32" y="28" width="16" height="18" rx="4" fill="url(#gearGrad)" opacity="0.85" transform="rotate(-45, 40, 37)"/>
+    </g>
+
+    <!-- Wrench -->
+    <g transform="translate(140, 100) rotate(-30)">
+      <rect x="0" y="10" width="80" height="14" rx="7" fill="#fff" opacity="0.7"/>
+      <path d="M-5,0 L15,0 L15,34 L-5,34 L-5,22 L5,17 L-5,12 Z" fill="#fff" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- Laptop with dashboard (center-right) -->
+  <g transform="translate(900, 220)">
+    <!-- Laptop screen -->
+    <rect x="0" y="0" width="200" height="130" rx="12" fill="url(#laptopGrad)" opacity="0.8"/>
+    <!-- Screen content -->
+    <rect x="12" y="12" width="176" height="106" rx="6" fill="#fff" opacity="0.15"/>
+    <!-- Dashboard bars -->
+    <rect x="24" y="85" width="22" height="28" rx="4" fill="#fff" opacity="0.4"/>
+    <rect x="52" y="65" width="22" height="48" rx="4" fill="#fbbf24" opacity="0.5"/>
+    <rect x="80" y="50" width="22" height="63" rx="4" fill="#fff" opacity="0.4"/>
+    <rect x="108" y="70" width="22" height="43" rx="4" fill="#f472b6" opacity="0.45"/>
+    <rect x="136" y="40" width="22" height="73" rx="4" fill="#fff" opacity="0.4"/>
+    <!-- Graph line -->
+    <path d="M30,70 Q60,40 100,55 T170,30" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <!-- Laptop base -->
+    <path d="M-15,130 L215,130 L200,150 L15,150 Z" fill="#3b82f6" opacity="0.5"/>
+  </g>
+
+  <!-- Lightbulb (floating) -->
+  <g transform="translate(480, 130)" opacity="0.6">
+    <ellipse cx="25" cy="25" rx="22" ry="25" fill="#fbbf24" opacity="0.8"/>
+    <rect x="17" y="48" width="16" height="12" rx="3" fill="#f59e0b" opacity="0.6"/>
+    <!-- Light rays -->
+    <line x1="25" y1="-8" x2="25" y2="-18" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <line x1="-2" y1="10" x2="-10" y2="5" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <line x1="52" y1="10" x2="60" y2="5" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+    <line x1="0" y1="35" x2="-8" y2="38" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+    <line x1="50" y1="35" x2="58" y2="38" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  </g>
+
+  <!-- Clock icon -->
+  <g transform="translate(1220, 300)" opacity="0.4">
+    <circle cx="30" cy="30" r="28" fill="#fff" opacity="0.2"/>
+    <circle cx="30" cy="30" r="25" fill="none" stroke="#fff" stroke-width="2.5"/>
+    <!-- Clock hands -->
+    <line x1="30" y1="30" x2="30" y2="14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="30" y1="30" x2="42" y2="30" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="30" cy="30" r="3" fill="#fff"/>
+  </g>
+
+  <!-- Star rating icons -->
+  <g transform="translate(350, 380)" opacity="0.25">
+    <polygon points="15,0 18.5,11 30,11 20.5,18 24,29 15,22 6,29 9.5,18 0,11 11.5,11" fill="#fbbf24"/>
+    <polygon points="50,0 53.5,11 65,11 55.5,18 59,29 50,22 41,29 44.5,18 35,11 46.5,11" fill="#fbbf24"/>
+    <polygon points="85,0 88.5,11 100,11 90.5,18 94,29 85,22 76,29 79.5,18 70,11 81.5,11" fill="#fbbf24"/>
+    <polygon points="120,0 123.5,11 135,11 125.5,18 129,29 120,22 111,29 114.5,18 105,11 116.5,11" fill="#fbbf24"/>
+    <polygon points="155,0 158.5,11 170,11 160.5,18 164,29 155,22 146,29 149.5,18 140,11 151.5,11" fill="#fbbf24"/>
+  </g>
+
+  <!-- Handshake icon -->
+  <g transform="translate(650, 350)" opacity="0.35">
+    <path d="M0,30 L20,10 L40,30 L35,35 L20,20 L5,35 Z" fill="#fff" opacity="0.8"/>
+    <path d="M40,30 L60,10 L80,30 L75,35 L60,20 L45,35 Z" fill="#fff" opacity="0.6"/>
+  </g>
+
+  <!-- Floating product card -->
+  <g transform="translate(1200, 80)">
+    <rect x="0" y="0" width="100" height="80" rx="14" fill="#fff" opacity="0.15"/>
+    <rect x="10" y="10" width="80" height="35" rx="8" fill="#fff" opacity="0.1"/>
+    <rect x="10" y="52" width="50" height="8" rx="4" fill="#fff" opacity="0.15"/>
+    <rect x="10" y="64" width="30" height="6" rx="3" fill="#fff" opacity="0.1"/>
+  </g>
+
+  <!-- Floating card (left) -->
+  <g transform="translate(60, 100)">
+    <rect x="0" y="0" width="90" height="70" rx="12" fill="#fff" opacity="0.12"/>
+    <rect x="10" y="10" width="70" height="30" rx="7" fill="#fff" opacity="0.08"/>
+    <rect x="10" y="46" width="40" height="7" rx="3.5" fill="#fff" opacity="0.12"/>
+    <rect x="10" y="57" width="25" height="5" rx="2.5" fill="#fff" opacity="0.08"/>
+  </g>
+
+  <!-- Checkmark badge -->
+  <g transform="translate(780, 180)" opacity="0.35">
+    <circle cx="20" cy="20" r="20" fill="#fff" opacity="0.3"/>
+    <path d="M10,20 L17,27 L30,14" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Connecting dots/lines -->
+  <g opacity="0.1">
+    <line x1="350" y1="300" x2="500" y2="250" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+    <line x1="900" y1="280" x2="1050" y2="320" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+    <line x1="600" y1="450" x2="780" y2="400" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+  </g>
+
+  <!-- Ground/floor area -->
+  <rect x="80" y="440" width="320" height="8" rx="4" fill="#fff" opacity="0.08"/>
+  <rect x="1050" y="420" width="240" height="6" rx="3" fill="#fff" opacity="0.06"/>
+
+  <!-- Small decorative shapes -->
+  <rect x="500" y="200" width="16" height="16" rx="4" fill="#fbbf24" opacity="0.2" transform="rotate(15, 508, 208)"/>
+  <rect x="820" y="160" width="12" height="12" rx="3" fill="#34d399" opacity="0.2" transform="rotate(30, 826, 166)"/>
+  <polygon points="680,440 686,452 698,452 688,460 692,472 680,464 668,472 672,460 662,452 674,452" fill="#fbbf24" opacity="0.15"/>
+  <polygon points="440,100 444,108 452,108 446,114 448,122 440,116 432,122 434,114 428,108 436,108" fill="#fff" opacity="0.25"/>
+  <polygon points="1320,430 1323,436 1330,436 1325,440 1327,446 1320,442 1313,446 1315,440 1310,436 1317,436" fill="#fff" opacity="0.2"/>
+
+  <!-- Triangle confetti -->
+  <polygon points="560,130 570,115 580,130" fill="#f472b6" opacity="0.15" transform="rotate(20, 570, 122)"/>
+  <polygon points="1250,220 1258,208 1266,220" fill="#fbbf24" opacity="0.12" transform="rotate(-10, 1258, 214)"/>
+  <polygon points="180,420 188,408 196,420" fill="#34d399" opacity="0.15" transform="rotate(15, 188, 414)"/>
+</svg>

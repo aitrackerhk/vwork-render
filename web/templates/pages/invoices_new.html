@@ -1,0 +1,234 @@
+{{ define "pages/invoices_new" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 id="pageTitle">新增發票</h3>
+        <a href="/invoices" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span>
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="invoiceForm">
+                <input type="hidden" id="invoiceId">
+                
+                <!-- 基本信息 -->
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">客戶</label>
+                        <select class="form-select" id="customerId">
+                            <option value="">請選擇客戶</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">訂單</label>
+                        <select class="form-select" id="orderId">
+                            <option value="">無（直接創建發票）</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">發票號</label>
+                        <input type="text" class="form-control" id="invoiceNumber" placeholder="留空將自動生成">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">發票日期 <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" id="invoiceDate" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">到期日期</label>
+                        <input type="date" class="form-control" id="dueDate">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">狀態</label>
+                        <select class="form-select" id="status">
+                            <option value="draft">草稿</option>
+                            <option value="sent">已發送</option>
+                            <option value="paid">已付款</option>
+                            <option value="overdue">逾期</option>
+                            <option value="cancelled">已取消</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 金額信息 -->
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">小計</label>
+                        <input type="number" class="form-control" id="subtotal" value="0" step="0.01" min="0">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">稅額</label>
+                        <input type="number" class="form-control" id="taxAmount" value="0" step="0.01" min="0">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">總金額</label>
+                        <input type="number" class="form-control" id="totalAmount" value="0" step="0.01" min="0" readonly>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">已付金額</label>
+                    <input type="number" class="form-control" id="paidAmount" value="0" step="0.01" min="0">
+                </div>
+
+                <!-- 備註 -->
+                <div class="mb-3">
+                    <label class="form-label">備註</label>
+                    <textarea class="form-control" id="notes" rows="3"></textarea>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <a href="/invoices" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // 載入客戶列表
+        try {
+            const customers = await App.apiRequest('/customers');
+            const customerSelect = document.getElementById('customerId');
+            if (customers.data && customers.data.length > 0) {
+                customers.data.forEach(customer => {
+                    const option = document.createElement('option');
+                    option.value = customer.id;
+                    option.textContent = customer.name;
+                    customerSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load customers:', error);
+        }
+
+        // 載入訂單列表
+        try {
+            const orders = await App.apiRequest('/orders');
+            const orderSelect = document.getElementById('orderId');
+            if (orders.data && orders.data.length > 0) {
+                orders.data.forEach(order => {
+                    const option = document.createElement('option');
+                    option.value = order.id;
+                    option.textContent = `${order.order_number || order.id} - ${order.customer ? order.customer.name : ''} ($${order.total_amount || 0})`;
+                    orderSelect.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load orders:', error);
+        }
+
+        // 計算總金額
+        function calculateTotal() {
+            const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;
+            const tax = parseFloat(document.getElementById('taxAmount').value) || 0;
+            const total = subtotal + tax;
+            document.getElementById('totalAmount').value = total.toFixed(2);
+        }
+
+        document.getElementById('subtotal').addEventListener('input', calculateTotal);
+        document.getElementById('taxAmount').addEventListener('input', calculateTotal);
+
+        // 從訂單載入數據
+        document.getElementById('orderId').addEventListener('change', async function() {
+            const orderId = this.value;
+            if (!orderId) return;
+
+            try {
+                const order = await App.apiRequest(`/orders/${orderId}`);
+                document.getElementById('customerId').value = order.customer_id || '';
+                document.getElementById('subtotal').value = order.total_amount || 0;
+                calculateTotal();
+            } catch (error) {
+                console.error('Failed to load order:', error);
+            }
+        });
+
+        // 設置默認日期為今天
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('invoiceDate').value = today;
+
+
+        const pathParts = window.location.pathname.split('/');
+        const isEdit = pathParts.length === 4 && pathParts[2] === 'edit';
+        const invoiceId = isEdit ? pathParts[3] : null;
+        const apiPath = '/invoices';
+        const listPath = '/invoices';
+
+        if (isEdit && invoiceId) {
+            document.getElementById('pageTitle').textContent = '編輯發票';
+            document.getElementById('invoiceId').value = invoiceId;
+            
+            try {
+                const invoice = await App.apiRequest(`${apiPath}/${invoiceId}`);
+                document.getElementById('customerId').value = invoice.customer_id || '';
+                document.getElementById('orderId').value = invoice.order_id || '';
+                document.getElementById('invoiceNumber').value = invoice.invoice_number || '';
+                document.getElementById('invoiceDate').value = formatDateForInput(invoice.invoice_date);
+                document.getElementById('dueDate').value = formatDateForInput(invoice.due_date);
+                document.getElementById('status').value = invoice.status || 'draft';
+                document.getElementById('subtotal').value = invoice.subtotal || 0;
+                document.getElementById('taxAmount').value = invoice.tax_amount || 0;
+                document.getElementById('totalAmount').value = invoice.total_amount || 0;
+                document.getElementById('paidAmount').value = invoice.paid_amount || 0;
+                document.getElementById('notes').value = invoice.notes || '';
+                calculateTotal();
+            } catch (error) {
+                App.showAlert('載入失敗: ' + error.message, 'danger');
+                setTimeout(() => { if (typeof Router !== 'undefined' && Router.go) { Router.go(listPath); } else { window.location.href = listPath; } }, 2000);
+                return;
+            }
+        }
+
+        document.getElementById('invoiceForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                customer_id: document.getElementById('customerId').value || null,
+                order_id: document.getElementById('orderId').value || null,
+                invoice_number: document.getElementById('invoiceNumber').value || null,
+                invoice_date: document.getElementById('invoiceDate').value,
+                due_date: document.getElementById('dueDate').value || null,
+                status: document.getElementById('status').value,
+                subtotal: parseFloat(document.getElementById('subtotal').value) || 0,
+                tax_amount: parseFloat(document.getElementById('taxAmount').value) || 0,
+                total_amount: parseFloat(document.getElementById('totalAmount').value) || 0,
+                paid_amount: parseFloat(document.getElementById('paidAmount').value) || 0,
+                notes: document.getElementById('notes').value || null
+            };
+
+            if (!data.invoice_date) {
+                App.showAlert('請填寫發票日期', 'warning');
+                return;
+            }
+
+            try {
+                if (isEdit && invoiceId) {
+                    await App.apiRequest(`${apiPath}/${invoiceId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                    App.showAlert('更新成功', 'success');
+                } else {
+                    await App.apiRequest(apiPath, {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                    App.showAlert('創建成功', 'success');
+                }
+                setTimeout(() => { if (typeof Router !== 'undefined' && Router.go) { Router.go(listPath); } else { window.location.href = listPath; } }, 1000);
+            } catch (error) {
+                App.showAlert('保存失敗: ' + error.message, 'danger');
+            }
+        });
+    });
+</script>
+{{ end }}

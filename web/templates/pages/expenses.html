@@ -1,0 +1,53 @@
+{{ define "pages/expenses" }}
+<div id="dynamicListContainer">
+    <!-- 內容將由 JavaScript 動態生成 -->
+</div>
+
+<script>
+    // 確保所有依賴都已載入
+    function initDynamicList() {
+        // 檢查必要的依賴
+        if (typeof DynamicList === 'undefined') {
+            console.error('DynamicList 類未定義');
+            return;
+        }
+        if (typeof getPageConfig === 'undefined') {
+            console.error('getPageConfig 函數未定義');
+            return;
+        }
+        
+        const pageName = 'expenses';
+        let config = getPageConfig(pageName);
+        
+        if (!config) {
+            const container = document.getElementById('dynamicListContainer');
+            if (container) {
+                container.innerHTML = '<div class="alert alert-danger">頁面配置未找到: ' + pageName + '</div>';
+            }
+            return;
+        }
+        
+        // 初始化動態列表
+        try {
+            window.dynamicList = new DynamicList(config);
+        } catch (error) {
+            console.error('初始化動態列表失敗:', error);
+            const container = document.getElementById('dynamicListContainer');
+            if (container) {
+                container.innerHTML = '<div class="alert alert-danger">初始化失敗: ' + error.message + '</div>';
+            }
+        }
+    }
+    
+    // 如果 DOM 已載入，直接執行；否則等待 DOMContentLoaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            // 等待所有腳本載入完成
+            setTimeout(initDynamicList, 100);
+        });
+    } else {
+        setTimeout(initDynamicList, 100);
+    }
+</script>
+{{ end }}
+

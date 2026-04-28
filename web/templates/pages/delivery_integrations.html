@@ -1,0 +1,820 @@
+{{ define "pages/delivery_integrations" }}
+<div class="container py-4">
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
+        <div>
+            <h4 class="mb-1"><i class="bi bi-scooter me-2"></i><span data-i18n="pages.deliveryIntegrations.title">外賣平台整合</span></h4>
+            <p class="text-muted small mb-0" data-i18n="pages.deliveryIntegrations.subtitle">連接外賣平台，自動接收訂單、同步菜單和更新訂單狀態。</p>
+        </div>
+        <button class="btn btn-primary" id="deliverySaveBtn" onclick="saveAllIntegrations()">
+            <i class="bi bi-save me-1"></i><span data-i18n="pages.deliveryIntegrations.saveSettings">儲存設定</span>
+        </button>
+    </div>
+
+    <!-- 選擇外賣平台 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="bi bi-plus-circle me-2"></i><span data-i18n="pages.deliveryIntegrations.addPlatform">添加外賣平台連接</span></h5>
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="addDeliverySelect" data-i18n="pages.deliveryIntegrations.selectPlatform">選擇要連接的外賣平台</label>
+                    <select class="form-select" id="addDeliverySelect">
+                        <option value="" data-i18n="pages.deliveryIntegrations.selectPlatformPlaceholder">請選擇外賣平台...</option>
+                        <option value="foodpanda">🛵 Foodpanda</option>
+                        <option value="keeta">🏍️ Keeta 美團香港</option>
+                        <option value="deliveroo">🚲 Deliveroo 戶戶送</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <button class="btn btn-outline-primary" id="addDeliveryBtn" onclick="addDeliveryPlatform()">
+                        <i class="bi bi-plus-lg me-1"></i><span data-i18n="common.add">添加</span>
+                    </button>
+                </div>
+            </div>
+            <p class="text-muted small mt-2 mb-0" data-i18n="pages.deliveryIntegrations.supportedNote">只顯示已支援 API 連接的外賣平台。</p>
+        </div>
+    </div>
+
+    <!-- Foodpanda -->
+    <div class="card mb-4 dp-card" id="foodpandaCard" data-dp="foodpanda" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <div class="me-2 d-flex align-items-center justify-content-center" 
+                         style="width: 28px; height: 28px; background: #d70f64; border-radius: 4px;">
+                        <i class="bi bi-bag-fill text-white" style="font-size: 14px;"></i>
+                    </div>
+                    <h5 class="mb-0">Foodpanda</h5>
+                    <span class="badge bg-secondary ms-2" id="foodpandaStatus" data-i18n="pages.deliveryIntegrations.notConnected">未連接</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeDeliveryPlatform('foodpanda')"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="pages.deliveryIntegrations.foodpandaDesc">連接 Foodpanda 外賣平台，自動接收訂單、同步菜單和更新訂單狀態。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="pages.deliveryIntegrations.environment">環境</label>
+                <select class="form-select" id="foodpandaEnvironment">
+                    <option value="sandbox" data-i18n="pages.deliveryIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="pages.deliveryIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="pages.deliveryIntegrations.environmentHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Vendor ID</label>
+                <input type="text" class="form-control" id="foodpandaVendorId" 
+                       data-i18n-placeholder="pages.deliveryIntegrations.foodpandaVendorIdPlaceholder" placeholder="Foodpanda 提供的商戶 ID">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">API Key</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="foodpandaApiKey" 
+                           data-i18n-placeholder="pages.deliveryIntegrations.foodpandaApiKeyPlaceholder" placeholder="Foodpanda 提供的 API Key">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('foodpandaApiKey')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">API Secret</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="foodpandaApiSecret" 
+                           data-i18n-placeholder="pages.deliveryIntegrations.foodpandaApiSecretPlaceholder" placeholder="Foodpanda 提供的 API Secret">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('foodpandaApiSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="pages.deliveryIntegrations.featureSettings">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="foodpandaAutoAccept">
+                <label class="form-check-label" for="foodpandaAutoAccept" data-i18n="pages.deliveryIntegrations.autoAccept">
+                    自動接單
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.autoAcceptHint">自動接受新訂單（不建議開啟）。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="foodpandaSyncMenu" checked>
+                <label class="form-check-label" for="foodpandaSyncMenu" data-i18n="pages.deliveryIntegrations.syncMenu">
+                    同步菜單
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.foodpandaSyncMenuHint">自動將 vWork 菜單同步至 Foodpanda。</small>
+            </div>
+            <div class="mb-2 ms-4">
+                <label class="form-label small text-muted mb-1" data-i18n="pages.deliveryIntegrations.syncMenuCategories">同步菜單類別</label>
+                <select class="form-select" id="foodpandaSyncMenuCategories" multiple="multiple" style="width:100%;"></select>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.syncMenuCategoriesHint">選擇要同步的產品類別（留空則同步全部）。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="foodpandaNotification" checked>
+                <label class="form-check-label" for="foodpandaNotification" data-i18n="pages.deliveryIntegrations.newOrderNotification">
+                    新訂單通知
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.newOrderNotificationHint">收到新訂單時發送通知。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-link-45deg me-1"></i><span data-i18n="pages.deliveryIntegrations.webhookSettings">Webhook 設定</span></h6>
+            <div class="mb-3">
+                <label class="form-label">Webhook URL</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="foodpandaWebhookUrl" readonly>
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="copyToClipboard('foodpandaWebhookUrl')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <small class="text-muted" data-i18n="pages.deliveryIntegrations.foodpandaWebhookHint">請將此 URL 設定在 Foodpanda 商戶後台。</small>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testPlatformConnection('foodpanda')">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="pages.deliveryIntegrations.testConnection">測試連接</span>
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="syncPlatformMenu('foodpanda')" id="syncMenuBtn_foodpanda" style="display:none;">
+                    <i class="bi bi-arrow-repeat me-1"></i><span data-i18n="pages.deliveryIntegrations.syncMenu">同步菜單</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keeta (美團香港) -->
+    <div class="card mb-4 dp-card" id="keetaCard" data-dp="keeta" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <div class="me-2 d-flex align-items-center justify-content-center" 
+                         style="width: 28px; height: 28px; background: #ffcc00; border-radius: 4px;">
+                        <i class="bi bi-bag-fill text-dark" style="font-size: 14px;"></i>
+                    </div>
+                    <h5 class="mb-0">Keeta 美團香港</h5>
+                    <span class="badge bg-secondary ms-2" id="keetaStatus" data-i18n="pages.deliveryIntegrations.notConnected">未連接</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeDeliveryPlatform('keeta')"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="pages.deliveryIntegrations.keetaDesc">連接 Keeta (美團香港) 外賣平台，自動接收訂單和同步訂單狀態。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="pages.deliveryIntegrations.environment">環境</label>
+                <select class="form-select" id="keetaEnvironment">
+                    <option value="sandbox" data-i18n="pages.deliveryIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="pages.deliveryIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="pages.deliveryIntegrations.environmentHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="pages.deliveryIntegrations.keetaMerchantIdLabel">商戶 ID (Merchant ID)</label>
+                <input type="text" class="form-control" id="keetaMerchantId" 
+                       data-i18n-placeholder="pages.deliveryIntegrations.keetaMerchantIdPlaceholder" placeholder="Keeta 提供的商戶 ID">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">App ID</label>
+                <input type="text" class="form-control" id="keetaAppId" 
+                       data-i18n-placeholder="pages.deliveryIntegrations.keetaAppIdPlaceholder" placeholder="Keeta 提供的 App ID">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">App Secret</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="keetaAppSecret" 
+                           data-i18n-placeholder="pages.deliveryIntegrations.keetaAppSecretPlaceholder" placeholder="Keeta 提供的 App Secret">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('keetaAppSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="pages.deliveryIntegrations.featureSettings">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="keetaAutoAccept">
+                <label class="form-check-label" for="keetaAutoAccept" data-i18n="pages.deliveryIntegrations.autoAccept">
+                    自動接單
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.autoAcceptHint">自動接受新訂單（不建議開啟）。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="keetaSyncMenu" checked>
+                <label class="form-check-label" for="keetaSyncMenu" data-i18n="pages.deliveryIntegrations.syncMenu">
+                    同步菜單
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.keetaSyncMenuHint">自動將 vWork 菜單同步至 Keeta。</small>
+            </div>
+            <div class="mb-2 ms-4">
+                <label class="form-label small text-muted mb-1" data-i18n="pages.deliveryIntegrations.syncMenuCategories">同步菜單類別</label>
+                <select class="form-select" id="keetaSyncMenuCategories" multiple="multiple" style="width:100%;"></select>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.syncMenuCategoriesHint">選擇要同步的產品類別（留空則同步全部）。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="keetaNotification" checked>
+                <label class="form-check-label" for="keetaNotification" data-i18n="pages.deliveryIntegrations.newOrderNotification">
+                    新訂單通知
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.newOrderNotificationHint">收到新訂單時發送通知。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-link-45deg me-1"></i><span data-i18n="pages.deliveryIntegrations.webhookSettings">Webhook 設定</span></h6>
+            <div class="mb-3">
+                <label class="form-label">Webhook URL</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="keetaWebhookUrl" readonly>
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="copyToClipboard('keetaWebhookUrl')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <small class="text-muted" data-i18n="pages.deliveryIntegrations.keetaWebhookHint">請將此 URL 設定在 Keeta 商戶後台。</small>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testPlatformConnection('keeta')">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="pages.deliveryIntegrations.testConnection">測試連接</span>
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="syncPlatformMenu('keeta')" id="syncMenuBtn_keeta" style="display:none;">
+                    <i class="bi bi-arrow-repeat me-1"></i><span data-i18n="pages.deliveryIntegrations.syncMenu">同步菜單</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deliveroo 戶戶送 -->
+    <div class="card mb-4 dp-card" id="deliverooCard" data-dp="deliveroo" style="display:none;">
+        <div class="card-header bg-light">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center">
+                    <div class="me-2 d-flex align-items-center justify-content-center" 
+                         style="width: 28px; height: 28px; background: #00ccbc; border-radius: 4px;">
+                        <i class="bi bi-bag-fill text-white" style="font-size: 14px;"></i>
+                    </div>
+                    <h5 class="mb-0">Deliveroo 戶戶送</h5>
+                    <span class="badge bg-secondary ms-2" id="deliverooStatus" data-i18n="pages.deliveryIntegrations.notConnected">未連接</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeDeliveryPlatform('deliveroo')"><i class="bi bi-x-lg"></i></button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-3" data-i18n="pages.deliveryIntegrations.deliverooDesc">連接 Deliveroo 外賣平台，自動接收訂單、同步菜單和更新訂單狀態。</p>
+            
+            <div class="mb-3">
+                <label class="form-label" data-i18n="pages.deliveryIntegrations.environment">環境</label>
+                <select class="form-select" id="deliverooEnvironment">
+                    <option value="sandbox" data-i18n="pages.deliveryIntegrations.sandbox">沙盒測試 (Sandbox)</option>
+                    <option value="production" data-i18n="pages.deliveryIntegrations.production">正式環境 (Production)</option>
+                </select>
+                <small class="text-muted" data-i18n="pages.deliveryIntegrations.environmentHint">請先使用沙盒環境測試，確認無誤後再切換至正式環境。</small>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Restaurant ID</label>
+                <input type="text" class="form-control" id="deliverooRestaurantId" 
+                       data-i18n-placeholder="pages.deliveryIntegrations.deliverooRestaurantIdPlaceholder" placeholder="Deliveroo 提供的餐廳 ID">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client ID</label>
+                <input type="text" class="form-control" id="deliverooClientId" 
+                       data-i18n-placeholder="pages.deliveryIntegrations.deliverooClientIdPlaceholder" placeholder="Deliveroo 提供的 Client ID">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Client Secret</label>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="deliverooClientSecret" 
+                           data-i18n-placeholder="pages.deliveryIntegrations.deliverooClientSecretPlaceholder" placeholder="Deliveroo 提供的 Client Secret">
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="togglePasswordVisibility('deliverooClientSecret')">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-gear me-1"></i><span data-i18n="pages.deliveryIntegrations.featureSettings">功能設定</span></h6>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="deliverooAutoAccept">
+                <label class="form-check-label" for="deliverooAutoAccept" data-i18n="pages.deliveryIntegrations.autoAccept">
+                    自動接單
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.autoAcceptHint">自動接受新訂單（不建議開啟）。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="deliverooSyncMenu" checked>
+                <label class="form-check-label" for="deliverooSyncMenu" data-i18n="pages.deliveryIntegrations.syncMenu">
+                    同步菜單
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.deliverooSyncMenuHint">自動將 vWork 菜單同步至 Deliveroo。</small>
+            </div>
+            <div class="mb-2 ms-4">
+                <label class="form-label small text-muted mb-1" data-i18n="pages.deliveryIntegrations.syncMenuCategories">同步菜單類別</label>
+                <select class="form-select" id="deliverooSyncMenuCategories" multiple="multiple" style="width:100%;"></select>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.syncMenuCategoriesHint">選擇要同步的產品類別（留空則同步全部）。</small>
+            </div>
+            
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="deliverooNotification" checked>
+                <label class="form-check-label" for="deliverooNotification" data-i18n="pages.deliveryIntegrations.newOrderNotification">
+                    新訂單通知
+                </label>
+                <small class="text-muted d-block" data-i18n="pages.deliveryIntegrations.newOrderNotificationHint">收到新訂單時發送通知。</small>
+            </div>
+
+            <hr class="my-3">
+            
+            <h6 class="mb-3"><i class="bi bi-link-45deg me-1"></i><span data-i18n="pages.deliveryIntegrations.webhookSettings">Webhook 設定</span></h6>
+            <div class="mb-3">
+                <label class="form-label">Webhook URL</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="deliverooWebhookUrl" readonly>
+                    <button class="btn btn-outline-secondary" type="button" 
+                            onclick="copyToClipboard('deliverooWebhookUrl')">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <small class="text-muted" data-i18n="pages.deliveryIntegrations.deliverooWebhookHint">請將此 URL 設定在 Deliveroo 商戶後台。</small>
+            </div>
+            
+            <div class="d-grid gap-2 mt-3">
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="testPlatformConnection('deliveroo')">
+                    <i class="bi bi-plug me-1"></i><span data-i18n="pages.deliveryIntegrations.testConnection">測試連接</span>
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="syncPlatformMenu('deliveroo')" id="syncMenuBtn_deliveroo" style="display:none;">
+                    <i class="bi bi-arrow-repeat me-1"></i><span data-i18n="pages.deliveryIntegrations.syncMenu">同步菜單</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function wdT(key, fallback) { return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback; }
+const DELIVERY_PLATFORMS = ['foodpanda', 'keeta', 'deliveroo'];
+let visiblePlatforms = [];
+let _allCategories = null; // cached categories from API
+
+// Initialize Select2 multi-select for sync menu categories
+async function initSyncMenuCategorySelect2(platform, selectedValues) {
+    const selEl = document.getElementById(`${platform}SyncMenuCategories`);
+    if (!selEl || typeof $ === 'undefined' || !$.fn.select2) return;
+    const $sel = $(selEl);
+
+    // Destroy existing instance if any
+    if ($sel.hasClass('select2-hidden-accessible')) {
+        $sel.select2('destroy');
+    }
+    $sel.empty();
+
+    // Load categories from API (cached)
+    if (_allCategories === null) {
+        try {
+            const resp = await fetch('/api/v1/products/categories');
+            const json = await resp.json();
+            _allCategories = json.data || [];
+        } catch (_) {
+            _allCategories = [];
+        }
+    }
+
+    // Merge: ensure selectedValues not in allCategories are still available
+    const catSet = new Set(_allCategories);
+    (selectedValues || []).forEach(v => catSet.add(v));
+    const finalList = Array.from(catSet).sort();
+
+    // Populate <option> elements
+    finalList.forEach(cat => {
+        const opt = new Option(cat, cat, false, (selectedValues || []).includes(cat));
+        $sel.append(opt);
+    });
+
+    // Init Select2
+    $sel.select2({
+        theme: 'bootstrap-5',
+        placeholder: wdT('pages.deliveryIntegrations.selectCategory', '選擇類別'),
+        allowClear: true,
+        width: '100%',
+        multiple: true,
+        tags: true
+    });
+}
+
+// Get selected sync menu categories for a platform
+function getSyncMenuCategories(platform) {
+    const selEl = document.getElementById(`${platform}SyncMenuCategories`);
+    if (!selEl || typeof $ === 'undefined' || !$.fn.select2) return [];
+    return $(selEl).val() || [];
+}
+
+// ============ Platform visibility management ============
+
+function getVisiblePlatformsKey() {
+    return 'vwork_visible_delivery_platforms';
+}
+
+function loadVisiblePlatforms() {
+    try {
+        const saved = localStorage.getItem(getVisiblePlatformsKey());
+        return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveVisiblePlatforms() {
+    try {
+        localStorage.setItem(getVisiblePlatformsKey(), JSON.stringify(visiblePlatforms));
+    } catch (e) {
+        console.warn('Cannot save to localStorage');
+    }
+}
+
+function updatePlatformVisibility() {
+    DELIVERY_PLATFORMS.forEach(dp => {
+        const card = document.getElementById(dp + 'Card');
+        if (card) {
+            card.style.display = visiblePlatforms.includes(dp) ? 'block' : 'none';
+        }
+    });
+    updateAddDeliverySelect();
+}
+
+function updateAddDeliverySelect() {
+    const select = document.getElementById('addDeliverySelect');
+    if (!select) return;
+    Array.from(select.options).forEach(opt => {
+        if (opt.value && DELIVERY_PLATFORMS.includes(opt.value)) {
+            opt.style.display = visiblePlatforms.includes(opt.value) ? 'none' : '';
+        }
+    });
+    select.value = '';
+}
+
+function addDeliveryPlatform() {
+    const select = document.getElementById('addDeliverySelect');
+    const dp = select?.value;
+    if (!dp || !DELIVERY_PLATFORMS.includes(dp)) {
+        showToast('warning', wdT('pages.deliveryIntegrations.selectPlatformAlert', '請選擇一個外賣平台'));
+        return;
+    }
+    if (!visiblePlatforms.includes(dp)) {
+        visiblePlatforms.push(dp);
+        saveVisiblePlatforms();
+        updatePlatformVisibility();
+        const card = document.getElementById(dp + 'Card');
+        if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+}
+
+function removeDeliveryPlatform(dp) {
+    if (!confirm(wdT('pages.deliveryIntegrations.confirmRemove', '確定要移除此外賣平台連接嗎？設定將被保留。'))) return;
+    visiblePlatforms = visiblePlatforms.filter(p => p !== dp);
+    saveVisiblePlatforms();
+    updatePlatformVisibility();
+}
+
+// ============ Load / Save ============
+
+// 頁面載入時初始化
+document.addEventListener('DOMContentLoaded', function() {
+    initWebhookUrls();
+    loadIntegrations();
+});
+
+// 初始化 Webhook URLs
+function initWebhookUrls() {
+    const baseUrl = window.location.origin;
+    DELIVERY_PLATFORMS.forEach(platform => {
+        const webhookInput = document.getElementById(`${platform}WebhookUrl`);
+        if (webhookInput) {
+            webhookInput.value = `${baseUrl}/api/v1/delivery/webhook/${platform}`;
+        }
+    });
+}
+
+// 載入整合設定
+async function loadIntegrations() {
+    try {
+        const response = await fetch('/api/v1/delivery-integrations');
+        if (!response.ok) throw new Error(wdT('pages.deliveryIntegrations.loadFailed', '載入失敗'));
+        
+        const integrations = await response.json();
+
+        visiblePlatforms = loadVisiblePlatforms();
+        
+        DELIVERY_PLATFORMS.forEach(platform => {
+            const integration = integrations.find(i => i.platform === platform);
+            if (integration) {
+                applyIntegrationData(platform, integration);
+                // Auto-show if has data
+                if (integration.is_enabled || integration.has_api_key) {
+                    if (!visiblePlatforms.includes(platform)) {
+                        visiblePlatforms.push(platform);
+                    }
+                }
+            }
+        });
+
+        saveVisiblePlatforms();
+        updatePlatformVisibility();
+    } catch (error) {
+        console.error('載入整合設定失敗:', error);
+    }
+}
+
+// 套用整合資料到表單
+function applyIntegrationData(platform, data) {
+    const statusBadge = document.getElementById(`${platform}Status`);
+    if (statusBadge) {
+        if (data.is_enabled && data.is_connected) {
+            statusBadge.textContent = wdT('pages.deliveryIntegrations.connected', '已連接');
+            statusBadge.className = 'badge bg-success ms-2';
+        } else if (data.is_enabled) {
+            statusBadge.textContent = wdT('pages.deliveryIntegrations.connecting', '連接中');
+            statusBadge.className = 'badge bg-warning ms-2';
+        } else {
+            statusBadge.textContent = wdT('pages.deliveryIntegrations.notConnected', '未連接');
+            statusBadge.className = 'badge bg-secondary ms-2';
+        }
+    }
+    
+    // 環境
+    const envSelect = document.getElementById(`${platform}Environment`);
+    if (envSelect && data.environment) {
+        envSelect.value = data.environment;
+    }
+    
+    // 根據平台填充不同欄位 (merchant_id is the unified backend field)
+    const config = (data.settings && data.settings.config) || {};
+    switch (platform) {
+        case 'foodpanda':
+            setInputValue('foodpandaVendorId', config.vendor_id || data.merchant_id);
+            // API key/secret are hidden - only show placeholder if configured
+            if (data.has_api_key) document.getElementById('foodpandaApiKey')?.setAttribute('placeholder', wdT('pages.deliveryIntegrations.alreadySet', '(已設定)'));
+            if (data.has_api_secret) document.getElementById('foodpandaApiSecret')?.setAttribute('placeholder', wdT('pages.deliveryIntegrations.alreadySet', '(已設定)'));
+            break;
+        case 'keeta':
+            setInputValue('keetaMerchantId', config.merchant_id || data.merchant_id);
+            if (data.has_api_key) document.getElementById('keetaAppId')?.setAttribute('placeholder', wdT('pages.deliveryIntegrations.alreadySet', '(已設定)'));
+            if (data.has_api_secret) document.getElementById('keetaAppSecret')?.setAttribute('placeholder', wdT('pages.deliveryIntegrations.alreadySet', '(已設定)'));
+            break;
+        case 'deliveroo':
+            setInputValue('deliverooRestaurantId', config.restaurant_id || data.merchant_id);
+            if (data.has_api_key) document.getElementById('deliverooClientId')?.setAttribute('placeholder', wdT('pages.deliveryIntegrations.alreadySet', '(已設定)'));
+            if (data.has_api_secret) document.getElementById('deliverooClientSecret')?.setAttribute('placeholder', wdT('pages.deliveryIntegrations.alreadySet', '(已設定)'));
+            break;
+    }
+    
+    // 功能設定
+    const settings = data.settings || {};
+    setCheckboxValue(`${platform}AutoAccept`, settings.auto_accept);
+    setCheckboxValue(`${platform}SyncMenu`, settings.sync_menu !== false);
+    setCheckboxValue(`${platform}Notification`, settings.notification !== false);
+
+    // Initialize Select2 for sync menu categories with saved values
+    const savedCategories = settings.sync_menu_categories || [];
+    initSyncMenuCategorySelect2(platform, savedCategories);
+    
+    // Webhook URL (use backend value if available)
+    if (data.webhook_url) {
+        const webhookInput = document.getElementById(`${platform}WebhookUrl`);
+        if (webhookInput) webhookInput.value = data.webhook_url;
+    }
+
+    // Show/hide sync menu button based on connection status
+    const syncBtn = document.getElementById(`syncMenuBtn_${platform}`);
+    if (syncBtn) {
+        syncBtn.style.display = (data.is_enabled && data.is_connected) ? '' : 'none';
+        // Store integration ID for sync menu calls
+        syncBtn.dataset.integrationId = data.id || '';
+    }
+}
+
+function setInputValue(id, value) {
+    const input = document.getElementById(id);
+    if (input && value) input.value = value;
+}
+
+function setCheckboxValue(id, value) {
+    const checkbox = document.getElementById(id);
+    if (checkbox) checkbox.checked = !!value;
+}
+
+// 測試平台連接
+async function testPlatformConnection(platform) {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + wdT('pages.deliveryIntegrations.testing', '測試中...');
+    
+    try {
+        const data = collectPlatformData(platform);
+        const response = await fetch(`/api/v1/delivery-integrations/test`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('success', wdT('pages.deliveryIntegrations.connectionSuccess', '連接成功！'));
+            updateStatusBadge(platform, 'connected');
+        } else {
+            showToast('error', result.message || wdT('pages.deliveryIntegrations.connectionFailed', '連接失敗'));
+            updateStatusBadge(platform, 'error');
+        }
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryIntegrations.testError', '測試連接時發生錯誤'));
+        console.error(error);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// 同步菜單到平台
+async function syncPlatformMenu(platform) {
+    const syncBtn = document.getElementById(`syncMenuBtn_${platform}`);
+    if (!syncBtn) return;
+
+    const integrationId = syncBtn.dataset.integrationId;
+    if (!integrationId) {
+        showToast('error', wdT('pages.deliveryIntegrations.noIntegrationFound', '未找到整合設定，請先儲存設定'));
+        return;
+    }
+
+    const originalText = syncBtn.innerHTML;
+    syncBtn.disabled = true;
+    syncBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + wdT('pages.deliveryIntegrations.syncing', '同步中...');
+
+    try {
+        const response = await fetch(`/api/v1/delivery-integrations/${integrationId}/sync-menu`, {
+            method: 'POST'
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('success', result.message || wdT('pages.deliveryIntegrations.syncSuccess', '菜單同步成功'));
+        } else {
+            showToast('error', result.error || wdT('pages.deliveryIntegrations.syncFailed', '菜單同步失敗'));
+        }
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryIntegrations.syncError', '同步菜單時發生錯誤'));
+        console.error(error);
+    } finally {
+        syncBtn.disabled = false;
+        syncBtn.innerHTML = originalText;
+    }
+}
+
+// 收集平台資料
+function collectPlatformData(platform) {
+    const data = {
+        platform: platform,
+        is_enabled: visiblePlatforms.includes(platform),
+        environment: document.getElementById(`${platform}Environment`)?.value || 'sandbox',
+        config: {},
+        settings: {
+            auto_accept: document.getElementById(`${platform}AutoAccept`)?.checked || false,
+            sync_menu: document.getElementById(`${platform}SyncMenu`)?.checked || false,
+            notification: document.getElementById(`${platform}Notification`)?.checked || false,
+            sync_menu_categories: getSyncMenuCategories(platform)
+        }
+    };
+    
+    switch (platform) {
+        case 'foodpanda':
+            data.config.vendor_id = document.getElementById('foodpandaVendorId')?.value;
+            data.api_key = document.getElementById('foodpandaApiKey')?.value;
+            data.api_secret = document.getElementById('foodpandaApiSecret')?.value;
+            break;
+        case 'keeta':
+            data.config.merchant_id = document.getElementById('keetaMerchantId')?.value;
+            data.api_key = document.getElementById('keetaAppId')?.value;
+            data.api_secret = document.getElementById('keetaAppSecret')?.value;
+            break;
+        case 'deliveroo':
+            data.config.restaurant_id = document.getElementById('deliverooRestaurantId')?.value;
+            data.api_key = document.getElementById('deliverooClientId')?.value;
+            data.api_secret = document.getElementById('deliverooClientSecret')?.value;
+            break;
+    }
+    
+    return data;
+}
+
+// 儲存所有整合設定
+async function saveAllIntegrations() {
+    const btn = document.getElementById('deliverySaveBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + wdT('pages.deliveryIntegrations.saving', '儲存中...');
+    
+    try {
+        for (const platform of DELIVERY_PLATFORMS) {
+            const data = collectPlatformData(platform);
+            await fetch('/api/v1/delivery-integrations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+        }
+        showToast('success', wdT('pages.deliveryIntegrations.saveSuccess', '設定已儲存'));
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryIntegrations.saveFailed', '儲存失敗'));
+        console.error(error);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// 更新狀態徽章
+function updateStatusBadge(platform, status) {
+    const badge = document.getElementById(`${platform}Status`);
+    if (!badge) return;
+    
+    switch (status) {
+        case 'connected':
+            badge.textContent = wdT('pages.deliveryIntegrations.connected', '已連接');
+            badge.className = 'badge bg-success ms-2';
+            break;
+        case 'error':
+            badge.textContent = wdT('pages.deliveryIntegrations.connectionFailed', '連接失敗');
+            badge.className = 'badge bg-danger ms-2';
+            break;
+        default:
+            badge.textContent = wdT('pages.deliveryIntegrations.notConnected', '未連接');
+            badge.className = 'badge bg-secondary ms-2';
+    }
+}
+
+// 切換密碼可見性
+function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    const btn = input.nextElementSibling;
+    const icon = btn.querySelector('i');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+    }
+}
+
+// 複製到剪貼板
+function copyToClipboard(inputId) {
+    const input = document.getElementById(inputId);
+    input.select();
+    document.execCommand('copy');
+    showToast('success', wdT('pages.deliveryIntegrations.copiedToClipboard', '已複製到剪貼板'));
+}
+
+// 顯示 Toast 通知
+function showToast(type, message) {
+    if (typeof Toastify !== 'undefined') {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            style: {
+                background: type === 'success' ? '#198754' : type === 'warning' ? '#ffc107' : '#dc3545'
+            }
+        }).showToast();
+    } else {
+        alert(message);
+    }
+}
+</script>
+{{ end }}

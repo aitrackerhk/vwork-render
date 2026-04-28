@@ -1,0 +1,98 @@
+{{ define "pages/enterprises_new" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 id="pageTitle">新增企業</h3>
+        <a href="/enterprises" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span>
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="dataForm">
+                <input type="hidden" id="itemId">
+                <div class="mb-3">
+                    <label class="form-label">名稱 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">代碼</label>
+                    <input type="text" class="form-control" id="code">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">狀態</label>
+                    <select class="form-select" id="status">
+                        <option value="active" data-i18n="common.active">活躍</option>
+                        <option value="inactive" data-i18n="common.inactive">非活躍</option>
+                    </select>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <a href="/enterprises" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        const pathParts = window.location.pathname.split('/');
+        const isEdit = pathParts.length === 4 && pathParts[2] === 'edit';
+        const itemId = isEdit ? pathParts[3] : null;
+        const apiPath = '/enterprises';
+        const listPath = '/enterprises';
+
+        if (isEdit && itemId) {
+            document.getElementById('pageTitle').textContent = '編輯企業';
+            document.getElementById('itemId').value = itemId;
+            
+            try {
+                const item = await App.apiRequest(`${apiPath}/${itemId}`);
+                document.getElementById('name').value = item.name || '';
+                document.getElementById('code').value = item.code || '';
+                document.getElementById('status').value = item.status || 'active';
+            } catch (error) {
+                App.showAlert('載入失敗: ' + error.message, 'danger');
+                setTimeout(() => { if (typeof Router !== 'undefined' && Router.go) { Router.go(listPath); } else { window.location.href = listPath; } }, 2000);
+                return;
+            }
+        }
+
+        document.getElementById('dataForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('name').value,
+                code: document.getElementById('code').value || null,
+                status: document.getElementById('status').value
+            };
+
+            if (!data.name) {
+                App.showAlert('請填寫名稱', 'warning');
+                return;
+            }
+
+            try {
+                if (isEdit && itemId) {
+                    await App.apiRequest(`${apiPath}/${itemId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                    App.showAlert('更新成功', 'success');
+                } else {
+                    await App.apiRequest(apiPath, {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                    App.showAlert('創建成功', 'success');
+                }
+                setTimeout(() => { if (typeof Router !== 'undefined' && Router.go) { Router.go(listPath); } else { window.location.href = listPath; } }, 1000);
+            } catch (error) {
+                App.showAlert('保存失敗: ' + error.message, 'danger');
+            }
+        });
+    });
+</script>
+{{ end }}
+

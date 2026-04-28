@@ -1,0 +1,96 @@
+{{define "layouts/sidemenu_voffice.html"}}
+<!-- vOffice Side Menu -->
+<div class="sidebar" id="sidebar">
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column" id="sidebarMenuList">
+            <!-- 軟件下載 -->
+            <li class="nav-item" data-menu-key="voffice-download">
+                <a class="nav-link" href="/voffice-download" id="nav-voffice-download">
+                    <i class="bi bi-download"></i> <span data-i18n="voffice.menu.download">軟件下載</span>
+                </a>
+            </li>
+
+            <!-- 費用中心 -->
+            <li class="nav-item nav-group" data-menu-key="billing">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#billingSubmenu" aria-expanded="false">
+                    <i class="bi bi-credit-card"></i> <span data-i18n="menu.billingCenter">費用中心</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="billingSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item" data-permission="billing">
+                            <a class="nav-link" href="/voffice-billing" id="nav-billing">
+                                <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-permission="ai-coins">
+                            <a class="nav-link" href="/voffice-vcoins" id="nav-ai-coins">
+                                <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="currentColor"/></svg> <span data-i18n="nav.aiCoins">vCoin</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- 返回首頁 -->
+            <li class="nav-item" data-menu-key="home">
+                <a class="nav-link" href="/?domain=voffice" id="nav-home">
+                    <i class="bi bi-house-door"></i> <span data-i18n="menu.backToHome">返回首頁</span>
+                </a>
+            </li>
+
+            <!-- Mobile only: support info, language, user -->
+            <li class="nav-item d-lg-none nav-group" data-menu-key="mobile-support" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vofficeCmsMobileSupportSubmenu" aria-expanded="false">
+                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="vofficeCmsMobileSupportSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/help/voffice" target="_blank">
+                                <i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/contact?product=voffice" target="_blank">
+                                <i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item d-lg-none nav-group" data-menu-key="mobile-language">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#mobileLanguageSubmenu" aria-expanded="false">
+                    <i class="bi bi-translate"></i> <span data-i18n="nav.language">語言</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="mobileLanguageSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item d-lg-none nav-group" data-menu-key="mobile-user">
+                <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#mobileUserSubmenu" aria-expanded="false">
+                    <i class="bi bi-person-circle" id="sidemenuUserIcon"></i> <span id="sidemenuUserName" data-i18n="nav.user">用戶</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <div class="collapse" id="mobileUserSubmenu">
+                    <ul class="nav flex-column submenu">
+                        <li class="nav-item"><a class="nav-link" href="/voffice-personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="/voffice-billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" id="logoutBtnSidemenu"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<button class="sidebar-toggle d-none" id="sidebarToggle" type="button" style="display: none !important;">
+    <i class="bi bi-list"></i>
+</button>
+{{end}}

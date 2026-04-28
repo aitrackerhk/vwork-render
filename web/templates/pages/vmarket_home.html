@@ -1,0 +1,240 @@
+{{define "pages/vmarket_home"}}
+<!-- Hero: image background, marketplace branding -->
+<section class="container">
+  <div class="vmarket-hero vmarket-hero-home text-center">
+    <div class="vmarket-pill mb-3"><i class="bi bi-stars"></i> <span data-i18n="vmarket.brand">VMarket</span></div>
+    <h1 class="display-5 fw-bold mb-3" data-i18n="vmarket.home.heroTitle">探索商品與服務</h1>
+    <p class="lead mb-4" data-i18n="vmarket.home.heroSubtitle">一站式瀏覽各家公司的精選商品與專業服務</p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a class="btn btn-light btn-lg rounded-pill px-4 fw-semibold" href="{{.BasePath}}/products">
+        <i class="bi bi-box-seam me-1"></i> <span data-i18n="vmarket.nav.products">商品</span>
+      </a>
+      <a class="btn btn-outline-light btn-lg rounded-pill px-4 fw-semibold" href="{{.BasePath}}/services">
+        <i class="bi bi-tools me-1"></i> <span data-i18n="vmarket.nav.services">服務</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Search Section -->
+<section class="container mt-4">
+  <div class="vmarket-home-search-section">
+    <div class="row align-items-center g-3">
+      <div class="col-12 col-lg-5">
+        <h3 class="fs-5 fw-semibold mb-1" data-i18n="vmarket.home.searchTitle">搜尋商品、服務或公司</h3>
+        <p class="text-muted small mb-0" data-i18n="vmarket.home.searchHint">可輸入商品名稱、服務項目或公司名稱</p>
+      </div>
+      <div class="col-12 col-lg-7">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+          <input type="text" class="form-control" id="vmarketSearchInput" data-i18n-placeholder="vmarket.home.searchPlaceholder" placeholder="輸入關鍵字搜尋">
+          <button class="btn btn-dark" type="button" id="vmarketSearchBtn" data-i18n="vmarket.home.searchButton">搜尋</button>
+        </div>
+      </div>
+    </div>
+    <div id="vmarketSearchPanel" class="vmarket-home-search-results mt-3" hidden>
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <span class="fw-semibold small" data-i18n="vmarket.home.searchResultsTitle">搜尋結果</span>
+        <span class="small text-muted" id="vmarketSearchCount"></span>
+      </div>
+      <div id="vmarketSearchResults"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products -->
+<section class="container mt-5">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="vmarket-section-title fs-4 mb-0">
+      <i class="bi bi-box-seam text-primary me-2"></i><span data-i18n="vmarket.home.featuredProducts">精選商品</span>
+    </h2>
+    <a class="btn btn-sm btn-outline-dark rounded-pill" href="{{.BasePath}}/products" data-i18n="vmarket.home.viewAll">查看全部</a>
+  </div>
+  {{if .FeaturedProducts}}
+  <div class="row g-3">
+    {{range .FeaturedProducts}}
+    <div class="col-6 col-md-4 col-xl-3">
+      <a class="vmarket-featured-card" href="{{.ProductURL}}">
+        <div class="vmarket-featured-img">
+          {{if .ImageURL}}
+            <img src="{{.ImageURL}}" alt="{{.Name}}" loading="lazy">
+          {{else}}
+            <div class="vmarket-featured-img-placeholder"><i class="bi bi-box-seam"></i></div>
+          {{end}}
+        </div>
+        <div class="vmarket-featured-body">
+          <div class="vmarket-featured-name">{{.Name}}</div>
+          {{if gt .Price 0.0}}
+            <div class="vmarket-featured-price">${{printf "%.2f" .Price}}</div>
+          {{end}}
+          <div class="vmarket-featured-company">
+            {{if .CompanyLogo}}<img src="{{.CompanyLogo}}" alt="" class="vmarket-featured-company-logo">{{end}}
+            <span>{{.CompanyName}}</span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{end}}
+  </div>
+  {{else}}
+  <div class="vmarket-home-empty-section">
+    <i class="bi bi-box-seam"></i>
+    <span data-i18n="vmarket.home.noProducts">目前還沒有商品上架，敬請期待</span>
+  </div>
+  {{end}}
+</section>
+
+<!-- Featured Services -->
+<section class="container mt-5">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h2 class="vmarket-section-title fs-4 mb-0">
+      <i class="bi bi-tools text-success me-2"></i><span data-i18n="vmarket.home.featuredServices">精選服務</span>
+    </h2>
+    <a class="btn btn-sm btn-outline-dark rounded-pill" href="{{.BasePath}}/services" data-i18n="vmarket.home.viewAll">查看全部</a>
+  </div>
+  {{if .FeaturedServices}}
+  <div class="row g-3">
+    {{range .FeaturedServices}}
+    <div class="col-6 col-md-4 col-xl-3">
+      <a class="vmarket-featured-card vmarket-featured-service" href="{{.ServiceURL}}">
+        <div class="vmarket-featured-img">
+          <div class="vmarket-featured-img-placeholder vmarket-featured-img-service"><i class="bi bi-tools"></i></div>
+        </div>
+        <div class="vmarket-featured-body">
+          <div class="vmarket-featured-name">{{.Name}}</div>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            {{if gt .Price 0.0}}
+              <span class="vmarket-featured-price">${{printf "%.2f" .Price}}</span>
+            {{end}}
+            {{if gt .Duration 0}}
+              <span class="vmarket-featured-duration"><i class="bi bi-clock"></i> {{.Duration}} min</span>
+            {{end}}
+          </div>
+          <div class="vmarket-featured-company">
+            {{if .CompanyLogo}}<img src="{{.CompanyLogo}}" alt="" class="vmarket-featured-company-logo">{{end}}
+            <span>{{.CompanyName}}</span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{end}}
+  </div>
+  {{else}}
+  <div class="vmarket-home-empty-section">
+    <i class="bi bi-tools"></i>
+    <span data-i18n="vmarket.home.noServices">目前還沒有服務上架，敬請期待</span>
+  </div>
+  {{end}}
+</section>
+
+<script>
+  window.vmarketHomeCompanies = {{toJSON .Companies}};
+  window.vmarketBasePath = '{{.BasePath}}';
+  (function() {
+    const input = document.getElementById('vmarketSearchInput');
+    const button = document.getElementById('vmarketSearchBtn');
+    const resultsEl = document.getElementById('vmarketSearchResults');
+    const panelEl = document.getElementById('vmarketSearchPanel');
+    const countEl = document.getElementById('vmarketSearchCount');
+
+    const renderResults = (items) => {
+      if (!resultsEl) return;
+      resultsEl.innerHTML = '';
+      if (panelEl) {
+        panelEl.hidden = items.length === 0;
+      }
+      if (countEl) {
+        countEl.textContent = items.length ? items.length.toString() : '0';
+      }
+      if (!items.length) {
+        if (panelEl) panelEl.hidden = true;
+        return;
+      }
+
+      items.slice(0, 8).forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'vmarket-search-item';
+
+        const header = document.createElement('div');
+        header.className = 'd-flex align-items-center gap-2';
+
+        const typeIcon = document.createElement('i');
+        typeIcon.className = item.type === 'product' ? 'bi bi-box-seam text-primary' :
+                            item.type === 'service' ? 'bi bi-tools text-success' :
+                            'bi bi-building text-secondary';
+
+        const title = document.createElement('div');
+        title.className = 'vmarket-search-item-title';
+        title.textContent = item.name || '';
+
+        header.appendChild(typeIcon);
+        header.appendChild(title);
+
+        const subtitle = document.createElement('div');
+        subtitle.className = 'vmarket-search-item-sub';
+        subtitle.textContent = item.company || item.category || '';
+
+        const action = document.createElement('a');
+        action.className = 'btn btn-sm btn-outline-dark rounded-pill';
+        action.href = item.url || '#';
+        action.textContent = '查看';
+
+        card.appendChild(header);
+        if (subtitle.textContent) {
+          card.appendChild(subtitle);
+        }
+        card.appendChild(action);
+        resultsEl.appendChild(card);
+      });
+    };
+
+    const doSearch = async () => {
+      const keyword = (input ? input.value : '').trim();
+      if (!keyword) {
+        if (panelEl) panelEl.hidden = true;
+        return;
+      }
+
+      try {
+        const resp = await fetch((window.vmarketBasePath || '/vmarket') + '/api/search?q=' + encodeURIComponent(keyword));
+        if (!resp.ok) throw new Error('Search failed');
+        const data = await resp.json();
+        renderResults(data.results || []);
+      } catch (err) {
+        console.error('VMarket search error:', err);
+        const companies = Array.isArray(window.vmarketHomeCompanies) ? window.vmarketHomeCompanies : [];
+        const filtered = companies.filter((c) => {
+          const haystack = [c.Name, c.EnterpriseName, c.Category].filter(Boolean).join(' ').toLowerCase();
+          return haystack.includes(keyword.toLowerCase());
+        }).map(c => ({
+          type: 'company',
+          name: c.Name || c.EnterpriseName,
+          company: c.EnterpriseName,
+          url: c.CompanyURL || c.WebsiteURL || '#'
+        }));
+        renderResults(filtered);
+      }
+    };
+
+    if (input) {
+      let debounceTimer;
+      input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(doSearch, 300);
+      });
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          clearTimeout(debounceTimer);
+          doSearch();
+        }
+      });
+    }
+    if (button) {
+      button.addEventListener('click', doSearch);
+    }
+    if (panelEl) {
+      panelEl.hidden = true;
+    }
+  })();
+</script>
+{{end}}

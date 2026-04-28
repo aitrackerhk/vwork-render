@@ -1,0 +1,298 @@
+{{ define "pages/api_token_create" }}
+<div class="container-fluid" style="max-width: 960px;">
+    <div class="mb-4">
+        <a href="/api-tokens" class="text-decoration-none text-muted small"><i class="bi bi-arrow-left me-1"></i>Back to API Tokens</a>
+        <h3 class="mt-2 mb-1"><i class="bi bi-plus-circle me-2"></i>Create API Token</h3>
+        <p class="text-muted small mb-0">Generate a new token for an external system to access the vWork API.</p>
+    </div>
+
+    <!-- Step 1: Basic Info -->
+    <div class="card mb-4">
+        <div class="card-header"><strong>1. Basic Information</strong></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Token Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="tokenName" placeholder="e.g. v01 Production">
+                    <small class="text-muted">A descriptive name to identify this token.</small>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Product <span class="text-danger">*</span></label>
+                    <select class="form-select" id="tokenProduct" onchange="onProductChange()">
+                        <option value="">-- Select --</option>
+                        <option value="vai">vAi</option>
+                        <option value="vwork">vWork</option>
+                        <option value="vmarket">vMarket</option>
+                        <option value="voffice">vOffice</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Expires In</label>
+                    <select class="form-select" id="tokenExpiry">
+                        <option value="">Never</option>
+                        <option value="2592000">30 days</option>
+                        <option value="7776000">90 days</option>
+                        <option value="15552000">180 days</option>
+                        <option value="31536000">1 year</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2: Scopes (shown after product selected) -->
+    <div class="card mb-4 d-none" id="scopesCard">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>2. Permissions (Scopes)</strong>
+            <div>
+                <div class="form-check form-check-inline mb-0">
+                    <input class="form-check-input" type="checkbox" id="scopeFullAccess" onchange="toggleFullAccess(this.checked)" checked>
+                    <label class="form-check-label fw-bold" for="scopeFullAccess">Full Access (*)</label>
+                </div>
+            </div>
+        </div>
+        <div class="card-body" id="scopesBody">
+            <!-- Rendered by JS based on selected product -->
+        </div>
+        <div class="card-footer small text-muted">
+            <i class="bi bi-info-circle me-1"></i>
+            <strong>read</strong> = GET requests &nbsp;|&nbsp;
+            <strong>write</strong> = POST / PUT / DELETE &nbsp;|&nbsp;
+            <strong>search</strong> = search / filter / export endpoints
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2 mb-5">
+        <button class="btn btn-primary btn-lg" onclick="createToken()" id="btnCreate">
+            <i class="bi bi-plus-lg me-1"></i>Create Token
+        </button>
+        <a href="/api-tokens" class="btn btn-secondary btn-lg">Cancel</a>
+    </div>
+</div>
+
+<script>
+    const OPERATIONS = ['read', 'write', 'search'];
+
+    // ── Product-specific scope definitions ──
+    // Each product has scope groups with modules relevant to that product's purpose.
+    const PRODUCT_SCOPES = {
+        vai: {
+            description: 'vAi - AI assistant for data analysis, queries, and automated CRUD operations.',
+            groups: [
+                { label: 'AI Core',           icon: 'bi-robot',           modules: ['ai', 'vai'] },
+                { label: 'Customers & CRM',   icon: 'bi-people',          modules: ['customers', 'customer-labels', 'member-levels', 'points', 'coupons'] },
+                { label: 'Products',           icon: 'bi-box-seam',        modules: ['products', 'product-types', 'brands', 'product-labels'] },
+                { label: 'Orders & Sales',     icon: 'bi-cart',            modules: ['orders', 'order-labels', 'invoices', 'payments', 'quotations'] },
+                { label: 'Services',           icon: 'bi-calendar-check',  modules: ['services', 'service-orders', 'appointments'] },
+                { label: 'Inventory',          icon: 'bi-archive',         modules: ['warehouses', 'inventory-movements', 'inventory-counts'] },
+                { label: 'Projects',           icon: 'bi-kanban',          modules: ['projects', 'project-types'] },
+                { label: 'HR',                 icon: 'bi-person-badge',    modules: ['attendances', 'leave-requests', 'payrolls'] },
+                { label: 'Finance',            icon: 'bi-cash-stack',      modules: ['incomes', 'expenses', 'bank-accounts', 'accounting'] },
+                { label: 'Organization',       icon: 'bi-building',        modules: ['enterprises', 'departments', 'users', 'stores'] },
+                { label: 'Reports',            icon: 'bi-bar-chart',       modules: ['order-reports', 'attendance-reports'] },
+                { label: 'Activity',           icon: 'bi-clock-history',   modules: ['activity-logs'] }
+            ]
+        },
+        vwork: {
+            description: 'vWork - Full ERP/CMS platform access for system-to-system integration.',
+            groups: [
+                { label: 'Customers & CRM',     icon: 'bi-people',          modules: ['customers', 'customer-labels', 'member-levels', 'points', 'coupons', 'referrals'] },
+                { label: 'Products & Inventory', icon: 'bi-box-seam',        modules: ['products', 'product-types', 'product-attributes', 'brands', 'product-labels', 'product-taxes', 'warehouses', 'inventory-movements', 'inventory-adjustments', 'inventory-counts'] },
+                { label: 'Orders & Sales',       icon: 'bi-cart',            modules: ['orders', 'order-labels', 'invoices', 'payments', 'quotations', 'pos-sales'] },
+                { label: 'Purchase & Suppliers',  icon: 'bi-truck',           modules: ['suppliers', 'purchase-orders', 'purchase-order-labels'] },
+                { label: 'Services',              icon: 'bi-calendar-check',  modules: ['services', 'service-types', 'service-orders', 'service-staffs', 'appointments'] },
+                { label: 'Projects',              icon: 'bi-kanban',          modules: ['projects', 'project-types'] },
+                { label: 'HR & Payroll',           icon: 'bi-person-badge',    modules: ['attendances', 'leave-requests', 'shifts', 'holidays', 'payrolls'] },
+                { label: 'Finance',                icon: 'bi-cash-stack',      modules: ['incomes', 'expenses', 'expense-requests', 'bank-accounts', 'accounting'] },
+                { label: 'Website & Content',      icon: 'bi-globe',           modules: ['pages', 'blogs', 'promotions', 'ad-positions'] },
+                { label: 'Organization',           icon: 'bi-building',        modules: ['enterprises', 'departments', 'roles', 'users', 'currencies', 'stores'] },
+                { label: 'Communication',          icon: 'bi-chat-dots',       modules: ['messages', 'notifications', 'support-communications'] },
+                { label: 'Shipping & Logistics',   icon: 'bi-truck',           modules: ['shipping-methods', 'logistics-companies', 'shipments'] },
+                { label: 'AI',                     icon: 'bi-robot',           modules: ['ai', 'vai'] },
+                { label: 'Reports & Logs',         icon: 'bi-bar-chart',       modules: ['order-reports', 'attendance-reports', 'activity-logs'] }
+            ]
+        },
+        vmarket: {
+            description: 'vMarket - E-commerce marketplace, focused on products, orders, and customer data.',
+            groups: [
+                { label: 'Customers',         icon: 'bi-people',          modules: ['customers', 'customer-labels', 'member-levels', 'points', 'coupons', 'referrals'] },
+                { label: 'Products',           icon: 'bi-box-seam',        modules: ['products', 'product-types', 'product-attributes', 'brands', 'product-labels', 'product-taxes'] },
+                { label: 'Orders & Payments',  icon: 'bi-cart',            modules: ['orders', 'order-labels', 'invoices', 'payments', 'quotations'] },
+                { label: 'Inventory',          icon: 'bi-archive',         modules: ['warehouses', 'inventory-movements', 'inventory-counts', 'product-warehouse-stocks'] },
+                { label: 'Shipping',           icon: 'bi-truck',           modules: ['shipping-methods', 'logistics-companies', 'shipments'] },
+                { label: 'Promotions',         icon: 'bi-megaphone',       modules: ['promotions', 'ad-positions'] },
+                { label: 'Website',            icon: 'bi-globe',           modules: ['pages', 'blogs'] },
+                { label: 'Organization',       icon: 'bi-building',        modules: ['enterprises', 'stores'] }
+            ]
+        },
+        voffice: {
+            description: 'vOffice - Office suite integration for documents, projects, and team collaboration.',
+            groups: [
+                { label: 'Projects',        icon: 'bi-kanban',          modules: ['projects', 'project-types'] },
+                { label: 'Organization',     icon: 'bi-building',        modules: ['enterprises', 'departments', 'roles', 'users'] },
+                { label: 'Communication',    icon: 'bi-chat-dots',       modules: ['messages', 'notifications'] },
+                { label: 'Calendar & Tasks', icon: 'bi-calendar-check',  modules: ['calendars', 'reminders'] },
+                { label: 'Notes',            icon: 'bi-journal-text',    modules: ['notes'] },
+                { label: 'Activity',         icon: 'bi-clock-history',   modules: ['activity-logs'] }
+            ]
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!App.checkAuth()) return;
+    });
+
+    // ── Product change ──
+
+    function onProductChange() {
+        const product = document.getElementById('tokenProduct').value;
+        const scopesCard = document.getElementById('scopesCard');
+
+        if (!product || !PRODUCT_SCOPES[product]) {
+            scopesCard.classList.add('d-none');
+            return;
+        }
+
+        scopesCard.classList.remove('d-none');
+        document.getElementById('scopeFullAccess').checked = true;
+        renderScopes(product);
+    }
+
+    function renderScopes(product) {
+        const config = PRODUCT_SCOPES[product];
+        const body = document.getElementById('scopesBody');
+
+        let html = '<p class="text-muted small mb-3">' + escapeHtml(config.description) + '</p>';
+        html += '<div id="scopeGroupsContainer">';
+
+        config.groups.forEach((group, gi) => {
+            const groupId = 'scopeGroup_' + gi;
+
+            // Header row for group with All/None
+            html += '<div class="mb-3">';
+            html += '<div class="d-flex align-items-center mb-2 pb-1 border-bottom">';
+            html += '  <i class="bi ' + group.icon + ' me-2 text-muted"></i>';
+            html += '  <strong class="small">' + escapeHtml(group.label) + '</strong>';
+            html += '  <button class="btn btn-sm btn-link p-0 ms-auto small" onclick="toggleGroupScopes(' + gi + ', true)">All</button>';
+            html += '  <span class="text-muted mx-1 small">/</span>';
+            html += '  <button class="btn btn-sm btn-link p-0 small" onclick="toggleGroupScopes(' + gi + ', false)">None</button>';
+            html += '</div>';
+
+            // Module table header
+            html += '<div class="ps-2" id="' + groupId + '">';
+            html += '<div class="row g-0 mb-1 text-muted small fw-bold">';
+            html += '  <div class="col-5">Module</div>';
+            OPERATIONS.forEach(op => {
+                html += '  <div class="col text-center">' + op + '</div>';
+            });
+            html += '</div>';
+
+            // Module rows
+            group.modules.forEach(mod => {
+                html += '<div class="row g-0 py-1 align-items-center border-bottom" style="border-color: #f0f0f0 !important;">';
+                html += '  <div class="col-5"><code class="small">' + mod + '</code></div>';
+                OPERATIONS.forEach(op => {
+                    const cbId = 'scope_' + mod + '_' + op;
+                    const val = mod + ':' + op;
+                    html += '  <div class="col text-center">';
+                    html += '    <input class="form-check-input scope-cb" type="checkbox" id="' + cbId + '" value="' + val + '" onchange="onScopeCheckChange()" checked>';
+                    html += '  </div>';
+                });
+                html += '</div>';
+            });
+
+            html += '</div></div>';
+        });
+
+        html += '</div>';
+        body.innerHTML = html;
+        updateScopesDisabledState(true); // Start with full access checked
+    }
+
+    // ── Scope interactions ──
+
+    function toggleFullAccess(checked) {
+        document.querySelectorAll('.scope-cb').forEach(cb => {
+            cb.checked = checked;
+        });
+        updateScopesDisabledState(checked);
+    }
+
+    function updateScopesDisabledState(fullAccess) {
+        const container = document.getElementById('scopeGroupsContainer');
+        if (!container) return;
+        container.style.opacity = fullAccess ? '0.5' : '1';
+        container.style.pointerEvents = fullAccess ? 'none' : 'auto';
+    }
+
+    function toggleGroupScopes(groupIndex, checked) {
+        const groupEl = document.getElementById('scopeGroup_' + groupIndex);
+        if (groupEl) {
+            groupEl.querySelectorAll('.scope-cb').forEach(cb => cb.checked = checked);
+        }
+        syncFullAccessCheckbox();
+    }
+
+    function onScopeCheckChange() {
+        syncFullAccessCheckbox();
+    }
+
+    function syncFullAccessCheckbox() {
+        const all = document.querySelectorAll('.scope-cb');
+        const checked = document.querySelectorAll('.scope-cb:checked');
+        const fa = document.getElementById('scopeFullAccess');
+        fa.checked = (all.length > 0 && all.length === checked.length);
+        updateScopesDisabledState(fa.checked);
+    }
+
+    function getSelectedScopes() {
+        if (document.getElementById('scopeFullAccess').checked) return '*';
+        const checked = document.querySelectorAll('.scope-cb:checked');
+        if (checked.length === 0) return '*';
+        return Array.from(checked).map(cb => cb.value).join(',');
+    }
+
+    // ── Create ──
+
+    async function createToken() {
+        const name = document.getElementById('tokenName').value.trim();
+        const product = document.getElementById('tokenProduct').value;
+        const expiryVal = document.getElementById('tokenExpiry').value;
+
+        if (!name) { App.showAlert('Token name is required.', 'warning'); return; }
+        if (!product) { App.showAlert('Please select a product.', 'warning'); return; }
+
+        const scopes = getSelectedScopes();
+        const body = { name, product, scopes };
+        if (expiryVal) body.expires_in = parseInt(expiryVal);
+
+        const btn = document.getElementById('btnCreate');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Creating...';
+
+        try {
+            const response = await App.apiRequest('/api/v1/api-tokens', {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+
+            // Store raw token in sessionStorage, redirect to list page
+            sessionStorage.setItem('_newApiToken', response.token);
+            if (typeof Router !== 'undefined' && Router.go) { Router.go('/api-tokens'); } else { window.location.href = '/api-tokens'; }
+
+        } catch (error) {
+            App.showAlert('Failed to create token: ' + error.message, 'danger');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-plus-lg me-1"></i>Create Token';
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+</script>
+{{ end }}

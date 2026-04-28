@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="customAiAgent.metaTitle">客製化 AI Agent - V-sys</title>
+    <link rel="icon" type="image/png" href="/static/vicon.png">
+    <link rel="apple-touch-icon" href="/static/vlogo.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vsys.css">
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+
+        :root {
+            --ca-ink: #1e293b;
+            --ca-muted: #64748b;
+            --ca-bg: #f8fafc;
+            --ca-accent: #6366f1;
+            --ca-accent-light: #6366f1;
+            --ca-accent-dark: #4f46e5;
+            --ca-card: rgba(255, 255, 255, 0.85);
+            --ca-card-border: rgba(99, 102, 241, 0.15);
+            --ca-line: rgba(148, 163, 184, 0.18);
+            --ca-glow: rgba(99, 102, 241, 0.15);
+        }
+
+        body {
+            background: var(--ca-bg);
+            color: var(--ca-ink);
+            overflow-x: hidden;
+        }
+
+        /* Animated grid background */
+        .ca-bg-grid {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.06) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .ca-bg-grid::before {
+            content: '';
+            position: absolute;
+            top: -20%; left: 10%;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+            animation: caOrbFloat1 18s ease-in-out infinite alternate;
+        }
+        .ca-bg-grid::after {
+            content: '';
+            position: absolute;
+            bottom: -10%; right: 5%;
+            width: 500px; height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
+            animation: caOrbFloat2 22s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes caOrbFloat1 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(80px, 60px) scale(1.15); }
+        }
+        @keyframes caOrbFloat2 {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-60px, -40px) scale(1.1); }
+        }
+
+        .ca-page { position: relative; z-index: 1; padding-top: calc(var(--topnav-height, 56px) + 28px); padding-bottom: 56px; }
+
+        /* Hero */
+        .ca-hero {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95) 0%, rgba(238, 235, 255, 0.85) 50%, rgba(255, 255, 255, 0.95) 100%);
+            border: 1px solid var(--ca-card-border);
+            border-radius: 28px;
+            padding: 48px 40px;
+            box-shadow: 0 4px 30px rgba(99, 102, 241, 0.06), 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .ca-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+        }
+        .ca-hero::after {
+            content: "";
+            position: absolute;
+            right: -80px; top: -80px;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.10) 0%, transparent 70%);
+            pointer-events: none;
+            animation: caHeroGlow 8s ease-in-out infinite alternate;
+        }
+        @keyframes caHeroGlow {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .ca-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            background: rgba(99, 102, 241, 0.10);
+            border: 1px solid rgba(99, 102, 241, 0.20);
+            color: var(--ca-accent);
+            font-weight: 700;
+            font-size: 0.86rem;
+            padding: 8px 16px;
+            margin-bottom: 16px;
+        }
+        .ca-title {
+            font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #1e293b 0%, #4f46e5 50%, #1e293b 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: caShimmer 6s ease-in-out infinite;
+        }
+        @keyframes caShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .ca-subtitle { color: var(--ca-muted); font-size: 1.04rem; margin-bottom: 20px; }
+
+        .ca-points { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+        .ca-points li { display: flex; align-items: flex-start; gap: 10px; color: var(--ca-muted); }
+        .ca-points i { color: var(--ca-accent-light); margin-top: 2px; }
+
+        .ca-btn-row { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 12px; }
+        .ca-btn-primary {
+            border: 1px solid var(--ca-accent);
+            background: linear-gradient(135deg, var(--ca-accent) 0%, var(--ca-accent-dark) 100%);
+            color: #fff;
+            border-radius: 999px;
+            padding: 10px 20px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+            transition: all 0.3s ease;
+        }
+        .ca-btn-primary:hover { box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35); transform: translateY(-2px); color: #fff; }
+        .ca-btn-secondary {
+            border: 1px solid var(--ca-line);
+            background: rgba(255, 255, 255, 0.60);
+            color: var(--ca-ink);
+            border-radius: 999px;
+            padding: 10px 20px;
+            font-weight: 600;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        .ca-btn-secondary:hover { background: rgba(255, 255, 255, 0.90); border-color: var(--ca-accent); color: var(--ca-accent); }
+
+        .ca-section { margin-top: 40px; }
+        .ca-section h2 {
+            font-size: clamp(1.35rem, 2.3vw, 2rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #1e293b;
+        }
+        .ca-section p.ca-lead { color: var(--ca-muted); margin-bottom: 18px; }
+
+        /* Cards - glassmorphism */
+        .ca-card {
+            background: var(--ca-card);
+            border: 1px solid var(--ca-card-border);
+            border-radius: 18px;
+            padding: 22px;
+            height: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .ca-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .ca-card:hover {
+            border-color: rgba(99, 102, 241, 0.30);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.08), 0 4px 20px rgba(0, 0, 0, 0.06);
+            transform: translateY(-3px);
+        }
+        .ca-card:hover::before { opacity: 1; }
+
+        .ca-icon {
+            width: 48px; height: 48px;
+            border-radius: 14px;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.12);
+            color: var(--ca-accent);
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .ca-card:hover .ca-icon {
+            background: rgba(99, 102, 241, 0.14);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.12);
+        }
+        .ca-card h3 { font-size: 1.06rem; font-weight: 700; margin-bottom: 8px; color: #1e293b; }
+        .ca-card p { color: var(--ca-muted); margin-bottom: 0; }
+
+        /* Steps */
+        .ca-step { position: relative; padding-left: 56px; margin-bottom: 20px; }
+        .ca-step:last-child { margin-bottom: 0; }
+        .ca-step-index {
+            position: absolute; left: 0; top: 0;
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--ca-accent) 0%, var(--ca-accent-dark) 100%);
+            color: #fff;
+            font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.30);
+        }
+        .ca-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #1e293b; }
+        .ca-step p { color: var(--ca-muted); margin-bottom: 0; }
+
+        /* CTA band */
+        .ca-cta-band {
+            margin-top: 40px;
+            border-radius: 24px;
+            padding: 30px;
+            background: linear-gradient(120deg, var(--ca-accent) 0%, var(--ca-accent-dark) 50%, #312e81 100%);
+            color: #fff;
+            border: 1px solid rgba(99, 102, 241, 0.30);
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .ca-cta-band::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .ca-cta-band h3 { font-size: 1.35rem; font-weight: 800; margin-bottom: 8px; }
+        .ca-cta-band p { margin-bottom: 12px; color: rgba(238, 240, 255, 0.85); }
+        .ca-cta-band .ca-btn-primary {
+            background: #fff;
+            color: #4f46e5;
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.20);
+        }
+        .ca-cta-band .ca-btn-primary:hover {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.35);
+        }
+
+        /* Footer - use default light footer styles */
+
+        @media (max-width: 991px) {
+            .ca-hero { padding: 28px 20px; }
+            .ca-page { padding-top: calc(var(--topnav-height, 56px) + 18px); }
+        }
+    </style>
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            let currentLang = 'zh';
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) localStorage.setItem('u-nai_lang', currentLang);
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) currentLang = 'zh-CN';
+                else if (browserLang.startsWith('zh')) currentLang = 'zh';
+                else currentLang = 'en';
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            window.__INITIAL_LANG__ = currentLang;
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) document.body.classList.remove('i18n-loading');
+                    }, 5000);
+                } else { requestAnimationFrame(checkBody); }
+            })();
+        })();
+    </script>
+</head>
+<body data-whatsapp-phone="{{.WhatsAppPhone}}">
+    <!-- Animated grid background -->
+    <div class="ca-bg-grid"></div>
+
+    <!-- 導航欄 (same as index_vsys) -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar">
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
+                <img src="/static/vlogo.png" alt="V-sys" style="height: auto; max-height: 15px; display: block;">
+            </a>
+            <!-- Mobile: App Switcher, Menu Toggle -->
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcherVsys">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                <span class="app-switcher-label">vAI</span>
+                            </a>
+                            <a href="/" class="app-switcher-item" data-app="vwork">
+                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                <span class="app-switcher-label">vWork</span>
+                            </a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                <span class="app-switcher-label">vMarket</span>
+                            </a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                <span class="app-switcher-label">vOffice</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="vsysMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                        <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                    </button>
+                </li>
+            </ul>
+            <!-- Desktop Menu -->
+            <div class="collapse navbar-collapse" id="vsysNavbar">
+                <ul class="navbar-nav me-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/" data-i18n="nav.home">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#about" data-i18n="nav.about">關於</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/custom-ai-agent" data-i18n="nav.customAiAgent">客製化 AI Agent</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a></li>
+                </ul>
+                <!-- 右側：theborderbox（支援、語言、登入/用戶） -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                                </a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                            <span class="app-switcher-label">vAI</span>
+                                        </a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork">
+                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                            <span class="app-switcher-label">vWork</span>
+                                        </a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                            <span class="app-switcher-label">vMarket</span>
+                                        </a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                            <span class="app-switcher-label">vOffice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=vwork" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="vsysLangDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="vsysLangDropdown">
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                </ul>
+                            </div>
+                            <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+                            </a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                                    <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li id="publicAICoinsDisplay" style="display: none;">
+                                        <a class="dropdown-item" href="/vcoins">
+                                            <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                                            <span class="fw-bold" id="publicAICoinsBalance">0</span>
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+                                    <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                    <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="vsysSidebarOverlay"></div>
+
+    <!-- vSys Sidebar Menu for mobile -->
+    <div class="sidebar" id="vsysSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/#about">
+                        <i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/custom-ai-agent">
+                        <i class="bi bi-robot"></i> <span data-i18n="nav.customAiAgent">客製化 AI Agent</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">
+                        <i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-group" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vsysSidebarLanguageSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="vsysSidebarLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <main class="ca-page">
+        <div class="container">
+            <!-- HERO -->
+            <section class="ca-hero">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-7">
+                        <span class="ca-badge"><i class="bi bi-robot"></i><span data-i18n="customAiAgent.heroBadge">AI Agent 客製化服務</span></span>
+                        <h1 class="ca-title" data-i18n="customAiAgent.heroTitle">為您的業務打造專屬 AI Agent</h1>
+                        <p class="ca-subtitle" data-i18n="customAiAgent.heroSubtitle">我們為企業設計、開發並部署客製化 AI Agent，從需求分析、知識庫建構、工作流設計到上線維護，全程專業服務。</p>
+                        <ul class="ca-points">
+                            <li><i class="bi bi-check-circle-fill"></i><span data-i18n="customAiAgent.heroPoint1">根據企業需求量身定制 AI 對話與決策邏輯</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i><span data-i18n="customAiAgent.heroPoint2">支援串接內部系統、CRM、ERP 與第三方 API</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i><span data-i18n="customAiAgent.heroPoint3">持續訓練與優化，確保 AI 表現符合業務目標</span></li>
+                        </ul>
+                        <div class="ca-btn-row">
+                            <a class="ca-btn-primary js-wa-link" href="https://wa.me/{{.WhatsAppPhone}}" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-whatsapp me-1"></i><span data-i18n="customAiAgent.heroPrimaryCta">WhatsApp 諮詢方案</span>
+                            </a>
+                            <a class="ca-btn-secondary" href="/contact" data-i18n="customAiAgent.heroSecondaryCta">先填聯絡表單</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="ca-card">
+                            <div class="ca-icon"><i class="bi bi-cpu"></i></div>
+                            <h3 data-i18n="customAiAgent.quickPanelTitle">不是通用聊天機器人，是您的業務專家</h3>
+                            <p data-i18n="customAiAgent.quickPanelDesc">每個 AI Agent 都根據您的行業知識、業務流程與品牌語調量身打造，真正理解您的業務場景。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CORE FEATURES -->
+            <section class="ca-section">
+                <h2 data-i18n="customAiAgent.featureTitle">核心服務能力</h2>
+                <p class="ca-lead" data-i18n="customAiAgent.featureSubtitle">從對話設計到系統整合，打造真正能落地的 AI Agent。</p>
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ca-card">
+                            <div class="ca-icon"><i class="bi bi-chat-dots"></i></div>
+                            <h3 data-i18n="customAiAgent.features.dialogue.title">智能對話設計</h3>
+                            <p data-i18n="customAiAgent.features.dialogue.desc">設計符合業務場景的對話流程，支援多輪對話、意圖識別與上下文記憶，讓 AI 真正理解客戶需求。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ca-card">
+                            <div class="ca-icon"><i class="bi bi-database"></i></div>
+                            <h3 data-i18n="customAiAgent.features.knowledge.title">知識庫建構</h3>
+                            <p data-i18n="customAiAgent.features.knowledge.desc">整合企業文件、FAQ、產品資料與內部知識，建構專屬知識庫，確保 AI 回答準確可靠。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ca-card">
+                            <div class="ca-icon"><i class="bi bi-plug"></i></div>
+                            <h3 data-i18n="customAiAgent.features.integration.title">系統整合</h3>
+                            <p data-i18n="customAiAgent.features.integration.desc">串接 CRM、ERP、訂單系統、客服平台等，讓 AI Agent 不只能回答問題，還能執行操作。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ca-card">
+                            <div class="ca-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                            <h3 data-i18n="customAiAgent.features.optimize.title">持續優化</h3>
+                            <p data-i18n="customAiAgent.features.optimize.desc">透過數據分析與用戶回饋持續優化 AI 表現，定期更新知識庫與對話策略。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- PROCESS + USE CASES -->
+            <section class="ca-section">
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <div class="ca-card">
+                            <h2 data-i18n="customAiAgent.processTitle">專案推進流程</h2>
+                            <p class="ca-lead" data-i18n="customAiAgent.processSubtitle">以目標與里程碑為導向，確保每一步都可驗證。</p>
+                            <div class="ca-step">
+                                <span class="ca-step-index">1</span>
+                                <h4 data-i18n="customAiAgent.steps.discovery.title">需求訪談與場景分析</h4>
+                                <p data-i18n="customAiAgent.steps.discovery.desc">深入了解您的業務流程、客戶互動場景與痛點，確定 AI Agent 的角色定位與功能範圍。</p>
+                            </div>
+                            <div class="ca-step">
+                                <span class="ca-step-index">2</span>
+                                <h4 data-i18n="customAiAgent.steps.knowledge.title">知識庫建構與訓練</h4>
+                                <p data-i18n="customAiAgent.steps.knowledge.desc">整理企業知識資料，建構結構化知識庫，訓練 AI 模型以確保回答品質。</p>
+                            </div>
+                            <div class="ca-step">
+                                <span class="ca-step-index">3</span>
+                                <h4 data-i18n="customAiAgent.steps.build.title">開發整合與測試</h4>
+                                <p data-i18n="customAiAgent.steps.build.desc">開發對話流程、串接業務系統，進行多輪測試與品質驗證。</p>
+                            </div>
+                            <div class="ca-step">
+                                <span class="ca-step-index">4</span>
+                                <h4 data-i18n="customAiAgent.steps.launch.title">上線部署與持續優化</h4>
+                                <p data-i18n="customAiAgent.steps.launch.desc">正式上線後持續監控效能，根據數據回饋優化對話策略與知識庫。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="ca-card h-100">
+                            <h2 data-i18n="customAiAgent.useCaseTitle">常見應用場景</h2>
+                            <p class="ca-lead" data-i18n="customAiAgent.useCaseSubtitle">AI Agent 可應用於多種業務場景，提升效率與客戶體驗。</p>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="ca-card">
+                                        <div class="ca-icon"><i class="bi bi-headset"></i></div>
+                                        <h3 data-i18n="customAiAgent.useCases.cs.title">智能客服</h3>
+                                        <p data-i18n="customAiAgent.useCases.cs.desc">7x24 自動回應客戶諮詢，處理常見問題，複雜問題轉人工。</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="ca-card">
+                                        <div class="ca-icon"><i class="bi bi-graph-up"></i></div>
+                                        <h3 data-i18n="customAiAgent.useCases.sales.title">銷售助手</h3>
+                                        <p data-i18n="customAiAgent.useCases.sales.desc">自動推薦產品、回答報價、跟進潛在客戶，提升轉化率。</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="ca-card">
+                                        <div class="ca-icon"><i class="bi bi-people"></i></div>
+                                        <h3 data-i18n="customAiAgent.useCases.internal.title">內部助手</h3>
+                                        <p data-i18n="customAiAgent.useCases.internal.desc">協助員工查詢內部政策、流程指引與知識庫，提升工作效率。</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="ca-card">
+                                        <div class="ca-icon"><i class="bi bi-calendar-check"></i></div>
+                                        <h3 data-i18n="customAiAgent.useCases.booking.title">預約排程</h3>
+                                        <p data-i18n="customAiAgent.useCases.booking.desc">自動處理預約、改期與取消，同步行事曆與通知系統。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- CTA -->
+            <section class="ca-section">
+                <div class="ca-cta-band">
+                    <h3 data-i18n="customAiAgent.finalTitle">每個業務都獨一無二，您的 AI Agent 也應該如此</h3>
+                    <p data-i18n="customAiAgent.finalSubtitle">聯絡我們，讓我們了解您的需求，為您規劃最適合的 AI Agent 方案。</p>
+                    <a class="ca-btn-primary js-wa-link" href="https://wa.me/{{.WhatsAppPhone}}" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-whatsapp me-1"></i><span data-i18n="customAiAgent.finalCta">立即 WhatsApp 諮詢</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer (same as index_vsys) -->
+    <footer class="site-footer-light" style="margin-top: 0;">
+        <div class="container-fluid px-4">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="V-sys Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                    <div class="mt-3">
+                        <a href="#" id="footerWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
+                        <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="#" id="footerVWorkLink" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/#about" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
+                        <li class="mb-2"><a href="/custom-ai-agent" class="text-muted text-decoration-none" data-i18n="nav.customAiAgent">客製化 AI Agent</a></li>
+                        <li class="mb-2"><a href="/sales-partner" class="text-muted text-decoration-none" data-i18n="footer.salesPartnerJoin">銷售商加盟</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contactUs">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none">info@vsysai.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span data-i18n="footer.location">香港</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span data-i18n="footer.hours">週一至週五 9:00 - 18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 V-sys Limited. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof I18n !== 'undefined') I18n.init();
+
+            // Language switcher
+            document.querySelectorAll('[data-lang]').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) I18n.switchLanguage(lang);
+                    closeVsysSidebar();
+                });
+            });
+
+            // WhatsApp links
+            var phone = document.body.getAttribute('data-whatsapp-phone') || '';
+            var prefill = 'I want to ask about custom AI Agent service.';
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                prefill = I18n.t('customAiAgent.whatsappPrefill') || prefill;
+            }
+            var waHref = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(prefill);
+            document.querySelectorAll('.js-wa-link').forEach(function(link) {
+                link.setAttribute('href', waHref);
+            });
+        });
+
+        // Sidebar toggle for mobile
+        var vsysMobileMenuToggle = document.getElementById('vsysMobileMenuToggle');
+        var vsysSidebar = document.getElementById('vsysSidebar');
+        var vsysSidebarOverlay = document.getElementById('vsysSidebarOverlay');
+
+        function ensureSidebarClosed() {
+            if (vsysSidebar) vsysSidebar.classList.remove('show');
+            if (vsysSidebarOverlay) vsysSidebarOverlay.classList.remove('show');
+        }
+        ensureSidebarClosed();
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 992) ensureSidebarClosed();
+        });
+
+        function toggleVsysSidebar() {
+            if (vsysSidebar) vsysSidebar.classList.toggle('show');
+            if (vsysSidebarOverlay) vsysSidebarOverlay.classList.toggle('show');
+        }
+
+        function closeVsysSidebar() {
+            if (vsysSidebar) vsysSidebar.classList.remove('show');
+            if (vsysSidebarOverlay) vsysSidebarOverlay.classList.remove('show');
+        }
+
+        if (vsysMobileMenuToggle) {
+            vsysMobileMenuToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleVsysSidebar();
+            });
+        }
+        if (vsysSidebarOverlay) {
+            vsysSidebarOverlay.addEventListener('click', closeVsysSidebar);
+        }
+
+        // Close sidebar on nav-link click (except language toggles)
+        document.querySelectorAll('#vsysSidebar .nav-link:not(.nav-group-toggle)').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (!this.hasAttribute('data-lang')) closeVsysSidebar();
+            });
+        });
+
+        // === vCoin balance ===
+        async function loadPublicAICoinsBalance() {
+            try {
+                var token = localStorage.getItem('auth_token');
+                if (!token || token === 'temp_token') return;
+                var headers = { 'Accept': 'application/json', 'Authorization': 'Bearer ' + token };
+                var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+                var resp = await fetch('/api/v1/ai-coins/balance', { headers: headers });
+                if (!resp.ok) return;
+                var data = await resp.json();
+                var balanceEl = document.getElementById('publicAICoinsBalance');
+                var displayEl = document.getElementById('publicAICoinsDisplay');
+                var dividerEl = document.getElementById('publicAICoinsDivider');
+                if (balanceEl && data.balance !== undefined) {
+                    balanceEl.textContent = Number(data.balance).toLocaleString();
+                    if (displayEl) displayEl.style.display = '';
+                    if (dividerEl) dividerEl.style.display = '';
+                }
+            } catch (_e) {}
+        }
+
+        // === Auth state check & nav update ===
+        async function checkAuthAndUpdateNav() {
+            var userDropdownNav = document.getElementById('userDropdown');
+            var userNameSpan = document.getElementById('userName');
+            var logoutBtn = document.getElementById('logoutBtn');
+            var loginLink = document.getElementById('loginLink');
+
+            async function fetchCurrentUserSilently() {
+                try {
+                    var headers = { 'Accept': 'application/json' };
+                    var token = localStorage.getItem('auth_token');
+                    if (token && token !== 'temp_token') {
+                        headers['Authorization'] = 'Bearer ' + token;
+                    } else { return null; }
+                    var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                    if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+                    var resp = await fetch('/api/v1/user/me', { headers: headers });
+                    if (!resp.ok) return null;
+                    var user = await resp.json();
+                    try {
+                        if (user) localStorage.setItem('user', JSON.stringify(user));
+                        if (user && user.tenant && user.tenant.subdomain) localStorage.setItem('tenant_subdomain', String(user.tenant.subdomain));
+                    } catch (_e) {}
+                    return user;
+                } catch (_e) { return null; }
+            }
+
+            var user = await fetchCurrentUserSilently();
+            if (!user) {
+                var hadToken = localStorage.getItem('auth_token');
+                if (hadToken) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tenant_subdomain');
+                }
+            }
+            var isLoggedIn = !!(user && user.name);
+
+            if (typeof App !== 'undefined' && typeof App.updateAppSwitcherLinks === 'function') {
+                App.updateAppSwitcherLinks(isLoggedIn);
+            }
+
+            if (isLoggedIn) {
+                if (userDropdownNav) userDropdownNav.style.display = '';
+                if (loginLink) loginLink.style.display = 'none';
+                if (userNameSpan && user.name) userNameSpan.textContent = user.name;
+                loadPublicAICoinsBalance();
+
+                var avatarImg = document.getElementById('publicUserAvatar');
+                var avatarIcon = document.getElementById('publicUserIcon');
+                if (avatarImg) {
+                    var url = (user && user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() { this.style.display = 'none'; if (avatarIcon) avatarIcon.style.display = ''; this.onerror = null; };
+                    } else {
+                        avatarImg.style.display = 'none';
+                        if (avatarIcon) avatarIcon.style.display = '';
+                    }
+                }
+
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) { App.logout(); }
+                        else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                              .finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace('/?logged_out=1');
+                              });
+                        }
+                    });
+                }
+            } else {
+                if (userDropdownNav) userDropdownNav.style.display = 'none';
+                if (loginLink) loginLink.style.display = '';
+            }
+        }
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'auth_token' && !e.newValue) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' }).finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === null) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' }).finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === 'auth_token') { checkAuthAndUpdateNav(); }
+        });
+
+        checkAuthAndUpdateNav();
+    </script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+{{define "pages/ads"}}
+<div class="container-fluid py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+          <li class="breadcrumb-item"><a href="/ad-positions" data-i18n="pages.adPositions.title">廣告位置管理</a></li>
+          <li class="breadcrumb-item active" id="positionName">廣告</li>
+        </ol>
+      </nav>
+      <h4 class="mb-0" data-i18n="pages.ads.title">廣告管理</h4>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="showCreateAdModal()">
+        <i class="bi bi-plus-lg me-1"></i>
+        <span data-i18n="pages.ads.create">新增廣告</span>
+      </button>
+      <a href="/carousel-settings/{{.AdPositionID}}" class="btn btn-success">
+        <i class="bi bi-gear me-1"></i>
+        <span data-i18n="pages.ads.carouselSettings">輪播設定</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <!-- 過濾 -->
+      <div class="row mb-3">
+        <div class="col-md-3">
+          <select class="form-select" id="mediaTypeFilter">
+            <option value="">全部類型</option>
+            <option value="image">圖片</option>
+            <option value="video">影片</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="statusFilter">
+            <option value="">全部狀態</option>
+            <option value="true">啟用</option>
+            <option value="false">停用</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <div class="search-box-wrapper">
+            <div class="input-group search-box">
+              <input type="text" class="form-control" id="searchInput"
+                     placeholder="搜索廣告名稱..."
+                     onkeydown="handleSearchKey(event)">
+              <button class="btn btn-outline-secondary border-start-0 border-end-0" type="button" id="clearSearchBtn" style="display: none;" onclick="document.getElementById('searchInput').value=''; loadAds(); this.style.display='none';">
+                <i class="bi bi-x-lg"></i>
+              </button>
+              <button class="btn btn-outline-secondary border-0" type="button" id="searchBtn" onclick="loadAds()">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 廣告列表 -->
+      <div class="row" id="adsList">
+        <div class="col-12 text-center text-muted py-5" data-i18n="common.loading">載入中...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 創建/編輯 Modal -->
+<div class="modal fade" id="adModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="adModalTitle" data-i18n="pages.ads.create">新增廣告</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="adId">
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.ads.name">廣告名稱</label>
+          <input type="text" class="form-control" id="adName" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.ads.mediaType">媒體類型</label>
+          <select class="form-select" id="adMediaType">
+            <option value="image">圖片</option>
+            <option value="video">影片</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.ads.media">媒體文件</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="adMediaURL" placeholder="媒體 URL" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('adMediaFile').click()">
+              <i class="bi bi-upload"></i> 上傳
+            </button>
+          </div>
+          <input type="file" id="adMediaFile" class="d-none" accept="image/*,video/*" onchange="uploadAdMedia(this)">
+          <input type="hidden" id="adMediaPath">
+        </div>
+        <div class="mb-3" id="mediaPreview" style="display:none;">
+          <label class="form-label">預覽</label>
+          <div id="mediaPreviewContainer"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.duration">顯示時長 (秒)</label>
+            <input type="number" class="form-control" id="adDuration" value="5" min="1">
+            <small class="text-muted">圖片使用此時長，影片會自動檢測</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.sortOrder">排序</label>
+            <input type="number" class="form-control" id="adSortOrder" value="0" min="0">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.startDate">開始日期</label>
+            <input type="datetime-local" class="form-control" id="adStartDate">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.endDate">結束日期</label>
+            <input type="datetime-local" class="form-control" id="adEndDate">
+          </div>
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="adIsActive" checked>
+          <label class="form-check-label" for="adIsActive" data-i18n="pages.ads.isActive">啟用廣告</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" onclick="saveAd()" data-i18n="common.save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let adModal;
+let ads = [];
+let adPosition = null;
+const adPositionId = '{{.AdPositionID}}';
+
+document.addEventListener('DOMContentLoaded', function() {
+  adModal = new bootstrap.Modal(document.getElementById('adModal'));
+  loadAdPosition();
+  loadAds();
+
+  // 過濾事件
+  document.getElementById('mediaTypeFilter').addEventListener('change', loadAds);
+  document.getElementById('statusFilter').addEventListener('change', loadAds);
+  document.getElementById('searchInput').addEventListener('input', debounce(loadAds, 300));
+
+  // 搜索輸入監聽 - 控制清除按鈕顯示
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearSearchBtn');
+  searchInput.addEventListener('input', function() {
+    clearBtn.style.display = this.value ? 'block' : 'none';
+  });
+});
+
+// Enter 鍵搜尋
+function handleSearchKey(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    loadAds();
+  }
+}
+
+async function loadAdPosition() {
+  try {
+    const resp = await App.apiRequest(`/api/v1/ad-positions/${adPositionId}`);
+    adPosition = resp;
+    document.getElementById('positionName').textContent = adPosition.name;
+  } catch (error) {
+    console.error('載入廣告位置失敗:', error);
+  }
+}
+
+async function loadAds() {
+  const mediaType = document.getElementById('mediaTypeFilter').value;
+  const isActive = document.getElementById('statusFilter').value;
+  const search = document.getElementById('searchInput').value;
+
+  // 更新清除按鈕顯示狀態
+  document.getElementById('clearSearchBtn').style.display = search ? 'block' : 'none';
+
+  try {
+    const params = new URLSearchParams({ ad_position_id: adPositionId });
+    if (mediaType) params.append('media_type', mediaType);
+    if (isActive) params.append('is_active', isActive);
+    if (search) params.append('search', search);
+    
+    const resp = await App.apiRequest(`/api/v1/ads?${params}`);
+    ads = resp.data || [];
+    renderAds();
+  } catch (error) {
+    console.error('載入廣告失敗:', error);
+    App.showError('載入廣告失敗');
+  }
+}
+
+function renderAds() {
+  const container = document.getElementById('adsList');
+  if (!ads.length) {
+    container.innerHTML = '<div class="col-12 text-center text-muted py-5" data-i18n="pages.ads.noData">暫無廣告，點擊「新增廣告」開始添加</div>';
+    return;
+  }
+
+  container.innerHTML = ads.map(ad => `
+    <div class="col-md-4 col-lg-3 mb-4">
+      <div class="card h-100 ${ad.is_active ? '' : 'opacity-50'}">
+        <div class="position-relative" style="height: 180px; background: #f8f9fa;">
+          ${ad.media_type === 'video' 
+            ? `<video src="${escapeHtml(ad.media_url)}" class="w-100 h-100" style="object-fit: cover;" muted></video>
+               <span class="position-absolute top-0 start-0 m-2 badge bg-primary"><i class="bi bi-play-fill"></i> 影片</span>`
+            : `<img src="${escapeHtml(ad.media_url)}" class="w-100 h-100" style="object-fit: cover;" alt="${escapeHtml(ad.name)}">`
+          }
+          <span class="position-absolute top-0 end-0 m-2 badge ${ad.is_active ? 'bg-success' : 'bg-secondary'}">
+            ${ad.is_active ? '啟用' : '停用'}
+          </span>
+        </div>
+        <div class="card-body">
+          <h6 class="card-title text-truncate">${escapeHtml(ad.name)}</h6>
+          <p class="card-text small text-muted mb-2">
+            <i class="bi bi-clock me-1"></i>${ad.duration} 秒
+            <span class="ms-2"><i class="bi bi-sort-numeric-down me-1"></i>排序: ${ad.sort_order}</span>
+          </p>
+          ${ad.start_date || ad.end_date ? `
+            <p class="card-text small text-muted">
+              ${ad.start_date ? `<span>開始: ${formatDate(ad.start_date)}</span>` : ''}
+              ${ad.end_date ? `<span class="ms-2">結束: ${formatDate(ad.end_date)}</span>` : ''}
+            </p>
+          ` : ''}
+        </div>
+        <div class="card-footer bg-transparent">
+          <div class="btn-group w-100">
+            <button class="btn btn-sm btn-outline-primary" onclick="editAd('${ad.id}')" title="編輯">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-${ad.is_active ? 'warning' : 'success'}" onclick="toggleAdStatus('${ad.id}', ${!ad.is_active})" title="${ad.is_active ? '停用' : '啟用'}">
+              <i class="bi bi-${ad.is_active ? 'pause' : 'play'}"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteAd('${ad.id}')" title="刪除">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function showCreateAdModal() {
+  document.getElementById('adId').value = '';
+  document.getElementById('adName').value = '';
+  document.getElementById('adMediaType').value = 'image';
+  document.getElementById('adMediaURL').value = '';
+  document.getElementById('adMediaPath').value = '';
+  document.getElementById('adDuration').value = adPosition ? adPosition.slide_interval : 5;
+  document.getElementById('adSortOrder').value = ads.length;
+  document.getElementById('adStartDate').value = '';
+  document.getElementById('adEndDate').value = '';
+  document.getElementById('adIsActive').checked = true;
+  document.getElementById('mediaPreview').style.display = 'none';
+  document.getElementById('adModalTitle').textContent = '新增廣告';
+  adModal.show();
+}
+
+function editAd(id) {
+  const ad = ads.find(a => a.id === id);
+  if (!ad) return;
+
+  document.getElementById('adId').value = ad.id;
+  document.getElementById('adName').value = ad.name;
+  document.getElementById('adMediaType').value = ad.media_type;
+  document.getElementById('adMediaURL').value = ad.media_url;
+  document.getElementById('adMediaPath').value = ad.media_path || '';
+  document.getElementById('adDuration').value = ad.duration;
+  document.getElementById('adSortOrder').value = ad.sort_order;
+  document.getElementById('adStartDate').value = ad.start_date ? ad.start_date.substring(0, 16) : '';
+  document.getElementById('adEndDate').value = ad.end_date ? ad.end_date.substring(0, 16) : '';
+  document.getElementById('adIsActive').checked = ad.is_active;
+  
+  // 顯示預覽
+  showMediaPreview(ad.media_url, ad.media_type);
+  
+  document.getElementById('adModalTitle').textContent = '編輯廣告';
+  adModal.show();
+}
+
+async function uploadAdMedia(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const resp = await fetch('/api/v1/ads/upload', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include'
+    });
+    const data = await resp.json();
+    
+    if (resp.ok) {
+      document.getElementById('adMediaURL').value = data.url;
+      document.getElementById('adMediaPath').value = data.path || '';
+      document.getElementById('adMediaType').value = data.media_type;
+      showMediaPreview(data.url, data.media_type);
+      App.showSuccess('上傳成功');
+    } else {
+      App.showError(data.error || '上傳失敗');
+    }
+  } catch (error) {
+    console.error('上傳失敗:', error);
+    App.showError('上傳失敗');
+  }
+  
+  input.value = '';
+}
+
+function showMediaPreview(url, mediaType) {
+  const container = document.getElementById('mediaPreviewContainer');
+  const preview = document.getElementById('mediaPreview');
+  
+  if (mediaType === 'video') {
+    container.innerHTML = `<video src="${escapeHtml(url)}" class="img-fluid" style="max-height: 200px;" controls></video>`;
+  } else {
+    container.innerHTML = `<img src="${escapeHtml(url)}" class="img-fluid" style="max-height: 200px;">`;
+  }
+  preview.style.display = 'block';
+}
+
+async function saveAd() {
+  const id = document.getElementById('adId').value;
+  const data = {
+    ad_position_id: adPositionId,
+    name: document.getElementById('adName').value,
+    media_type: document.getElementById('adMediaType').value,
+    media_url: document.getElementById('adMediaURL').value,
+    media_path: document.getElementById('adMediaPath').value,
+    duration: parseInt(document.getElementById('adDuration').value) || 5,
+    sort_order: parseInt(document.getElementById('adSortOrder').value) || 0,
+    is_active: document.getElementById('adIsActive').checked
+  };
+
+  const startDate = document.getElementById('adStartDate').value;
+  const endDate = document.getElementById('adEndDate').value;
+  if (startDate) data.start_date = new Date(startDate).toISOString();
+  if (endDate) data.end_date = new Date(endDate).toISOString();
+
+  if (!data.name || !data.media_url) {
+    App.showError('請填寫名稱並上傳媒體文件');
+    return;
+  }
+
+  try {
+    if (id) {
+      await App.apiRequest(`/api/v1/ads/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+    } else {
+      await App.apiRequest('/api/v1/ads', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+    }
+    adModal.hide();
+    App.showSuccess('保存成功');
+    loadAds();
+  } catch (error) {
+    console.error('保存廣告失敗:', error);
+    App.showError(error.message || '保存失敗');
+  }
+}
+
+async function toggleAdStatus(id, isActive) {
+  try {
+    await App.apiRequest(`/api/v1/ads/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ is_active: isActive })
+    });
+    App.showSuccess(isActive ? '已啟用' : '已停用');
+    loadAds();
+  } catch (error) {
+    console.error('更新狀態失敗:', error);
+    App.showError('更新失敗');
+  }
+}
+
+async function deleteAd(id) {
+  if (!confirm('確定要刪除此廣告嗎？')) return;
+
+  try {
+    await App.apiRequest(`/api/v1/ads/${id}`, { method: 'DELETE' });
+    App.showSuccess('刪除成功');
+    loadAds();
+  } catch (error) {
+    console.error('刪除廣告失敗:', error);
+    App.showError('刪除失敗');
+  }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString();
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+{{end}}

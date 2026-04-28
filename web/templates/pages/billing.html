@@ -1,0 +1,1044 @@
+{{ define "pages/billing" }}
+    <style>
+        
+
+        /* Billing cycle toggle */
+        .billing-toggle {
+            display: inline-flex;
+            align-items: center;
+            background: #f1f5f9;
+            border-radius: 100px;
+            padding: 4px;
+            gap: 0;
+            position: relative;
+        }
+        .billing-toggle-opt {
+            position: relative;
+            z-index: 1;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            border-radius: 100px;
+            cursor: pointer;
+            transition: color 0.25s ease;
+            white-space: nowrap;
+        }
+        .billing-toggle-opt.active {
+            color: #fff;
+        }
+        .billing-toggle-slider {
+            position: absolute;
+            top: 4px;
+            height: calc(100% - 8px);
+            border-radius: 100px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+        .billing-toggle-save {
+            display: inline-block;
+            margin-left: 0.75rem;
+            padding: 0.25rem 0.65rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #059669;
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: 100px;
+            letter-spacing: 0.01em;
+        }
+    </style>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-credit-card me-2"></i><span data-i18n="billing.title">訂閱</span></h2>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <!-- 當前訂閱狀態 -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-credit-card"></i> <span data-i18n="billing.currentSubscription">當前訂閱</span></h5>
+        </div>
+        <div class="card-body">
+            <div id="currentSubscription">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden" data-i18n="billing.loading">載入中...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 訂閱計劃 -->
+    <div class="mb-4">
+        <h5 class="mb-3"><i class="bi bi-box-seam"></i> 方案資訊</h5>
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle me-2"></i>前端暫時不顯示訂閱方案與價格。如需方案資訊，請聯絡客服。
+        </div>
+            <!-- Monthly / Yearly Toggle -->
+            <div class="d-flex justify-content-center align-items-center mb-4">
+                <div class="billing-toggle" id="billingToggle">
+                    <div class="billing-toggle-slider" id="billingToggleSlider"></div>
+                    <button type="button" class="billing-toggle-opt" id="billingOptMonthly" data-i18n="billing.monthlyBilling">月付</button>
+                    <button type="button" class="billing-toggle-opt active" id="billingOptYearly" data-i18n="billing.yearlyBilling">年付</button>
+                </div>
+                <span class="billing-toggle-save" id="billingToggleSave" data-i18n="billing.yearlySaveTag">省 34%</span>
+            </div>
+            <div class="row g-4" id="subscriptionPlans">
+                <!-- vSuite -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-primary h-100 d-none" id="vsuitePlanCard">
+                        <div class="card-body text-center p-4">
+                            <div class="badge bg-primary mb-2" id="vsuitePlanBadge" data-i18n="billing.vsuite.badge">基本</div>
+                            <h4 id="vsuitePlanName" data-i18n="billing.vsuite.name">vSuite</h4>
+                            <div class="billing-monthly">
+                                <div class="display-5 fw-bold mb-3" id="vsuiteMonthlyPriceDisplay"><span data-i18n="billing.vsuite.monthlyPrice">$380/月</span></div>
+                            </div>
+                            <div class="billing-yearly">
+                                <div class="display-5 fw-bold mb-1" id="vsuiteYearlyPriceDisplay"><span data-i18n="billing.vsuite.yearlyPrice">$250/月</span></div>
+                                <div class="text-muted small mb-2" id="vsuiteYearlyTotalDisplay" data-i18n="billing.vsuite.yearlyTotal">年付 $3,000</div>
+                                <div class="alert alert-success py-1 px-2 mb-2" style="font-size:0.8125rem;"><strong data-i18n="billing.vsuite.yearlySavings">節省 $1,560/年</strong></div>
+                            </div>
+                            <ul class="list-unstyled mb-4 text-start">
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite.features.0">所有基本功能</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite.features.1">無限記錄</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite.features.2">無廣告</span></li>
+                                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <strong>500</strong> <span data-i18n="billing.vsuite.features.3">vCoins/月</span></li>
+                                <li class="mb-2"><i class="bi bi-pc-display text-primary"></i> <span data-i18n="billing.vsuite.features.4">vOffice - AI 智慧辦公</span></li>
+                                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="billing.vsuite.features.5">vMarket - 商品市集</span></li>
+                                <li class="mb-2"><i class="bi bi-headset text-info"></i> <span data-i18n="billing.vsuite.features.6">支援服務</span></li>
+                            </ul>
+                            <button class="btn btn-primary w-100" id="btnVSuite" data-i18n="billing.vsuite.button">立即訂閱</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- vSuite Pro -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card border-success h-100 d-none" style="border-width:2px;" id="vsuiteProPlanCard">
+                        <div class="card-body text-center p-4">
+                            <div class="badge bg-success mb-2" id="vsuiteProPlanBadge" data-i18n="billing.vsuite_pro.badge">熱門</div>
+                            <h4 id="vsuiteProPlanName" data-i18n="billing.vsuite_pro.name">vSuite Pro</h4>
+                            <div class="billing-monthly">
+                                <div class="display-5 fw-bold mb-3" id="vsuiteProMonthlyPriceDisplay"><span data-i18n="billing.vsuite_pro.monthlyPrice">$880/月</span></div>
+                            </div>
+                            <div class="billing-yearly">
+                                <div class="display-5 fw-bold mb-1" id="vsuiteProYearlyPriceDisplay"><span data-i18n="billing.vsuite_pro.yearlyPrice">$800/月</span></div>
+                                <div class="text-muted small mb-2" id="vsuiteProYearlyTotalDisplay" data-i18n="billing.vsuite_pro.yearlyTotal">年付 $9,600</div>
+                                <div class="alert alert-success py-1 px-2 mb-2" style="font-size:0.8125rem;"><strong data-i18n="billing.vsuite_pro.yearlySavings">節省 $960/年</strong></div>
+                            </div>
+                            <ul class="list-unstyled mb-4 text-start">
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro.features.0">所有 vSuite 功能</span></li>
+                                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <strong>1,000</strong> <span data-i18n="billing.vsuite_pro.features.2">vCoins/月</span></li>
+                                <li class="mb-2"><i class="bi bi-camera-video text-primary"></i> <span data-i18n="billing.vsuite_pro.features.video">vAi 影片生成</span></li>
+                                <li class="mb-2"><i class="bi bi-pc-display text-primary"></i> <span data-i18n="billing.vsuite_pro.features.3">vOffice - AI 智慧辦公</span></li>
+                                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="billing.vsuite_pro.features.4">vMarket - 商品市集</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro.features.5">企業支援服務</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro.features.6">資料遺失防護</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro.features.7">安全控管服務</span></li>
+                            </ul>
+                            <button class="btn btn-success w-100" id="btnVSuitePro" data-i18n="billing.vsuite_pro.button">立即訂閱</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- vSuite Pro+ -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100" style="border: 2px solid #6f42c1;" id="vsuiteProPlusPlanCard">
+                        <div class="card-body text-center p-4">
+                            <div class="badge mb-2" style="background:#6f42c1;" id="vsuiteProPlusPlanBadge" data-i18n="billing.vsuite_pro_plus.badge">最強方案</div>
+                            <h4 id="vsuiteProPlusPlanName" data-i18n="billing.vsuite_pro_plus.name">vSuite Pro+</h4>
+                            <div class="billing-monthly">
+                                <div class="display-5 fw-bold mb-3" id="vsuiteProPlusMonthlyPriceDisplay"><span data-i18n="billing.vsuite_pro_plus.monthlyPrice">$2,500/月</span></div>
+                            </div>
+                            <div class="billing-yearly">
+                                <div class="display-5 fw-bold mb-1" id="vsuiteProPlusYearlyPriceDisplay"><span data-i18n="billing.vsuite_pro_plus.yearlyPrice">$2,200/月</span></div>
+                                <div class="text-muted small mb-2" id="vsuiteProPlusYearlyTotalDisplay" data-i18n="billing.vsuite_pro_plus.yearlyTotal">年付 $26,400</div>
+                                <div class="alert alert-success py-1 px-2 mb-2" style="font-size:0.8125rem;"><strong data-i18n="billing.vsuite_pro_plus.yearlySavings">節省 $3,600/年</strong></div>
+                            </div>
+                            <ul class="list-unstyled mb-4 text-start">
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro_plus.features.0">所有 vSuite Pro 功能</span></li>
+                                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <strong>3,000</strong> <span data-i18n="billing.vsuite_pro_plus.features.1">vCoins/月</span></li>
+                                <li class="mb-2"><i class="bi bi-search text-danger"></i> <span data-i18n="billing.vsuite_pro_plus.features.leadFinder">自動搵客系統</span></li>
+                                <li class="mb-2"><i class="bi bi-pc-display text-primary"></i> <span data-i18n="billing.vsuite_pro_plus.features.3">vOffice - AI 智慧辦公</span></li>
+                                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="billing.vsuite_pro_plus.features.4">vMarket - 商品市集</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro_plus.features.5">企業支援服務</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro_plus.features.6">資料遺失防護</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.vsuite_pro_plus.features.7">安全控管服務</span></li>
+                            </ul>
+                            <button class="btn w-100" style="background:#6f42c1;color:#fff;" id="btnVSuiteProPlus" data-i18n="billing.vsuite_pro_plus.button">立即訂閱</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Custom -->
+                <div class="col-lg-3 col-md-6">
+                    <div class="card h-100" id="customPlanCard">
+                        <div class="card-body text-center p-4">
+                            <div class="badge mb-2 bg-dark" data-i18n="billing.custom.badge">專屬定制</div>
+                            <h4 data-i18n="billing.custom.name">自訂方案</h4>
+                            <div class="display-5 fw-bold mb-3">
+                                <span data-i18n="billing.custom.price">客製化</span>
+                            </div>
+                            <ul class="list-unstyled mb-4 text-start">
+                                <li class="mb-2">✓ <span data-i18n="billing.custom.features.0">完全定制系統</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.custom.features.1">專屬技術支持</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.custom.features.2">個性化功能開發</span></li>
+                                <li class="mb-2">✓ <span data-i18n="billing.custom.features.3">專屬顧問服務</span></li>
+                            </ul>
+                            <a href="/contact" class="btn btn-dark w-100" data-i18n="billing.custom.button">聯繫我們</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/* Website service add-on (hidden - custom website features suspended, restore by removing if false) */}}
+            {{if false}}
+            <div class="mt-3" id="websiteAddonContainer">
+                <label class="d-flex align-items-start gap-3 p-3 rounded-3 border" id="websiteAddonLabel" style="cursor:pointer;background:#f8fafc;border-color:#e2e8f0 !important;transition:all 0.2s ease;" onclick="toggleWebsiteAddon()">
+                    <input type="checkbox" id="websiteAddonCheck" style="margin-top:0.2rem;width:1.125rem;height:1.125rem;flex-shrink:0;accent-color:#0d6efd;cursor:pointer;">
+                    <div style="flex:1;">
+                        <div style="font-weight:600;font-size:0.9375rem;color:#1e293b;margin-bottom:0.125rem;">
+                            <i class="bi bi-globe2 me-1"></i><span data-i18n="billing.websiteService.name">訂製網站</span>
+                            <span class="badge bg-success ms-2 d-none" id="websiteAddonPurchased" data-i18n="billing.websitePurchase.statusPaid">已購買</span>
+                        </div>
+                        <p style="font-size:0.8125rem;color:#64748b;margin:0;" data-i18n="billing.websiteAddon.desc">由我們團隊為你建立專屬品牌網站（一次性收費，與訂閱一併結帳）</p>
+                    </div>
+                    <div style="font-weight:700;color:#0d6efd;font-size:0.9375rem;white-space:nowrap;" data-i18n="billing.websiteAddon.price">+HKD 3,800</div>
+                </label>
+                <!-- Standalone purchase button for already-subscribed users -->
+                <div id="websiteAddonStandaloneBtn" style="display:none;margin-top:0.5rem;">
+                    <button class="btn btn-primary w-100" onclick="purchaseWebsiteStandalone()" data-i18n="billing.websiteAddon.purchaseButton">購買訂製網站</button>
+                </div>
+                <!-- Terms checkbox -->
+                <div id="billingAddonTerms" style="display:none;margin-top:0.5rem;padding:0.5rem 1rem;font-size:0.8125rem;color:#475569;">
+                    <label style="display:flex;align-items:flex-start;gap:0.5rem;cursor:pointer;">
+                        <input type="checkbox" id="billingAddonTermsCheck" style="margin-top:0.2rem;accent-color:#0d6efd;" onchange="updateBillingButtons()">
+                        <span><span data-i18n="billing.websiteAddon.termsLabel">購買網頁服務代表你了解</span><a style="color:#0d6efd;text-decoration:underline;cursor:pointer;" onclick="showBillingTermsPopup(event)"><span data-i18n="billing.websiteAddon.termsPopupTitle">訂製網站條款</span></a></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Terms Popup for Billing -->
+            <div id="billingTermsOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+                <div style="background:white;border-radius:0.75rem;padding:2rem;max-width:500px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+                    <h5 data-i18n="billing.websiteAddon.termsPopupTitle">訂製網站條款</h5>
+                    <ul style="list-style:disc;padding-left:1.5rem;margin-bottom:1.5rem;">
+                        <li style="margin-bottom:0.5rem;font-size:0.9rem;color:#334155;" data-i18n="billing.websiteAddon.termsPopupLine1">只包含 6 頁以內的網站（基本的 user login 和 shopping cart 不算在頁數內）</li>
+                        <li style="margin-bottom:0.5rem;font-size:0.9rem;color:#334155;" data-i18n="billing.websiteAddon.termsPopupLine2">設計和內容由我方決定，之後客戶可自行修改</li>
+                    </ul>
+                    <button class="btn btn-primary w-100" onclick="closeBillingTermsPopup(true)" data-i18n="billing.websiteAddon.termsPopupConfirm">我了解並同意</button>
+                </div>
+            </div>
+
+            <!-- Company Info Modal for Billing -->
+            <div id="billingCompanyInfoOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+                <div style="background:white;border-radius:0.75rem;padding:2rem;max-width:500px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+                    <h5 data-i18n="billing.websiteAddon.companyInfoTitle">請提供公司資料</h5>
+                    <p style="font-size:0.875rem;color:#64748b;margin-bottom:1rem;" data-i18n="billing.websiteAddon.companyInfoDesc">請輸入公司資料連結，或上傳相關圖片/檔案，以便我們為你建立網站。</p>
+                    <div>
+                        <textarea id="billingCompanyLink" style="width:100%;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;font-size:0.875rem;resize:vertical;min-height:60px;" data-placeholder-i18n="billing.websiteAddon.companyLinkPlaceholder" placeholder="公司網站連結或資料連結"></textarea>
+                        <div style="margin-top:0.5rem;">
+                            <label style="font-size:0.8125rem;color:#64748b;" data-i18n="billing.websiteAddon.companyAttachLabel">或上傳圖片/檔案</label>
+                            <input type="file" id="billingCompanyFiles" multiple accept="image/*,.pdf,.doc,.docx" style="font-size:0.8125rem;">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary w-100 mt-3" onclick="submitBillingCompanyInfo()" data-i18n="billing.websiteAddon.companySubmit">提交資料</button>
+                    <div class="text-center mt-2">
+                        <a href="#" style="color:#64748b;text-decoration:none;font-size:0.875rem;" onclick="skipBillingCompanyInfo(event)" data-i18n="billing.websiteAddon.companySkip">稍後再提供</a>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+    </div>
+
+    <!-- 付款歷史 -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> <span data-i18n="billing.paymentHistoryTitle">付款歷史</span></h5>
+        </div>
+        <div class="card-body">
+            <div id="paymentHistory">
+                <div class="text-center py-4 text-muted" data-i18n="billing.noPaymentHistory">
+                    暫無付款記錄
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Billing cycle state
+var billingIsYearly = true;
+var addWebsite = false;
+// Track current active subscription plan (set by loadSubscriptionInfo)
+var currentActivePlan = null; // e.g. 'vsuite_yearly', 'vsuite_pro_monthly', etc.
+var hasActiveSubscription = false;
+
+function positionToggleSlider() {
+    var slider = document.getElementById('billingToggleSlider');
+    var optM = document.getElementById('billingOptMonthly');
+    var optY = document.getElementById('billingOptYearly');
+    if (!slider || !optM || !optY) return;
+    var active = billingIsYearly ? optY : optM;
+    slider.style.left = active.offsetLeft + 'px';
+    slider.style.width = active.offsetWidth + 'px';
+}
+
+function toggleWebsiteAddon() {
+    var cb = document.getElementById('websiteAddonCheck');
+    if (cb && cb.disabled) return;
+    var label = document.getElementById('websiteAddonLabel');
+    var termsBox = document.getElementById('billingAddonTerms');
+    var standaloneBtn = document.getElementById('websiteAddonStandaloneBtn');
+    setTimeout(function() {
+        addWebsite = cb.checked;
+        if (label) {
+            if (addWebsite) {
+                label.style.borderColor = '#0d6efd';
+                label.style.background = 'rgba(13, 110, 253, 0.05)';
+                if (termsBox) termsBox.style.display = 'block';
+                // Show standalone purchase button for already-subscribed users
+                if (hasActiveSubscription && standaloneBtn) standaloneBtn.style.display = 'block';
+            } else {
+                label.style.borderColor = '#e2e8f0';
+                label.style.background = '#f8fafc';
+                if (termsBox) termsBox.style.display = 'none';
+                if (standaloneBtn) standaloneBtn.style.display = 'none';
+                var tc = document.getElementById('billingAddonTermsCheck');
+                if (tc) tc.checked = false;
+            }
+        }
+        updateBillingButtons();
+    }, 0);
+}
+
+function showBillingTermsPopup(e) {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    var overlay = document.getElementById('billingTermsOverlay');
+    if (overlay) overlay.style.display = 'flex';
+}
+
+function closeBillingTermsPopup(agree) {
+    var overlay = document.getElementById('billingTermsOverlay');
+    if (overlay) overlay.style.display = 'none';
+    if (agree) {
+        var tc = document.getElementById('billingAddonTermsCheck');
+        if (tc) tc.checked = true;
+        updateBillingButtons();
+    }
+}
+
+function updateBillingButtons() {
+    // If website addon is checked, terms must be checked for subscribe buttons to work
+    var websiteCheck = document.getElementById('websiteAddonCheck');
+    var termsCheck = document.getElementById('billingAddonTermsCheck');
+    var termsOk = !websiteCheck || !websiteCheck.checked || (termsCheck && termsCheck.checked);
+    var btns = [document.getElementById('btnVSuite'), document.getElementById('btnVSuitePro'), document.getElementById('btnVSuiteProPlus')];
+    btns.forEach(function(btn) {
+        if (!btn) return;
+        // Don't re-enable buttons that were disabled because of active subscription
+        if (btn.dataset.subscribedDisabled === 'true') return;
+        if (!termsOk) {
+            btn.disabled = true;
+            btn.title = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.websiteAddon.termsLabel', '請先同意訂製網站條款') : '請先同意訂製網站條款';
+        } else {
+            btn.disabled = false;
+            btn.title = '';
+        }
+    });
+    // Also control standalone purchase button
+    var standaloneBtn = document.getElementById('websiteAddonStandaloneBtn');
+    if (standaloneBtn) {
+        var purchaseBtn = standaloneBtn.querySelector('button');
+        if (purchaseBtn) {
+            purchaseBtn.disabled = !termsOk;
+        }
+    }
+}
+
+var billingPendingCheckoutData = null;
+
+function showBillingCompanyInfoModal() {
+    var overlay = document.getElementById('billingCompanyInfoOverlay');
+    if (overlay) overlay.style.display = 'flex';
+    if (typeof I18n !== 'undefined' && I18n.updatePage) I18n.updatePage();
+}
+
+function skipBillingCompanyInfo(e) {
+    if (e) e.preventDefault();
+    var overlay = document.getElementById('billingCompanyInfoOverlay');
+    if (overlay) overlay.style.display = 'none';
+    proceedBillingCheckout();
+}
+
+async function submitBillingCompanyInfo() {
+    var link = (document.getElementById('billingCompanyLink').value || '').trim();
+    var files = document.getElementById('billingCompanyFiles').files;
+
+    if (!link && files.length === 0) {
+        skipBillingCompanyInfo();
+        return;
+    }
+
+    try {
+        var formData = new FormData();
+        if (link) formData.append('company_link', link);
+        for (var i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+        formData.append('purchase_type', 'tailor_made_website');
+
+        await App.apiRequest('/hardware-purchase/submit-company-info', {
+            method: 'POST',
+            body: formData,
+            rawBody: true
+        });
+    } catch (_e) {}
+
+    var overlay = document.getElementById('billingCompanyInfoOverlay');
+    if (overlay) overlay.style.display = 'none';
+    proceedBillingCheckout();
+}
+
+function proceedBillingCheckout() {
+    if (billingPendingCheckoutData && billingPendingCheckoutData.checkout_url) {
+        window.location.href = billingPendingCheckoutData.checkout_url;
+    }
+}
+
+function updateBillingToggle() {
+    var optM = document.getElementById('billingOptMonthly');
+    var optY = document.getElementById('billingOptYearly');
+    var saveTag = document.getElementById('billingToggleSave');
+    if (!optM || !optY) return;
+
+    optM.classList.toggle('active', !billingIsYearly);
+    optY.classList.toggle('active', billingIsYearly);
+    if (saveTag) {
+        if (billingIsYearly) {
+            saveTag.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.yearlySaveTag', '省 34%') : '省 34%';
+            saveTag.style.opacity = '1';
+            saveTag.style.color = '#059669';
+            saveTag.style.background = 'rgba(5, 150, 105, 0.1)';
+        } else {
+            saveTag.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.noDiscount', '沒有優惠') : '沒有優惠';
+            saveTag.style.opacity = '1';
+            saveTag.style.color = '#94a3b8';
+            saveTag.style.background = 'rgba(148, 163, 184, 0.1)';
+        }
+    }
+
+    positionToggleSlider();
+
+    var monthlyEls = document.querySelectorAll('#subscriptionPlans .billing-monthly');
+    var yearlyEls = document.querySelectorAll('#subscriptionPlans .billing-yearly');
+    for (var i = 0; i < monthlyEls.length; i++) monthlyEls[i].style.display = billingIsYearly ? 'none' : 'block';
+    for (var j = 0; j < yearlyEls.length; j++) yearlyEls[j].style.display = billingIsYearly ? 'block' : 'none';
+    // Update button onclick handlers
+    var btnVSuite = document.getElementById('btnVSuite');
+    var btnVSuitePro = document.getElementById('btnVSuitePro');
+    if (btnVSuite) btnVSuite.onclick = function() { window.subscribePlan(billingIsYearly ? 'vsuite_yearly' : 'vsuite_monthly'); };
+    if (btnVSuitePro) btnVSuitePro.onclick = function() { window.subscribePlan(billingIsYearly ? 'vsuite_pro_yearly' : 'vsuite_pro_monthly'); };
+    var btnVSuiteProPlus = document.getElementById('btnVSuiteProPlus');
+    if (btnVSuiteProPlus) btnVSuiteProPlus.onclick = function() { window.subscribePlan(billingIsYearly ? 'vsuite_pro_plus_yearly' : 'vsuite_pro_plus_monthly'); };
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    if (!App.checkAuth()) return;
+
+    // Check if user has a tenant — billing requires a tenant
+    var tenantId = localStorage.getItem('tenant_id');
+    var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+    var noTenantId = !tenantId || tenantId === '' || tenantId === 'null' || tenantId === 'undefined' || tenantId === '00000000-0000-0000-0000-000000000000';
+    var noTenantSub = !tenantSubdomain || tenantSubdomain === '' || tenantSubdomain === 'null' || tenantSubdomain === 'undefined';
+    if (noTenantId && noTenantSub) {
+        var alertContainer = document.getElementById('alertContainer');
+        if (alertContainer) {
+            var msg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.noTenant', '您尚未建立公司租戶，請先完成公司設置後再使用費用中心。') : '您尚未建立公司租戶，請先完成公司設置後再使用費用中心。';
+            var btnText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.goSetupTenant', '前往建立公司') : '前往建立公司';
+            alertContainer.innerHTML =
+                '<div class="alert alert-warning d-flex align-items-center" role="alert" style="border-radius: 0.75rem;">' +
+                    '<i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 1.5rem;"></i>' +
+                    '<div class="flex-grow-1">' +
+                        '<strong>' + msg + '</strong>' +
+                    '</div>' +
+                    '<a href="/setup-tenant" class="btn btn-primary ms-3">' +
+                        '<i class="bi bi-building me-1"></i>' + btnText +
+                    '</a>' +
+                '</div>';
+        }
+        // Hide the rest of the page content
+        var cards = document.querySelectorAll('.card.mb-4');
+        for (var i = 0; i < cards.length; i++) cards[i].style.display = 'none';
+        return;
+    }
+
+    // Hide plan selection and payment history if partner mode is active
+    if (localStorage.getItem('partner')) {
+        var planCard = document.querySelector('#subscriptionPlans');
+        if (planCard) {
+            var card = planCard.closest('.card');
+            if (card) card.style.display = 'none';
+        }
+        // Also hide payment history
+        var paymentCard = document.getElementById('paymentHistory');
+        if (paymentCard) {
+            var card = paymentCard.closest('.card');
+            if (card) card.style.display = 'none';
+        }
+        // Hide website addon in partner mode
+        var addonContainer = document.getElementById('websiteAddonContainer');
+        if (addonContainer) addonContainer.style.display = 'none';
+    }
+
+    // Init billing toggle
+    var optM = document.getElementById('billingOptMonthly');
+    var optY = document.getElementById('billingOptYearly');
+    if (optM && optY) {
+        optM.addEventListener('click', function() { billingIsYearly = false; updateBillingToggle(); });
+        optY.addEventListener('click', function() { billingIsYearly = true; updateBillingToggle(); });
+        // Position slider after layout is ready
+        requestAnimationFrame(function() { updateBillingToggle(); });
+        window.addEventListener('resize', positionToggleSlider);
+        window.addEventListener('languageChanged', function() {
+            setTimeout(positionToggleSlider, 50);
+        });
+    }
+
+    // Detect if website service was already purchased
+    try {
+        var hwResponse = await App.apiRequest('/hardware-purchase/records');
+        var hwRecords = (hwResponse && Array.isArray(hwResponse.data)) ? hwResponse.data : (Array.isArray(hwResponse) ? hwResponse : []);
+        if (hwRecords.length > 0) {
+            var alreadyPurchased = hwRecords.some(function(r) {
+                return r.status === 'paid' && r.items && r.items.some(function(item) {
+                    return item.id === 'tailor_made_website';
+                });
+            });
+            if (alreadyPurchased) {
+                var purchasedBadge = document.getElementById('websiteAddonPurchased');
+                if (purchasedBadge) purchasedBadge.classList.remove('d-none');
+                var addonCheck = document.getElementById('websiteAddonCheck');
+                if (addonCheck) addonCheck.disabled = true;
+                var addonLabel = document.getElementById('websiteAddonLabel');
+                if (addonLabel) addonLabel.style.cursor = 'default';
+                var addonPrice = document.querySelector('#websiteAddonContainer [data-i18n="billing.websiteAddon.price"]');
+                if (addonPrice) addonPrice.style.display = 'none';
+                var termsBox = document.getElementById('billingAddonTerms');
+                if (termsBox) termsBox.style.display = 'none';
+                addWebsite = false;
+            }
+        }
+    } catch (_e) {
+        // Silently ignore — addon stays available
+    }
+
+    // Handle Stripe Checkout callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkout = urlParams.get('checkout');
+    const sessionId = urlParams.get('session_id');
+    const purchaseId = urlParams.get('purchase_id');
+    
+    if (checkout === 'success') {
+        if (purchaseId) {
+            const websiteSuccessMsg = I18n.t ? I18n.t('billing.websitePurchase.checkoutSuccess', '網站服務購買成功！') : '網站服務購買成功！';
+            App.showAlert(websiteSuccessMsg, 'success');
+            if (sessionId) {
+                try {
+                    await App.apiRequest('/hardware-purchase/sync-checkout-session?session_id=' + encodeURIComponent(sessionId));
+                } catch (_e) {}
+            }
+        } else {
+            const successMsg = I18n.t ? I18n.t('billing.checkoutSuccess') : '訂閱成功！您的訂閱已激活。';
+            App.showAlert(successMsg, 'success');
+
+            if (sessionId) {
+                try {
+                    await App.apiRequest('/billing/sync-checkout-session?session_id=' + encodeURIComponent(sessionId));
+                } catch (_e) {}
+            }
+        }
+        
+        window.history.replaceState({}, document.title, window.location.pathname);
+        await loadSubscriptionInfo();
+        await loadPaymentHistory();
+    } else if (checkout === 'cancel') {
+        const cancelMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.checkoutCancel') : '訂閱已取消。您可以隨時重新訂閱。';
+        if (cancelMsg && cancelMsg !== 'billing.checkoutCancel') {
+            App.showAlert(cancelMsg, 'info');
+        } else {
+            App.showAlert('訂閱已取消。您可以隨時重新訂閱。', 'info');
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    await loadSubscriptionInfo();
+    await loadPaymentHistory();
+});
+
+function formatCurrency(amount, currency) {
+    try {
+        const locale = I18n.currentLang === 'zh-CN' ? 'zh-CN' : (I18n.currentLang === 'zh' ? 'zh-TW' : 'en-US');
+        return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(amount || 0);
+    } catch (_e) {
+        return '$' + (amount || 0).toFixed(2);
+    }
+}
+
+// Normalize legacy plan names to new names
+function normalizePlanName(plan) {
+    if (plan === 'monthly') return 'vsuite_monthly';
+    if (plan === 'yearly') return 'vsuite_yearly';
+    return plan;
+}
+
+// Check if plan is a paid vSuite/vSuite Pro/vSuite Pro+ plan
+function isPaidPlan(plan) {
+    var p = normalizePlanName(plan);
+    return p === 'vsuite_monthly' || p === 'vsuite_yearly' || p === 'vsuite_pro_monthly' || p === 'vsuite_pro_yearly' || p === 'vsuite_pro_plus_monthly' || p === 'vsuite_pro_plus_yearly';
+}
+
+// Get display name key for a plan
+function getPlanNameKey(plan) {
+    var p = normalizePlanName(plan);
+    if (p === 'vsuite_monthly' || p === 'vsuite_yearly') return 'billing.vsuite.name';
+    if (p === 'vsuite_pro_monthly' || p === 'vsuite_pro_yearly') return 'billing.vsuite_pro.name';
+    if (p === 'vsuite_pro_plus_monthly' || p === 'vsuite_pro_plus_yearly') return 'billing.vsuite_pro_plus.name';
+    return '';
+}
+
+// Get price display for active subscription
+function getPlanPriceDisplay(plan) {
+    var p = normalizePlanName(plan);
+    if (p === 'vsuite_monthly') return '$380/月';
+    if (p === 'vsuite_yearly') return '$3,000/年';
+    if (p === 'vsuite_pro_monthly') return '$880/月';
+    if (p === 'vsuite_pro_yearly') return '$9,600/年';
+    if (p === 'vsuite_pro_plus_monthly') return '$2,500/月';
+    if (p === 'vsuite_pro_plus_yearly') return '$26,400/年';
+    return '';
+}
+
+function applySalesPartnerPricing(subscriptionInfo) {
+    const sp = subscriptionInfo && subscriptionInfo.sales_partner;
+    if (!sp || sp.status !== 'approved') return;
+
+    const monthlyPrice = sp.monthly_price;
+    const yearlyPrice = sp.yearly_price;
+    const currency = (sp.currency || 'HKD').toUpperCase();
+
+    if (!monthlyPrice && !yearlyPrice) return;
+
+    // Hide vSuite and vSuite Pro cards (grid is now col-lg-3 col-md-6)
+    var vsuiteCard = document.getElementById('vsuitePlanCard');
+    if (vsuiteCard) { var col = vsuiteCard.closest('.col-lg-3, .col-md-6'); if (col) col.classList.add('d-none'); }
+    var proCard = document.getElementById('vsuiteProPlanCard');
+    if (proCard) { var col2 = proCard.closest('.col-lg-3, .col-md-6'); if (col2) col2.classList.add('d-none'); }
+
+    // Override the existing static Pro+ card with partner pricing
+    var proPlusCard = document.getElementById('vsuiteProPlusPlanCard');
+    if (proPlusCard) {
+        var perMonth = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.perMonth', '/月') : '/月';
+        var yearlyLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.yearlyBilling', '年付') : '年付';
+        var monthlyDisplay = monthlyPrice ? formatCurrency(monthlyPrice, currency) : '';
+        var yearlyAvg = yearlyPrice ? formatCurrency(yearlyPrice / 12, currency) : '';
+        var yearlyTotal = yearlyPrice ? formatCurrency(yearlyPrice, currency) : '';
+
+        // Update monthly price display
+        var mEl = proPlusCard.querySelector('.billing-monthly');
+        if (mEl && monthlyPrice) {
+            mEl.innerHTML = '<div class="display-5 fw-bold mb-3">' + monthlyDisplay + '<small class="fs-6">' + perMonth + '</small></div>';
+        }
+        // Update yearly price display
+        var yEl = proPlusCard.querySelector('.billing-yearly');
+        if (yEl && yearlyPrice) {
+            var savingsHtml = '';
+            if (monthlyPrice && yearlyPrice) {
+                var saved = (monthlyPrice * 12) - yearlyPrice;
+                if (saved > 0) {
+                    var savingsText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.yearlySavingsAmount', '節省') : '節省';
+                    savingsHtml = '<div class="alert alert-success py-1 px-2 mb-2" style="font-size:0.8125rem;"><strong>' + savingsText + ' ' + formatCurrency(saved, currency) + '/' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.year', '年') : '年') + '</strong></div>';
+                }
+            }
+            yEl.innerHTML = '<div class="display-5 fw-bold mb-1">' + yearlyAvg + '<small class="fs-6">' + perMonth + '</small></div>' +
+                '<div class="text-muted small mb-2">' + yearlyLabel + ' ' + yearlyTotal + '</div>' + savingsHtml;
+        }
+
+        // Widen the Pro+ and Custom columns since vSuite/Pro are hidden
+        var proPlusCol = proPlusCard.closest('.col-lg-3, .col-md-6');
+        if (proPlusCol) { proPlusCol.className = 'col-md-6'; }
+        var customCard = document.getElementById('customPlanCard');
+        if (customCard) { var customCol = customCard.closest('.col-lg-3, .col-md-6'); if (customCol) customCol.className = 'col-md-6'; }
+    }
+
+    // Re-bind Pro+ button (already bound in updateBillingToggle, but ensure)
+    var btnProPlus = document.getElementById('btnVSuiteProPlus');
+    if (btnProPlus) {
+        btnProPlus.onclick = function() {
+            window.subscribePlan(billingIsYearly ? 'vsuite_pro_plus_yearly' : 'vsuite_pro_plus_monthly');
+        };
+    }
+
+    // Update toggle visibility
+    var monthlyEls = document.querySelectorAll('#subscriptionPlans .billing-monthly');
+    var yearlyEls = document.querySelectorAll('#subscriptionPlans .billing-yearly');
+    for (var i = 0; i < monthlyEls.length; i++) monthlyEls[i].style.display = billingIsYearly ? 'none' : 'block';
+    for (var j = 0; j < yearlyEls.length; j++) yearlyEls[j].style.display = billingIsYearly ? 'block' : 'none';
+}
+
+async function loadSubscriptionInfo() {
+    try {
+        const subscriptionInfo = await App.apiRequest('/billing/subscription');
+        const tenantInfo = subscriptionInfo.tenant;
+        
+        const container = document.getElementById('currentSubscription');
+        
+        const plan = tenantInfo.plan || 'trial';
+        
+        if (plan === 'trial') {
+            const sp = subscriptionInfo.sales_partner;
+            const isSalesPartnerTrial = sp && sp.status === 'approved';
+
+            const expiresAt = tenantInfo.trial_expires_at ? new Date(tenantInfo.trial_expires_at) : null;
+            const daysLeft = expiresAt ? Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24)) : 0;
+            const loc = I18n.currentLang === 'zh-CN' ? 'zh-CN' : (I18n.currentLang === 'zh' ? 'zh-TW' : 'en-US');
+            const expiresDateStr = expiresAt ? expiresAt.toLocaleDateString(loc) : '';
+
+            if (isSalesPartnerTrial) {
+                // Sales partner tenant trial — show partner name + days left, no quota, no "免費試用版"
+                const partnerName = sp.name || sp.company || sp.code || '';
+                container.innerHTML =
+                    '<div class="alert alert-info">' +
+                        '<h5><i class="bi bi-building"></i> ' + I18n.t('billing.salesPartnerTrial.title', '合作夥伴試用期') + '</h5>' +
+                        '<p class="mb-2">' + I18n.t('billing.salesPartnerTrial.desc', '您正在使用由 {partner} 提供的試用服務').replace('{partner}', '<strong>' + partnerName + '</strong>') + '</p>' +
+                        (expiresAt ? '<p class="mb-0"><strong>' + I18n.t('billing.trial.daysLeft', '剩餘天數') + '：' + (daysLeft > 0 ? daysLeft : 0) + ' ' + I18n.t('billing.trial.days', '天') + '</strong></p>' : '') +
+                    '</div>' +
+                    (expiresAt ? '<p class="text-muted small mb-0">' + I18n.t('billing.salesPartnerTrial.expiredWithDate', '試用期將於 {date} 結束，届時請聯絡您的合作夥伴以訂閱服務').replace('{date}', expiresDateStr) + '</p>' : '');
+                I18n.updatePage();
+            } else {
+                // Normal tenant trial — quota-based, no day countdown
+                const trialUsage = subscriptionInfo.trial_usage || {};
+                const orderUsed = trialUsage.order_count != null ? trialUsage.order_count : null;
+                const orderLimit = trialUsage.order_limit != null ? trialUsage.order_limit : 5;
+                let quotaHtml = '';
+                if (orderUsed !== null) {
+                    const orderRemain = Math.max(0, orderLimit - orderUsed);
+                    if (expiresAt) {
+                        // Grace period active — show countdown
+                    } else if (orderRemain > 0) {
+                        quotaHtml = '<p class="mb-0 mt-1"><span data-i18n="billing.trial.orderQuota">vWork 訂單配額</span>：' + orderUsed + ' / ' + orderLimit + ' <span class="text-success">（' + I18n.t('billing.trial.remainOrders', '還剩 {n} 張').replace('{n}', orderRemain) + '）</span></p>';
+                    } else {
+                        quotaHtml = '<p class="mb-0 mt-1"><span data-i18n="billing.trial.orderQuota">vWork 訂單配額</span>：' + orderUsed + ' / ' + orderLimit + ' <span class="text-warning">（' + I18n.t('billing.trial.quotaFull', '已達上限') + '）</span></p>';
+                    }
+                }
+
+                // Build expiry/hint line (only for grace period)
+                let hintHtml = '';
+                if (expiresAt) {
+                    hintHtml = '<p class="text-muted small mb-0">' + I18n.t('billing.trial.expiredWithDate').replace('{date}', expiresDateStr) + '</p>';
+                } else {
+                    hintHtml = '<p class="text-muted small mb-0" data-i18n="billing.trial.expired">試用期結束後，請選擇訂閱計劃以繼續使用服務</p>';
+                }
+
+                container.innerHTML =
+                    '<div class="alert alert-info">' +
+                        '<h5><i class="bi bi-box-seam"></i> <span data-i18n="billing.trial.title">試用期</span></h5>' +
+                        '<p class="mb-2" data-i18n="billing.trial.quotaDesc">您目前正在使用免費試用，以下為您的配額使用狀況</p>' +
+                        quotaHtml +
+                    '</div>' +
+                    hintHtml;
+                I18n.updatePage();
+            }
+        } else if (isPaidPlan(plan)) {
+            // Set global subscription state
+            currentActivePlan = normalizePlanName(plan);
+            hasActiveSubscription = true;
+
+            const nameKey = getPlanNameKey(plan);
+            const planName = I18n.t(nameKey);
+            const subscription = subscriptionInfo.subscription || {};
+            const periodEnd = subscription.current_period_end ? 
+                new Date(subscription.current_period_end).toLocaleDateString(I18n.currentLang === 'zh-CN' ? 'zh-CN' : (I18n.currentLang === 'zh' ? 'zh-TW' : 'en-US')) : '';
+            
+            container.innerHTML =
+                '<div class="row align-items-center">' +
+                    '<div class="col-md-8">' +
+                        '<h5>' + planName + '</h5>' +
+                        (periodEnd ? '<p class="text-muted small mb-0"><span data-i18n="billing.nextRenewal">下次續費</span>：' + periodEnd + '</p>' : '') +
+                    '</div>' +
+                    '<div class="col-md-4 text-end">' +
+                        '<span class="badge bg-success" data-i18n="billing.subscribed">已訂閱</span>' +
+                        (subscription.cancel_at_period_end ? '<div class="mt-2"><small class="text-warning" data-i18n="billing.cancelAtPeriodEnd">將在周期結束時取消</small></div>' : '') +
+                    '</div>' +
+                '</div>' +
+                (!subscription.cancel_at_period_end ? '<div class="mt-3"><button class="btn btn-outline-danger btn-sm" onclick="cancelSubscription()" data-i18n="billing.cancelSubscription">取消訂閱</button></div>' : '');
+            I18n.updatePage();
+
+        } else {
+            container.innerHTML =
+                '<div class="alert alert-warning">' +
+                    '<p class="mb-0">目前前端暫不顯示訂閱方案。</p>' +
+                '</div>';
+            I18n.updatePage();
+        }
+
+    } catch (error) {
+        App.showAlert(I18n.t('billing.loadError') + ': ' + error.message, 'danger');
+    }
+}
+
+async function loadPaymentHistory() {
+    return;
+    try {
+        const container = document.getElementById('paymentHistory');
+        
+        container.innerHTML =
+            '<div class="text-center py-4">' +
+                '<div class="spinner-border spinner-border-sm text-primary" role="status">' +
+                    '<span class="visually-hidden" data-i18n="billing.loading">載入中...</span>' +
+                '</div>' +
+            '</div>';
+        
+        // Fetch both Stripe invoices and hardware purchase records in parallel
+        const [data, hwRes] = await Promise.all([
+            App.apiRequest('/billing/payment-history').catch(function() { return { payments: [] }; }),
+            App.apiRequest('/hardware-purchase/records').catch(function() { return { data: [] }; })
+        ]);
+
+        const invoicePayments = Array.isArray(data.payments) ? data.payments : [];
+        const hwList = Array.isArray(hwRes.data) ? hwRes.data : [];
+
+        // Filter hardware purchases for tailor_made_website items with status "paid"
+        const websitePayments = hwList.filter(function(p) {
+            if (p.status !== 'paid') return false;
+            const items = Array.isArray(p.items) ? p.items : [];
+            return items.some(function(i) { return i && i.id === 'tailor_made_website'; });
+        });
+
+        // Merge into a unified list
+        const t = (key, fallback) => (typeof I18n !== 'undefined' && I18n.t) ? (I18n.t(key) || fallback) : fallback;
+        const loc = I18n.currentLang === 'zh-CN' ? 'zh-CN' : (I18n.currentLang === 'zh' ? 'zh-TW' : 'en-US');
+
+        // Normalize invoice payments
+        const allRows = [];
+        invoicePayments.forEach(function(payment) {
+            allRows.push({
+                sortDate: payment.paid_date ? new Date(payment.paid_date).getTime() : 0,
+                date: payment.paid_date ? new Date(payment.paid_date).toLocaleDateString(loc) : '-',
+                invoice: payment.number || payment.id || '-',
+                amount: new Intl.NumberFormat(loc, { style: 'currency', currency: payment.currency || 'HKD' }).format(payment.amount),
+                period: (function() {
+                    var ps = payment.period_start ? new Date(payment.period_start).toLocaleDateString(loc) : '-';
+                    var pe = payment.period_end ? new Date(payment.period_end).toLocaleDateString(loc) : '-';
+                    return (ps !== '-' && pe !== '-') ? ps + ' - ' + pe : '-';
+                })(),
+                status: payment.status,
+                statusBadge: (function() {
+                    if (payment.status === 'paid') return '<span class="badge bg-success">' + t('billing.paymentStatus.paid', '已支付') + '</span>';
+                    if (payment.status === 'open') return '<span class="badge bg-warning">' + t('billing.paymentStatus.open', '待支付') + '</span>';
+                    if (payment.status === 'void') return '<span class="badge bg-secondary">' + t('billing.paymentStatus.void', '已作廢') + '</span>';
+                    return '<span class="badge bg-secondary">' + (payment.status || '-') + '</span>';
+                })(),
+                actions: (function() {
+                    if (payment.hosted_invoice_url) {
+                        return '<a href="' + payment.hosted_invoice_url + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-pdf"></i> ' + t('billing.invoiceView', '查看發票') + '</a>';
+                    } else if (payment.invoice_pdf) {
+                        return '<a href="' + payment.invoice_pdf + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-pdf"></i> ' + t('billing.invoiceDownloadPdf', '下載 PDF') + '</a>';
+                    }
+                    return '';
+                })()
+            });
+        });
+
+        // Normalize website purchase records into the same format
+        websitePayments.forEach(function(p) {
+            var createdAt = p.created_at ? new Date(p.created_at) : null;
+            var paid = String(p.status || '').toLowerCase() === 'paid';
+            var currency = (p.currency || 'HKD').toUpperCase();
+            var amount = p.amount_total || 0;
+            var websiteName = t('billing.websiteService.name', '訂製網站');
+
+            allRows.push({
+                sortDate: createdAt ? createdAt.getTime() : 0,
+                date: createdAt ? createdAt.toLocaleDateString(loc) : '-',
+                invoice: '<span class="text-info"><i class="bi bi-globe2"></i> ' + websiteName + '</span>',
+                amount: new Intl.NumberFormat(loc, { style: 'currency', currency: currency }).format(amount),
+                period: '-',
+                status: p.status,
+                statusBadge: paid
+                    ? '<span class="badge bg-success">' + t('billing.paymentStatus.paid', '已支付') + '</span>'
+                    : '<span class="badge bg-warning text-dark">' + t('billing.paymentStatus.open', '待支付') + '</span>',
+                actions: ''
+            });
+        });
+
+        if (allRows.length === 0) {
+            container.innerHTML = '<div class="text-center py-4 text-muted" data-i18n="billing.noPaymentHistory">暫無付款記錄</div>';
+            I18n.updatePage();
+            return;
+        }
+
+        // Sort by date descending
+        allRows.sort(function(a, b) { return b.sortDate - a.sortDate; });
+
+        let html =
+            '<div class="table-responsive">' +
+                '<table class="table table-hover">' +
+                    '<thead><tr>' +
+                        '<th data-i18n="billing.paymentHistory.date">日期</th>' +
+                        '<th data-i18n="billing.paymentHistory.invoice">發票號</th>' +
+                        '<th data-i18n="billing.paymentHistory.amount">金額</th>' +
+                        '<th data-i18n="billing.paymentHistory.period">期間</th>' +
+                        '<th data-i18n="billing.paymentHistory.status">狀態</th>' +
+                        '<th data-i18n="billing.paymentHistory.actions">操作</th>' +
+                    '</tr></thead><tbody>';
+        
+        allRows.forEach(function(row) {
+            html += '<tr><td>' + row.date + '</td><td>' + row.invoice + '</td><td><strong>' + row.amount + '</strong></td><td><small class="text-muted">' + row.period + '</small></td><td>' + row.statusBadge + '</td><td>' + row.actions + '</td></tr>';
+        });
+        
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+        I18n.updatePage();
+    } catch (error) {
+        console.error('載入付款歷史失敗:', error);
+        const container = document.getElementById('paymentHistory');
+        const errorMsg = I18n.t ? I18n.t('billing.paymentHistoryError') : '載入付款歷史失敗';
+        container.innerHTML = '<div class="alert alert-warning">' + errorMsg + ': ' + (error.message || '未知錯誤') + '</div>';
+        I18n.updatePage();
+    }
+}
+
+window.subscribePlan = async function(planType) {
+    try {
+        console.log('訂閱計劃:', planType);
+        
+        if (typeof App === 'undefined') {
+            alert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.systemNotInitialized', '系統未初始化，請刷新頁面') : '系統未初始化，請刷新頁面');
+            return;
+        }
+
+        // If user already has an active subscription and only wants to add website, use standalone hardware-purchase checkout
+        if (hasActiveSubscription && addWebsite) {
+            var processingMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.processing', '正在處理購買請求...') : '正在處理購買請求...';
+            App.showAlert(processingMsg, 'info');
+
+            const response = await App.apiRequest('/hardware-purchase/create-checkout-session', {
+                method: 'POST',
+                body: JSON.stringify({
+                    items: [{ id: 'tailor_made_website', quantity: 1 }],
+                    return_page: 'billing'
+                })
+            });
+
+            if (response.checkout_url && response.checkout_url.startsWith('http')) {
+                billingPendingCheckoutData = response;
+                showBillingCompanyInfoModal();
+                return;
+            } else {
+                var message = response.message || 'Stripe 整合尚未完成，請聯繫客服完成購買';
+                App.showAlert(message, 'warning');
+            }
+            return;
+        }
+
+        // If user already has the same plan, warn and stop
+        if (hasActiveSubscription && currentActivePlan === normalizePlanName(planType) && !addWebsite) {
+            var alreadyMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.alreadySubscribed', '您已經訂閱了此方案') : '您已經訂閱了此方案';
+            App.showAlert(alreadyMsg, 'info');
+            return;
+        }
+        
+        var processingMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.processing', '正在處理訂閱請求...') : '正在處理訂閱請求...';
+        if (typeof App.showAlert === 'undefined') {
+            alert(processingMsg);
+        } else {
+            App.showAlert(processingMsg, 'info');
+        }
+        
+        const response = await App.apiRequest('/billing/create-checkout-session', {
+            method: 'POST',
+            body: JSON.stringify({ plan: planType, add_website: addWebsite })
+        });
+        
+        if (response.checkout_url && response.checkout_url.startsWith('http')) {
+            // If website addon is selected, show company info form first
+            if (addWebsite) {
+                billingPendingCheckoutData = response;
+                showBillingCompanyInfoModal();
+                return;
+            }
+            window.location.href = response.checkout_url;
+        } else {
+            const message = response.message || 'Stripe 整合尚未完成，請聯繫客服完成訂閱';
+            if (typeof App !== 'undefined' && typeof App.showAlert !== 'undefined') {
+                App.showAlert(message, 'warning');
+            } else {
+                alert(message);
+            }
+        }
+    } catch (error) {
+        console.error('訂閱錯誤:', error);
+        var errMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.subscribeError', '訂閱失敗') : '訂閱失敗';
+        errMsg += ': ' + (error.message || '未知錯誤');
+        if (typeof App !== 'undefined' && typeof App.showAlert !== 'undefined') {
+            App.showAlert(errMsg, 'danger');
+        } else {
+            alert(errMsg);
+        }
+    }
+};
+
+// Standalone purchase for website addon (for already-subscribed users)
+window.purchaseWebsiteStandalone = async function() {
+    try {
+        var termsCheck = document.getElementById('billingAddonTermsCheck');
+        if (!termsCheck || !termsCheck.checked) {
+            var termsMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.websiteAddon.termsLabel', '請先同意訂製網站條款') : '請先同意訂製網站條款';
+            App.showAlert(termsMsg, 'warning');
+            return;
+        }
+
+        var processingMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.processing', '正在處理購買請求...') : '正在處理購買請求...';
+        App.showAlert(processingMsg, 'info');
+
+        const response = await App.apiRequest('/hardware-purchase/create-checkout-session', {
+            method: 'POST',
+            body: JSON.stringify({
+                items: [{ id: 'tailor_made_website', quantity: 1 }],
+                return_page: 'billing'
+            })
+        });
+
+        if (response.checkout_url && response.checkout_url.startsWith('http')) {
+            billingPendingCheckoutData = response;
+            showBillingCompanyInfoModal();
+        } else {
+            var message = response.message || 'Stripe 整合尚未完成，請聯繫客服完成購買';
+            App.showAlert(message, 'warning');
+        }
+    } catch (error) {
+        console.error('購買錯誤:', error);
+        var errMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('billing.purchaseError', '購買失敗') : '購買失敗';
+        errMsg += ': ' + (error.message || '未知錯誤');
+        App.showAlert(errMsg, 'danger');
+    }
+};
+
+window.cancelSubscription = async function() {
+    if (!confirm(I18n.t('billing.cancelConfirm'))) {
+        return;
+    }
+    
+    try {
+        await App.apiRequest('/billing/cancel-subscription', {
+            method: 'POST'
+        });
+        App.showAlert(I18n.t('billing.cancelSuccess'), 'success');
+        await loadSubscriptionInfo();
+    } catch (error) {
+        App.showAlert(I18n.t('billing.cancelError') + ': ' + error.message, 'danger');
+    }
+};
+</script>
+{{ end }}

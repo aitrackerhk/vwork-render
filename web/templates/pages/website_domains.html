@@ -1,0 +1,630 @@
+{{define "pages/website_domains"}}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="mb-0" data-i18n="pages.websiteDomains.title">自訂網域 & SSL</h4>
+                    <a class="btn btn-sm btn-outline-secondary" href="/help/dns-setup" target="_blank" rel="noopener" data-i18n="pages.websiteDomains.viewTutorial">看教學</a>
+                </div>
+                <div class="card-body">
+                    <div id="alertContainer"></div>
+
+                    <!-- Stepper -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <div class="fw-semibold" data-i18n="pages.websiteDomains.setupProcess">設定流程</div>
+                            <div class="small text-muted" data-i18n="pages.websiteDomains.followSteps">依步驟完成即可</div>
+                        </div>
+                        <div class="progress mt-2" style="height: 10px; border-radius: 999px;">
+                            <div id="stepProgress" class="progress-bar" role="progressbar" style="width: 20%; border-radius: 999px;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2 small text-muted">
+                            <span id="stepLabel1" data-i18n="pages.websiteDomains.stepLabel1">1. 輸入網域</span>
+                            <span id="stepLabel2" data-i18n="pages.websiteDomains.stepLabel2">2. 設定 DNS</span>
+                            <span id="stepLabel3" data-i18n="pages.websiteDomains.stepLabel3">3. 檢查 & 驗證</span>
+                            <span id="stepLabel4" data-i18n="pages.websiteDomains.stepLabel4">4. SSL 狀態</span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 1 -->
+                    <div id="step1" class="step-panel">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.websiteDomains.step1Title">步驟 1：輸入網域（www）</label>
+                            <input class="form-control" id="customDomainWww" data-i18n-placeholder="pages.websiteDomains.step1Placeholder" placeholder="例如：www.example.com">
+                            <div class="form-text text-muted" data-i18n="pages.websiteDomains.step1Hint">
+                                請輸入完整的 www 網域。若你還未有網域，可到 GoDaddy、Squarespace 等註冊商自行購買後再回來設定。
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" id="btnSaveAndNext" data-i18n="pages.websiteDomains.saveAndNext">保存並下一步</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div id="step2" class="step-panel" style="display:none;">
+                        <div class="alert alert-light border mb-3">
+                            <div class="fw-semibold mb-2" data-i18n="pages.websiteDomains.step2Title">步驟 2：新增一筆 CNAME</div>
+                            <div class="row g-2">
+                                <div class="col-12 col-md-4">
+                                    <div class="small text-muted" data-i18n="pages.websiteDomains.cnameHost">名稱（Host）</div>
+                                    <div class="font-monospace">www</div>
+                                    <button class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyHost" data-i18n="pages.websiteDomains.copy">複製</button>
+                                </div>
+                                <div class="col-12 col-md-8">
+                                    <div class="small text-muted" data-i18n="pages.websiteDomains.cnameTarget">指向（Value / Target）</div>
+                                    <div class="font-monospace" id="cnameTargetText">{{.CustomDomainCnameTarget}}</div>
+                                    <button class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyTarget" data-i18n="pages.websiteDomains.copy">複製</button>
+                                </div>
+                            </div>
+                            <div class="small text-muted mt-3" data-i18n="pages.websiteDomains.step2Hint">
+                                完成後回到此頁，進入下一步檢查 DNS。
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary" id="btnBackTo1" data-i18n="pages.websiteDomains.previous">上一步</button>
+                            <button class="btn btn-primary" id="btnGoTo3" data-i18n="pages.websiteDomains.next">下一步</button>
+                        </div>
+                    </div>
+
+                    {{if .DomainConnectEnabled}}
+                    <div class="card mb-3" id="autoInstructions" style="display:none;">
+                        <div class="card-body">
+                            <div class="fw-semibold mb-2" data-i18n="pages.websiteDomains.domainConnectTitle">Cloudflare Domain Connect（自動）</div>
+                            <ol class="small text-muted mb-3">
+                                <li data-i18n="pages.websiteDomains.domainConnectStep1">客戶確保該網域已把 NS 指向 Cloudflare（DNS 在 Cloudflare 管）</li>
+                                <li data-i18n="pages.websiteDomains.domainConnectStep2">客戶在你的平台填好 `www.customer.com` 並保存</li>
+                                <li>客戶登入 Cloudflare → 選擇該網域 → 套用 Domain Connect 模板（會自動建立 CNAME 指向 <code>{{.CustomDomainCnameTarget}}</code>）</li>
+                                <li data-i18n="pages.websiteDomains.domainConnectStep4">回來按「檢查 www DNS」看到 OK</li>
+                            </ol>
+                            <div class="alert alert-warning mb-0">
+                                <div class="small" data-i18n="pages.websiteDomains.domainConnectNote">
+                                    注意：要真正做到「一鍵自動加 DNS」，你需要先把 Domain Connect 模板提交到官方模板庫，並按 Cloudflare 文件要求寄信給 `domain-connect@cloudflare.com` 讓模板上線。
+                                    在模板未上線前，自動模式會變成「指引式流程」。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{end}}
+
+                    <!-- STEP 3 - DNS CHECK & TXT VERIFICATION -->
+                    <div id="step3" class="step-panel" style="display:none;">
+                        <div class="card border-0 bg-light mb-3">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-2" data-i18n="pages.websiteDomains.step3Title">步驟 3：檢查 DNS & 驗證域名</div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-12 col-lg-6">
+                                        <div class="small text-muted" data-i18n="pages.websiteDomains.yourDomain">你的網域</div>
+                                        <div class="font-monospace" id="currentDomains" data-i18n="pages.websiteDomains.notSet">（未設定）</div>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <div class="small text-muted" data-i18n="pages.websiteDomains.dnsCheckResult">DNS 檢查結果</div>
+                                        <div id="dnsStatus" data-i18n="pages.websiteDomains.notChecked">尚未檢查</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- TXT Verification Section -->
+                                <div class="alert alert-info mb-3" id="txtVerificationSection" style="display:none;">
+                                    <div class="fw-semibold mb-2" data-i18n="pages.websiteDomains.txtVerificationTitle">域名所有權驗證</div>
+                                    <div class="small text-muted mb-2" data-i18n="pages.websiteDomains.txtVerificationDesc">
+                                        為了安全，需要驗證你確實擁有此域名。請在你的 DNS 提供商中添加以下 TXT 記錄：
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-12 col-md-4">
+                                            <div class="small text-muted" data-i18n="pages.websiteDomains.txtType">類型</div>
+                                            <div class="font-monospace">TXT</div>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <div class="small text-muted" data-i18n="pages.websiteDomains.txtName">名稱</div>
+                                            <div class="font-monospace" id="txtVerificationName">_cf-custom-hostname.www</div>
+                                            <button class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyTxtName" data-i18n="pages.websiteDomains.copy">複製</button>
+                                        </div>
+                                        <div class="col-12 col-md-8">
+                                            <div class="small text-muted" data-i18n="pages.websiteDomains.txtValue">值</div>
+                                            <div class="font-monospace small" id="txtVerificationValue" data-i18n="pages.websiteDomains.txtValuePlaceholder">載入中...</div>
+                                            <button class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyTxtValue" data-i18n="pages.websiteDomains.copy">複製</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3 d-flex gap-2 flex-wrap">
+                                    <button class="btn btn-outline-secondary" id="btnBackTo2" data-i18n="pages.websiteDomains.previous">上一步</button>
+                                    <button class="btn btn-primary" id="btnCheckWww" data-i18n="pages.websiteDomains.checkNow">立即檢查</button>
+                                    <button class="btn btn-outline-primary" id="btnCheckTxtVerification" data-i18n="pages.websiteDomains.checkVerification" style="display:none;">檢查驗證</button>
+                                    <button class="btn btn-outline-primary" id="btnGoTo4" data-i18n="pages.websiteDomains.next">下一步</button>
+                                </div>
+                                <div class="small text-muted mt-2" data-i18n="pages.websiteDomains.dnsDelayHint">DNS 生效通常 5–60 分鐘（最慢可到 24 小時）。</div>
+                                <div id="verificationStatus" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3.5 - TXT VERIFICATION -->
+                    <div id="step3_5" class="step-panel" style="display:none;">
+                        <div class="card border-warning bg-light mb-3">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-2" data-i18n="pages.websiteDomains.step35Title">步驟 3.5：域名所有權驗證</div>
+                                <div class="small text-muted mb-3" data-i18n="pages.websiteDomains.step35Desc">
+                                    為了安全，需要驗證你確實擁有此域名。請在你的 DNS 提供商中添加以下 TXT 記錄：
+                                </div>
+                                <div class="alert alert-info mb-3">
+                                    <div class="row g-2">
+                                        <div class="col-12 col-md-4">
+                                            <div class="small text-muted" data-i18n="pages.websiteDomains.txtType">類型</div>
+                                            <div class="font-monospace">TXT</div>
+                                        </div>
+                                        <div class="col-12 col-md-4">
+                                            <div class="small text-muted" data-i18n="pages.websiteDomains.txtName">名稱</div>
+                                            <div class="font-monospace" id="txtVerificationName">_cf-custom-hostname.www</div>
+                                            <button class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyTxtName" data-i18n="pages.websiteDomains.copy">複製</button>
+                                        </div>
+                                        <div class="col-12 col-md-8">
+                                            <div class="small text-muted" data-i18n="pages.websiteDomains.txtValue">值</div>
+                                            <div class="font-monospace small" id="txtVerificationValue" data-i18n="pages.websiteDomains.txtValuePlaceholder">載入中...</div>
+                                            <button class="btn btn-sm btn-outline-secondary mt-2" id="btnCopyTxtValue" data-i18n="pages.websiteDomains.copy">複製</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="small text-muted mb-3" data-i18n="pages.websiteDomains.step35Hint">
+                                    添加完成後請等待 5-10 分鐘 DNS 生效，然後點擊「檢查驗證」。
+                                </div>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button class="btn btn-outline-secondary" id="btnBackTo3" data-i18n="pages.websiteDomains.previous">上一步</button>
+                                    <button class="btn btn-primary" id="btnCheckTxtVerification" data-i18n="pages.websiteDomains.checkVerification">檢查驗證</button>
+                                    <button class="btn btn-outline-primary" id="btnSkipTo4" data-i18n="pages.websiteDomains.skipToSSL">跳到 SSL</button>
+                                </div>
+                                <div id="txtVerificationStatus" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div id="step4" class="step-panel" style="display:none;">
+                        <div class="card border-0 bg-light mb-3">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-2" data-i18n="pages.websiteDomains.step4Title">步驟 4：SSL 狀態</div>
+                                <div class="small text-muted mb-2" data-i18n="pages.websiteDomains.step4Desc">
+                                    DNS 正確後，系統會在背景自動同步 Cloudflare 並簽發 SSL。
+                                </div>
+                                <div id="cfStatus" class="small text-muted" data-i18n="pages.websiteDomains.statusNotFetched">尚未取得狀態</div>
+                                <div class="mt-3 d-flex gap-2 flex-wrap">
+                                    <button class="btn btn-outline-secondary" id="btnBackTo4" data-i18n="pages.websiteDomains.previous">上一步</button>
+                                    <button class="btn btn-outline-secondary" id="btnCloudflareRefresh" data-i18n="pages.websiteDomains.refreshStatus">更新狀態</button>
+                                    <a class="btn btn-primary" href="#" id="btnOpenDomain" target="_blank" rel="noopener" data-i18n="pages.websiteDomains.openWebsite">開啟網站</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Helper: get i18n translation with fallback
+    function wdT(key, fallback) {
+        if (typeof I18n !== 'undefined' && I18n.t) {
+            const v = I18n.t(key);
+            if (v && v !== key) return v;
+        }
+        return fallback;
+    }
+
+    async function apiRequest(url, options = {}) {
+        if (typeof App !== 'undefined' && App.apiRequest) {
+            return await App.apiRequest(url, options);
+        }
+        const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }
+        };
+        const response = await fetch(url, { ...defaultOptions, ...options });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || wdT('pages.websiteDomains.requestFailed', '請求失敗'));
+        return data;
+    }
+
+    function showAlert(message, type = 'success') {
+        const container = document.getElementById('alertContainer');
+        container.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        setTimeout(() => { container.innerHTML = ''; }, 5000);
+    }
+
+    function setDnsStatus(ok, observed, expected, err) {
+        const el = document.getElementById('dnsStatus');
+        if (ok === true) {
+            const pointedTo = wdT('pages.websiteDomains.dnsPointedTo', '已指向');
+            el.innerHTML = `<span class="badge bg-success">${wdT('pages.websiteDomains.dnsOk', 'OK')}</span> <span class="small text-muted">${pointedTo} ${expected}</span>`;
+            return;
+        }
+        if (ok === false) {
+            const msg = err ? `（${err}）` : '';
+            const incomplete = wdT('pages.websiteDomains.dnsIncomplete', '未完成');
+            const current = wdT('pages.websiteDomains.dnsCurrent', '目前');
+            const shouldBe = wdT('pages.websiteDomains.dnsShouldBe', '應為');
+            el.innerHTML = `<span class="badge bg-warning text-dark">${incomplete}</span> <span class="small text-muted">${current}：${observed || '—'}；${shouldBe}：${expected} ${msg}</span>`;
+            return;
+        }
+        el.textContent = wdT('pages.websiteDomains.notChecked', '尚未檢查');
+    }
+
+    // --- Step wizard ---
+    let currentStep = 1;
+    function setStep(step) {
+        currentStep = step;
+        const steps = [1, 2, 3, 4];
+        for (const s of steps) {
+            const panel = document.getElementById('step' + s);
+            if (panel) panel.style.display = (s === step) ? '' : 'none';
+            const lbl = document.getElementById('stepLabel' + s);
+            if (lbl) lbl.style.fontWeight = (s === step) ? '600' : '400';
+        }
+        const prog = document.getElementById('stepProgress');
+        if (prog) {
+            // Calculate progress: step 1 = 25%, step 2 = 50%, step 3 = 75%, step 4 = 100%
+            const progressPercent = ((step - 1) / 3) * 100;
+            prog.style.width = progressPercent + '%';
+            console.log('Step:', step, 'Progress:', progressPercent + '%');
+        }
+        try { localStorage.setItem('website_domains_step', String(step)); } catch (e) {}
+        
+        // Load TXT verification data when entering step 3
+        if (step === 3) {
+            loadTxtVerification();
+        }
+    }
+
+    function updateOpenDomainLink(www) {
+        const a = document.getElementById('btnOpenDomain');
+        if (!a) return;
+        if (www && www.toLowerCase().startsWith('www.')) a.href = 'https://' + www;
+        else a.href = '#';
+    }
+
+    function normalizeWWWInput(v) {
+        return (v || '').trim();
+    }
+
+    function validateWWW(v) {
+        const www = normalizeWWWInput(v);
+        if (!www) return { ok: false, message: wdT('pages.websiteDomains.validationEmpty', '請先輸入 www 網域（例如：www.example.com）。') };
+        const lower = www.toLowerCase();
+        if (!lower.startsWith('www.')) return { ok: false, message: wdT('pages.websiteDomains.validationWwwOnly', '目前只支援 www 網域，請輸入以 www. 開頭的網域。') };
+        if (lower.startsWith('http://') || lower.startsWith('https://')) return { ok: false, message: wdT('pages.websiteDomains.validationNoProtocol', '請只輸入網域（不要包含 http(s)://）。') };
+        if (www.includes('/') || www.includes(' ')) return { ok: false, message: wdT('pages.websiteDomains.validationInvalid', '網域格式不正確，請只填網域（不要包含路徑或空白）。') };
+        return { ok: true, www };
+    }
+
+    async function copyText(text) {
+        const t = (text || '').trim();
+        if (!t) return;
+        try {
+            await navigator.clipboard.writeText(t);
+            showAlert(wdT('pages.websiteDomains.copied', '已複製'), 'success');
+        } catch (e) {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = t;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                showAlert(wdT('pages.websiteDomains.copied', '已複製'), 'success');
+            } catch (e2) {
+                showAlert(wdT('pages.websiteDomains.copyFailed', '複製失敗，請手動複製。'), 'warning');
+            }
+        }
+    }
+
+    async function loadCurrent() {
+        console.log('=== LOAD CURRENT DOMAINS DEBUG ===');
+        try {
+            const resp = await apiRequest('/api/v1/tenant/custom-domain');
+            console.log('Current domains response:', resp);
+            const domains = resp?.data?.custom_domains || [];
+            console.log('Custom domains array:', domains);
+            const notSetText = wdT('pages.websiteDomains.notSet', '（未設定）');
+            const listText = (domains && domains.length) ? domains.join(', ') : notSetText;
+            console.log('Display text:', listText);
+            document.getElementById('currentDomains').textContent = listText;
+
+            // Fill inputs (best-effort): www only
+            let www = '';
+            for (const d of domains) {
+                if (d && d.toLowerCase().startsWith('www.')) {
+                    if (!www) www = d;
+                }
+            }
+            console.log('Selected www domain:', www);
+            document.getElementById('customDomainWww').value = www;
+            updateOpenDomainLink(www);
+            setDnsStatus(null);
+
+            // If no domain saved yet, always stay on step 1 (even if localStorage remembered later step)
+            if (!www) setStep(1);
+        } catch (e) {
+            console.log('LOAD CURRENT ERROR:', e);
+            throw e;
+        } finally {
+            console.log('===============================');
+        }
+    }
+
+    async function loadTxtVerification() {
+        console.log('=== LOAD TXT VERIFICATION DEBUG ===');
+        try {
+            const raw = document.getElementById('customDomainWww').value || '';
+            const v = validateWWW(raw);
+            if (!v.ok) {
+                console.log('Invalid domain for TXT verification:', v.message);
+                return;
+            }
+            
+            console.log('Loading TXT verification for domain:', v.www);
+            
+            // Get Cloudflare Custom Hostname info
+            const resp = await apiRequest('/api/v1/tenant/custom-domain/cloudflare/status');
+            const data = resp?.data || {};
+            
+            console.log('Cloudflare status response:', data);
+            
+            // Extract TXT verification info
+            if (data.ownership_verification) {
+                const txtName = data.ownership_verification.name;
+                const txtValue = data.ownership_verification.value;
+                
+                console.log('TXT verification - Name:', txtName);
+                console.log('TXT verification - Value:', txtValue);
+                
+                // Update UI
+                document.getElementById('txtVerificationName').textContent = txtName;
+                document.getElementById('txtVerificationValue').textContent = txtValue;
+                
+                showAlert(wdT('pages.websiteDomains.txtVerificationLoaded', 'TXT 驗證資訊已載入'), 'info');
+            } else {
+                console.log('No TXT verification info found');
+                document.getElementById('txtVerificationValue').textContent = wdT('pages.websiteDomains.txtVerificationNotFound', '無法取得驗證資訊，請稍後再試');
+            }
+        } catch (e) {
+            console.log('LOAD TXT VERIFICATION ERROR:', e);
+            document.getElementById('txtVerificationValue').textContent = wdT('pages.websiteDomains.txtVerificationError', '載入失敗：') + e.message;
+        } finally {
+            console.log('==================================');
+        }
+    }
+
+    async function checkTxtVerification() {
+        const btn = document.getElementById('btnCheckTxtVerification');
+        if (btn) btn.disabled = true;
+        
+        try {
+            console.log('=== CHECK TXT VERIFICATION DEBUG ===');
+            
+            const raw = document.getElementById('customDomainWww').value || '';
+            const v = validateWWW(raw);
+            if (!v.ok) {
+                showAlert(v.message, 'warning');
+                return;
+            }
+            
+            // Refresh Cloudflare status
+            await cloudflareRefresh();
+            
+            // Check if verification passed
+            const resp = await apiRequest('/api/v1/tenant/custom-domain/cloudflare/status');
+            const data = resp?.data || {};
+            
+            console.log('Verification check response:', data);
+            
+            const statusDiv = document.getElementById('verificationStatus');
+            
+            // Check if either:
+            // 1. Status is active AND no verification errors, OR
+            // 2. SSL is active (which means verification is working)
+            const isVerificationSuccess = (data.status === 'active' && !data.verification_errors) || 
+                                          (data.ssl_status === 'active' && 
+                                           (!data.verification_errors || 
+                                            data.verification_errors.length === 0 || 
+                                            data.verification_errors.every(err => err.includes('fallback origin'))));
+            
+            if (isVerificationSuccess) {
+                if (data.status === 'active') {
+                    statusDiv.innerHTML = `<div class="alert alert-success">${wdT('pages.websiteDomains.verificationSuccess', '驗證成功！SSL 已經生效，可以繼續到下一步。')}</div>`;
+                    showAlert(wdT('pages.websiteDomains.verificationSuccess', '驗證成功！SSL 已經生效。'), 'success');
+                } else {
+                    statusDiv.innerHTML = `<div class="alert alert-info">${wdT('pages.websiteDomains.verificationPartialSuccess', 'TXT 驗證已完成，SSL 已生效。Cloudflare 正在處理後端設置，這可能需要 5-10 分鐘。期間可能會看到 Error 1014，這是正常的。')}</div>`;
+                    showAlert(wdT('pages.websiteDomains.verificationPartialSuccess', '驗證已完成，請等待 Cloudflare 完全激活。'), 'info');
+                }
+                
+                // Auto-advance to step 4 after 3 seconds
+                setTimeout(() => setStep(4), 3000);
+            } else {
+                const errors = data.verification_errors || [wdT('pages.websiteDomains.verificationPending', '驗證尚未完成')];
+                let errorMsg = wdT('pages.websiteDomains.verificationFailed', '驗證失敗或尚未完成：') + ' ' + errors.join(', ');
+                
+                // If it's just a fallback origin issue but SSL is active, show a more helpful message
+                if (data.ssl_status === 'active' && errors.some(err => err.includes('fallback origin'))) {
+                    errorMsg = wdT('pages.websiteDomains.verificationPartialSuccess', 'TXT 驗證已完成，SSL 已生效。Cloudflare 正在處理後端設置，這不影響網站正常使用。期間可能會看到 Error 1014，這是正常的，通常 5-10 分鐘內會解決。');
+                }
+                
+                statusDiv.innerHTML = `<div class="alert alert-warning">${errorMsg}</div>`;
+                showAlert(wdT('pages.websiteDomains.verificationPending', '驗證尚未完成，請確認 TXT 記錄已正確添加並等待 DNS 生效。'), 'warning');
+            }
+        } catch (e) {
+            console.log('CHECK TXT VERIFICATION ERROR:', e);
+            showAlert(wdT('pages.websiteDomains.verificationCheckFailed', '檢查驗證失敗：') + e.message, 'danger');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    async function saveDomain() {
+        const raw = document.getElementById('customDomainWww').value || '';
+        const v = validateWWW(raw);
+        if (!v.ok) {
+            showAlert(v.message, 'warning');
+            return false;
+        }
+        try {
+            const custom_domains = [v.www].filter(Boolean);
+            const resp = await apiRequest('/api/v1/tenant/custom-domains', {
+                method: 'PUT',
+                body: JSON.stringify({ custom_domains })
+            });
+            const domains = resp?.data?.custom_domains || [];
+            const notSetText = wdT('pages.websiteDomains.notSet', '（未設定）');
+            document.getElementById('currentDomains').textContent = domains.length ? domains.join(', ') : notSetText;
+            showAlert(wdT('pages.websiteDomains.domainSaved', '已保存自訂網域設定（www）'), 'success');
+            updateOpenDomainLink(v.www);
+            setDnsStatus(null);
+            return true;
+        } catch (e) {
+            showAlert(wdT('pages.websiteDomains.saveFailed', '保存失敗') + '：' + e.message, 'danger');
+            return false;
+        }
+    }
+
+    async function checkDnsFor(domain, btnId) {
+        const btn = document.getElementById(btnId);
+        btn.disabled = true;
+        try {
+            console.log('=== DNS CHECK DEBUG ===');
+            console.log('Checking domain:', domain);
+            
+            // 先用公共 DNS API 檢查
+            console.log('Checking with public DNS API...');
+            const dohResponse = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=CNAME`, {
+                headers: { 'Accept': 'application/dns-json' }
+            });
+            const dohData = await dohResponse.json();
+            console.log('Cloudflare DNS API Response:', dohData);
+            
+            const resp = await apiRequest('/api/v1/tenant/custom-domain/check-dns', {
+                method: 'POST',
+                body: JSON.stringify({ domain })
+            });
+            
+            const d = resp?.data || {};
+            console.log('Backend DNS Response:', d);
+            console.log('Expected CNAME:', d.expected_cname);
+            console.log('Observed CNAME:', d.observed_cname);
+            console.log('DNS OK:', d.ok);
+            console.log('Error:', d.error);
+            console.log('Note:', d.note);
+            
+            // 手動檢查邏輯
+            const expected = d.expected_cname;
+            const observed = d.observed_cname;
+            console.log('Manual check - Expected:', expected);
+            console.log('Manual check - Observed:', observed);
+            console.log('Manual check - Match:', observed === expected);
+            console.log('Manual check - Suffix match:', observed && observed.endsWith('.' + expected));
+            console.log('===================');
+            
+            setDnsStatus(!!d.ok, d.observed_cname, d.expected_cname, d.error);
+            if (d.ok) {
+                showAlert(wdT('pages.websiteDomains.dnsCorrect', 'DNS 已正確指向。請完成下方的域名所有權驗證。'), 'success');
+                // Show TXT verification section and check verification button
+                document.getElementById('txtVerificationSection').style.display = '';
+                document.getElementById('btnCheckTxtVerification').style.display = '';
+            } else {
+                showAlert((d.note ? d.note : wdT('pages.websiteDomains.dnsNotCorrect', 'DNS 尚未指到正確目標，請依指示修改。')), 'warning');
+            }
+        } catch (e) {
+            console.log('DNS CHECK ERROR:', e);
+            showAlert(wdT('pages.websiteDomains.checkFailed', '檢查失敗') + '：' + e.message, 'danger');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    async function cloudflareRefresh() {
+        const btn = document.getElementById('btnCloudflareRefresh');
+        if (btn) btn.disabled = true;
+        try {
+            const resp = await apiRequest('/api/v1/tenant/custom-domain/cloudflare/status', { method: 'GET' });
+            const d = resp?.data || {};
+            const last = d.last_sync ? ` / last=${d.last_sync}` : '';
+            const statusLabel = wdT('pages.websiteDomains.statusLabel', '狀態');
+            document.getElementById('cfStatus').innerHTML =
+                `<span class="badge bg-secondary">${statusLabel}</span> <span class="small text-muted">status=${d.status || '—'} / ssl=${d.ssl_status || '—'}${last}</span>`;
+        } catch (e) {
+            const statusFailed = wdT('pages.websiteDomains.statusFailed', '狀態失敗');
+            document.getElementById('cfStatus').innerHTML =
+                `<span class="badge bg-warning text-dark">${statusFailed}</span> <span class="small text-muted">${e.message}</span>`;
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    async function saveAndNext() {
+        const btn = document.getElementById('btnSaveAndNext');
+        if (btn) btn.disabled = true;
+        try {
+            const ok = await saveDomain();
+            if (ok) setStep(2);
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    document.getElementById('btnSaveAndNext')?.addEventListener('click', saveAndNext);
+    document.getElementById('btnBackTo1')?.addEventListener('click', () => setStep(1));
+    document.getElementById('btnGoTo3')?.addEventListener('click', () => {
+        const raw = document.getElementById('customDomainWww').value || '';
+        const v = validateWWW(raw);
+        if (!v.ok) {
+            showAlert(v.message, 'warning');
+            setStep(1);
+            return;
+        }
+        setStep(3);
+    });
+    document.getElementById('btnBackTo2')?.addEventListener('click', () => setStep(2));
+    document.getElementById('btnCheckWww')?.addEventListener('click', async () => {
+        console.log('btnCheckWww clicked');
+        const raw = document.getElementById('customDomainWww').value || '';
+        const v = validateWWW(raw);
+        if (!v.ok) {
+            showAlert(v.message, 'warning');
+            setStep(1);
+            return;
+        }
+        await checkDnsFor(v.www, 'btnCheckWww');
+    });
+    document.getElementById('btnGoTo4')?.addEventListener('click', async () => { setStep(4); await cloudflareRefresh(); });
+    document.getElementById('btnBackTo4')?.addEventListener('click', () => {
+        console.log('btnBackTo4 clicked, going to step 3');
+        setStep(3);
+    });
+    document.getElementById('btnCopyHost')?.addEventListener('click', () => copyText('www'));
+    document.getElementById('btnCopyTarget')?.addEventListener('click', () => copyText(document.getElementById('cnameTargetText')?.textContent || ''));
+    document.getElementById('btnCloudflareRefresh')?.addEventListener('click', cloudflareRefresh);
+    
+    // TXT verification event listeners
+    document.getElementById('btnCheckTxtVerification')?.addEventListener('click', checkTxtVerification);
+    document.getElementById('btnCopyTxtName')?.addEventListener('click', () => copyText(document.getElementById('txtVerificationName')?.textContent || ''));
+    document.getElementById('btnCopyTxtValue')?.addEventListener('click', () => copyText(document.getElementById('txtVerificationValue')?.textContent || ''));
+
+    (function initWizard() {
+        let step = 1;
+        try {
+            const saved = localStorage.getItem('website_domains_step');
+            if (saved) step = Math.max(1, Math.min(4, parseInt(saved, 10) || 1));
+        } catch (e) {}
+        setStep(step);
+    })();
+
+    loadCurrent().catch(e => showAlert(wdT('pages.websiteDomains.loadFailed', '載入失敗') + '：' + e.message, 'danger'));
+</script>
+{{end}}

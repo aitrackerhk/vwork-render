@@ -1,0 +1,670 @@
+{{ define "pages/attendance_clock" }}
+<style>
+    /* ===== Attendance Clock Page Styles ===== */
+
+    /* Clock hero area */
+    .clock-hero {
+        text-align: center;
+        padding: 2.5rem 1rem 2rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%);
+        border-radius: 1.25rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .clock-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 30% 40%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
+                    radial-gradient(circle at 70% 60%, rgba(59, 130, 246, 0.05) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+    }
+    /* Floating orbs background animation */
+    .clock-hero-orbs {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+        z-index: 1;
+        overflow: hidden;
+    }
+    .clock-hero-orb {
+        position: absolute;
+        border-radius: 50%;
+    }
+    .clock-hero-orb--1 {
+        width: 240px; height: 240px;
+        top: -40px; left: -30px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%);
+        animation: orbFloat1 10s ease-in-out infinite alternate;
+    }
+    .clock-hero-orb--2 {
+        width: 200px; height: 200px;
+        bottom: -50px; right: -20px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        animation: orbFloat2 13s ease-in-out infinite alternate;
+    }
+    .clock-hero-orb--3 {
+        width: 160px; height: 160px;
+        top: 15%; left: 55%;
+        background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);
+        animation: orbFloat3 11s ease-in-out infinite alternate;
+    }
+    @keyframes orbFloat1 {
+        0%   { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(30px, 20px) scale(1.1); }
+    }
+    @keyframes orbFloat2 {
+        0%   { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(-25px, -15px) scale(1.08); }
+    }
+    @keyframes orbFloat3 {
+        0%   { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(15px, -20px) scale(1.12); }
+    }
+    .clock-hero > *:not(.clock-hero-orbs) {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Date display */
+    .clock-date {
+        font-size: 1rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.02em;
+    }
+
+    /* Large time display */
+    .clock-time {
+        font-size: 4.5rem;
+        font-weight: 800;
+        font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+        color: #1e293b;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        transition: color 0.3s ease;
+    }
+    @media (max-width: 576px) {
+        .clock-time { font-size: 3rem; }
+    }
+
+    /* Clock action buttons row */
+    .clock-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .clock-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.85rem 2.2rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 100px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .clock-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .clock-btn-in {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(17, 153, 142, 0.35);
+    }
+    .clock-btn-in:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.5);
+    }
+    .clock-btn-in:not(:disabled):active {
+        transform: translateY(0);
+    }
+
+    .clock-btn-out {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(245, 87, 108, 0.35);
+    }
+    .clock-btn-out:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+    }
+    .clock-btn-out:not(:disabled):active {
+        transform: translateY(0);
+    }
+
+    /* Status badge area below buttons */
+    .clock-status {
+        margin-top: 1.5rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 1rem;
+        border-radius: 100px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    .status-badge-success {
+        background: rgba(17, 153, 142, 0.1);
+        color: #0d7a6f;
+    }
+    .status-badge-warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: #b45309;
+    }
+    .status-badge-muted {
+        background: rgba(100, 116, 139, 0.1);
+        color: #64748b;
+    }
+
+    /* Clock + Stats horizontal layout */
+    .clock-hero-wrapper {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        align-items: stretch;
+    }
+    .clock-hero-wrapper > .clock-hero {
+        flex: 1 1 0;
+        margin-bottom: 0;
+    }
+    .clock-hero-wrapper > .att-stats-row {
+        flex: 0 0 320px;
+        margin-bottom: 0;
+    }
+    @media (max-width: 991px) {
+        .clock-hero-wrapper {
+            flex-direction: column;
+        }
+        .clock-hero-wrapper > .att-stats-row {
+            flex: none;
+        }
+    }
+
+    /* Stats row (gradient cards) */
+    .att-stats-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    @media (max-width: 576px) {
+        .att-stats-row { gap: 0.75rem; }
+    }
+
+    .att-stat-card {
+        border-radius: 1rem;
+        padding: 1.25rem;
+        color: #fff;
+        position: relative;
+        overflow: hidden;
+        min-height: 100px;
+    }
+    .att-stat-card::after {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -15%;
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .att-stat-card .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.85;
+        margin-bottom: 0.35rem;
+        font-weight: 500;
+    }
+    .att-stat-card .stat-value {
+        font-size: 1.35rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    .att-stat-card .stat-icon {
+        position: absolute;
+        bottom: 0.75rem;
+        right: 1rem;
+        font-size: 1.8rem;
+        opacity: 0.3;
+    }
+
+    .att-stat-purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .att-stat-green  { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+    .att-stat-pink   { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .att-stat-blue   { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+    /* Week records table */
+    .week-records-card {
+        border: none;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .week-records-card .card-header {
+        background: #fff;
+        border-bottom: 1px solid #f1f5f9;
+        padding: 1rem 1.25rem;
+    }
+    .week-records-card .card-header h5 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+    .week-records-card .card-body {
+        padding: 0 !important;
+        border-bottom: none !important;
+        min-height: auto !important;
+    }
+    .week-records-card .table {
+        margin: 0;
+    }
+    .week-records-card .table thead th {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 0.75rem 1rem;
+        white-space: nowrap;
+    }
+    .week-records-card .table tbody td {
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+        color: #334155;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .week-records-card .table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    .week-records-card .table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    /* Overtime badge */
+    .ot-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: rgba(245, 158, 11, 0.1);
+        color: #b45309;
+    }
+
+    /* Pulse animation for active clock-in state */
+    @keyframes subtlePulse {
+        0%, 100% { box-shadow: 0 4px 15px rgba(245, 87, 108, 0.35); }
+        50% { box-shadow: 0 4px 25px rgba(245, 87, 108, 0.55); }
+    }
+    .clock-btn-out:not(:disabled) {
+        animation: subtlePulse 2.5s ease-in-out infinite;
+    }
+    .clock-btn-out:not(:disabled):hover {
+        animation: none;
+    }
+
+    /* Success animation */
+    @keyframes clockSuccess {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .clock-success-flash {
+        animation: clockSuccess 0.4s ease;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-clock me-2"></i><span data-i18n="attendance.clock">打卡</span></h3>
+        <a href="/attendances" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> <span data-i18n="attendance.viewRecords" class="d-none d-md-inline">查看記錄</span>
+        </a>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <!-- Clock Hero + Stats Side by Side -->
+    <div class="clock-hero-wrapper">
+        <!-- Clock Hero Section -->
+        <div class="clock-hero">
+            <div class="clock-hero-orbs">
+                <div class="clock-hero-orb clock-hero-orb--1"></div>
+                <div class="clock-hero-orb clock-hero-orb--2"></div>
+                <div class="clock-hero-orb clock-hero-orb--3"></div>
+            </div>
+            <div class="clock-date" id="currentDate"></div>
+            <div class="clock-time" id="currentTime"></div>
+
+            <!-- Action Buttons -->
+            <div class="clock-actions">
+                <button class="clock-btn clock-btn-in" id="clockInBtn" disabled>
+                    <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="attendance.clockIn">上班打卡</span>
+                </button>
+                <button class="clock-btn clock-btn-out" id="clockOutBtn" disabled>
+                    <i class="bi bi-box-arrow-right"></i> <span data-i18n="attendance.clockOut">下班打卡</span>
+                </button>
+            </div>
+
+            <!-- Status Area -->
+            <div class="clock-status" id="todayAttendance">
+                <span class="status-badge status-badge-muted">
+                    <i class="bi bi-hourglass-split"></i>
+                    <span data-i18n="common.loading">載入中...</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="att-stats-row" id="statsRow">
+            <div class="att-stat-card att-stat-purple">
+                <div class="stat-label" data-i18n="attendance.clockInTime">上班時間</div>
+                <div class="stat-value" id="statClockIn">--:--</div>
+                <i class="bi bi-sunrise stat-icon"></i>
+            </div>
+            <div class="att-stat-card att-stat-green">
+                <div class="stat-label" data-i18n="attendance.clockOutTime">下班時間</div>
+                <div class="stat-value" id="statClockOut">--:--</div>
+                <i class="bi bi-sunset stat-icon"></i>
+            </div>
+            <div class="att-stat-card att-stat-blue">
+                <div class="stat-label" data-i18n="attendance.workDuration">工作時長</div>
+                <div class="stat-value" id="statWorkDuration">--</div>
+                <i class="bi bi-clock-history stat-icon"></i>
+            </div>
+            <div class="att-stat-card att-stat-pink">
+                <div class="stat-label" data-i18n="attendance.overtime">加班時長</div>
+                <div class="stat-value" id="statOT">--</div>
+                <i class="bi bi-lightning-charge stat-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Week Records -->
+    <div class="week-records-card card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="bi bi-calendar-week me-2"></i><span data-i18n="attendance.weekRecords">本週記錄</span></h5>
+        </div>
+        <div class="card-body">
+            <div class="report-table">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th data-i18n="attendance.date">日期</th>
+                                <th data-i18n="attendance.clockInTime">上班</th>
+                                <th data-i18n="attendance.clockOutTime">下班</th>
+                                <th data-i18n="attendance.workDuration">工作時長</th>
+                                <th data-i18n="attendance.overtime">加班</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weekAttendanceTable">
+                            <tr><td colspan="5" class="text-center text-muted py-4" data-i18n="common.loading">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentAttendance = null;
+    function t(key, fallback) {
+        try {
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                const v = I18n.t(key);
+                if (v && v !== key) return v;
+            }
+        } catch (e) { /* ignore */ }
+        return fallback;
+    }
+    function uiLocale() {
+        try {
+            if (typeof I18n !== 'undefined' && I18n.currentLang) {
+                if (I18n.currentLang === 'en') return 'en-US';
+                if (I18n.currentLang === 'zh-CN') return 'zh-CN';
+            }
+        } catch {}
+        return 'zh-TW';
+    }
+
+    // Update current time & date
+    function updateCurrentTime() {
+        const now = new Date();
+        document.getElementById('currentTime').textContent = now.toLocaleTimeString(uiLocale(), {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('currentDate').textContent = now.toLocaleDateString(uiLocale(), {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+        });
+    }
+    setInterval(updateCurrentTime, 1000);
+    updateCurrentTime();
+
+    // Update stats cards
+    function updateStatsCards(attendance) {
+        const hoursText = t('attendance.hours', '時');
+        const minutesText = t('attendance.minutes', '分');
+        const notClockedText = '--:--';
+
+        if (attendance && attendance.clock_in) {
+            document.getElementById('statClockIn').textContent =
+                new Date(attendance.clock_in).toLocaleTimeString(uiLocale(), { hour: '2-digit', minute: '2-digit' });
+        } else {
+            document.getElementById('statClockIn').textContent = notClockedText;
+        }
+
+        if (attendance && attendance.clock_out) {
+            document.getElementById('statClockOut').textContent =
+                new Date(attendance.clock_out).toLocaleTimeString(uiLocale(), { hour: '2-digit', minute: '2-digit' });
+        } else {
+            document.getElementById('statClockOut').textContent = notClockedText;
+        }
+
+        if (attendance && attendance.work_duration) {
+            const h = Math.floor(attendance.work_duration / 60);
+            const m = attendance.work_duration % 60;
+            document.getElementById('statWorkDuration').textContent = h + hoursText + m + minutesText;
+        } else {
+            document.getElementById('statWorkDuration').textContent = '--';
+        }
+
+        if (attendance && attendance.ot_duration > 0) {
+            const h = Math.floor(attendance.ot_duration / 60);
+            const m = attendance.ot_duration % 60;
+            document.getElementById('statOT').textContent = h + hoursText + m + minutesText;
+        } else {
+            document.getElementById('statOT').textContent = '--';
+        }
+    }
+
+    // Load today attendance
+    async function loadTodayAttendance() {
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const data = await App.apiRequest(`/attendances?start_date=${today}&end_date=${today}&limit=1`);
+            const attendances = data.data || [];
+
+            if (attendances.length > 0) {
+                currentAttendance = attendances[0];
+                renderTodayAttendance(currentAttendance);
+            } else {
+                currentAttendance = null;
+                const noClockText = t('attendance.noClockToday', '今日尚未打卡');
+                document.getElementById('todayAttendance').innerHTML =
+                    '<span class="status-badge status-badge-warning"><i class="bi bi-exclamation-circle"></i> ' + noClockText + '</span>';
+                document.getElementById('clockInBtn').disabled = false;
+                document.getElementById('clockOutBtn').disabled = true;
+                updateStatsCards(null);
+            }
+        } catch (error) {
+            console.error('載入打卡記錄失敗:', error);
+        }
+    }
+
+    function renderTodayAttendance(attendance) {
+        currentAttendance = attendance;
+        updateStatsCards(attendance);
+
+        const clockInLabel = t('attendance.clockInTime', '上班時間');
+        const clockOutLabel = t('attendance.clockOutTime', '下班時間');
+        const notClockedText = t('attendance.notClocked', '未打卡');
+        const clockedInText = t('attendance.clockedIn', '已上班打卡');
+        const clockedOutText = t('attendance.clockedOut', '已完成打卡');
+        const workingText = t('attendance.working', '工作中');
+
+        let statusHtml = '';
+        if (attendance.clock_in && attendance.clock_out) {
+            statusHtml = '<span class="status-badge status-badge-success"><i class="bi bi-check-circle-fill"></i> ' + clockedOutText + '</span>';
+        } else if (attendance.clock_in) {
+            statusHtml = '<span class="status-badge status-badge-success"><i class="bi bi-play-circle-fill"></i> ' + workingText + '</span>';
+        } else {
+            statusHtml = '<span class="status-badge status-badge-warning"><i class="bi bi-exclamation-circle"></i> ' + notClockedText + '</span>';
+        }
+        document.getElementById('todayAttendance').innerHTML = statusHtml;
+
+        // Button states
+        document.getElementById('clockInBtn').disabled = attendance.clock_in != null;
+        document.getElementById('clockOutBtn').disabled = attendance.clock_out != null || attendance.clock_in == null;
+    }
+
+    // Clock In
+    document.getElementById('clockInBtn').addEventListener('click', async function() {
+        try {
+            const result = await App.apiRequest('/attendances/clock-in', { method: 'POST' });
+            const successText = t('attendance.clockInSuccess', '上班打卡成功');
+            App.showAlert(successText, 'success');
+            // Flash animation
+            document.querySelector('.clock-hero').classList.add('clock-success-flash');
+            setTimeout(() => document.querySelector('.clock-hero').classList.remove('clock-success-flash'), 500);
+            loadTodayAttendance();
+            loadWeekAttendance();
+        } catch (error) {
+            const errorText = t('attendance.clockFailed', '打卡失敗');
+            App.showAlert(errorText + ': ' + error.message, 'danger');
+        }
+    });
+
+    // Clock Out
+    document.getElementById('clockOutBtn').addEventListener('click', async function() {
+        if (!currentAttendance || !currentAttendance.clock_in) {
+            const warningText = t('attendance.clockInFirst', '請先完成上班打卡！');
+            App.showAlert(warningText, 'warning');
+            return;
+        }
+        if (currentAttendance.clock_out) {
+            const infoText = t('attendance.alreadyClockedOut', '您已經完成下班打卡');
+            App.showAlert(infoText, 'info');
+            return;
+        }
+        try {
+            const result = await App.apiRequest('/attendances/clock-out', { method: 'POST' });
+            const successText = t('attendance.clockOutSuccess', '下班打卡成功');
+            App.showAlert(successText, 'success');
+            document.querySelector('.clock-hero').classList.add('clock-success-flash');
+            setTimeout(() => document.querySelector('.clock-hero').classList.remove('clock-success-flash'), 500);
+            loadTodayAttendance();
+            loadWeekAttendance();
+        } catch (error) {
+            const errorText = t('attendance.clockFailed', '打卡失敗');
+            App.showAlert(errorText + ': ' + error.message, 'danger');
+        }
+    });
+
+    // Load week records
+    async function loadWeekAttendance() {
+        try {
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay());
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+            const startDate = startOfWeek.toISOString().split('T')[0];
+            const endDate = endOfWeek.toISOString().split('T')[0];
+
+            const data = await App.apiRequest(`/attendances?start_date=${startDate}&end_date=${endDate}&limit=7`);
+            const attendances = data.data || [];
+
+            const tbody = document.getElementById('weekAttendanceTable');
+            if (attendances.length === 0) {
+                const noRecordsText = t('attendance.noRecords', '暫無記錄');
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">' + noRecordsText + '</td></tr>';
+                return;
+            }
+
+            const hoursText = t('attendance.hours', '時');
+            const minutesText = t('attendance.minutes', '分');
+
+            tbody.innerHTML = attendances.map(att => {
+                const workHours = att.work_duration ? Math.floor(att.work_duration / 60) : 0;
+                const workMins = att.work_duration ? att.work_duration % 60 : 0;
+                const otHours = att.ot_duration ? Math.floor(att.ot_duration / 60) : 0;
+                const otMins = att.ot_duration ? att.ot_duration % 60 : 0;
+
+                const dateStr = new Date(att.date).toLocaleDateString(uiLocale(), { month: 'short', day: 'numeric', weekday: 'short' });
+                const clockIn = att.clock_in ? new Date(att.clock_in).toLocaleTimeString(uiLocale(), { hour: '2-digit', minute: '2-digit' }) : '<span class="text-muted">-</span>';
+                const clockOut = att.clock_out ? new Date(att.clock_out).toLocaleTimeString(uiLocale(), { hour: '2-digit', minute: '2-digit' }) : '<span class="text-muted">-</span>';
+                const workDur = att.work_duration ? workHours + hoursText + workMins + minutesText : '<span class="text-muted">-</span>';
+                const otDur = otHours > 0 ? '<span class="ot-badge"><i class="bi bi-lightning-charge-fill"></i>' + otHours + hoursText + otMins + minutesText + '</span>' : '<span class="text-muted">-</span>';
+
+                return '<tr>' +
+                    '<td><strong>' + dateStr + '</strong></td>' +
+                    '<td>' + clockIn + '</td>' +
+                    '<td>' + clockOut + '</td>' +
+                    '<td>' + workDur + '</td>' +
+                    '<td>' + otDur + '</td>' +
+                    '</tr>';
+            }).join('');
+        } catch (error) {
+            console.error('載入本週記錄失敗:', error);
+        }
+    }
+
+    // Init
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTodayAttendance();
+            loadWeekAttendance();
+        });
+    } else {
+        loadTodayAttendance();
+        loadWeekAttendance();
+    }
+</script>
+{{ end }}

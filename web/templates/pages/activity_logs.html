@@ -1,0 +1,487 @@
+{{define "pages/activity_logs"}}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0"><i class="bi bi-clock-history"></i> <span data-i18n="activityLogs.title">活動記錄</span></h4>
+        <div class="activity-logs-actions">
+            <button class="btn btn-sm btn-outline-secondary" onclick="loadActivityLogs()">
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="common.refresh">刷新</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 過濾器 -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small"><span data-i18n="activityLogs.action">操作類型</span></label>
+                    <select class="form-select form-select-sm" id="filterAction" onchange="applyFilters()">
+                        <option value="" data-i18n="activityLogs.all">全部</option>
+                        <option value="create" data-i18n="activityLogs.actions.create">建立</option>
+                        <option value="update" data-i18n="activityLogs.actions.update">更新</option>
+                        <option value="delete" data-i18n="activityLogs.actions.delete">刪除</option>
+                        <option value="join" data-i18n="activityLogs.actions.join">加入</option>
+                        <option value="login" data-i18n="activityLogs.actions.login">登入</option>
+                        <option value="logout" data-i18n="activityLogs.actions.logout">登出</option>
+                        <option value="setting_change" data-i18n="activityLogs.actions.setting_change">設定更改</option>
+                        <option value="login_as" data-i18n="activityLogs.actions.login_as">模擬登入</option>
+                        <option value="invite" data-i18n="activityLogs.actions.invite">邀請</option>
+                        <option value="add_bonus_coins" data-i18n="activityLogs.actions.add_bonus_coins">新增獎勵幣</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small"><span data-i18n="activityLogs.resourceType">資源類型</span></label>
+                    <select class="form-select form-select-sm" id="filterResourceType" onchange="applyFilters()">
+                        <option value="" data-i18n="activityLogs.all">全部</option>
+                        <option value="user" data-i18n="activityLogs.resourceTypes.user">用戶</option>
+                        <option value="customer" data-i18n="activityLogs.resourceTypes.customer">客戶</option>
+                        <option value="product" data-i18n="activityLogs.resourceTypes.product">產品</option>
+                        <option value="order" data-i18n="activityLogs.resourceTypes.order">訂單</option>
+                        <option value="service_order" data-i18n="activityLogs.resourceTypes.service_order">服務單</option>
+                        <option value="setting" data-i18n="activityLogs.resourceTypes.setting">設定</option>
+                        <option value="tenant" data-i18n="activityLogs.resourceTypes.tenant">租戶</option>
+                        <option value="enterprise" data-i18n="activityLogs.resourceTypes.enterprise">企業</option>
+                        <option value="auth" data-i18n="activityLogs.resourceTypes.auth">身份驗證</option>
+                        <option value="vworkadmin" data-i18n="activityLogs.resourceTypes.vworkadmin">vWork 管理員</option>
+                        <option value="business_goal" data-i18n="activityLogs.resourceTypes.business_goal">業務目標</option>
+                        <option value="ai_coins" data-i18n="activityLogs.resourceTypes.ai_coins">AI 幣</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small"><span data-i18n="activityLogs.startDate">開始日期</span></label>
+                    <input type="date" class="form-control form-control-sm" id="filterStartDate" onchange="applyFilters()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small"><span data-i18n="activityLogs.endDate">結束日期</span></label>
+                    <input type="date" class="form-control form-control-sm" id="filterEndDate" onchange="applyFilters()">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small"><span data-i18n="common.search">搜尋</span></label>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" id="filterSearch" data-i18n-placeholder="activityLogs.placeholder.description" placeholder="描述" onkeydown="handleSearchKey(event)">
+                        <button class="btn btn-outline-secondary" type="button" onclick="applyFilters()">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 活動記錄列表 -->
+    <div id="activityLogsContainer" class="row g-3">
+        <div class="col-12 text-center p-5 text-muted">
+            <i class="bi bi-clock-history fs-1"></i>
+            <p class="mt-2" data-i18n="activityLogs.loading">載入活動記錄中...</p>
+        </div>
+    </div>
+
+    <!-- 分頁 -->
+    <div class="d-flex justify-content-between align-items-center mt-4" id="paginationContainer" style="display: none;">
+        <div class="text-muted" id="paginationInfo"></div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+const pageSize = 50;
+let searchTimeout = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 翻譯頁面上的 data-i18n 元素
+    if (typeof I18n !== 'undefined' && I18n.translatePage) {
+        I18n.translatePage();
+    }
+    
+    // 設置搜索框的 placeholder
+    const searchInput = document.getElementById('filterSearch');
+    if (searchInput && typeof I18n !== 'undefined' && I18n.t) {
+        const placeholderText = I18n.t('activityLogs.placeholder.description', '描述');
+        searchInput.setAttribute('placeholder', placeholderText);
+    }
+    
+    loadActivityLogs();
+});
+
+function handleSearchKey(event) {
+    if (!event) return;
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        applyFilters();
+    }
+}
+
+function applyFilters() {
+    currentPage = 1;
+    loadActivityLogs();
+}
+
+async function loadActivityLogs() {
+    try {
+        const container = document.getElementById('activityLogsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12 text-center p-5 text-muted">
+                    <i class="bi bi-clock-history fs-1"></i>
+                    <p class="mt-2" data-i18n="activityLogs.loading">載入活動記錄中...</p>
+                </div>
+            `;
+        }
+        
+        const params = new URLSearchParams({
+            page: currentPage,
+            limit: pageSize
+        });
+        
+        const action = document.getElementById('filterAction')?.value;
+        if (action) {
+            params.append('action', action);
+        }
+        
+        const resourceType = document.getElementById('filterResourceType')?.value;
+        if (resourceType) {
+            params.append('resource_type', resourceType);
+        }
+        
+        const startDate = document.getElementById('filterStartDate')?.value;
+        if (startDate) {
+            params.append('start_date', startDate);
+        }
+        
+        const endDate = document.getElementById('filterEndDate')?.value;
+        if (endDate) {
+            params.append('end_date', endDate);
+        }
+        
+        const search = document.getElementById('filterSearch')?.value;
+        if (search) {
+            params.append('search', search);
+        }
+        
+        const response = await App.apiRequest(`/activity-logs?${params.toString()}`);
+        
+        if (response && response.data) {
+            renderActivityLogs(response.data, response.total || 0);
+        } else {
+            renderActivityLogs([], 0);
+        }
+    } catch (error) {
+        console.error('載入活動記錄失敗:', error);
+        const loadErrorText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('activityLogs.loadError') : '載入活動記錄失敗';
+        const container = document.getElementById('activityLogsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12 text-center p-5 text-danger">
+                    <i class="bi bi-exclamation-triangle fs-1"></i>
+                    <p class="mt-2">${loadErrorText}</p>
+                </div>
+            `;
+        }
+        App.showAlert(loadErrorText, 'danger');
+    }
+}
+
+function getDescriptionText(description) {
+    if (!description) return '';
+    // Try to parse as structured i18n JSON: {"key":"customer.update","params":{"name":"張三"}}
+    try {
+        const parsed = JSON.parse(description);
+        if (parsed && parsed.key) {
+            const i18nKey = `activityLogs.descriptions.${parsed.key}`;
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                let text = I18n.t(i18nKey, description);
+                // Replace {param} placeholders with actual values
+                if (parsed.params) {
+                    Object.entries(parsed.params).forEach(([k, v]) => {
+                        text = text.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+                    });
+                }
+                return text;
+            }
+        }
+    } catch (e) {
+        // Not JSON, fall through to display as-is
+    }
+    return description;
+}
+
+function renderActivityLogs(logs, total) {
+    const container = document.getElementById('activityLogsContainer');
+    if (!container) {
+        return;
+    }
+    
+    if (!logs || logs.length === 0) {
+        const noRecordsText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('activityLogs.noRecords') : '暫無活動記錄';
+        container.innerHTML = `
+            <div class="col-12 text-center p-5 text-muted">
+                <i class="bi bi-inbox fs-1"></i>
+                <p class="mt-2">${noRecordsText}</p>
+            </div>
+        `;
+        document.getElementById('paginationContainer').style.display = 'none';
+        return;
+    }
+    
+    const locale = (typeof I18n !== 'undefined' && I18n.currentLang === 'en') ? 'en-US' : 'zh-TW';
+    
+    container.innerHTML = logs.map(log => {
+        const timeStr = new Date(log.created_at).toLocaleString(locale, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        const actionIcon = getActionIcon(log.action);
+        const actionBadge = getActionBadge(log.action);
+        const resourceTypeText = getResourceTypeText(log.resource_type);
+        const resourceBadge = `<span class="badge bg-secondary">${resourceTypeText}</span>`;
+        
+        let changesHtml = '';
+        if (log.changes && Object.keys(log.changes).length > 0) {
+            const viewChangesText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('activityLogs.viewChanges') : '查看詳細變更';
+            changesHtml = `
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#changes-${log.id}" aria-expanded="false">
+                        <i class="bi bi-info-circle"></i> ${viewChangesText}
+                    </button>
+                    <div class="collapse mt-2" id="changes-${log.id}">
+                        <div class="card card-body bg-light">
+                            <pre class="mb-0" style="white-space: pre-wrap; font-size: 0.875rem;">${escapeHtml(JSON.stringify(log.changes, null, 2))}</pre>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="${actionIcon} text-primary"></i>
+                                    ${actionBadge}
+                                    ${resourceBadge}
+                                    ${log.user ? `<span class="text-muted small">${escapeHtml(log.user.name || log.user.email)}</span>` : ''}
+                                </div>
+                                <p class="mb-1">${escapeHtml(getDescriptionText(log.description))}</p>
+                                <div class="d-flex align-items-center gap-3 text-muted small">
+                                    <span><i class="bi bi-clock"></i> ${timeStr}</span>
+                                    ${log.ip_address ? `<span><i class="bi bi-geo-alt"></i> ${escapeHtml(log.ip_address)}</span>` : ''}
+                                </div>
+                                ${changesHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // 渲染分頁
+    renderPagination(total);
+}
+
+function getResourceTypeText(resourceType) {
+    if (!resourceType) return '';
+    const getResourceTypeTranslation = (typeKey) => {
+        if (typeof I18n !== 'undefined' && I18n.t) {
+            return I18n.t(`activityLogs.resourceTypes.${typeKey}`, typeKey);
+        }
+        const fallback = {
+            'user': '用戶',
+            'customer': '客戶',
+            'product': '產品',
+            'order': '訂單',
+            'service_order': '服務單',
+            'setting': '設定',
+            'tenant': '租戶',
+            'enterprise': '企業',
+            'auth': '身份驗證',
+            'vworkadmin': 'vWork 管理員',
+            'business_goal': '業務目標',
+            'ai_coins': 'AI 幣'
+        };
+        return fallback[typeKey] || typeKey;
+    };
+    return escapeHtml(getResourceTypeTranslation(resourceType));
+}
+
+function getActionIcon(action) {
+    const icons = {
+        'create': 'bi bi-plus-circle-fill',
+        'update': 'bi bi-pencil-fill',
+        'delete': 'bi bi-trash-fill',
+        'join': 'bi bi-person-plus-fill',
+        'login': 'bi bi-box-arrow-in-right',
+        'logout': 'bi bi-box-arrow-right',
+        'setting_change': 'bi bi-gear-fill',
+        'login_as': 'bi bi-person-badge',
+        'invite': 'bi bi-envelope-plus-fill',
+        'add_bonus_coins': 'bi bi-coin'
+    };
+    return icons[action] || 'bi bi-circle-fill';
+}
+
+function getActionBadge(action) {
+    const getActionText = (actionKey) => {
+        if (typeof I18n !== 'undefined' && I18n.t) {
+            return I18n.t(`activityLogs.actions.${actionKey}`, actionKey);
+        }
+        const fallback = {
+            'create': '建立',
+            'update': '更新',
+            'delete': '刪除',
+            'join': '加入',
+            'login': '登入',
+            'logout': '登出',
+            'setting_change': '設定更改',
+            'login_as': '模擬登入',
+            'invite': '邀請',
+            'add_bonus_coins': '新增獎勵幣'
+        };
+        return fallback[actionKey] || actionKey;
+    };
+    
+    const badges = {
+        'create': `<span class="badge bg-success">${getActionText('create')}</span>`,
+        'update': `<span class="badge bg-primary">${getActionText('update')}</span>`,
+        'delete': `<span class="badge bg-danger">${getActionText('delete')}</span>`,
+        'join': `<span class="badge bg-info">${getActionText('join')}</span>`,
+        'login': `<span class="badge bg-info">${getActionText('login')}</span>`,
+        'logout': `<span class="badge bg-secondary">${getActionText('logout')}</span>`,
+        'setting_change': `<span class="badge bg-warning text-dark">${getActionText('setting_change')}</span>`,
+        'login_as': `<span class="badge bg-warning text-dark">${getActionText('login_as')}</span>`,
+        'invite': `<span class="badge bg-info">${getActionText('invite')}</span>`,
+        'add_bonus_coins': `<span class="badge bg-success">${getActionText('add_bonus_coins')}</span>`
+    };
+    return badges[action] || `<span class="badge bg-secondary">${escapeHtml(action)}</span>`;
+}
+
+function renderPagination(total) {
+    const container = document.getElementById('paginationContainer');
+    const info = document.getElementById('paginationInfo');
+    const pagination = document.getElementById('pagination');
+    
+    if (!container || !info || !pagination) {
+        return;
+    }
+    
+    const totalPages = Math.ceil(total / pageSize);
+    
+    if (totalPages <= 1) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'flex';
+    let paginationText = `共 ${total} 筆記錄，第 ${currentPage} / ${totalPages} 頁`;
+    if (typeof I18n !== 'undefined' && I18n.t) {
+        const template = I18n.t('activityLogs.pagination.totalRecords', paginationText);
+        paginationText = template.replace('{total}', total).replace('{currentPage}', currentPage).replace('{totalPages}', totalPages);
+    }
+    info.textContent = paginationText;
+    
+    pagination.innerHTML = '';
+    
+    // 上一頁
+    const prevPageText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('activityLogs.pagination.prevPage') : '上一頁';
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">${prevPageText}</a>`;
+    pagination.appendChild(prevLi);
+    
+    // 頁碼
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (startPage > 1) {
+        const firstLi = document.createElement('li');
+        firstLi.className = 'page-item';
+        firstLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(1); return false;">1</a>`;
+        pagination.appendChild(firstLi);
+        
+        if (startPage > 2) {
+            const ellipsisLi = document.createElement('li');
+            ellipsisLi.className = 'page-item disabled';
+            ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+            pagination.appendChild(ellipsisLi);
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>`;
+        pagination.appendChild(li);
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            const ellipsisLi = document.createElement('li');
+            ellipsisLi.className = 'page-item disabled';
+            ellipsisLi.innerHTML = '<span class="page-link">...</span>';
+            pagination.appendChild(ellipsisLi);
+        }
+        
+        const lastLi = document.createElement('li');
+        lastLi.className = 'page-item';
+        lastLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${totalPages}); return false;">${totalPages}</a>`;
+        pagination.appendChild(lastLi);
+    }
+    
+    // 下一頁
+    const nextPageText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('activityLogs.pagination.nextPage') : '下一頁';
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">${nextPageText}</a>`;
+    pagination.appendChild(nextLi);
+}
+
+function changePage(page) {
+    const total = parseInt(document.getElementById('paginationInfo')?.textContent.match(/\d+/)?.[0] || 0);
+    const totalPages = Math.ceil(total / pageSize);
+    
+    if (page < 1 || page > totalPages) {
+        return;
+    }
+    
+    currentPage = page;
+    loadActivityLogs();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+
+<style>
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+@media (max-width: 767.98px) {
+    .activity-logs-actions {
+        margin-top: 10px;
+    }
+}
+</style>
+{{end}}
+

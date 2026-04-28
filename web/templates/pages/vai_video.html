@@ -1,0 +1,388 @@
+{{define "pages/vai_video"}}
+<!-- vAI Video Generation Tool -->
+<div class="vai-video-page" id="vaiVideoPage">
+    <!-- Left: Video History Sidebar -->
+    <div class="vai-video-sidebar" id="vaiVideoSidebar">
+        <div class="vai-video-sidebar-header">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-primary flex-grow-1" onclick="VaiVideo.createProject()">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.video.newProject">新增影片</span>
+                </button>
+                <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="VaiVideo.toggleSidebar()" title="關閉" data-i18n-title="vai.common.close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- Sidebar tabs -->
+            <div class="vai-sidebar-tabs mt-2">
+                <button class="vai-sidebar-tab active" data-tab="projects" onclick="VaiVideo.switchSidebarTab('projects')">
+                    <i class="bi bi-film me-1"></i><span data-i18n="vai.sidebar.myProjects">我的專案</span>
+                </button>
+                <button class="vai-sidebar-tab" data-tab="chat" onclick="VaiVideo.switchSidebarTab('chat')">
+                    <i class="bi bi-chat-dots me-1"></i><span data-i18n="vai.sidebar.chatGeneration">對話生成</span>
+                </button>
+            </div>
+        </div>
+        <!-- Tab: My Projects -->
+        <div id="vaiHistoryList" class="vai-video-history-list">
+            <!-- Rendered by vai-video.js -->
+            <div class="text-center text-muted p-4" style="font-size: 0.8rem;">
+                <i class="bi bi-clock-history mb-2 d-block" style="font-size: 1.5rem;"></i>
+                <span data-i18n="vai.video.noHistory">尚無影片記錄</span><br>
+                <span data-i18n="vai.video.createHint">點擊「新增影片」開始</span>
+            </div>
+        </div>
+        <!-- Tab: Chat Generated Videos -->
+        <div id="vaiChatVideoList" class="vai-video-history-list" style="display: none;">
+            <!-- Rendered by vai-video.js -->
+        </div>
+    </div>
+
+    <!-- Right: Main Content Area -->
+    <div class="vai-video-main d-flex flex-column flex-grow-1" style="min-width: 0;">
+        <!-- Top Toolbar -->
+        <div class="vai-video-toolbar" id="vaiVideoToolbar">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- Mobile sidebar toggle -->
+                <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="VaiVideo.toggleSidebar()" title="歷史記錄" data-i18n-title="vai.video.historyLabel">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div class="vr d-md-none mx-1" style="height: 24px;"></div>
+
+                <!-- Current project title -->
+                <span class="fw-semibold text-muted" id="vaiProjectTitle" style="font-size: 0.85rem;">
+                    <span data-i18n="vai.video.selectProject">選擇或新增一個影片專案</span>
+                </span>
+
+                <!-- Aspect ratio selector (project-level, hidden until project selected) -->
+                <div class="d-flex align-items-center gap-1 ms-2" id="vaiAspectRatioGroup" style="display: none;">
+                    <label class="mb-0 small text-muted" style="font-size: 0.75rem;" data-i18n="vai.video.aspectRatio">比例</label>
+                    <select class="form-select form-select-sm" id="vaiVideoAspectRatio" style="width: auto; font-size: 0.8rem;" onchange="VaiVideo.updateShotSetting('aspectRatio', this.value)">
+                        <option value="16:9">16:9</option>
+                        <option value="9:16" selected>9:16</option>
+                        <option value="1:1">1:1</option>
+                        <option value="4:3">4:3</option>
+                        <option value="3:4">3:4</option>
+                    </select>
+                </div>
+
+                <div class="flex-grow-1"></div>
+
+                <!-- Chat mode settings: rename / delete -->
+                <div class="d-flex align-items-center gap-2" id="vaiChatSettings">
+                    <button class="btn btn-sm btn-link text-muted p-0 ms-1" onclick="VaiVideo.renameProject()" title="重命名" data-i18n-title="vai.common.rename">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-link text-danger p-0 ms-1" onclick="VaiVideo.deleteProject(VaiVideo.getCurrentProjectId())" title="刪除" data-i18n-title="vai.common.delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shot strip removed — aspect ratio is now in toolbar -->
+
+        <!-- Main Editor Content -->
+        <div class="vai-video-editor" id="vaiVideoEditor">
+            <!-- Chat Mode (default view - replaces old empty state) -->
+            <div class="vai-video-chat" id="vaiVideoChat">
+                <!-- Chat messages area -->
+                <div class="vai-video-chat-messages" id="vaiChatMessages">
+                    <!-- Welcome message (same structure as vai-chat) -->
+                    <div class="d-flex justify-content-start mb-2">
+                        <div class="avatar-circle me-2 flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.9rem; border: 1px solid #dee2e6; background: transparent; color: #6c757d; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-robot"></i>
+                        </div>
+                        <div class="message-bubble ai position-relative" style="max-width: 70%;">
+                            <div class="ai-msg-content">
+                                <p class="mb-2 fw-semibold" data-i18n="vai.video.chatWelcome">Hi! 我是 vAi 影片助手</p>
+                                <p class="mb-1 small" data-i18n="vai.video.chatWelcomeDesc">告訴我你想做什麼影片，我會自動幫你規劃分鏡和故事。例如：</p>
+                                <div class="vai-chat-suggestions">
+                                    <button class="vai-chat-suggestion" onclick="VaiVideo.useSuggestion(this)" data-i18n="vai.video.chatSuggest1">幫我做一個 30 秒的產品開箱影片</button>
+                                    <button class="vai-chat-suggestion" onclick="VaiVideo.useSuggestion(this)" data-i18n="vai.video.chatSuggest2">製作一段社群短影片，介紹我們的新服務</button>
+                                    <button class="vai-chat-suggestion" onclick="VaiVideo.useSuggestion(this)" data-i18n="vai.video.chatSuggest3">做一個品牌形象宣傳片，有質感的畫面</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Dynamic messages rendered by JS -->
+                </div>
+
+                <!-- Chat input area (fixed at bottom of chat) — same style as vai-chat -->
+                <div class="border-top p-3 bg-white">
+                    <!-- Hidden file input for attachments -->
+                    <input type="file" id="vaiVideoChatFileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.webm,.wav,.mp3,.m4a,.ogg" style="display: none;" onchange="VaiVideo.handleVideoChatFileSelect(event)">
+                    <!-- File preview area (shown when files are attached) -->
+                    <div id="vaiVideoChatFilePreview" class="ai-file-preview-area" style="display: none;"></div>
+                    <!-- Input row — identical to vai-chat input-group -->
+                    <form id="vaiVideoChatForm" onsubmit="VaiVideo.sendChatMessage(); return false;">
+                        <div class="input-group">
+                            <button type="button" class="btn ai-upload-btn mb-0" title="上傳文件" data-i18n-title="vai.chat.uploadFile" style="cursor: pointer;" onclick="VaiVideo.openImagePicker('attachment')">
+                                <i class="bi bi-paperclip"></i>
+                            </button>
+                            <textarea class="form-control" id="vaiChatInput" rows="1" placeholder="描述你想做的影片，AI 會自動幫你規劃分鏡..." data-i18n-placeholder="vai.video.chatPlaceholder" style="resize: none; max-height: 120px;"></textarea>
+                            <button type="button" class="btn btn-outline-secondary" id="vaiVideoHistoryBtn" onclick="VaiVideo.toggleVideoGenHistory()" title="生成歷史" data-i18n-title="vai.video.genHistoryBtn">
+                                <i class="bi bi-clock-history"></i>
+                            </button>
+                            <button type="button" class="btn btn-success" id="vaiVideoMicBtn" onclick="VaiVideo.toggleVoiceInput()" data-i18n-title="vai.chat.voiceInput" title="Voice Input">
+                                <i class="bi bi-mic"></i>
+                            </button>
+                            <button type="submit" class="btn btn-success" id="vaiChatSendBtn" style="display: none;">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <!-- Generation History Panel (combined videos only) -->
+                    <div id="vaiVideoGenHistory" class="vai-video-gen-history" style="display: none;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <small class="fw-semibold"><i class="bi bi-clock-history me-1"></i><span data-i18n="vai.video.genHistory">生成歷史</span></small>
+                            <button class="btn btn-sm btn-link text-muted p-0" onclick="VaiVideo.toggleVideoGenHistory()">&times;</button>
+                        </div>
+                        <div id="vaiVideoGenHistoryList" class="vai-video-gen-history-list">
+                            <div class="text-center text-muted py-3" style="font-size: 0.8rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入中...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legacy empty state (hidden, kept for fallback) -->
+            <div class="vai-video-empty" id="vaiVideoEmpty" style="display: none;">
+                <i class="bi bi-camera-video" style="font-size: 3rem; opacity: 0.3;"></i>
+                <p class="mt-3 mb-1 fw-semibold" data-i18n="vai.video.emptyTitle">開始製作影片</p>
+                <p class="text-muted small" data-i18n="vai.video.emptyDesc">新增影片專案，加入分鏡，使用 AI 逐段生成影片</p>
+                <button class="btn btn-primary mt-2" onclick="VaiVideo.createProject()">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.video.createFirst">新增第一個影片</span>
+                </button>
+            </div>
+
+            <!-- Active shot editor (hidden until shot selected) -->
+            <div class="vai-video-shot-editor" id="vaiShotEditor" style="display: none;">
+                <!-- Duration (per-shot setting) -->
+                <div class="vai-video-section">
+                    <div class="d-flex align-items-center gap-3">
+                        <label class="mb-0 small text-muted" style="font-size: 0.75rem;" data-i18n="vai.video.duration">時長</label>
+                        <select class="form-select form-select-sm" id="vaiVideoDuration" style="width: auto; font-size: 0.8rem;" onchange="VaiVideo.updateShotSetting('duration', this.value)">
+                            <option value="5s">5s</option>
+                            <option value="10s" selected>10s</option>
+                            <option value="15s">15s</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Previous Shot Continuity Banner -->
+                <div class="vai-video-section" id="vaiPrevShotBanner" style="display: none;">
+                    <div class="d-flex align-items-center gap-2 p-2 rounded" style="background: linear-gradient(135deg, #e8f5e9, #e3f2fd); border: 1px solid #c8e6c9;">
+                        <div class="flex-shrink-0">
+                            <img id="vaiPrevShotThumb" src="" alt="Previous" style="width: 64px; height: 36px; object-fit: cover; border-radius: 4px; border: 1px solid #a5d6a7;">
+                        </div>
+                        <div class="flex-grow-1" style="min-width: 0;">
+                            <div class="fw-semibold small" style="font-size: 0.8rem;">
+                                <i class="bi bi-link-45deg me-1"></i><span data-i18n="vai.video.prevShotContinuity">承接上一分鏡</span>
+                            </div>
+                            <small class="text-muted" style="font-size: 0.7rem;" data-i18n="vai.video.prevShotHint">已自動擷取上一分鏡最後畫面作為參考，確保畫面連貫</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary flex-shrink-0" onclick="VaiVideo.removePrevShotRef()" title="移除" style="font-size: 0.7rem;">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reference Image Section -->
+                <div class="vai-video-section">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <label class="fw-semibold small" data-i18n="vai.video.referenceImage">參考圖片 (選填)</label>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-success" id="vaiUsePrevFrameBtn" onclick="VaiVideo.usePrevShotFrame()" style="display: none;" title="繼承上一分鏡最後畫面" data-i18n-title="vai.video.prevShotContinuity">
+                                <i class="bi bi-link-45deg me-1"></i><span data-i18n="vai.video.prevShotContinuity">承接上一分鏡</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="VaiVideo.openImagePicker()" title="選擇圖片">
+                                <i class="bi bi-image me-1"></i><span data-i18n="vai.video.selectImage">選擇圖片</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('vaiVideoImageUpload').click()" title="上傳">
+                                <i class="bi bi-upload"></i>
+                            </button>
+                            <input type="file" id="vaiVideoImageUpload" accept="image/*" style="display: none;" onchange="VaiVideo.handleImageUpload(event)">
+                        </div>
+                    </div>
+                    <div class="vai-video-ref-preview" id="vaiRefPreview">
+                        <div class="vai-video-ref-empty" id="vaiRefEmpty">
+                            <i class="bi bi-image text-muted" style="font-size: 1.5rem;"></i>
+                            <small class="text-muted" data-i18n="vai.video.noRefImage">無參考圖片 (純文字生成)</small>
+                        </div>
+                        <div class="vai-video-ref-img-wrapper" id="vaiRefImgWrapper" style="display: none;">
+                            <img id="vaiRefImg" src="" alt="Reference">
+                            <button class="btn btn-sm btn-danger vai-video-ref-remove" onclick="VaiVideo.removeRefImage()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prompt Section -->
+                <div class="vai-video-section">
+                    <label class="fw-semibold small mb-2" data-i18n="vai.video.prompt">影片描述</label>
+                    <div class="position-relative">
+                        <textarea class="form-control" id="vaiShotPrompt" rows="4" placeholder="描述這個分鏡的內容，例如：一隻貓在陽光下伸懶腰，畫面緩慢推進..." data-i18n-placeholder="vai.video.promptPlaceholder" style="padding-right: 2.5rem;"></textarea>
+                        <button type="button" class="btn btn-sm vai-stt-btn-float" onclick="VaiSTT.toggle('vaiShotPrompt', this)" title="Voice Input" data-i18n-title="vai.chat.voiceInput">
+                            <i class="bi bi-mic"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Generate / Preview Section -->
+                <div class="vai-video-section">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <button class="btn btn-primary" onclick="VaiVideo.generateShot()" id="vaiGenShotBtn">
+                            <i class="bi bi-stars me-1"></i><span data-i18n="vai.video.generate">AI 生成影片</span>
+                        </button>
+                        <div class="spinner-border spinner-border-sm text-primary" id="vaiGenSpinner" style="display: none;"></div>
+                        <span class="small text-muted" id="vaiGenStatus"></span>
+                    </div>
+
+                    <!-- Generation progress -->
+                    <div class="vai-video-progress" id="vaiGenProgress" style="display: none;">
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="vaiGenProgressBar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted mt-1" id="vaiGenProgressText" data-i18n="vai.video.generating">生成中...</small>
+                    </div>
+
+                    <!-- Video preview -->
+                    <div class="vai-video-preview" id="vaiVideoPreview" style="display: none;">
+                        <video id="vaiPreviewPlayer" controls playsinline style="max-width: 100%; max-height: 400px; border-radius: 8px;">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="d-flex gap-2 mt-2 flex-wrap">
+                            <button class="btn btn-sm btn-outline-primary" onclick="VaiVideo.downloadShot()">
+                                <i class="bi bi-download me-1"></i><span data-i18n="vai.video.download">下載</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="VaiVideo.extendShot()" id="vaiExtendShotBtn" title="從此分鏡的影片延伸 7 秒">
+                                <i class="bi bi-skip-forward-fill me-1"></i><span data-i18n="vai.video.extendVideo">延伸影片</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="VaiVideo.regenerateShot()">
+                                <i class="bi bi-arrow-clockwise me-1"></i><span data-i18n="vai.video.regenerate">重新生成</span>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="VaiVideo.deleteShot()">
+                                <i class="bi bi-trash me-1"></i><span data-i18n="vai.video.deleteShot">刪除分鏡</span>
+                            </button>
+                        </div>
+                        <!-- Extend progress (shown during extend operation) -->
+                        <div class="vai-video-progress mt-2" id="vaiExtendProgress" style="display: none;">
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="vaiExtendProgressBar" style="width: 0%"></div>
+                            </div>
+                            <small class="text-muted mt-1" id="vaiExtendProgressText" data-i18n="vai.video.extending">延伸中...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combined Video Result (bottom) -->
+        <div class="vai-video-combined" id="vaiCombinedResult" style="display: none;">
+            <div class="border-top p-3 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <label class="fw-semibold small"><i class="bi bi-film me-1"></i><span data-i18n="vai.video.combinedResult">合併影片結果</span></label>
+                    <button class="btn btn-sm btn-link text-muted p-0" onclick="VaiVideo.closeCombinedResult()">&times;</button>
+                </div>
+                <video id="vaiCombinedPlayer" controls playsinline style="max-width: 100%; max-height: 300px; border-radius: 8px;">
+                </video>
+                <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="VaiVideo.downloadCombined()">
+                        <i class="bi bi-download me-1"></i><span data-i18n="vai.video.downloadCombined">下載合併影片</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Image Picker Modal (reuse pattern from sketch) -->
+<div class="modal fade" id="vaiVideoImagePickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title mb-0" data-i18n="vai.video.selectRefImage">選擇參考圖片</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <ul class="nav nav-tabs px-3 pt-2" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#vaiVidImgTabUpload" type="button">
+                            <i class="bi bi-upload me-1"></i><span data-i18n="vai.video.upload">上傳</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vaiVidImgTabSketches" type="button">
+                            <i class="bi bi-brush me-1"></i><span data-i18n="vai.video.sketchImages">圖片</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#vaiVidImgTabProducts" type="button">
+                            <i class="bi bi-box-seam me-1"></i><span data-i18n="vai.video.productImages">產品圖片</span>
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <!-- Upload Tab (first) -->
+                    <div class="tab-pane fade show active p-3" id="vaiVidImgTabUpload">
+                        <div class="vai-upload-dropzone" id="vaiVidUploadDropzone" onclick="document.getElementById('vaiVideoImageUpload').click()">
+                            <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: #adb5bd;"></i>
+                            <p class="mb-1 mt-2" style="font-size: 0.9rem;" data-i18n="vai.video.dropzoneText">點擊或拖拽圖片到這裡</p>
+                            <small class="text-muted">JPG, PNG, GIF, WebP</small>
+                        </div>
+                    </div>
+                    <!-- Sketch Images Tab -->
+                    <div class="tab-pane fade p-3" id="vaiVidImgTabSketches">
+                        <div id="vaiVidSketchImgGrid" class="vai-product-img-grid">
+                            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.video.loadingSketches">載入圖片...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Images Tab -->
+                    <div class="tab-pane fade p-3" id="vaiVidImgTabProducts">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="vaiVidProductSearch" placeholder="搜尋產品名稱..." data-i18n-placeholder="vai.video.searchProducts" oninput="VaiVideo.searchProductImages(this.value)">
+                        </div>
+                        <div id="vaiVidProductImgGrid" class="vai-product-img-grid">
+                            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.video.loadingProducts">載入產品圖片...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/vai-video.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof VaiVideo !== 'undefined') {
+        VaiVideo.init();
+    }
+});
+</script>
+
+{{if not .HasVideoGen}}
+<!-- Feature Gate Overlay: vAi Video requires vSuite Pro or above -->
+<div id="featureGateOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:#fff;border-radius:1rem;max-width:480px;width:100%;padding:2.5rem 2rem;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+        <div style="font-size:3rem;margin-bottom:1rem;"><i class="bi bi-camera-video text-danger"></i></div>
+        <h4 style="font-weight:700;margin-bottom:0.5rem;" data-i18n="vai.video.featureGateTitle">vAi 影片生成</h4>
+        <p style="color:#64748b;font-size:0.9375rem;margin-bottom:1.5rem;" data-i18n="vai.video.featureGateDesc" data-i18n-plan="{{.RequiredPlan}}">此功能需要 <strong>{{.RequiredPlan}}</strong> 或以上方案。<br>請升級您的訂閱以使用 AI 影片生成功能。</p>
+        <a href="/billing" class="btn btn-primary btn-lg w-100" style="font-weight:600;">
+            <i class="bi bi-arrow-up-circle me-2"></i><span data-i18n="vai.video.upgradePlan">升級方案</span>
+        </a>
+        <div style="margin-top:1rem;">
+            <a href="/vai-chat" style="color:#64748b;font-size:0.875rem;text-decoration:none;">
+                <i class="bi bi-arrow-left me-1"></i><span data-i18n="vai.video.backToVai">返回 vAi</span>
+            </a>
+        </div>
+    </div>
+</div>
+{{end}}
+{{end}}

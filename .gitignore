@@ -1,0 +1,61 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+nwork
+api
+cronjob
+main
+temp
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# Bundled Go SDK (do not commit)
+/go/
+go.zip
+
+# Build output
+/bin/
+/dist/
+
+# User data / uploads / runtime state
+/web/uploads/
+/client data/
+/data/
+/logs/
+
+# Temp / scratch
+tmp_*.json
+TASK_REPORT.md
+logs_cleanup_report.md
+debug_dns.go
+compile_and_*.ps1
+
+# Environment variables
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

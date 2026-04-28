@@ -1,0 +1,126 @@
+{{ define "pages/customer_analysis_report" }}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0" data-i18n="customerAnalysisReport.title">客戶分析報告</h3>
+  <div class="d-flex gap-2">
+    <a href="/customers" class="btn btn-outline-secondary"><i class="bi bi-people"></i> <span data-i18n="menu.customers">客戶</span></a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label" data-i18n="accounting.startDate">開始日期</label>
+        <input type="date" class="form-control" id="caStart">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" data-i18n="accounting.endDate">結束日期</label>
+        <input type="date" class="form-control" id="caEnd">
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100" type="button" onclick="CustomerAnalysis.load()"><i class="bi bi-search"></i> <span data-i18n="accounting.search">查詢</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small" data-i18n="customerAnalysisReport.totalCustomers">客戶總數</div><div class="fs-4 fw-semibold" id="caTotalCustomers">-</div></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small" data-i18n="customerAnalysisReport.newCustomers">新增客戶</div><div class="fs-4 fw-semibold" id="caNewCustomers">-</div></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small" data-i18n="customerAnalysisReport.orderRevenue">訂單收入</div><div class="fs-4 fw-semibold" id="caOrderRevenue">-</div></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small" data-i18n="customerAnalysisReport.serviceRevenue">服務單收入</div><div class="fs-4 fw-semibold" id="caServiceRevenue">-</div></div></div></div>
+</div>
+
+<div class="card">
+  <div class="card-header bg-white">
+    <div class="fw-semibold" data-i18n="customerAnalysisReport.topCustomers">Top 客戶（按收入）</div>
+  </div>
+  <div class="card-body p-0">
+    <div class="report-table">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead class="text-muted small">
+          <tr>
+            <th data-i18n="fields.customer">客戶</th>
+            <th style="width: 160px;" data-i18n="fields.phone">電話</th>
+            <th style="width: 120px;" class="text-end" data-i18n="customerAnalysisReport.ordersCount">訂單數</th>
+            <th style="width: 180px;" class="text-end" data-i18n="customerAnalysisReport.revenue">收入</th>
+            <th style="width: 90px;"></th>
+          </tr>
+        </thead>
+        <tbody id="caTopTbody">
+          <tr class="text-muted"><td colspan="5" class="text-center py-3" data-i18n="common.loading">載入中...</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CustomerAnalysis = (() => {
+  function qs(id){ return document.getElementById(id); }
+  function fmtMoney(n){ return '$' + Number(n || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+  function defaultRange() {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - 30);
+    qs('caStart').value = start.toISOString().slice(0,10);
+    qs('caEnd').value = end.toISOString().slice(0,10);
+  }
+
+  async function load() {
+    const start = qs('caStart').value;
+    const end = qs('caEnd').value;
+    const tbody = qs('caTopTbody');
+    const t = (k, fallback) => (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(k) : fallback;
+    if (tbody) tbody.innerHTML = `<tr class="text-muted"><td colspan="5" class="text-center py-3">${t('common.loading','載入中...')}</td></tr>`;
+    try {
+      const res = await App.apiRequest(`/reports/customer-analysis?start_date=${encodeURIComponent(start)}&end_date=${encodeURIComponent(end)}`);
+      const s = res.summary || {};
+      qs('caTotalCustomers').textContent = s.total_customers ?? '-';
+      qs('caNewCustomers').textContent = s.new_customers ?? '-';
+      qs('caOrderRevenue').textContent = fmtMoney(s.orders_revenue || 0);
+      qs('caServiceRevenue').textContent = fmtMoney(s.service_orders_revenue || 0);
+
+      const rows = res.top_customers || [];
+      if (!rows.length) {
+        tbody.innerHTML = `<tr class="text-muted"><td colspan="5" class="text-center py-3">${t('common.noData','沒有資料')}</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(r => {
+        const name = (r.customer_name || '').trim() || r.customer_id;
+        const trashedBadge = r.is_trashed ? ' <span class="badge bg-secondary ms-1">' + t('common.deleted', '已刪除') + '</span>' : '';
+        const rowClass = r.is_trashed ? ' class="text-muted"' : '';
+        return `
+          <tr${rowClass}>
+            <td>${name}${trashedBadge}</td>
+            <td class="text-muted small">${r.phone || ''}</td>
+            <td class="text-end">${Number(r.orders_count || 0).toLocaleString()}</td>
+            <td class="text-end">${fmtMoney(r.revenue || 0)}</td>
+            <td class="text-end">
+              ${r.is_trashed ? '' : '<a class="btn btn-sm btn-outline-primary" href="/customers/' + r.customer_id + '/edit" target="_blank"><i class="bi bi-pencil"></i></a>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+      if (tbody) tbody.innerHTML = `<tr class="text-danger"><td colspan="5" class="text-center py-3">${t('common.loadError','載入失敗')}</td></tr>`;
+      App.showAlert(e.message || t('common.loadError','載入失敗'), 'danger');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!App.checkAuth()) return;
+    defaultRange();
+    load();
+  });
+
+  return { load };
+})();
+</script>
+{{ end }}
+
+

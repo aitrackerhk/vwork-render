@@ -1,0 +1,60 @@
+{{define "pages/vmarket_products"}}
+<section class="container">
+  <div class="vmarket-hero vmarket-hero-products">
+    <div class="vmarket-pill mb-3"><i class="bi bi-box-seam"></i> <span data-i18n="vmarket.nav.products">商品</span></div>
+    <h1 class="display-6 fw-semibold mb-3" data-i18n="vmarket.products.heroTitle">探索所有商品</h1>
+    <p class="lead text-muted mb-0" data-i18n="vmarket.products.heroSubtitle">瀏覽各公司在 VMarket 上架的精選商品</p>
+  </div>
+</section>
+
+<section class="container mt-4">
+  <div class="row g-4">
+    <aside class="col-12 col-lg-2">
+      {{template "partials/vmarket_category_sidebar" .}}
+    </aside>
+    <div class="col-12 col-lg-10">
+      {{if .Products}}
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="vmarket-section-title fs-5 mb-0">
+          <span data-i18n="vmarket.productList.title">所有商品</span>
+          <span class="badge bg-secondary rounded-pill ms-2">{{len .Products}}</span>
+        </h2>
+      </div>
+      <div class="row g-3">
+        {{range .Products}}
+        <div class="col-6 col-md-4 col-xl-3">
+          <a class="vmarket-featured-card" href="{{.ProductURL}}">
+            <div class="vmarket-featured-img">
+              {{if .ImageURL}}
+                <img src="{{.ImageURL}}" alt="{{.Name}}" loading="lazy">
+              {{else}}
+                <div class="vmarket-featured-img-placeholder"><i class="bi bi-box-seam"></i></div>
+              {{end}}
+            </div>
+            <div class="vmarket-featured-body">
+              <div class="vmarket-featured-name">{{.Name}}</div>
+              {{if gt .Price 0.0}}
+                <div class="vmarket-featured-price">${{printf "%.2f" .Price}}</div>
+              {{end}}
+              {{if .Category}}
+                <div class="vmarket-featured-category"><i class="bi bi-tag"></i> {{.Category}}</div>
+              {{end}}
+              <div class="vmarket-featured-company">
+                {{if .CompanyLogo}}<img src="{{.CompanyLogo}}" alt="" class="vmarket-featured-company-logo">{{end}}
+                <span>{{.CompanyName}}</span>
+              </div>
+            </div>
+          </a>
+        </div>
+        {{end}}
+      </div>
+      {{else}}
+      <div class="vmarket-empty vmarket-empty-tall">
+        <i class="bi bi-box-seam fs-1 d-block mb-3"></i>
+        <h5 class="fw-semibold" data-i18n="vmarket.productList.empty">目前沒有上架商品</h5>
+      </div>
+      {{end}}
+    </div>
+  </div>
+</section>
+{{end}}

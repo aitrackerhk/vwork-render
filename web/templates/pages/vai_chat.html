@@ -1,0 +1,263 @@
+{{define "pages/vai_chat"}}
+<!-- vAI Full-Page Chat - same interface as aiChatFloatingBtn popup -->
+<div class="vai-chat-fullpage" id="vaiChatFullpage">
+    <!-- Left: Conversation Sidebar -->
+    <div class="ai-chat-sidebar" id="vaiChatSidebar">
+        <div class="ai-chat-sidebar-header d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="createNewAiConversation()">
+                <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.chat.newChat">新對話</span>
+            </button>
+            <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="toggleVaiSidebar()" title="關閉" data-i18n-title="vai.common.close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div id="aiConversationList" class="ai-conversation-list">
+            <!-- Rendered by ai-chat.js -->
+        </div>
+    </div>
+    <!-- Right: Chat Main Area -->
+    <div class="ai-chat-main d-flex flex-column flex-grow-1" style="min-width: 0;">
+        <!-- Conversation Header -->
+        <div id="aiChatConvHeader" class="ai-chat-conv-header d-none">
+            <button class="btn btn-sm btn-link text-muted p-0 me-2 d-md-none" onclick="toggleVaiSidebar()" data-i18n-title="vai.common.conversationList" title="對話列表">
+                <i class="bi bi-list fs-5"></i>
+            </button>
+            <span id="aiChatConvTitle" class="ai-chat-conv-title flex-grow-1">新對話</span>
+            <button class="btn btn-sm btn-link text-muted p-0 ms-1" onclick="renameCurrentConversation()" data-i18n-title="vai.common.rename" title="重命名">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-link text-danger p-0 ms-1" onclick="deleteCurrentConversation()" title="刪除" data-i18n-title="vai.common.delete">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <!-- Messages Area -->
+        <div id="aiChatMessages" class="flex-grow-1 overflow-auto p-3 bg-light" style="min-height: 0;">
+            <div class="text-center p-4 text-muted">
+                <img src="/static/vai.png" alt="vAi" style="width: 120px; height: 120px; object-fit: contain; margin-bottom: 1rem;">
+                <p class="mt-2" data-i18n="vai.chat.startConversation">開始與 vAi 助手對話</p>
+                <small class="text-muted" data-i18n="vai.chat.llmConfigured">LLM Endpoint 由系統管理員配置</small>
+            </div>
+        </div>
+        <!-- Input Area -->
+        <div class="border-top p-3 bg-white">
+            <!-- Hidden file input -->
+                <input type="file" id="aiFileInput" multiple accept=".xls,.xlsx,.doc,.docx,.ppt,.pptx,.pdf,.txt,.jpg,.jpeg,.png,.webm,.wav,.mp3,.m4a,.ogg" style="display: none;">
+            <!-- File preview area (shown when files are attached) -->
+            <div id="aiFilePreviewArea" class="ai-file-preview-area" style="display: none;"></div>
+            <form id="aiChatForm" onsubmit="sendAIMessage(event)">
+                <div class="input-group">
+                    <button type="button" class="btn ai-upload-btn mb-0" title="上傳文件" data-i18n-title="vai.chat.uploadFile" style="cursor: pointer;" onclick="openAiChatAttachPicker()">
+                        <i class="bi bi-paperclip"></i>
+                    </button>
+                    <button type="button" class="btn ai-upload-btn mb-0" id="aiWebSearchToggle" onclick="toggleWebSearch()" data-i18n-title="vai.chat.webSearch" title="Web Search" style="cursor: pointer; position: relative;">
+                        <i class="bi bi-globe2"></i>
+                    </button>
+                    <textarea class="form-control" id="aiMessageInput" rows="1" data-i18n-placeholder="vai.chat.inputMessage" placeholder="輸入訊息給 AI..." style="resize: none; max-height: 120px;"></textarea>
+                    <button type="button" class="btn btn-success" id="aiMicButton" onclick="toggleAIVoiceInput()" data-i18n-title="vai.chat.voiceInput" title="Voice Input">
+                        <i class="bi bi-mic"></i>
+                    </button>
+                    <button type="submit" class="btn btn-success" id="aiSendButton" style="display: none;">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// vAI full-page chat: toggle sidebar on mobile
+function toggleVaiSidebar() {
+    const sidebar = document.getElementById('vaiChatSidebar');
+    if (!sidebar) return;
+    sidebar.classList.toggle('show');
+    // Manage backdrop overlay
+    var backdrop = document.getElementById('vaiSidebarBackdrop');
+    if (sidebar.classList.contains('show')) {
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = 'vaiSidebarBackdrop';
+            backdrop.className = 'vai-sidebar-backdrop';
+            backdrop.onclick = function() { toggleVaiSidebar(); };
+            sidebar.parentElement.appendChild(backdrop);
+        }
+        backdrop.style.display = 'block';
+    } else {
+        if (backdrop) backdrop.style.display = 'none';
+    }
+}
+
+// Override closeMobileSidebar for full-page mode
+(function() {
+    const origClose = window.closeMobileSidebar;
+    window.closeMobileSidebar = function() {
+        const sidebar = document.getElementById('vaiChatSidebar');
+        if (sidebar) sidebar.classList.remove('show');
+        var backdrop = document.getElementById('vaiSidebarBackdrop');
+        if (backdrop) backdrop.style.display = 'none';
+        if (typeof origClose === 'function') origClose();
+    };
+})();
+</script>
+
+<!-- Attachment Picker Modal (3-source: Upload, Sketch History, Product Images) -->
+<div class="modal fade" id="aiChatAttachPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title mb-0" data-i18n="vai.chat.addAttachment">新增附件</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <ul class="nav nav-tabs px-3 pt-2" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#aiChatAttachTabUpload" type="button">
+                            <i class="bi bi-upload me-1"></i><span data-i18n="vai.common.upload">上傳</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#aiChatAttachTabSketches" type="button">
+                            <i class="bi bi-brush me-1"></i><span data-i18n="vai.common.sketchImages">圖片</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#aiChatAttachTabProducts" type="button">
+                            <i class="bi bi-box-seam me-1"></i><span data-i18n="vai.common.productImages">產品圖片</span>
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <!-- Upload Tab -->
+                    <div class="tab-pane fade show active p-3" id="aiChatAttachTabUpload">
+                        <div class="vai-upload-dropzone" onclick="document.getElementById('aiFileInput').click()">
+                            <i class="bi bi-cloud-arrow-up" style="font-size: 2.5rem; color: #adb5bd;"></i>
+                            <p class="mb-1 mt-2" style="font-size: 0.9rem;" data-i18n="vai.common.dropzoneText">點擊或拖拽檔案到這裡</p>
+                            <small class="text-muted">JPG, PNG, PDF, DOC, XLS, PPT, TXT, Audio</small>
+                        </div>
+                    </div>
+                    <!-- Sketch/AI Images Tab -->
+                    <div class="tab-pane fade p-3" id="aiChatAttachTabSketches">
+                        <div id="aiChatAttachSketchGrid" class="vai-product-img-grid">
+                            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入中...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Product Images Tab -->
+                    <div class="tab-pane fade p-3" id="aiChatAttachTabProducts">
+                        <div class="input-group input-group-sm mb-3">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="aiChatAttachProductSearch" placeholder="搜尋產品名稱..." data-i18n-placeholder="vai.common.searchProducts" oninput="searchAiChatAttachProducts(this.value)">
+                        </div>
+                        <div id="aiChatAttachProductGrid" class="vai-product-img-grid">
+                            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入中...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ─── Attachment Picker for vai-chat ──────────────────────────
+var _aiChatAttachPickerModal = null;
+var _aiChatAttachProductTimer = null;
+
+function openAiChatAttachPicker() {
+    if (!_aiChatAttachPickerModal) {
+        var el = document.getElementById('aiChatAttachPickerModal');
+        if (el && typeof bootstrap !== 'undefined') {
+            _aiChatAttachPickerModal = new bootstrap.Modal(el);
+        }
+    }
+    if (_aiChatAttachPickerModal) {
+        // Reset to Upload tab
+        var firstTab = document.querySelector('#aiChatAttachPickerModal .nav-link:first-child');
+        if (firstTab && typeof bootstrap !== 'undefined') {
+            var tab = new bootstrap.Tab(firstTab);
+            tab.show();
+        }
+        _aiChatAttachPickerModal.show();
+        loadAiChatAttachSketches();
+        loadAiChatAttachProducts();
+    }
+}
+
+function loadAiChatAttachSketches() {
+    var grid = document.getElementById('aiChatAttachSketchGrid');
+    if (!grid) return;
+    grid.innerHTML = '<div class="text-center text-muted py-4" style="font-size: 0.85rem;"><span class="spinner-border spinner-border-sm me-1"></span>' + (typeof I18n !== 'undefined' ? I18n.t('vai.common.loading') : '載入中...') + '</div>';
+    App.apiRequest('/ai/sketches').then(function(resp) {
+        var sketches = (resp.data || resp || []).filter(function(s) { return s.thumbnail && s.thumbnail.trim(); });
+        if (sketches.length === 0) {
+            grid.innerHTML = '<div class="text-center text-muted py-4" style="font-size: 0.85rem;"><i class="bi bi-brush d-block mb-1" style="font-size: 1.5rem;"></i>No images</div>';
+            return;
+        }
+        grid.innerHTML = sketches.map(function(s) {
+            var safeUrl = (s.thumbnail || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            var title = (s.title || 'Image').replace(/"/g, '&quot;');
+            return '<div class="vai-product-img-item" onclick="selectAiChatAttachImage(\'' + safeUrl + '\', \'' + title.replace(/'/g, "\\'") + '\')" title="' + title + '">' +
+                '<img src="' + (s.thumbnail || '') + '" alt="' + title + '" loading="lazy">' +
+                '<div class="vai-product-img-name">' + title + '</div></div>';
+        }).join('');
+    }).catch(function() {
+        grid.innerHTML = '<div class="text-center text-muted py-4" style="font-size: 0.85rem;">Failed to load</div>';
+    });
+}
+
+function loadAiChatAttachProducts(search) {
+    var grid = document.getElementById('aiChatAttachProductGrid');
+    if (!grid) return;
+    grid.innerHTML = '<div class="text-center text-muted py-4" style="font-size: 0.85rem;"><span class="spinner-border spinner-border-sm me-1"></span>' + (typeof I18n !== 'undefined' ? I18n.t('vai.common.loading') : '載入中...') + '</div>';
+    var url = '/products?limit=50';
+    if (search && search.trim()) url += '&search=' + encodeURIComponent(search.trim());
+    App.apiRequest(url).then(function(resp) {
+        var products = (resp.data || resp || []).filter(function(p) { return p.image_url && p.image_url.trim(); });
+        if (products.length === 0) {
+            grid.innerHTML = '<div class="text-center text-muted py-4" style="font-size: 0.85rem;"><i class="bi bi-image d-block mb-1" style="font-size: 1.5rem;"></i>No product images</div>';
+            return;
+        }
+        grid.innerHTML = products.map(function(p) {
+            var safeUrl = (p.image_url || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            var name = (p.name || '').replace(/"/g, '&quot;');
+            return '<div class="vai-product-img-item" onclick="selectAiChatAttachImage(\'' + safeUrl + '\', \'' + name.replace(/'/g, "\\'") + '\')" title="' + name + '">' +
+                '<img src="' + (p.image_url || '') + '" alt="' + name + '" loading="lazy">' +
+                '<div class="vai-product-img-name">' + name + '</div></div>';
+        }).join('');
+    }).catch(function() {
+        grid.innerHTML = '<div class="text-center text-muted py-4" style="font-size: 0.85rem;">Failed to load</div>';
+    });
+}
+
+function searchAiChatAttachProducts(query) {
+    clearTimeout(_aiChatAttachProductTimer);
+    _aiChatAttachProductTimer = setTimeout(function() {
+        loadAiChatAttachProducts(query);
+    }, 300);
+}
+
+function selectAiChatAttachImage(url, name) {
+    // Add URL-based image as a pending file attachment
+    var ext = (url.split('.').pop() || 'jpg').split('?')[0].toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(ext) < 0) ext = 'jpg';
+    var filename = (name || 'image') + (name && name.indexOf('.') >= 0 ? '' : '.' + ext);
+    var mimeType = 'image/' + (ext === 'jpg' ? 'jpeg' : ext);
+
+    // Create a fake File-like entry for the existing aiPendingFiles system
+    var fileId = 'f_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    if (typeof aiPendingFiles === 'undefined') return;
+    aiPendingFiles.push({
+        file: { name: filename, type: mimeType, size: 0 },
+        id: fileId,
+        _isUrlImage: true,
+        _imageUrl: url
+    });
+    if (_aiChatAttachPickerModal) _aiChatAttachPickerModal.hide();
+    if (typeof renderAIFilePreview === 'function') renderAIFilePreview();
+    if (typeof updateAIMicSendToggle === 'function') updateAIMicSendToggle();
+}
+</script>
+{{end}}

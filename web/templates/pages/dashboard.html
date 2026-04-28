@@ -1,0 +1,773 @@
+{{ define "pages/dashboard" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-speedometer2 me-2"></i><span data-i18n="dashboard.title">儀表板</span></h3>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary" id="tenantPlanContainer" disabled style="color: #000;">
+                <i class="bi bi-star me-1"></i>
+                <span id="tenantPlan" data-i18n="dashboard.loading">載入中...</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 方案詳情彈窗 -->
+    <div class="modal fade" id="tenantPlanModal" tabindex="-1" aria-labelledby="tenantPlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tenantPlanModalLabel" data-i18n="dashboard.planDetails">方案詳情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="text-muted small" data-i18n="dashboard.currentPlan">目前方案</div>
+                        <div class="fs-5 fw-semibold" id="tenantPlanModalPlan">-</div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="text-muted small" data-i18n="dashboard.planStatus">狀態</div>
+                            <div id="tenantPlanModalStatus">-</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-muted small" data-i18n="dashboard.subscription">訂閱</div>
+                            <div id="tenantPlanModalSubscription" class="text-break">-</div>
+                        </div>
+                    </div>
+                    <hr class="my-2" />
+                    <div>
+                        <div class="text-muted small mb-1" data-i18n="dashboard.quotaTitle">Quota</div>
+                        <div id="tenantPlanModalQuota">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 邀請團隊成員卡片 -->
+    <div class="row mb-4" id="inviteCardRow" style="display:none;">
+        <div class="col-12">
+            <div class="card border-primary" style="background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 100%);">
+                <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                        <h6 class="mb-1"><i class="bi bi-people-fill me-1 text-primary"></i><span data-i18n="dashboard.inviteCard.title">邀請團隊成員</span></h6>
+                        <p class="mb-0 text-muted small" data-i18n="dashboard.inviteCard.description">邀請同事加入您的公司，一起使用 vWork 管理業務。</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm" id="inviteCardBtn" style="border-radius:100px;" onclick="openInviteModal()"><i class="bi bi-envelope-plus me-1"></i><span data-i18n="dashboard.inviteCard.inviteBtn">邀請成員</span></button>
+                        <button class="btn btn-outline-secondary btn-sm" id="inviteCardDismiss" style="border-radius:100px;"><i class="bi bi-x-lg me-1"></i><span data-i18n="dashboard.inviteCard.dismissBtn">不再顯示</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2" data-i18n="dashboard.monthlyRevenue">本月收入</h6>
+                            <h3 class="mb-0" id="monthlyRevenue">$0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2" data-i18n="dashboard.pendingOrders">待處理訂單</h6>
+                            <h3 class="mb-0" id="pendingOrders">0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-cart-check fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2" data-i18n="dashboard.unpaidInvoices">待付款發票</h6>
+                            <h3 class="mb-0" id="unpaidInvoices">0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-receipt fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-subtitle mb-2" data-i18n="dashboard.lowStockProducts">低庫存商品</h6>
+                            <h3 class="mb-0" id="lowStockProducts">0</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-exclamation-triangle fs-1 opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 更多統計 -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted" data-i18n="dashboard.totalCustomers">總客戶數</h6>
+                    <h3 class="mb-0" id="totalCustomers">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted" data-i18n="dashboard.totalProducts">總產品數</h6>
+                    <h3 class="mb-0" id="totalProducts">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted" data-i18n="dashboard.totalOrders">總訂單數</h6>
+                    <h3 class="mb-0" id="totalOrders">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted" data-i18n="dashboard.yearlyRevenue">年度收入</h6>
+                    <h3 class="mb-0" id="yearlyRevenue">$0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 本月銷售圖表 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" data-i18n="dashboard.monthlyChartTitle">本月銷售、成本、利潤趨勢</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="monthlyChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 財務趨勢圖 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" data-i18n="accounting.trendChart">財務趨勢圖</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="accountingChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近活動 -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" data-i18n="dashboard.recentOrders">最近訂單</h5>
+                </div>
+                <div class="card-body">
+                    <div id="recentOrders">
+                        <p class="text-muted" data-i18n="dashboard.loading">載入中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" data-i18n="dashboard.recentAppointments">最近預約</h5>
+                </div>
+                <div class="card-body">
+                    <div id="recentAppointments">
+                        <p class="text-muted" data-i18n="dashboard.loading">載入中...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="/static/vendor/chartjs/chart.umd.min.js"></script>
+<script>
+    var monthlyChart = null;
+    var accountingChart = null;
+    var __lastMonthlyChartData = null;
+    var __lastAccountingChartData = null;
+    var __lastPlanStats = null;
+
+    // 翻譯小工具：如果 i18n 還沒載入或 key 沒命中，就回退到固定中文，避免 chart label 出現 key
+    function t(key, fallback) {
+        try {
+            if (typeof I18n === 'undefined' || typeof I18n.t !== 'function') return fallback;
+            const v = I18n.t(key);
+            if (!v || v === key) return fallback;
+            return v;
+        } catch (e) {
+            return fallback;
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // 等 i18n 載入完成再 render 圖表文字，避免偶發 label 翻譯取不到
+        if (typeof I18n !== 'undefined' && typeof I18n.whenReady === 'function') {
+            await I18n.whenReady(5000);
+        }
+
+        // Load invite card independently — don't let dashboard data failure block it
+        loadInviteCardStatus();
+
+        try {
+            showDashboardLoading();
+            await loadDashboardData();
+        } catch (e) {
+            console.error('[Dashboard] loadDashboardData error:', e);
+        } finally {
+            hideDashboardLoading();
+        }
+    });
+
+    function showTenantPlanModal() {
+        if (!__lastPlanStats) return;
+
+        const planTexts = {
+            'free': t('dashboard.plans.free', '免費版'),
+            'basic': t('dashboard.plans.basic', '基礎版'),
+            'pro': t('dashboard.plans.pro', '專業版'),
+            'enterprise': t('dashboard.plans.enterprise', '企業版'),
+            'trial': t('dashboard.plans.free', '免費版'),
+            'vsuite_monthly': t('dashboard.plans.vsuite_monthly', 'vSuite'),
+            'vsuite_yearly': t('dashboard.plans.vsuite_yearly', 'vSuite'),
+            'vsuite_pro_monthly': t('dashboard.plans.vsuite_pro_monthly', 'vSuite Pro'),
+            'vsuite_pro_yearly': t('dashboard.plans.vsuite_pro_yearly', 'vSuite Pro'),
+            'vsuite_pro_plus_monthly': t('dashboard.plans.vsuite_pro_plus_monthly', 'vSuite Pro+'),
+            'vsuite_pro_plus_yearly': t('dashboard.plans.vsuite_pro_plus_yearly', 'vSuite Pro+')
+        };
+
+        const tenantPlan = __lastPlanStats.tenant?.plan || '';
+        const planText = planTexts[tenantPlan] || tenantPlan || '-';
+        const tenantStatus = __lastPlanStats.tenant?.status || '-';
+        const subscriptionId = __lastPlanStats.tenant?.subscription_id || t('dashboard.noSubscription', '無');
+
+        const quota = __lastPlanStats.trial_quota || {};
+        const isTrialLimited = !!quota.is_trial_limited;
+        const orderLabel = t('dashboard.quotaOrders', '訂單');
+        const serviceOrderLabel = t('dashboard.quotaServiceOrders', '服務單');
+        const taskLabel = t('dashboard.quotaTasks', '項目任務');
+        const aiTodayLabel = t('dashboard.aiQueriesToday', 'AI 今日查詢');
+        const ordersUsed = quota.orders_used || 0;
+        const ordersLimit = quota.orders_limit || 5;
+        const serviceOrdersUsed = quota.service_orders_used || 0;
+        const serviceOrdersLimit = quota.service_orders_limit || 5;
+        const tasksUsed = quota.tasks_used || 0;
+        const tasksLimit = quota.tasks_limit || 5;
+        const aiTodayQueries = quota.ai_today_queries || 0;
+        let quotaHtml = `<div class="text-muted">${t('dashboard.quotaNotLimited', '無試用配額限制')}</div>`;
+        if (isTrialLimited) {
+            quotaHtml = `
+                <ul class="list-unstyled mb-0">
+                    <li>${orderLabel}: ${ordersUsed}/${ordersLimit}</li>
+                    <li>${serviceOrderLabel}: ${serviceOrdersUsed}/${serviceOrdersLimit}</li>
+                    <li>${taskLabel}: ${tasksUsed}/${tasksLimit}</li>
+                    <li>${aiTodayLabel}: ${aiTodayQueries}</li>
+                </ul>
+            `;
+        }
+
+        const planEl = document.getElementById('tenantPlanModalPlan');
+        const statusEl = document.getElementById('tenantPlanModalStatus');
+        const subscriptionEl = document.getElementById('tenantPlanModalSubscription');
+        const quotaEl = document.getElementById('tenantPlanModalQuota');
+
+        if (planEl) planEl.textContent = planText;
+        if (statusEl) statusEl.textContent = tenantStatus;
+        if (subscriptionEl) subscriptionEl.textContent = subscriptionId || '-';
+        if (quotaEl) quotaEl.innerHTML = quotaHtml;
+
+        const modalEl = document.getElementById('tenantPlanModal');
+        if (!modalEl) return;
+        if (window.bootstrap && typeof window.bootstrap.Modal === 'function') {
+            const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        } else {
+            const quotaText = isTrialLimited
+                ? `${orderLabel}: ${ordersUsed}/${ordersLimit}\n${serviceOrderLabel}: ${serviceOrdersUsed}/${serviceOrdersLimit}\n${taskLabel}: ${tasksUsed}/${tasksLimit}\n${aiTodayLabel}: ${aiTodayQueries}`
+                : t('dashboard.quotaNotLimited', '無試用配額限制');
+            alert(`${t('dashboard.planDetails', '方案詳情')}\n${t('dashboard.currentPlan', '目前方案')}: ${planText}\n${t('dashboard.planStatus', '狀態')}: ${tenantStatus}\n${t('dashboard.subscription', '訂閱')}: ${subscriptionId}\n${t('dashboard.quotaTitle', 'Quota')}\n${quotaText}`);
+        }
+    }
+
+    async function loadDashboardData() {
+        try {
+            const stats = await App.apiRequest('/dashboard/stats');
+            
+            // 更新租戶信息
+            if (stats.tenant) {
+                const planTexts = {
+                    'free': t('dashboard.plans.free', '免費版'),
+                    'basic': t('dashboard.plans.basic', '基礎版'),
+                    'pro': t('dashboard.plans.pro', '專業版'),
+                    'enterprise': t('dashboard.plans.enterprise', '企業版'),
+                    'trial': t('dashboard.plans.free', '免費版'),
+                    'vsuite_monthly': t('dashboard.plans.vsuite_monthly', 'vSuite'),
+                    'vsuite_yearly': t('dashboard.plans.vsuite_yearly', 'vSuite'),
+                    'vsuite_pro_monthly': t('dashboard.plans.vsuite_pro_monthly', 'vSuite Pro'),
+                    'vsuite_pro_yearly': t('dashboard.plans.vsuite_pro_yearly', 'vSuite Pro'),
+                    'vsuite_pro_plus_monthly': t('dashboard.plans.vsuite_pro_plus_monthly', 'vSuite Pro+'),
+                    'vsuite_pro_plus_yearly': t('dashboard.plans.vsuite_pro_plus_yearly', 'vSuite Pro+')
+                };
+                const planText = planTexts[stats.tenant.plan] || stats.tenant.plan;
+                document.getElementById('tenantPlan').textContent = planText;
+                __lastPlanStats = stats;
+
+                const tenantPlanContainer = document.getElementById('tenantPlanContainer');
+                if (tenantPlanContainer) {
+                    tenantPlanContainer.disabled = false;
+                    tenantPlanContainer.classList.add('cursor-pointer');
+                    tenantPlanContainer.title = t('dashboard.planDetails', '方案詳情');
+                    if (!tenantPlanContainer.__planClickBound) {
+                        tenantPlanContainer.addEventListener('click', showTenantPlanModal);
+                        tenantPlanContainer.__planClickBound = true;
+                    }
+                }
+            }
+            
+            // 更新統計卡片
+            document.getElementById('monthlyRevenue').textContent = '$' + (stats.orders.monthly_revenue || 0).toLocaleString('zh-TW');
+            document.getElementById('pendingOrders').textContent = stats.orders.pending || 0;
+            document.getElementById('unpaidInvoices').textContent = stats.invoices.unpaid || 0;
+            document.getElementById('lowStockProducts').textContent = stats.products.low_stock || 0;
+            
+            // 更新更多統計
+            document.getElementById('totalCustomers').textContent = stats.customers.total || 0;
+            document.getElementById('totalProducts').textContent = stats.products.total || 0;
+            document.getElementById('totalOrders').textContent = stats.orders.total || 0;
+            document.getElementById('yearlyRevenue').textContent = '$' + (stats.orders.yearly_revenue || 0).toLocaleString('zh-TW');
+            
+            // 更新最近訂單
+            const recentOrdersDiv = document.getElementById('recentOrders');
+            if (stats.recent_orders && stats.recent_orders.length > 0) {
+                const orderStatusBadges = {
+                    'pending': 'warning',
+                    'confirmed': 'info',
+                    'processing': 'primary',
+                    'completed': 'success',
+                    'cancelled': 'danger',
+                    'draft': 'secondary'
+                };
+                const orderStatusLabels = {
+                    'pending': '待處理',
+                    'confirmed': '已確認',
+                    'processing': '處理中',
+                    'completed': '已完成',
+                    'cancelled': '已取消',
+                    'draft': '草稿'
+                };
+                recentOrdersDiv.innerHTML = stats.recent_orders.map(order => {
+                    const statusBadge = orderStatusBadges[order.status] || 'secondary';
+                    const statusLabel = orderStatusLabels[order.status] || order.status || '';
+                    const editUrl = order.id ? `/orders/${order.id}/edit` : '#';
+                    return `
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                        <div>
+                            <a href="${editUrl}" target="_blank" class="text-decoration-none">
+                            <strong>${order.order_number || order.id}</strong>
+                            </a>
+                            <br>
+                            <small class="text-muted">${order.customer ? order.customer.name : t('dashboard.noCustomer', '無客戶')}</small>
+                        </div>
+                        <div class="text-end">
+                            <strong>$${order.total_amount || 0}</strong>
+                            <br>
+                            <span class="badge bg-${statusBadge}">${statusLabel}</span>
+                        </div>
+                    </div>
+                `;
+                }).join('');
+            } else {
+                recentOrdersDiv.innerHTML = '<p class="text-muted">' + t('dashboard.noOrders', '暫無訂單') + '</p>';
+            }
+            
+            // 更新最近預約
+            const recentAppointmentsDiv = document.getElementById('recentAppointments');
+            if (stats.recent_appointments && stats.recent_appointments.length > 0) {
+                recentAppointmentsDiv.innerHTML = stats.recent_appointments.map(appointment => {
+                    const startTime = new Date(appointment.start_time);
+                    const endTime = new Date(appointment.end_time);
+                    const dateStr = startTime.toLocaleDateString('zh-TW', { month: '2-digit', day: '2-digit' });
+                    const timeStr = startTime.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) + 
+                                   ' - ' + endTime.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+                    const statusBadges = {
+                        'pending': 'warning',
+                        'confirmed': 'info',
+                        'completed': 'success',
+                        'cancelled': 'danger'
+                    };
+                    const statusLabels = {
+                        'pending': t('dashboard.appointmentStatuses.pending', '待處理'),
+                        'confirmed': t('dashboard.appointmentStatuses.confirmed', '已確認'),
+                        'completed': t('dashboard.appointmentStatuses.completed', '已完成'),
+                        'cancelled': t('dashboard.appointmentStatuses.cancelled', '已取消')
+                    };
+                    const statusBadge = statusBadges[appointment.status] || 'secondary';
+                    const statusLabel = statusLabels[appointment.status] || appointment.status;
+                    
+                    const editUrl = appointment.id ? `/appointments/${appointment.id}/edit` : '#';
+                    return `
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                        <div>
+                            <a href="${editUrl}" target="_blank" class="text-decoration-none">
+                                <strong>${appointment.customer ? appointment.customer.name : t('dashboard.noCustomer', '無客戶')}</strong>
+                            </a>
+                            <br>
+                            <small class="text-muted">${appointment.service ? appointment.service.name : t('dashboard.noService', '無服務')} - ${dateStr} ${timeStr}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-${statusBadge}">${statusLabel}</span>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } else {
+                recentAppointmentsDiv.innerHTML = '<p class="text-muted">' + t('dashboard.noAppointments', '暫無預約') + '</p>';
+            }
+            
+            // 繪製本月銷售圖表（即使沒有數據也顯示）
+            __lastMonthlyChartData = stats.monthly_chart || [];
+            renderMonthlyChart(__lastMonthlyChartData);
+            
+            // 載入財務趨勢圖
+            await loadAccountingChart();
+        } catch (error) {
+            console.error('Failed to load dashboard data:', error);
+            App.showAlert(t('dashboard.loadError', '載入失敗') + ': ' + error.message, 'danger');
+        }
+    }
+
+    function showDashboardLoading() {
+        const mainContent = document.querySelector('.main-content');
+        if (!mainContent) {
+            setTimeout(showDashboardLoading, 50);
+            return;
+        }
+        window.dashboardLoadingStart = Date.now();
+        let overlay = document.getElementById('dashboardLoadingOverlay');
+        if (!overlay) {
+            const originalPosition = window.getComputedStyle(mainContent).position;
+            if (originalPosition === 'static') mainContent.style.position = 'relative';
+            overlay = document.createElement('div');
+            overlay.id = 'dashboardLoadingOverlay';
+            overlay.className = 'form-loading-overlay';
+            const loadingText = (typeof I18n !== 'undefined' && I18n.t && I18n.t('common.loading') !== 'common.loading')
+                ? I18n.t('common.loading')
+                : '載入中...';
+            const loadingDataText = (typeof I18n !== 'undefined' && I18n.t && I18n.t('common.loadingData') !== 'common.loadingData')
+                ? I18n.t('common.loadingData')
+                : '正在載入數據...';
+            overlay.innerHTML = `
+                <div class="loading-content">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">${loadingText}</span>
+                    </div>
+                    <p class="mt-3 text-muted">${loadingDataText}</p>
+                </div>
+            `;
+            mainContent.appendChild(overlay);
+        }
+        overlay.style.display = 'flex';
+    }
+
+    function hideDashboardLoading() {
+        const overlay = document.getElementById('dashboardLoadingOverlay');
+        const elapsed = Date.now() - (window.dashboardLoadingStart || Date.now());
+        const delay = elapsed < 100 ? 100 - elapsed : 0;
+        if (!overlay) return;
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, delay);
+    }
+    
+    async function loadAccountingChart() {
+        try {
+            // 設置默認日期範圍（本月）
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            
+            const url = `/accounting/summary?start_date=${firstDay.toISOString().split('T')[0]}&end_date=${lastDay.toISOString().split('T')[0]}`;
+            const data = await App.apiRequest(url);
+            
+            // 繪製財務趨勢圖表
+            __lastAccountingChartData = data.daily_chart || [];
+            renderAccountingChart(__lastAccountingChartData);
+        } catch (error) {
+            console.error('載入財務趨勢圖失敗:', error);
+            // 即使失敗也顯示空圖表
+            __lastAccountingChartData = [];
+            renderAccountingChart(__lastAccountingChartData);
+        }
+    }
+    
+    function renderAccountingChart(data) {
+        const ctx = document.getElementById('accountingChart');
+        if (!ctx) return;
+        
+        // 銷毀舊圖表
+        if (accountingChart) {
+            accountingChart.destroy();
+        }
+        
+        // 如果沒有數據，創建空數據（本月）
+        if (!data || data.length === 0) {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            data = [];
+            for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+                data.push({
+                    date: d.toISOString().split('T')[0],
+                    income: 0,
+                    expense: 0,
+                    purchase: 0,
+                    net_profit: 0
+                });
+            }
+        }
+        
+        const labels = data.map(item => {
+            const date = new Date(item.date);
+            return (date.getMonth() + 1) + '/' + date.getDate();
+        });
+        const incomeData = data.map(item => item.income || 0);
+        const expenseData = data.map(item => item.expense || 0);
+        const netProfitData = data.map(item => item.net_profit || 0);
+        
+        accountingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: t('accounting.chart.totalIncome', '總收入'),
+                        data: incomeData,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: t('accounting.chart.totalExpense', '總支出'),
+                        data: expenseData,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: t('accounting.chart.netProfit', '淨利潤'),
+                        data: netProfitData,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                // mobile 下避免高度被壓扁：讓高度跟隨 canvas/CSS
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString('zh-TW', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString('zh-TW');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderMonthlyChart(data) {
+        const ctx = document.getElementById('monthlyChart');
+        if (!ctx) return;
+        
+        // 銷毀舊圖表
+        if (monthlyChart) {
+            monthlyChart.destroy();
+        }
+        
+        // 如果沒有數據，創建空數據
+        if (!data || data.length === 0) {
+            const now = new Date();
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            data = [];
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(now.getFullYear(), now.getMonth(), day);
+                data.push({
+                    date: date.toISOString().split('T')[0],
+                    sales: 0,
+                    cost: 0,
+                    profit: 0
+                });
+            }
+        }
+        
+        const labels = data.map(item => {
+            const date = new Date(item.date);
+            return (date.getMonth() + 1) + '/' + date.getDate();
+        });
+        const salesData = data.map(item => item.sales || 0);
+        const costData = data.map(item => item.cost || 0);
+        const profitData = data.map(item => item.profit || 0);
+        
+        monthlyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: t('dashboard.sales', '銷售'),
+                        data: salesData,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: t('dashboard.cost', '成本'),
+                        data: costData,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: t('dashboard.profit', '利潤'),
+                        data: profitData,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                // mobile 下避免高度被壓扁：讓高度跟隨 canvas/CSS
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString('zh-TW', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString('zh-TW');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // ── Invite card ──
+    async function loadInviteCardStatus() {
+        console.log('[InviteCard] loadInviteCardStatus called');
+        try {
+            const data = await App.apiRequest('/dashboard/invite-card-status');
+            console.log('[InviteCard] API response:', data);
+            console.log('[InviteCard] show_card:', data && data.show_card);
+            if (data && data.show_card) {
+                const row = document.getElementById('inviteCardRow');
+                console.log('[InviteCard] row found:', !!row, row);
+                if (row) {
+                    row.style.display = 'flex';
+                    console.log('[InviteCard] SET display to flex, offsetHeight:', row.offsetHeight);
+                } else {
+                    console.warn('[InviteCard] inviteCardRow NOT FOUND in DOM!');
+                }
+                // Bind dismiss
+                const dismissBtn = document.getElementById('inviteCardDismiss');
+                if (dismissBtn && !dismissBtn.__bound) {
+                    dismissBtn.__bound = true;
+                    dismissBtn.addEventListener('click', async () => {
+                        try {
+                            await App.apiRequest('/dashboard/dismiss-invite-card', { method: 'POST' });
+                        } catch (_e) {}
+                        row.style.display = 'none';
+                    });
+                }
+            }
+        } catch (e) {
+            console.error('[InviteCard] Error:', e);
+        }
+    }
+
+    // 若語言檔較慢，等載入後再重繪一次 chart（不必等 reload）
+    window.addEventListener('languageChanged', () => {
+        try {
+            if (__lastMonthlyChartData) renderMonthlyChart(__lastMonthlyChartData);
+            if (__lastAccountingChartData) renderAccountingChart(__lastAccountingChartData);
+        } catch (e) {
+            console.warn('re-render charts on languageChanged failed', e);
+        }
+    });
+</script>
+{{ end }}

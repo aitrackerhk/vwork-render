@@ -1,0 +1,298 @@
+{{ define "pages/stripe_connect" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-link-45deg me-2"></i><span data-i18n="pages.stripeConnect.title">Stripe Connect</span></h2>
+        <a href="/payment-methods" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i><span data-i18n="pages.stripeConnect.back">返回付款方式</span></a>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <!-- Stripe Connect intro -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i><span data-i18n="pages.stripeConnect.introTitle">連接 Stripe 收款</span></h5>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <p class="mb-2"><strong data-i18n="pages.stripeConnect.introDesc">透過 Stripe Connect 安全收款，不需要管理 API Key</strong></p>
+                    <ul class="mb-3">
+                        <li data-i18n="pages.stripeConnect.introStep1">支援信用卡、Apple Pay、Google Pay</li>
+                        <li data-i18n="pages.stripeConnect.introStep2">不需要自己管理 API Key</li>
+                        <li data-i18n="pages.stripeConnect.introStep3">自動轉帳到你的銀行帳戶</li>
+                        <li data-i18n="pages.stripeConnect.introStep4">可在 Stripe Express Dashboard 查看交易記錄</li>
+                    </ul>
+                    <div class="alert alert-warning mb-0 py-2">
+                        <strong><i class="bi bi-info-circle me-1"></i><span data-i18n="pages.stripeConnect.prepTitle">開始前請準備以下資料：</span></strong>
+                        <ol class="mb-0 mt-1 ps-3">
+                            <li data-i18n="pages.stripeConnect.prepBank">銀行帳號（用於接收付款）</li>
+                            <li data-i18n="pages.stripeConnect.prepId">身份驗證文件（身份證或護照）</li>
+                        </ol>
+                        <small class="text-muted" data-i18n="pages.stripeConnect.prepNote">註冊過程約 5-10 分鐘，需在 Stripe 頁面上完成驗證並同意服務條款。</small>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <img src="https://stripe.com/img/v3/home/social.png" alt="Stripe" class="img-fluid" style="max-width: 200px; border-radius: 8px;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection status -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-plug me-2"></i><span data-i18n="pages.stripeConnect.statusTitle">連接狀態</span></h5>
+        </div>
+        <div class="card-body" id="connectStatus">
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden" data-i18n="pages.stripeConnect.loading">載入中...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card mb-4" id="connectActionsCard" style="display:none;">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-gear me-2"></i><span data-i18n="pages.stripeConnect.actionsTitle">操作</span></h5>
+        </div>
+        <div class="card-body" id="connectActions">
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-question-circle me-2"></i><span data-i18n="pages.stripeConnect.instructionsTitle">使用說明</span></h5>
+        </div>
+        <div class="card-body">
+            <h6 data-i18n="pages.stripeConnect.instructionsSubtitle">如何啟用 Stripe Connect 收款？</h6>
+            <ol>
+                <li data-i18n="pages.stripeConnect.step1">點擊下方「開始連接 Stripe」按鈕</li>
+                <li data-i18n="pages.stripeConnect.step2">系統會將你導向 Stripe 頁面，依指示完成以下步驟：</li>
+                <ul class="mb-2">
+                    <li data-i18n="pages.stripeConnect.step2a">同意 Stripe 服務條款</li>
+                    <li data-i18n="pages.stripeConnect.step2b">填寫銀行帳號（接收付款用）</li>
+                    <li data-i18n="pages.stripeConnect.step2c">驗證身份資料</li>
+                </ul>
+                <li data-i18n="pages.stripeConnect.step3">完成後 Stripe 會自動跳回此頁面，狀態會顯示「已連接」</li>
+                <li id="step5-text">前往<a href="/payment-methods">付款方式管理</a>新增一個「Stripe Connect」類型的付款方式</li>
+                <li data-i18n="pages.stripeConnect.step4">將該付款方式設為「網店付款方式」即可在網店使用</li>
+            </ol>
+            <div class="alert alert-info mt-3" id="fee-info-text">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>費用說明：</strong>Stripe 會收取每筆交易的手續費（一般為 2.9% + HK$2.35）。
+                平台會另外收取每筆交易金額的 2% 作為服務費。詳情請參考 Stripe 的<a href="https://stripe.com/hk/pricing" target="_blank">定價頁面</a>。
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const SC = 'pages.stripeConnect.';
+        const t = (key) => (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(SC + key) : key;
+        const statusEl = document.getElementById('connectStatus');
+        const actionsCard = document.getElementById('connectActionsCard');
+        const actionsEl = document.getElementById('connectActions');
+        const alertContainer = document.getElementById('alertContainer');
+
+        // Translate step5 and fee info (contain links, need special handling)
+        function translateStaticTexts() {
+            if (typeof I18n === 'undefined' || !I18n.t) return;
+            const step5El = document.getElementById('step5-text');
+            if (step5El) {
+                const step5Text = t('step5');
+                step5El.innerHTML = step5Text
+                    .replace('{linkStart}', '<a href="/payment-methods">')
+                    .replace('{linkEnd}', '</a>');
+            }
+            const feeEl = document.getElementById('fee-info-text');
+            if (feeEl) {
+                const feeTitle = t('feeTitle');
+                const feeDesc = t('feeDesc');
+                feeEl.innerHTML = '<i class="bi bi-info-circle me-2"></i><strong>' + feeTitle + '</strong>' +
+                    feeDesc
+                        .replace('{linkStart}', '<a href="https://stripe.com/hk/pricing" target="_blank">')
+                        .replace('{linkEnd}', '</a>');
+            }
+        }
+
+        // Wait for I18n to be ready, then translate
+        if (typeof I18n !== 'undefined' && I18n.ready) {
+            I18n.ready.then(() => translateStaticTexts());
+        } else {
+            document.addEventListener('i18n:ready', translateStaticTexts);
+            setTimeout(translateStaticTexts, 500);
+        }
+
+        function showAlert(msg, type) {
+            alertContainer.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show" role="alert">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+        }
+
+        async function loadStatus() {
+            try {
+                const resp = await App.apiRequest('/stripe-connect/status');
+                renderStatus(resp);
+            } catch (e) {
+                statusEl.innerHTML = `<div class="alert alert-danger">${t('loadError')} ${e.message || e}</div>`;
+            }
+        }
+
+        function renderStatus(data) {
+            if (!data.connected) {
+                statusEl.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-plug text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">${t('notConnectedTitle')}</h5>
+                        <p class="text-muted mb-4">${t('notConnectedDesc')}</p>
+                        <button class="btn btn-primary btn-lg" onclick="window.connectStripe()" id="btnConnect">
+                            <i class="bi bi-box-arrow-up-right me-2"></i>${t('connectBtn')}
+                        </button>
+                    </div>
+                `;
+                actionsCard.style.display = 'none';
+                return;
+            }
+
+            const chargesOk = data.charges_enabled;
+            const payoutsOk = data.payouts_enabled;
+            const detailsOk = data.details_submitted;
+            const allGood = chargesOk && payoutsOk && detailsOk;
+
+            let statusBadge = allGood
+                ? `<span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>${t('connectedBadge')}</span>`
+                : `<span class="badge bg-warning text-dark fs-6"><i class="bi bi-exclamation-triangle me-1"></i>${t('needsSetup')}</span>`;
+
+            let requirementsHtml = '';
+            if (data.requirements && (data.requirements.currently_due?.length > 0 || data.requirements.past_due?.length > 0)) {
+                requirementsHtml = `
+                    <div class="alert alert-warning mt-3">
+                        <strong>${t('requirementsTitle')}</strong>
+                        <ul class="mb-0 mt-2">
+                            ${(data.requirements.currently_due || []).map(r => `<li>${r}</li>`).join('')}
+                            ${(data.requirements.past_due || []).map(r => `<li class="text-danger">${r} ${t('pastDue')}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            statusEl.innerHTML = `
+                <div class="d-flex align-items-center mb-3">
+                    <div>
+                        <h5 class="mb-1">${t('accountLabel')}</h5>
+                        <code>${data.account_id}</code>
+                    </div>
+                    <div class="ms-auto">${statusBadge}</div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 text-center">
+                            <i class="bi ${chargesOk ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'}" style="font-size:1.5rem;"></i>
+                            <div class="mt-1">${t('charges')}</div>
+                            <small class="text-muted">${chargesOk ? t('enabled') : t('disabled')}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 text-center">
+                            <i class="bi ${payoutsOk ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'}" style="font-size:1.5rem;"></i>
+                            <div class="mt-1">${t('payouts')}</div>
+                            <small class="text-muted">${payoutsOk ? t('enabled') : t('disabled')}</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3 text-center">
+                            <i class="bi ${detailsOk ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'}" style="font-size:1.5rem;"></i>
+                            <div class="mt-1">${t('details')}</div>
+                            <small class="text-muted">${detailsOk ? t('submitted') : t('incomplete')}</small>
+                        </div>
+                    </div>
+                </div>
+                ${requirementsHtml}
+            `;
+
+            // Actions
+            actionsCard.style.display = 'block';
+            let actionsHtml = '<div class="d-flex gap-2 flex-wrap">';
+            if (!allGood) {
+                actionsHtml += `<button class="btn btn-warning" onclick="window.connectStripe()"><i class="bi bi-pencil me-1"></i>${t('continueSetup')}</button>`;
+            }
+            if (chargesOk) {
+                actionsHtml += `<button class="btn btn-outline-primary" onclick="window.openDashboard()"><i class="bi bi-speedometer2 me-1"></i>${t('dashboard')}</button>`;
+            }
+            actionsHtml += `<button class="btn btn-outline-danger" onclick="window.disconnectStripe()"><i class="bi bi-unlink me-1"></i>${t('disconnect')}</button>`;
+            actionsHtml += '</div>';
+
+            if (allGood) {
+                const allReadyDesc = t('allReadyDesc')
+                    .replace('{linkStart}', '<a href="/payment-methods" class="alert-link">')
+                    .replace('{linkEnd}', '</a>');
+                actionsHtml += `
+                    <div class="alert alert-success mt-3 mb-0">
+                        <i class="bi bi-check2-all me-2"></i>
+                        <strong>${t('allReady')}</strong> ${allReadyDesc}
+                    </div>
+                `;
+            }
+
+            actionsEl.innerHTML = actionsHtml;
+        }
+
+        window.connectStripe = async function() {
+            const btn = document.getElementById('btnConnect');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>${t('connecting')}`;
+            }
+            try {
+                const resp = await App.apiRequest('/stripe-connect/create-account', { method: 'POST' });
+                if (resp.onboarding_url) {
+                    window.location.href = resp.onboarding_url;
+                } else {
+                    showAlert(t('onboardingError'), 'danger');
+                }
+            } catch (e) {
+                showAlert(t('connectError') + ' ' + (e.message || e), 'danger');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="bi bi-box-arrow-up-right me-2"></i>${t('connectBtn')}`;
+                }
+            }
+        };
+
+        window.openDashboard = async function() {
+            try {
+                const resp = await App.apiRequest('/stripe-connect/dashboard-link', { method: 'POST' });
+                if (resp.dashboard_url) {
+                    window.open(resp.dashboard_url, '_blank');
+                } else {
+                    showAlert(t('dashboardError'), 'danger');
+                }
+            } catch (e) {
+                showAlert(t('dashboardFetchError') + ' ' + (e.message || e), 'danger');
+            }
+        };
+
+        window.disconnectStripe = async function() {
+            if (!confirm(t('disconnectConfirm'))) return;
+            try {
+                await App.apiRequest('/stripe-connect/disconnect', { method: 'POST' });
+                showAlert(t('disconnectSuccess'), 'success');
+                loadStatus();
+            } catch (e) {
+                showAlert(t('disconnectError') + ' ' + (e.message || e), 'danger');
+            }
+        };
+
+        // Check URL params (Stripe callback)
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('stripe_connect') === 'return') {
+            showAlert(t('returnSuccess'), 'success');
+        } else if (params.get('stripe_connect') === 'refresh') {
+            showAlert(t('refreshWarning'), 'warning');
+        }
+
+        loadStatus();
+    });
+    </script>
+{{ end }}

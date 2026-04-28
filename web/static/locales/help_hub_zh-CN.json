@@ -1,0 +1,76 @@
+{
+    "nav": {
+        "home": "首页",
+        "about": "关于",
+        "features": "功能",
+        "pricing": "定价",
+        "supportCenter": "支持中心",
+        "supportInfo": "支持信息",
+        "login": "登录",
+        "contact": "联系客服",
+        "tryFree": "免费试用",
+        "goToSystem": "前往系统",
+        "accountSettings": "账户设置",
+        "billing": "订阅",
+        "logout": "退出",
+        "user": "用户",
+        "language": "语言",
+        "help": "帮助"
+    },
+    "helpPage": {
+        "title": "支持中心",
+        "needMoreHelp": "需要更多帮助？",
+        "needMoreHelpDesc": "如果您遇到问题或需要进一步的协助，请：",
+        "needMoreHelpItem2": "前往 联系客服 页面提交问题"
+    },
+    "helpHub": {
+        "subtitle": "请选择您需要查看的产品支持文档",
+        "vai": {
+            "desc": "人工智能助手平台 - 智能对话 / 数据分析 / 自动化",
+            "tags": {
+                "chat": "智能对话",
+                "analysis": "数据分析",
+                "automation": "自动化"
+            }
+        },
+        "vwork": {
+            "desc": "全功能 AI 企业管理系统 - ERP / CMS / POS",
+            "tags": {
+                "product": "商品管理",
+                "order": "订单管理",
+                "pos": "POS 收银",
+                "customer": "客户管理",
+                "more": "更多..."
+            }
+        },
+        "vmarket": {
+            "desc": "在线市场平台",
+            "tags": {
+                "browse": "浏览商品",
+                "purchase": "购买流程",
+                "seller": "商家入驻"
+            }
+        },
+        "voffice": {
+            "desc": "在线文档编辑协作平台",
+            "tags": {
+                "doc": "文档编辑",
+                "sheet": "电子表格",
+                "slide": "演示文稿"
+            }
+        }
+    },
+    "footer": {
+        "description": "V-sys 以科技帮助人类，让工作和生活更简单高效。我们相信科技能够帮助每个人提升效率，优化生活。",
+        "products": "产品",
+        "info": "信息",
+        "support": "支持信息",
+        "documentation": "支持中心",
+        "contactSupport": "联系客服",
+        "salesPartnerJoin": "销售商加盟",
+        "contactUs": "联系我们",
+        "location": "香港",
+        "hours": "周一至周五 9:00 - 18:00",
+        "copyright": "© 2025 V-sys Limited. All rights reserved."
+    }
+}

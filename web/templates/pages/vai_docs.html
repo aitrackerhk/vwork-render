@@ -1,0 +1,197 @@
+{{define "pages/vai_docs"}}
+<!-- vAI Document Generation Tool -->
+<div class="vai-docs-page" id="vaiDocsPage">
+    <!-- Left: Document List Sidebar -->
+    <div class="vai-docs-sidebar" id="vaiDocsSidebar">
+        <div class="vai-docs-sidebar-header">
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="VaiDocs.showNewDocForm()">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.docs.newDoc">新文件</span>
+                </button>
+                <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="VaiDocs.toggleSidebar()" title="關閉" data-i18n-title="vai.common.close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <!-- Sidebar tabs -->
+            <div class="vai-sidebar-tabs mt-2">
+                <button class="vai-sidebar-tab active" data-tab="docs" onclick="VaiDocs.switchSidebarTab('docs')">
+                    <i class="bi bi-file-earmark-text me-1"></i><span data-i18n="vai.sidebar.myDocs">我的文件</span>
+                </button>
+                <button class="vai-sidebar-tab" data-tab="chat" onclick="VaiDocs.switchSidebarTab('chat')">
+                    <i class="bi bi-chat-dots me-1"></i><span data-i18n="vai.sidebar.chatGeneration">對話生成</span>
+                </button>
+            </div>
+        </div>
+        <!-- Tab: My Documents -->
+        <div id="vaiDocsList" class="vai-docs-list">
+            <!-- Rendered by vai-docs.js -->
+            <div class="text-center text-muted py-4" style="font-size: 0.85rem;">
+                <span class="spinner-border spinner-border-sm me-1"></span><span data-i18n="vai.common.loading">載入中...</span>
+            </div>
+        </div>
+        <!-- Tab: Chat Generated Documents -->
+        <div id="vaiChatDocsList" class="vai-docs-list" style="display: none;">
+            <!-- Rendered by vai-docs.js -->
+        </div>
+    </div>
+
+    <!-- Right: Main Content Area -->
+    <div class="vai-docs-main d-flex flex-column flex-grow-1" style="min-width: 0;">
+        <!-- Empty state (shown when no documents exist) -->
+        <div class="vai-docs-empty" id="vaiDocsEmpty">
+            <div class="text-center text-muted">
+                <i class="bi bi-file-earmark-text" style="font-size: 3rem; opacity: 0.3;"></i>
+                <p class="mt-3 mb-1" data-i18n="vai.docs.emptyTitle">AI 文件生成</p>
+                <p class="small" data-i18n="vai.docs.emptyDesc">輸入描述讓 AI 幫你生成 Word、Excel、PowerPoint 或 PDF 文件</p>
+                <button class="btn btn-primary mt-3" onclick="VaiDocs.showNewDocForm()">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.docs.createFirst">建立第一份文件</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- No selection state (shown when documents exist but none selected) -->
+        <div class="vai-docs-empty" id="vaiDocsNoSelection" style="display: none;">
+            <div class="text-center text-muted">
+                <i class="bi bi-hand-index" style="font-size: 3rem; opacity: 0.3;"></i>
+                <p class="mt-3 mb-1" data-i18n="vai.docs.selectDoc">請選擇文件</p>
+                <p class="small" data-i18n="vai.docs.selectDocHint">從左側列表選擇一份文件查看，或建立新文件</p>
+                <button class="btn btn-primary mt-3" onclick="VaiDocs.showNewDocForm()">
+                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.docs.createNew">建立新文件</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- New Document Form -->
+        <div class="vai-docs-form" id="vaiDocsForm" style="display: none;">
+            <div class="vai-docs-form-inner">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-plus me-2"></i><span data-i18n="vai.docs.newDoc">新文件</span></h5>
+                    <button class="btn btn-sm btn-link text-muted" onclick="VaiDocs.hideNewDocForm()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <form onsubmit="event.preventDefault(); VaiDocs.generate();">
+                    <!-- Document Type Selector -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" data-i18n="vai.docs.docType">文件類型</label>
+                        <div class="vai-doc-type-selector">
+                            <label class="vai-doc-type-option active" data-type="docx">
+                                <input type="radio" name="docType" value="docx" checked class="d-none">
+                                <i class="bi bi-file-earmark-word text-primary"></i>
+                                <span>Word (.docx)</span>
+                            </label>
+                            <label class="vai-doc-type-option" data-type="xlsx">
+                                <input type="radio" name="docType" value="xlsx" class="d-none">
+                                <i class="bi bi-file-earmark-excel text-success"></i>
+                                <span>Excel (.xlsx)</span>
+                            </label>
+                            <label class="vai-doc-type-option" data-type="pptx">
+                                <input type="radio" name="docType" value="pptx" class="d-none">
+                                <i class="bi bi-file-earmark-ppt text-danger"></i>
+                                <span>PowerPoint (.pptx)</span>
+                            </label>
+                            <label class="vai-doc-type-option" data-type="pdf">
+                                <input type="radio" name="docType" value="pdf" class="d-none">
+                                <i class="bi bi-file-earmark-pdf" style="color: #dc3545;"></i>
+                                <span>PDF (.pdf)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Title (optional) -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="vaiDocTitle" data-i18n="vai.docs.title">標題 (選填)</label>
+                        <input type="text" class="form-control" id="vaiDocTitle" placeholder="文件標題..." data-i18n-placeholder="vai.docs.titlePlaceholder">
+                    </div>
+
+                    <!-- Prompt -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" for="vaiDocPrompt" data-i18n="vai.docs.prompt">描述</label>
+                        <div class="position-relative">
+                            <textarea class="form-control" id="vaiDocPrompt" rows="5" placeholder="描述你想要生成的文件內容... &#10;&#10;例如：&#10;- 建立一份產品行銷企劃書&#10;- 產生一份員工薪資明細表&#10;- 製作一份季度業績報告簡報" data-i18n-placeholder="vai.docs.promptPlaceholder" required style="padding-right: 2.5rem;"></textarea>
+                            <button type="button" class="btn btn-sm vai-stt-btn-float" onclick="VaiSTT.toggle('vaiDocPrompt', this)" title="Voice Input" data-i18n-title="vai.chat.voiceInput">
+                                <i class="bi bi-mic"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button type="submit" class="btn btn-primary w-100" id="vaiDocGenBtn">
+                        <i class="bi bi-stars me-1"></i><span data-i18n="vai.docs.generate">生成文件</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Document Detail / Result View -->
+        <div class="vai-docs-detail" id="vaiDocsDetail" style="display: none;">
+            <div class="vai-docs-detail-inner">
+                <!-- Header -->
+                <div class="d-flex align-items-start justify-content-between mb-3">
+                    <div>
+                        <h5 class="mb-1" id="vaiDocDetailTitle"></h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge" id="vaiDocDetailTypeBadge"></span>
+                            <span class="badge" id="vaiDocDetailStatusBadge"></span>
+                            <small class="text-muted" id="vaiDocDetailDate"></small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-danger" onclick="VaiDocs.deleteCurrent()" title="刪除" data-i18n-title="vai.common.delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Prompt -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <small class="text-muted fw-semibold d-block mb-1"><i class="bi bi-chat-dots me-1"></i>Prompt</small>
+                        <p class="mb-0" id="vaiDocDetailPrompt" style="white-space: pre-wrap;"></p>
+                    </div>
+                </div>
+
+                <!-- Download area -->
+                <div id="vaiDocDetailDownload" style="display: none;">
+                    <div class="card border-success">
+                        <div class="card-body text-center py-4">
+                            <i class="bi bi-file-earmark-check text-success" style="font-size: 3rem;"></i>
+                            <p class="mt-2 mb-1 fw-semibold" data-i18n="vai.docs.ready">文件已生成</p>
+                            <p class="small text-muted mb-3" id="vaiDocDetailFileSize"></p>
+                            <a href="#" class="btn btn-success" id="vaiDocDetailDownloadBtn" download>
+                                <i class="bi bi-download me-1"></i><span data-i18n="vai.docs.download">下載文件</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error area -->
+                <div id="vaiDocDetailError" style="display: none;">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        <span id="vaiDocDetailErrorMsg"></span>
+                    </div>
+                </div>
+
+                <!-- Generating spinner -->
+                <div id="vaiDocDetailGenerating" style="display: none;">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <p class="text-muted" data-i18n="vai.docs.generating">AI 正在生成文件，請稍候...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/vai-docs.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof VaiDocs !== 'undefined') {
+        VaiDocs.init();
+    }
+});
+</script>
+{{end}}

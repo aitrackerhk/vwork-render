@@ -1,0 +1,482 @@
+{
+    "nav": {
+        "language": "Language",
+        "billing": "Subscription",
+        "aiCoins": "vCoin",
+        "contact": "Contact Us",
+        "user": "User",
+        "accountSettings": "Account Settings",
+        "logout": "Logout",
+        "supportInfo": "Support Info",
+        "supportCenter": "Support Center",
+        "login": "Login",
+        "tryFree": "Try Free",
+        "goToSystem": "Go to System",
+        "home": "Home",
+        "about": "About"
+    },
+    "voffice": {
+        "nav": {
+            "features": "Features",
+            "download": "Download",
+            "support": "Support",
+            "pricing": "Pricing"
+        },
+        "hero": {
+            "badge": "vOffice Enterprise",
+            "badge2": "Free Office Software",
+            "title": "AI-Powered Smart Office Software",
+            "subtitle": "Create docs, sheets, and slides with teamwork and offline access.",
+            "primaryCta": "Download now",
+            "secondaryCta": "See features",
+            "stat1": "3 platforms",
+            "stat2": "100% offline",
+            "stat3": "Enterprise security"
+        },
+        "features": {
+            "title": "Key features for teams",
+            "subtitle": "Make collaboration, version control, and security effortless.",
+            "items": {
+                "1": {
+                    "title": "Free to use",
+                    "desc": "All office features are completely free. Only AI features require payment."
+                },
+                "2": {
+                    "title": "PDF support",
+                    "desc": "Full PDF viewing, editing, and conversion for all your document needs."
+                },
+                "3": {
+                    "title": "Offline installers",
+                    "desc": "Install on Windows with offline packages."
+                }
+            }
+        },
+        "ai": {
+            "badge": "AI Assistant",
+            "title": "Built-in AI for smarter work",
+            "subtitle": "vOffice comes with a built-in AI assistant that writes, translates, summarizes, and analyzes right inside your documents.",
+            "nav": "AI Features",
+            "demo": {
+                "status": "Ready",
+                "userMsg": "Translate this report section into English",
+                "aiMsg": "Done! I've translated the selected paragraph into English while preserving the original formatting. Want me to adjust the tone or wording?",
+                "userMsg2": "Summarize the key points of this 20-page contract",
+                "aiMsg2": "I've extracted 5 key clause summaries, covering payment terms, breach liability, and confidentiality provisions.",
+                "placeholder": "Type a command and let AI do the rest..."
+            },
+            "features": {
+                "write": {
+                    "title": "AI Writing",
+                    "desc": "Auto-generate emails, reports, and copy to quickly draft content."
+                },
+                "translate": {
+                    "title": "AI Translation",
+                    "desc": "Real-time multilingual translation with original layout preserved."
+                },
+                "summary": {
+                    "title": "AI Summary",
+                    "desc": "One-click document summaries and key point extraction."
+                },
+                "analysis": {
+                    "title": "AI Analysis",
+                    "desc": "Smart spreadsheet analysis with auto-generated charts and insights."
+                }
+            },
+            "pricingNote": "Office features are completely free. AI features use vCoin pay-as-you-go pricing.",
+            "learnMore": "Learn about vCoin"
+        },
+        "vcoinModal": {
+            "title": "vCoin",
+            "whatIsTitle": "What is vCoin?",
+            "whatIsDesc": "vCoin is V-sys's AI usage token. All office features are free. When you use the AI assistant (writing, translation, summarization, analysis, etc.), vCoins are consumed. You get 5 free queries per day.",
+            "usageTitle": "Usage Info",
+            "simpleQuery": "Simple Query",
+            "simpleQueryDesc": "Basic Q&A, data lookup",
+            "contentGen": "Content Generation",
+            "contentGenDesc": "Document generation, email writing",
+            "dailyFreeTip": "You have 5 free queries per day (chat & image generation), resets daily. Video and document generation are not included.",
+            "buyTitle": "Buy vCoin",
+            "planSmall": "Small",
+            "planMedium": "Medium",
+            "popular": "Most Popular",
+            "planMega": "Mega",
+            "save17": "Save 17%",
+            "save30": "Save 30%",
+            "save38": "Save 38%",
+            "loginToBuy": "Log in to buy",
+            "close": "Close"
+        },
+        "pricing": {
+            "title": "vSuite Pricing Plans",
+            "subtitle": "Subscribe to vSuite to unlock full vOffice features, including AI assistant and more products.",
+            "welcomeBonus": "Sign up and get 50 vCoins free — try AI features instantly!",
+            "monthlyBilling": "Monthly",
+            "yearlyBilling": "Yearly",
+            "perMonth": "/month",
+            "yearlySaveTag": "Save 34%",
+            "noDiscount": "No discount",
+            "free": {
+                "name": "Free Plan",
+                "price": "Free",
+                "badge": "Free",
+                "features": {
+                    "0": "Basic office features",
+                    "1": "Documents, Spreadsheets & Presentations",
+                    "2": "PDF viewing",
+                    "3": "5 AI questions per day",
+                    "4": "Upgrade anytime"
+                },
+                "button": "Free Download"
+            },
+            "vsuite": {
+                "name": "vSuite",
+                "monthlyPrice": "$380",
+                "yearlyPrice": "",
+                "yearlyTotal": "$3,000/year",
+                "yearlySavings": "Save $1,560/year",
+                "badge": "Popular",
+                "features": {
+                    "0": "All features",
+                    "1": "Unlimited records",
+                    "2": "Ad-free",
+                    "3": "500 vCoins/month",
+                    "4": "vOffice - AI Smart Office",
+                    "5": "vMarket - Product Marketplace",
+                    "6": "Support services",
+                    "4a": "Documents, Spreadsheets & Presentations",
+                    "4b": "PDF View, Edit & Convert",
+                    "4c": "Offline Desktop (Windows)",
+                    "4d": "AI Write, Translate, Summarize, Analyze"
+                },
+                "button": "Subscribe Now"
+            },
+            "vsuite_pro": {
+                "name": "vSuite Pro",
+                "monthlyPrice": "$880",
+                "yearlyPrice": "$800",
+                "yearlyTotal": "$9,600/year",
+                "yearlySavings": "Save $960/year",
+                "badge": "Best Value",
+                "features": {
+                    "0": "All vSuite features",
+                    "1": "Ad-free",
+                    "2": "1,000 vCoins/month",
+                    "3": "vOffice - AI Smart Office",
+                    "4": "vMarket - Product Marketplace",
+                    "5": "Enterprise support services",
+                    "6": "Data loss prevention",
+                    "7": "Security controls",
+                    "3a": "Documents, Spreadsheets & Presentations",
+                    "3b": "PDF View, Edit & Convert",
+                    "3c": "Offline Desktop (Windows)",
+                    "3d": "AI Write, Translate, Summarize, Analyze"
+                },
+                "button": "Subscribe Now"
+            },
+            "vsuite_pro_plus": {
+                "name": "vSuite Pro+",
+                "monthlyPrice": "$2,500",
+                "yearlyPrice": "$2,200",
+                "yearlyTotal": "$26,400/year",
+                "yearlySavings": "Save $3,600/year",
+                "badge": "Enterprise",
+                "features": {
+                    "0": "All vSuite Pro features",
+                    "1": "3,000 vCoins/month",
+                    "2": "3,000 vCoins/month",
+                    "3": "vOffice - AI Smart Office",
+                    "4": "vMarket - Product Marketplace",
+                    "5": "vAi Video Generation",
+                    "6": "Lead Finder (Auto Prospecting)",
+                    "7": "Enterprise support services",
+                    "8": "Data loss prevention",
+                    "9": "Security controls"
+                },
+                "button": "Subscribe Now"
+            },
+            "custom": {
+                "name": "Custom Plan",
+                "price": "Customized",
+                "badge": "Exclusive",
+                "features": {
+                    "0": "Fully customized system",
+                    "1": "Dedicated technical support",
+                    "2": "Personalized feature development",
+                    "3": "Dedicated consultant service"
+                },
+                "button": "Contact Us"
+            }
+        },
+        "download": {
+            "title": "Download vOffice",
+            "subtitle": "Download the Windows version and get started.",
+            "subtitleComingSoon": "Coming soon. Stay tuned.",
+            "windows": "Windows - Coming Soon",
+            "mac": "macOS - Coming Soon",
+            "linux": "Linux - Coming Soon",
+            "cardTitle": "Latest vOffice release",
+            "cardSubtitle": "Full offline installer, ready for enterprise deployment.",
+            "cardSubtitleComingSoon": "Coming soon. Stay tuned.",
+            "macDesc": "For macOS 11 and above",
+            "linuxDesc": "For major Linux distributions",
+            "comingSoon": "Coming Soon",
+            "pageTitle": "Software Download",
+            "pageSubtitle": "Download the vOffice desktop app to use the full office suite locally.",
+            "windowsDesc": "For Windows 10 and above",
+            "featuresTitle": "vOffice Feature Highlights",
+            "feature1Title": "Word Processing",
+            "feature1Desc": "Create and edit documents with .docx support.",
+            "feature2Title": "Spreadsheets",
+            "feature2Desc": "Data analysis and calculations with .xlsx support.",
+            "feature3Title": "Presentations",
+            "feature3Desc": "Create professional presentations with .pptx support.",
+            "feature4Title": "AI Assistant",
+            "feature4Desc": "Built-in AI assistant for document editing and analysis."
+        },
+        "menu": {
+            "download": "Software Download"
+        }
+    },
+    "footer": {
+        "description": "Using technology to help humanity, making work and life simpler and more efficient. We believe technology can help everyone improve efficiency and optimize their lives.",
+        "products": "Products",
+        "productList": {
+            "vwork": "vWork",
+            "vmarket": "vMarket",
+            "voffice": "vOffice"
+        },
+        "info": "Information",
+        "support": "Support",
+        "documentation": "Support Center",
+        "contactSupport": "Contact Us",
+        "features": "Features",
+        "pricing": "Pricing",
+        "login": "Login",
+        "salesPartnerJoin": "Sales Partner Join",
+        "contact": "Contact Us",
+        "contactUs": "Contact Us",
+        "email": "info@vsysai.com",
+        "founded": "Founded December 7, 2025",
+        "location": "Hong Kong",
+        "home": "Home",
+        "workingHours": "Mon - Fri 9:00 - 18:00",
+        "hours": "Mon - Fri 9:00 - 18:00",
+        "copyright": "© 2025 V-sys Limited. All rights reserved."
+    },
+    "aiCoins": {
+        "title": "vCoin",
+        "balance": "Current Balance",
+        "totalAvailable": "Total Available",
+        "monthlyQuota": "Monthly Quota",
+        "dailyFree": "Daily Free",
+        "purchased": "Purchased Balance",
+        "totalUsed": "Total Used",
+        "usageInfo": "Usage Info",
+        "operation": "Operation Type",
+        "coinsPerUse": "Coins per Use",
+        "description": "Description",
+        "simpleQuery": "Simple Query",
+        "simpleQueryDesc": "Basic Q&A, data lookup",
+        "analysis": "Data Analysis",
+        "analysisDesc": "Report analysis, trend prediction",
+        "generate": "Content Generation",
+        "generateDesc": "Document generation, email writing",
+        "export": "Data Export",
+        "exportDesc": "Excel/PDF export",
+        "automation": "Automation Task",
+        "automationDesc": "Batch processing, automated workflows",
+        "dailyFreeTip": "You have 5 free queries per day (chat & image generation), resets daily. Video and document generation are not included.",
+        "buyCoins": "Buy vCoin",
+        "buy": "Buy",
+        "popular": "Most Popular",
+        "transactionHistory": "Transaction History",
+        "allTypes": "All Types",
+        "typeConsume": "Usage",
+        "typePurchase": "Purchase",
+        "typeMonthlyReset": "Monthly Quota",
+        "typeBonus": "Bonus",
+        "noTransactions": "No transaction records",
+        "resetsOn": "Resets on",
+        "loadBalanceFailed": "Failed to load balance",
+        "purchaseComingSoon": "Purchase feature coming soon",
+        "purchaseFailed": "Purchase failed",
+        "planSmall": "Small",
+        "planMedium": "Medium",
+        "planMega": "Mega",
+        "save17": "Save 17%",
+        "save30": "Save 30%",
+        "save38": "Save 38%",
+        "imageGen": "Image Generation",
+        "imageGenDesc": "AI image generation",
+        "sketchGen": "Sketch Generation",
+        "sketchGenDesc": "AI sketch generation",
+        "docGen": "Document Generation",
+        "docGenDesc": "5 vCoins per 15 pages, minimum 5 vCoins",
+        "videoGen": "Video Generation",
+        "videoGenDesc": "AI video generation (per 5 seconds)",
+        "videoExtend": "Video Extension",
+        "videoExtendDesc": "AI video extension (per 5 seconds)",
+        "ocr": "OCR Text Recognition",
+        "ocrDesc": "Extract text from images",
+        "stt": "Speech to Text",
+        "sttDesc": "Speech to text conversion",
+        "matchFields": "Field Matching",
+        "matchFieldsDesc": "AI automatic field matching",
+        "aiSuggestion": "AI Suggestion/Analysis",
+        "aiSuggestionDesc": "AI smart suggestions and analysis"
+    },
+    "billing": {
+        "title": "Subscription",
+        "currentSubscription": "Current Subscription",
+        "selectPlan": "Select Plan",
+        "paymentHistoryTitle": "Payment History",
+        "loading": "Loading...",
+        "monthlyBilling": "Monthly",
+        "yearlyBilling": "Yearly",
+        "yearlySaveTag": "Save 34%",
+        "noDiscount": "No discount",
+        "checkoutSuccess": "Subscription successful! Your subscription has been activated.",
+        "checkoutCancel": "Subscription canceled. You can resubscribe anytime.",
+        "paymentHistoryError": "Failed to load payment history",
+        "paymentHistory": {
+            "date": "Date",
+            "invoice": "Invoice Number",
+            "amount": "Amount",
+            "period": "Period",
+            "status": "Status",
+            "actions": "Actions"
+        },
+        "trial": {
+            "title": "Trial Period",
+            "desc": "You are currently using the free trial version",
+            "quotaDesc": "You are currently on a free trial. Here is your quota usage",
+            "daysLeft": "Days Left",
+            "days": "days",
+            "expired": "After the trial period ends, please select a subscription plan to continue",
+            "expiredWithDate": "Your trial will end on {date}. Please select a subscription plan to continue.",
+            "orderQuota": "vWork Order Quota",
+            "remainOrders": "{n} orders remaining",
+            "quotaFull": "Limit reached, subscription required in 7 days"
+        },
+        "salesPartnerTrial": {
+            "title": "Partner Trial Period",
+            "desc": "You are using a trial service provided by {partner}",
+            "expiredWithDate": "Your trial will end on {date}. Please contact your partner to subscribe."
+        },
+        "vsuite": {
+            "badge": "Popular",
+            "name": "vSuite",
+            "monthlyPrice": "$380/month",
+            "yearlyPrice": "",
+            "yearlyTotal": "$3,000/year",
+            "yearlySavings": "Save $1,560/year",
+            "features": {
+                "0": "All features",
+                "1": "Unlimited records",
+                "2": "Ad-free",
+                "3": "vCoins/month",
+                "4": "vOffice - AI Smart Office",
+                "5": "vMarket - Marketplace",
+                "6": "Support services"
+            },
+            "button": "Subscribe Now"
+        },
+        "vsuite_pro": {
+            "badge": "Best Value",
+            "name": "vSuite Pro",
+            "monthlyPrice": "$880/month",
+            "yearlyPrice": "$800/month",
+            "yearlyTotal": "$9,600/year",
+            "yearlySavings": "Save $960/year",
+            "features": {
+                "0": "All vSuite features",
+                "1": "Ad-free",
+                "2": "vCoins/month",
+                "3": "vOffice - AI Smart Office",
+                "4": "vMarket - Marketplace",
+                "5": "Enterprise support",
+                "6": "Data loss prevention",
+                "7": "Security controls"
+            },
+            "button": "Subscribe Now"
+        },
+        "vsuite_pro_plus": {
+            "badge": "Enterprise",
+            "name": "vSuite Pro+",
+            "monthlyPrice": "$2,500/month",
+            "yearlyPrice": "$2,200/month",
+            "yearlyTotal": "$26,400/year",
+            "yearlySavings": "Save $3,600/year",
+            "features": {
+                "0": "All vSuite Pro features",
+                "1": "3,000 vCoins/month",
+                "2": "3,000 vCoins/month",
+                "3": "vOffice - AI Smart Office",
+                "4": "vMarket - Marketplace",
+                "5": "vAi Video Generation",
+                "6": "Lead Finder",
+                "7": "Enterprise support",
+                "8": "Data loss prevention",
+                "9": "Security controls"
+            },
+            "button": "Subscribe Now"
+        },
+        "custom": {
+            "badge": "Custom",
+            "name": "Custom Plan",
+            "price": "Custom",
+            "features": {
+                "0": "Fully customized system",
+                "1": "Dedicated technical support",
+                "2": "Personalized feature development",
+                "3": "Dedicated consultant service"
+            },
+            "button": "Contact Us"
+        },
+        "subscribed": "Subscribed",
+        "nextRenewal": "Next Renewal",
+        "cancelAtPeriodEnd": "Will be canceled at period end",
+        "cancelSubscription": "Cancel Subscription",
+        "noPlan": "You have not subscribed to any plan yet. Please select a plan to get started",
+        "noPaymentHistory": "No payment records",
+        "loadError": "Failed to load subscription information",
+        "processing": "Processing subscription request...",
+        "subscribeError": "Subscription failed",
+        "cancelConfirm": "Are you sure you want to cancel? The subscription will be canceled at the end of the current billing period.",
+        "cancelSuccess": "Subscription set to cancel at period end",
+        "cancelError": "Failed to cancel subscription",
+        "perMonth": "/month",
+        "year": "year",
+        "month": "month",
+        "yearlySavingsAmount": "Save"
+    },
+    "menu": {
+        "billingCenter": "Billing Center",
+        "backToHome": "Back to Home"
+    },
+    "tenantSwitch": {
+        "title": "Select Company",
+        "selectHint": "Please select the company to enter",
+        "addTenant": "Add Tenant",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "pleaseSelect": "Please select a company",
+        "switchFailed": "Failed to switch tenant"
+    },
+    "login": {
+        "selectTenant": "Select Tenant",
+        "selectTenantHint": "Please select the tenant to enter",
+        "selectTenantRequired": "Please select a tenant",
+        "noTenants": "No available tenants"
+    },
+    "helpVoffice": {
+        "breadcrumb": {
+            "supportCenter": "Support Center"
+        },
+        "title": "vOffice Support Center",
+        "description": "vOffice is V-sys's online document editing and collaboration platform, supporting documents, spreadsheets, and presentations.",
+        "underConstruction": "vOffice support documentation is under construction. Stay tuned.",
+        "contactPrompt": "If you have any questions, feel free to",
+        "contactLink": "Contact Us"
+    }
+}

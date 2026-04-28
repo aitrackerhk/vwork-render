@@ -1,0 +1,1895 @@
+{{define "pages/project_form"}}
+<div class="container-fluid" id="projectFormPage" data-project-id="{{.ID}}">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="mb-1"><i class="bi bi-folder2-open"></i> <span id="projectFormTitle" data-i18n="projectForm.newTitle">{{.Title}}</span></h3>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="/projects"><i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span></a>
+    </div>
+  </div>
+
+  <!-- 用 form 包起來，讓 cms_layout 的 setupFormButtonBar 把按鈕移到固定底部欄位 -->
+  <form id="projectForm" onsubmit="event.preventDefault(); return false;">
+  <div class="row g-3">
+    <div class="col-12 col-xl-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label" data-i18n="projectForm.cover">封面</label>
+              <div class="d-flex gap-3 align-items-center">
+                <div style="width: 140px; height: 90px; border-radius: 10px; overflow: hidden; background: #f1f5f9; border: 1px solid rgba(0,0,0,0.06);">
+                  <img id="p_cover_preview" src="" style="width: 100%; height: 100%; object-fit: cover; display:none;">
+                  <div id="p_cover_placeholder" class="h-100 w-100 d-flex align-items-center justify-content-center text-muted">
+                    <i class="bi bi-image"></i>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <input type="file" class="form-control" id="p_cover_file" accept="image/*">
+                  <input type="hidden" id="p_cover_url" value="">
+                  <div class="d-flex gap-2 mt-2">
+                    <button class="btn btn-sm btn-outline-primary" type="button" onclick="ProjectForm.uploadCover()"><i class="bi bi-upload"></i> <span data-i18n="common.upload">上傳</span></button>
+                    <button class="btn btn-sm btn-outline-danger" type="button" onclick="ProjectForm.removeCover()"><i class="bi bi-trash"></i> <span data-i18n="common.remove">移除</span></button>
+                  </div>
+                  <div class="form-text" data-i18n="projectForm.coverHint">建議比例 16:9</div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label"><span data-i18n="projectForm.projectName">項目名稱</span> <span class="text-danger">*</span></label>
+              <input class="form-control" id="p_name" placeholder="例如：網站改版 / 門市開幕..." data-i18n-placeholder="projectForm.projectNamePlaceholder" />
+            </div>
+            <div class="col-12">
+              <label class="form-label" data-i18n="projectForm.code">編號</label>
+              <input class="form-control" id="p_code" placeholder="留空將自動生成" data-i18n-placeholder="placeholders.autoGenerateIfEmpty" readonly />
+            </div>
+            <div class="col-12">
+              <label class="form-label" data-i18n="projectForm.projectType">項目類型</label>
+              <select class="form-select" id="p_type"></select>
+            </div>
+            <div class="col-12">
+              <label class="form-label" data-i18n="projectForm.owner">負責人</label>
+              <select class="form-select" id="p_owner"></select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" data-i18n="fields.status">狀態</label>
+              <select class="form-select" id="p_status">
+                <option value="active" data-i18n="projects.status.active">進行中</option>
+                <option value="on_hold" data-i18n="projects.status.on_hold">暫停</option>
+                <option value="completed" data-i18n="projects.status.completed">已完成</option>
+                <option value="cancelled" data-i18n="projects.status.cancelled">已取消</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" data-i18n="projectForm.budget">預算</label>
+              <input class="form-control" id="p_budget" type="number" step="0.01" min="0" value="0" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" data-i18n="fields.startDate">開始日期</label>
+              <input class="form-control" id="p_start" type="date" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" data-i18n="fields.endDate">結束日期</label>
+              <input class="form-control" id="p_end" type="date" />
+            </div>
+            <div class="col-12">
+              <label class="form-label" data-i18n="fields.description">描述</label>
+              <textarea class="form-control" id="p_desc" rows="4" placeholder="簡短描述項目目標、範圍、備註..." data-i18n-placeholder="projectForm.descriptionPlaceholder"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-7">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+          <ul class="nav nav-tabs card-header-tabs" id="projectTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="tab-tasks" data-bs-toggle="tab" data-bs-target="#pane-tasks" type="button" role="tab">
+                <span data-i18n="projectForm.tabs.tasks">任務</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-files" data-bs-toggle="tab" data-bs-target="#pane-files" type="button" role="tab">
+                <span data-i18n="projectForm.tabs.files">項目檔案</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-expenses" data-bs-toggle="tab" data-bs-target="#pane-expenses" type="button" role="tab">
+                <span data-i18n="projectForm.tabs.expenses">項目支出</span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tab-resources" data-bs-toggle="tab" data-bs-target="#pane-resources" type="button" role="tab">
+                <span data-i18n="projectForm.tabs.resources">資源使用</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="card-body">
+          <div class="tab-content">
+            <!-- Tasks -->
+            <div class="tab-pane fade show active" id="pane-tasks" role="tabpanel">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold"><i class="bi bi-list-check"></i> <span data-i18n="projectForm.tasksTitle">任務</span></div>
+                <button class="btn btn-sm btn-outline-primary" type="button" onclick="ProjectForm.addTaskRow()">
+                  <i class="bi bi-plus-lg"></i> <span data-i18n="projectForm.addTask">新增任務</span>
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead>
+                    <tr class="text-muted small">
+                      <th style="width: 32%;" data-i18n="fields.title">標題</th>
+                      <th style="width: 22%;" data-i18n="projectForm.owner">負責人</th>
+                      <th style="width: 14%;" data-i18n="projectForm.dueDate">期限</th>
+                      <th style="width: 14%;" data-i18n="fields.status">狀態</th>
+                      <th style="width: 10%;" data-i18n="projectForm.priority">優先</th>
+                      <th style="width: 8%;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="tasksTbody">
+                    <tr class="text-muted" id="tasksEmptyRow">
+                      <td colspan="6" class="text-center py-4" data-i18n="projectForm.noTasks">尚無任務，點「新增任務」開始</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="small text-muted">
+                <span data-i18n="projectForm.tasksTip">小提示：用 ↑ ↓ 來調整順序；保存後會按順序寫入。</span>
+              </div>
+            </div>
+
+            <!-- Files -->
+            <div class="tab-pane fade" id="pane-files" role="tabpanel">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold"><i class="bi bi-paperclip"></i> <span data-i18n="projectForm.filesTitle">項目檔案</span></div>
+                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="ProjectForm.loadProjectFiles()">
+                  <i class="bi bi-arrow-clockwise"></i> <span data-i18n="common.refresh">刷新</span>
+                </button>
+              </div>
+              <div class="alert alert-warning py-2" id="filesNeedSave" style="display:none;">
+                <span data-i18n="projectForm.needSaveToUploadFiles">請先保存項目後，才可以上傳檔案。</span>
+              </div>
+              <div class="d-flex gap-2 mb-3 align-items-stretch">
+                <label class="w-100 border rounded-3 p-3 bg-white" style="border-style: dashed !important; cursor: pointer;">
+                  <div class="fw-semibold" data-i18n="projectForm.filesDropzone">拖拽或點擊選擇檔案</div>
+                  <div class="text-muted small" id="projectFilesHint" data-i18n="projectForm.filesNotSelected">未選擇檔案</div>
+                  <input type="file" id="projectFilesInput" class="form-control" multiple style="display:none;">
+                </label>
+                 <button class="btn btn-sm btn-outline-primary" type="button" onclick="ProjectForm.uploadProjectFiles()" style="white-space: nowrap;">
+                   <i class="bi bi-upload"></i> <span data-i18n="common.upload">上傳</span>
+                 </button>
+              </div>
+              <div class="mb-3">
+                <label class="form-label mb-1" data-i18n="projectForm.fileDescriptionOptional">檔案描述（可選）</label>
+                <textarea id="projectFilesDescription" class="form-control" rows="2" placeholder="例如：報價單、合同附件、設計稿、會議紀錄..." data-i18n-placeholder="projectForm.fileDescriptionPlaceholder"></textarea>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead class="text-muted small">
+                    <tr>
+                      <th data-i18n="projectForm.fileName">檔名</th>
+                      <th data-i18n="fields.description">描述</th>
+                      <th style="width: 120px;" data-i18n="projectForm.fileSize">大小</th>
+                      <th style="width: 140px;" data-i18n="fields.date">時間</th>
+                      <th style="width: 90px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="projectFilesTbody">
+                    <tr class="text-muted"><td colspan="5" class="text-center py-3" data-i18n="projectForm.noFiles">尚無檔案</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Expenses -->
+            <div class="tab-pane fade" id="pane-expenses" role="tabpanel">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold"><i class="bi bi-receipt"></i> <span data-i18n="projectForm.expensesTitle">項目支出</span></div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-primary" type="button" onclick="ProjectForm.openExpenseSideform()">
+                    <i class="bi bi-plus-lg"></i> <span data-i18n="projectForm.addExpense">新增支出</span>
+                  </button>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead class="text-muted small">
+                    <tr>
+                      <th data-i18n="fields.date">日期</th>
+                      <th data-i18n="fields.description">描述</th>
+                      <th style="width: 120px;" data-i18n="fields.amount">金額</th>
+                      <th style="width: 90px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="projectExpensesTbody">
+                    <tr class="text-muted"><td colspan="4" class="text-center py-3" data-i18n="common.loading">載入中...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Resources -->
+            <div class="tab-pane fade" id="pane-resources" role="tabpanel">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-semibold"><i class="bi bi-boxes"></i> <span data-i18n="projectForm.resourcesTitle">資源使用</span></div>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-primary" type="button" onclick="ProjectForm.openReservationSideform()">
+                    <i class="bi bi-plus-lg"></i> <span data-i18n="projectForm.addReservation">新增預留</span>
+                  </button>
+                </div>
+              </div>
+              <div class="alert alert-warning py-2" id="reservationsNeedSave" style="display:none;">
+                <span data-i18n="projectForm.needSaveToReserve">請先保存項目後，才可以設定資源預留。</span>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle">
+                  <thead class="text-muted small">
+                    <tr>
+                      <th style="width: 120px;" data-i18n="fields.type">類型</th>
+                       <th style="min-width: 80px;" data-i18n="projectForm.resource">資源</th>
+                      <th style="min-width: 200px;" data-i18n="projectForm.user">使用者</th>
+                      <th style="width: 170px;" data-i18n="fields.startDate">開始</th>
+                      <th style="width: 170px;" data-i18n="fields.endDate">結束</th>
+                      <th style="width: 80px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody id="reservationsTbody">
+                    <tr class="text-muted" id="reservationsEmptyRow"><td colspan="6" class="text-center py-3" data-i18n="projectForm.noReservations">尚無預留</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="small text-muted" data-i18n="projectForm.reservationConflictHint">會自動檢查是否與預約/其他預留衝突（除非該資源允許重複使用）。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom button bar（會被 cms_layout 複製到固定底部欄位） -->
+  <div class="d-flex gap-2 mt-4 form-buttons-container">
+    <button class="btn btn-primary" type="button" id="saveProjectBtn" onclick="ProjectForm.save()">
+      <i class="bi bi-save"></i> <span data-i18n="common.save">保存</span>
+    </button>
+    <!-- 草稿僅用於 /projects/new（編輯頁不顯示，JS 會保險隱藏） -->
+    <button class="btn btn-outline-primary" type="button" id="saveProjectDraftBtn" onclick="ProjectForm.saveDraftNow()">
+      <i class="bi bi-file-earmark"></i> <span data-i18n="common.draft">草稿</span>
+    </button>
+    <button class="btn btn-secondary" type="button" onclick="if(typeof Router!=='undefined'&&Router.go){Router.go('/projects')}else{window.location.href='/projects'}">
+      <i class="bi bi-x"></i> <span data-i18n="common.cancel">取消</span>
+    </button>
+  </div>
+  </form>
+</div>
+
+<!-- Right slide sideform (Expenses / Reservations) -->
+<div id="projectSideformOverlay" style="position: fixed; inset: 0; background: rgba(0,0,0,0.18); display: none; z-index: 1060;">
+  <div id="projectSideformDrawer" style="position: absolute; top: 0; right: 0; height: 100%; width: min(520px, 92vw); background: #fff; box-shadow: -12px 0 30px rgba(0,0,0,0.12); display: flex; flex-direction: column;">
+    <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+      <div class="fw-semibold" id="projectSideformTitle" data-i18n="common.add">新增</div>
+      <button class="btn btn-sm btn-outline-secondary" type="button" onclick="ProjectForm.closeSideform()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="p-3" style="overflow: auto;">
+      <!-- Expense sideform -->
+      <div id="projectSideformExpense" style="display:none;">
+        <div class="mb-2 text-muted small" data-i18n="projectForm.expenseSideformAutoFillHint">標題/項目/類別會自動帶入（只讀）。</div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="fields.title">標題</label>
+          <input class="form-control" id="sf_expense_title" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="menu.projects">項目</label>
+          <input class="form-control" id="sf_expense_project" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="projectForm.expenseCategory">支出類別</label>
+          <input class="form-control" id="sf_expense_category" readonly value="項目支出">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="projectForm.relatedUser">相關人員</label>
+          <select class="form-select" id="sf_expense_related_user" style="width: 100%;"></select>
+        </div>
+        <div class="row g-2">
+          <div class="col-12">
+            <label class="form-label" data-i18n="fields.amount">金額</label>
+            <input class="form-control" id="sf_expense_amount" type="number" step="0.01" min="0">
+          </div>
+          <div class="col-12">
+            <label class="form-label" data-i18n="fields.date">日期</label>
+            <input class="form-control" id="sf_expense_date" type="date">
+          </div>
+        </div>
+        <div class="mb-3 mt-2">
+          <label class="form-label" data-i18n="fields.paymentMethod">支付方式</label>
+          <select class="form-select" id="sf_expense_payment_method" style="width: 100%;"></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="projectForm.bankAccountOptional">付款賬戶(可選輸入)</label>
+          <select class="form-select" id="sf_expense_bank_account" style="width: 100%;"></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="fields.referenceNumber">參考號碼</label>
+          <input class="form-control" id="sf_expense_reference_number" type="text">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="projectForm.attachmentOptional">附件（可選）</label>
+          <input class="form-control" id="sf_expense_attachment" type="file">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="fields.notes">備註</label>
+          <textarea class="form-control" id="sf_expense_notes" rows="3"></textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-secondary w-50" type="button" onclick="ProjectForm.closeSideform()"><i class="bi bi-x"></i> <span data-i18n="common.cancel">取消</span></button>
+          <button class="btn btn-primary w-50" type="button" id="sf_expense_save_btn" onclick="ProjectForm.saveExpenseFromSideform()"><i class="bi bi-save"></i> <span data-i18n="common.save">保存</span></button>
+        </div>
+      </div>
+
+      <!-- Reservation sideform -->
+      <div id="projectSideformReservation" style="display:none;">
+        <div class="mb-3">
+          <label class="form-label" data-i18n="fields.type">類型</label>
+          <select class="form-select" id="sf_res_type">
+            <option value="room" data-i18n="resourceUsageCalendar.room">房間</option>
+            <option value="equipment" data-i18n="resourceUsageCalendar.equipment">設備</option>
+            <option value="vehicle" data-i18n="resourceUsageCalendar.vehicle">車輛</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="projectForm.resource">資源</label>
+          <select class="form-select" id="sf_res_resource" style="width: 100%;"></select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="projectForm.user">使用者</label>
+          <select class="form-select" id="sf_res_user" style="width: 100%;"></select>
+        </div>
+        <div class="row g-2">
+          <div class="col-12">
+            <label class="form-label" data-i18n="fields.startDate">開始</label>
+            <input class="form-control" id="sf_res_start" type="datetime-local">
+          </div>
+          <div class="col-12">
+            <label class="form-label" data-i18n="fields.endDate">結束</label>
+            <input class="form-control" id="sf_res_end" type="datetime-local">
+          </div>
+        </div>
+        <div class="mb-3 mt-2">
+          <label class="form-label" data-i18n="projectForm.notesOptional">備註（可選）</label>
+          <textarea class="form-control" id="sf_res_notes" rows="3"></textarea>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-secondary w-50" type="button" onclick="ProjectForm.closeSideform()"><i class="bi bi-x"></i> <span data-i18n="common.cancel">取消</span></button>
+          <button class="btn btn-primary w-50" type="button" onclick="ProjectForm.addReservationFromSideform()"><i class="bi bi-plus-lg"></i> <span data-i18n="projectForm.addToReservations">加入預留</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ProjectForm = (() => {
+  const pageEl = document.getElementById('projectFormPage');
+  const projectId = pageEl ? pageEl.getAttribute('data-project-id') : '';
+  const pageName = 'projects';
+
+  function qs(id) { return document.getElementById(id); }
+  function token() { return localStorage.getItem('auth_token') || ''; }
+  function t(key, fallback) {
+    try {
+      if (typeof I18n !== 'undefined' && I18n.t) {
+        const val = I18n.t(key);
+        // 如果返回值不等于 key，说明找到了翻译
+        if (val && val !== key) return val;
+      }
+    } catch {}
+    return fallback;
+  }
+  function uiLocale() {
+    return (typeof I18n !== 'undefined' && I18n.currentLang === 'en') ? 'en-US' : 'zh-TW';
+  }
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function formatBytes(n) {
+    const v = Number(n || 0);
+    if (!v) return '0 B';
+    const units = ['B','KB','MB','GB'];
+    let i = 0; let x = v;
+    while (x >= 1024 && i < units.length - 1) { x /= 1024; i++; }
+    return `${x.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+  }
+
+  // ===== Draft（草稿）=====
+  let autoSaveDraftTimer = null;
+
+  function updateURLWithDraftId(draftId) {
+    if (!draftId) return;
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('draft_id', draftId);
+      window.history.replaceState({}, '', url.toString());
+    } catch (e) {
+      console.warn('updateURLWithDraftId failed', e);
+    }
+  }
+
+  function setSelectValueWithText(selectEl, id, text) {
+    if (!selectEl) return;
+    if (!id) {
+      try {
+        if (window.$ && $.fn && $(selectEl).data('select2')) {
+          $(selectEl).val(null).trigger('change');
+        } else {
+          selectEl.value = '';
+        }
+      } catch {}
+      return;
+    }
+    try {
+      const exists = selectEl.querySelector(`option[value="${id}"]`);
+      if (!exists) {
+        const opt = new Option(text || id, id, true, true);
+        selectEl.appendChild(opt);
+      }
+      if (window.$ && $.fn && $(selectEl).data('select2')) {
+        $(selectEl).val(id).trigger('change');
+      } else {
+        selectEl.value = id;
+      }
+    } catch (e) {
+      console.warn('setSelectValueWithText failed', e);
+    }
+  }
+
+  function getSelectText(selectEl) {
+    try {
+      if (window.$ && selectEl && $(selectEl).data('select2')) {
+        const d = $(selectEl).select2('data');
+        if (d && d[0] && d[0].text) return String(d[0].text);
+      }
+    } catch {}
+    try {
+      const opt = selectEl && selectEl.selectedOptions && selectEl.selectedOptions[0];
+      return opt ? String(opt.textContent || '') : '';
+    } catch {}
+    return '';
+  }
+
+  function collectReservationsForDraft() {
+    const rows = document.querySelectorAll('#reservationsTbody tr[data-reservation-row="1"]');
+    const out = [];
+    rows.forEach(tr => {
+      const type = tr.querySelector('.res-type')?.value || '';
+      const resSel = tr.querySelector('.res-resource');
+      const userSel = tr.querySelector('.res-user');
+      const resourceId = resSel?.value || '';
+      const userId = userSel?.value || '';
+      const start = tr.querySelector('.res-start')?.value || '';
+      const end = tr.querySelector('.res-end')?.value || '';
+      if (!type && !resourceId && !start && !end) return;
+      out.push({
+        resource_type: type,
+        resource_id: resourceId,
+        resource_name: getSelectText(resSel),
+        user_id: userId,
+        user_name: getSelectText(userSel),
+        start_time_local: start,
+        end_time_local: end,
+        notes: tr.dataset.notes || ''
+      });
+    });
+    return out;
+  }
+
+  function collectTasksForDraft() {
+    const rows = document.querySelectorAll('#tasksTbody tr[data-task-row="1"]');
+    const tasks = [];
+    let idx = 0;
+    rows.forEach(tr => {
+      const title = tr.querySelector('.task-title')?.value?.trim() || '';
+      const assigneeSel = tr.querySelector('.task-assignee');
+      const assigneeId = assigneeSel ? (assigneeSel.value || '') : '';
+      const due = tr.querySelector('.task-due')?.value || '';
+      const status = tr.querySelector('.task-status')?.value || 'todo';
+      const priority = tr.querySelector('.task-priority')?.value || 'medium';
+      if (!title && !assigneeId && !due) return;
+      tasks.push({
+        title,
+        assignee_user_id: assigneeId || null,
+        assignee_name: getSelectText(assigneeSel),
+        due_date: due,
+        status,
+        priority,
+        sort_order: idx
+      });
+      idx++;
+    });
+    return tasks;
+  }
+
+  function collectDraftData() {
+    return {
+      name: qs('p_name')?.value?.trim() || '',
+      code: qs('p_code')?.value?.trim() || '',
+      cover_url: qs('p_cover_url')?.value || '',
+      project_type_id: qs('p_type')?.value || null,
+      project_type_name: getSelectText(qs('p_type')),
+      owner_user_id: qs('p_owner')?.value || null,
+      owner_name: getSelectText(qs('p_owner')),
+      status: qs('p_status')?.value || 'active',
+      budget: Number(qs('p_budget')?.value || 0),
+      start_date: qs('p_start')?.value || '',
+      end_date: qs('p_end')?.value || '',
+      description: qs('p_desc')?.value || '',
+      tasks: collectTasksForDraft(),
+      reservations: collectReservationsForDraft()
+    };
+  }
+
+  function applyDraftData(data) {
+    if (!data) return;
+    if (qs('p_name')) qs('p_name').value = data.name || '';
+    if (qs('p_code')) qs('p_code').value = data.code || '';
+    if (qs('p_budget')) qs('p_budget').value = (data.budget != null ? data.budget : 0);
+    if (qs('p_start')) qs('p_start').value = data.start_date || '';
+    if (qs('p_end')) qs('p_end').value = data.end_date || '';
+    if (qs('p_desc')) qs('p_desc').value = data.description || '';
+    if (qs('p_status')) qs('p_status').value = data.status || 'active';
+
+    // cover
+    if (data.cover_url) {
+      let cover = String(data.cover_url || '');
+      if (cover && !cover.startsWith('http') && !cover.startsWith('/')) cover = '/' + cover;
+      qs('p_cover_url').value = cover;
+      const img = qs('p_cover_preview');
+      const ph = qs('p_cover_placeholder');
+      if (img) { img.src = cover; img.style.display = 'block'; }
+      if (ph) ph.style.display = 'none';
+    }
+
+    // type/owner
+    setSelectValueWithText(qs('p_type'), data.project_type_id, data.project_type_name || data.project_type_id);
+    setSelectValueWithText(qs('p_owner'), data.owner_user_id, data.owner_name || data.owner_user_id);
+
+    // tasks
+    const tbody = qs('tasksTbody');
+    if (tbody) {
+      tbody.querySelectorAll('tr[data-task-row="1"]').forEach(r => r.remove());
+      const list = Array.isArray(data.tasks) ? data.tasks : [];
+      list.forEach(t => {
+        addTaskRow({
+          title: t.title || '',
+          due_date: t.due_date || '',
+          status: t.status || 'todo',
+          priority: t.priority || 'medium',
+          assignee_user_id: t.assignee_user_id || null,
+          assignee: { name: t.assignee_name || '' }
+        });
+      });
+      ensureEmptyRow();
+    }
+
+    // reservations
+    const resTbody = qs('reservationsTbody');
+    if (resTbody) {
+      resTbody.querySelectorAll('tr[data-reservation-row="1"]').forEach(r => r.remove());
+      const list = Array.isArray(data.reservations) ? data.reservations : [];
+      list.forEach(r => {
+        addReservationRow({
+          resource_type: r.resource_type,
+          resource_id: r.resource_id,
+          resource_name: r.resource_name,
+          user_id: r.user_id,
+          user_name: r.user_name,
+          notes: r.notes || '',
+          start_time_local: r.start_time_local || '',
+          end_time_local: r.end_time_local || ''
+        });
+      });
+      ensureReservationsEmptyRow();
+    }
+  }
+
+  function loadDraft(draftId) {
+    try {
+      if (!window.draftManager || !draftId) return false;
+      const draft = draftManager.getDraft(pageName, draftId);
+      if (!draft || !draft.data) return false;
+      applyDraftData(draft.data);
+      return true;
+    } catch (e) {
+      console.error('loadDraft failed', e);
+      return false;
+    }
+  }
+
+  function triggerAutoSaveDraft() {
+    if (projectId) return; // 編輯模式不保存草稿
+    if (autoSaveDraftTimer) clearTimeout(autoSaveDraftTimer);
+    autoSaveDraftTimer = setTimeout(() => {
+      try {
+        const formData = collectDraftData();
+        const hasData = Object.keys(formData).some(k => {
+          const v = formData[k];
+          if (v === null || v === undefined) return false;
+          if (typeof v === 'string' && v.trim() === '') return false;
+          if (Array.isArray(v) && v.length === 0) return false;
+          if (typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length === 0) return false;
+          return true;
+        });
+        if (!hasData) return;
+
+        const isNewDraft = !window.currentDraftId;
+        const draftId = draftManager.saveDraft(pageName, formData, 'code', window.currentDraftId);
+        if (draftId) {
+          window.currentDraftId = draftId;
+          if (isNewDraft) updateURLWithDraftId(draftId);
+        }
+      } catch (e) {
+        console.error('autoSaveDraft failed', e);
+      }
+    }, 2000);
+  }
+
+  function saveDraftNow() {
+    try {
+      if (projectId) {
+        App.showAlert(t('projectForm.alert.noDraftInEdit', '編輯模式不需要草稿'), 'info');
+        return;
+      }
+      const data = collectDraftData();
+      const draftId = draftManager.saveDraft(pageName, data, 'code', window.currentDraftId);
+      if (draftId) {
+        window.currentDraftId = draftId;
+        updateURLWithDraftId(draftId);
+        App.showAlert(t('projectForm.alert.draftSaved', '草稿已保存'), 'success');
+      } else {
+        App.showAlert(t('projectForm.alert.saveDraftFailed', '保存草稿失敗'), 'danger');
+      }
+    } catch (e) {
+      console.error(e);
+      App.showAlert(t('projectForm.alert.saveDraftFailed', '保存草稿失敗'), 'danger');
+    }
+  }
+
+  function ensureEmptyRow() {
+    const tbody = qs('tasksTbody');
+    const hasRows = tbody.querySelectorAll('tr[data-task-row="1"]').length > 0;
+    const empty = qs('tasksEmptyRow');
+    if (empty) empty.style.display = hasRows ? 'none' : '';
+  }
+
+  function createAssigneeSelect() {
+    const sel = document.createElement('select');
+    sel.className = 'form-select form-select-sm task-assignee';
+    // Select2 初始化（如果可用）
+    setTimeout(() => {
+      if (window.$ && $.fn && $.fn.select2) {
+        $(sel).select2({
+          theme: 'bootstrap-5',
+          placeholder: t('projectForm.selectOwnerPlaceholder', '選擇負責人...'),
+          allowClear: true,
+          width: '100%',
+          ajax: {
+            transport: function (params, success, failure) {
+              const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+              fetch(url, {
+                headers: { 'Authorization': 'Bearer ' + token() }
+              }).then(r => r.json()).then(success).catch(failure);
+            },
+            url: '/api/v1/users',
+            delay: 250,
+            data: function (params) {
+              return { search: params.term || '', page: 1, limit: 20, status: 'active' };
+            },
+            processResults: function (data) {
+              const results = (data.data || []).map(u => ({ id: u.id, text: u.name || u.email || u.id }));
+              return { results };
+            }
+          }
+        });
+      }
+    }, 0);
+    return sel;
+  }
+
+  function addTaskRow(prefill) {
+    const tbody = qs('tasksTbody');
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-task-row', '1');
+
+    const title = document.createElement('input');
+    title.className = 'form-control form-control-sm task-title';
+    title.placeholder = t('projectForm.taskTitlePlaceholder', '例如：確認需求/製作報價/上線...');
+    title.value = (prefill && prefill.title) ? prefill.title : '';
+
+    const assignee = createAssigneeSelect();
+
+    const due = document.createElement('input');
+    due.type = 'date';
+    due.className = 'form-control form-control-sm task-due';
+    due.value = (prefill && prefill.due_date) ? prefill.due_date : '';
+
+    const status = document.createElement('select');
+    status.className = 'form-select form-select-sm task-status';
+    status.innerHTML = `
+      <option value="todo">${t('projectForm.taskStatus.todo', '待辦')}</option>
+      <option value="in_progress">${t('projectForm.taskStatus.inProgress', '進行中')}</option>
+      <option value="done">${t('projectForm.taskStatus.done', '完成')}</option>
+      <option value="blocked">${t('projectForm.taskStatus.blocked', '卡住')}</option>
+    `;
+    status.value = (prefill && prefill.status) ? prefill.status : 'todo';
+
+    const priority = document.createElement('select');
+    priority.className = 'form-select form-select-sm task-priority';
+    priority.innerHTML = `
+      <option value="low">${t('projectForm.priorityOptions.low', '低')}</option>
+      <option value="medium">${t('projectForm.priorityOptions.medium', '中')}</option>
+      <option value="high">${t('projectForm.priorityOptions.high', '高')}</option>
+    `;
+    priority.value = (prefill && prefill.priority) ? prefill.priority : 'medium';
+
+    const actions = document.createElement('div');
+    actions.className = 'd-flex gap-1 justify-content-end';
+    actions.innerHTML = `
+      <button class="btn btn-sm btn-outline-secondary" type="button" title="${t('projectForm.moveUp', '上移')}">↑</button>
+      <button class="btn btn-sm btn-outline-secondary" type="button" title="${t('projectForm.moveDown', '下移')}">↓</button>
+      <button class="btn btn-sm btn-outline-danger" type="button" title="${t('common.delete', '刪除')}"><i class="bi bi-trash"></i></button>
+    `;
+
+    const [upBtn, downBtn, delBtn] = actions.querySelectorAll('button');
+    upBtn.addEventListener('click', () => {
+      const prev = tr.previousElementSibling;
+      if (prev && prev.getAttribute('data-task-row') === '1') tbody.insertBefore(tr, prev);
+      ensureEmptyRow();
+    });
+    downBtn.addEventListener('click', () => {
+      const next = tr.nextElementSibling;
+      if (next) tbody.insertBefore(next, tr);
+      ensureEmptyRow();
+    });
+    delBtn.addEventListener('click', () => {
+      tr.remove();
+      ensureEmptyRow();
+      triggerAutoSaveDraft();
+    });
+
+    tr.appendChild(tdWrap(title));
+    tr.appendChild(tdWrap(assignee));
+    tr.appendChild(tdWrap(due));
+    tr.appendChild(tdWrap(status));
+    tr.appendChild(tdWrap(priority));
+    const tdA = document.createElement('td'); tdA.appendChild(actions); tr.appendChild(tdA);
+
+    tbody.appendChild(tr);
+    ensureEmptyRow();
+    triggerAutoSaveDraft();
+
+    // prefill assignee
+    if (prefill && prefill.assignee_user_id) {
+      const id = prefill.assignee_user_id;
+      const text = (prefill.assignee && prefill.assignee.name) ? prefill.assignee.name : id;
+      // 若 select2 已初始化，先插入 option
+      const opt = new Option(text, id, true, true);
+      assignee.appendChild(opt);
+      if (window.$ && $.fn && $(assignee).data('select2')) {
+        $(assignee).val(id).trigger('change');
+      } else {
+        assignee.value = id;
+      }
+    }
+  }
+
+  function tdWrap(el) {
+    const td = document.createElement('td');
+    td.appendChild(el);
+    return td;
+  }
+
+  function initOwnerSelect2() {
+    const el = qs('p_owner');
+    if (!el) return;
+    // 預設空 option
+    el.innerHTML = `<option value=""></option>`;
+    if (window.$ && $.fn && $.fn.select2) {
+      $(el).select2({
+        theme: 'bootstrap-5',
+        placeholder: t('projectForm.selectOwnerPlaceholder', '選擇負責人...'),
+        allowClear: true,
+        width: '100%',
+        ajax: {
+          transport: function (params, success, failure) {
+            const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+            fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+              .then(r => r.json()).then(success).catch(failure);
+          },
+          url: '/api/v1/users',
+          delay: 250,
+          data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'active' }; },
+          processResults: function (data) {
+            const results = (data.data || []).map(u => ({ id: u.id, text: u.name || u.email || u.id }));
+            return { results };
+          }
+        }
+      });
+    }
+  }
+
+  function initTypeSelect2() {
+    const el = qs('p_type');
+    if (!el) return;
+    el.innerHTML = `<option value=""></option>`;
+    if (window.$ && $.fn && $.fn.select2) {
+      $(el).select2({
+        theme: 'bootstrap-5',
+        placeholder: t('projectForm.selectProjectTypePlaceholder', '選擇項目類型...'),
+        allowClear: true,
+        width: '100%',
+        ajax: {
+          transport: function (params, success, failure) {
+            const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+            fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+              .then(r => r.json()).then(success).catch(failure);
+          },
+          url: '/api/v1/project-types',
+          delay: 250,
+          data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'active' }; },
+          processResults: function (data) {
+            const results = (data.data || []).map(t => ({ id: t.id, text: t.name || t.id }));
+            return { results };
+          }
+        }
+      });
+    }
+  }
+
+  async function uploadCover() {
+    const input = qs('p_cover_file');
+    if (!input || !input.files || !input.files[0]) {
+      App.showAlert(t('projectForm.alert.selectImageFirst', '請先選擇圖片'), 'warning');
+      return;
+    }
+    const file = input.files[0];
+    const formData = new FormData();
+    formData.append('file', file, file.name || 'cover.jpg');
+    try {
+      const res = await fetch('/api/v1/upload', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token() },
+        body: formData
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || t('projectForm.alert.uploadFailed', '上傳失敗'));
+      let url = data.url || '';
+      if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+      qs('p_cover_url').value = url;
+      const img = qs('p_cover_preview');
+      const ph = qs('p_cover_placeholder');
+      if (img) { img.src = url; img.style.display = 'block'; }
+      if (ph) ph.style.display = 'none';
+      App.showAlert(t('projectForm.alert.coverUploaded', '封面已上傳'), 'success');
+    } catch (e) {
+      console.error(e);
+      App.showAlert(t('projectForm.alert.coverUploadFailed', '封面上傳失敗'), 'danger');
+    }
+  }
+
+  function removeCover() {
+    qs('p_cover_url').value = '';
+    const img = qs('p_cover_preview');
+    const ph = qs('p_cover_placeholder');
+    if (img) { img.src = ''; img.style.display = 'none'; }
+    if (ph) ph.style.display = 'flex';
+    const input = qs('p_cover_file');
+    if (input) input.value = '';
+  }
+
+  // ===== Project Code (Reserved) =====
+  async function loadReservedProjectCode() {
+    try {
+      const codeEl = qs('p_code');
+      if (!codeEl) return;
+
+      // 如果已經有值（例如從草稿/預填），不重新生成
+      if (codeEl.value && codeEl.value.trim() !== '') {
+        return;
+      }
+
+      // 取得下一個可用項目編號
+      const response = await App.apiRequest('/reserved-numbers/next?field_name=code&page_name=projects');
+      const nextCode = response.next_number || response.number || response.nextCode;
+      if (!nextCode) return;
+
+      codeEl.value = nextCode;
+
+      // 預留這個編號（比照 orders/new）
+      try {
+        await App.apiRequest('/reserved-numbers', {
+          method: 'POST',
+          body: JSON.stringify({
+            field_name: 'code',
+            field_value: nextCode,
+            page_name: 'projects'
+          })
+        });
+      } catch (reserveError) {
+        console.warn('預留項目編號失敗:', reserveError);
+        // 即使預留失敗，也保留該編號，因為後端仍會檢查唯一性
+      }
+    } catch (e) {
+      console.error('載入項目編號失敗:', e);
+    }
+  }
+
+  // ===== Project Files =====
+  async function loadProjectFiles() {
+    const tbody = qs('projectFilesTbody');
+    if (!tbody) return;
+    if (!projectId) {
+      const warn = qs('filesNeedSave'); if (warn) warn.style.display = '';
+      tbody.innerHTML = `<tr class="text-muted"><td colspan="5" class="text-center py-3">${t('projectForm.alert.saveProjectFirst', '請先保存項目')}</td></tr>`;
+      return;
+    }
+    const warn = qs('filesNeedSave'); if (warn) warn.style.display = 'none';
+    try {
+      const res = await App.apiRequest(`/projects/${projectId}/files`);
+      const files = res.data || [];
+      if (!files.length) {
+        tbody.innerHTML = `<tr class="text-muted"><td colspan="5" class="text-center py-3">${t('projectForm.noFiles', '尚無檔案')}</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = files.map(f => {
+        let url = f.file_url || '';
+        if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+        const ts = f.created_at ? new Date(f.created_at).toLocaleString(uiLocale()) : '';
+        return `
+          <tr>
+            <td>
+              <a href="${escapeHtml(url)}" target="_blank">${escapeHtml(f.file_name || '')}</a>
+              ${f.mime_type ? `<div class="text-muted small">${escapeHtml(f.mime_type)}</div>` : ''}
+            </td>
+            <td>
+              <div class="text-muted small" style="white-space: pre-wrap;">${escapeHtml(f.description || '')}</div>
+            </td>
+            <td class="text-muted small">${formatBytes(f.file_size)}</td>
+            <td class="text-muted small">${escapeHtml(ts)}</td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-danger" type="button" onclick="ProjectForm.deleteProjectFile('${f.id}')">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+      tbody.innerHTML = `<tr class="text-danger"><td colspan="5" class="text-center py-3">${t('common.loadError', '載入失敗')}</td></tr>`;
+    }
+  }
+
+  async function uploadProjectFiles() {
+    if (!projectId) {
+      App.showAlert(t('projectForm.alert.saveFirstToUpload', '請先保存項目後再上傳檔案'), 'warning');
+      return;
+    }
+    const input = qs('projectFilesInput');
+    if (!input || !input.files || input.files.length === 0) {
+      App.showAlert(t('projectForm.alert.selectFilesFirst', '請先選擇檔案'), 'warning');
+      return;
+    }
+    const files = Array.from(input.files);
+    const descEl = qs('projectFilesDescription');
+    const desc = descEl ? (descEl.value || '').trim() : '';
+    for (const file of files) {
+      try {
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+        const up = await fetch('/api/v1/upload', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token() },
+          body: formData
+        });
+        const upData = await up.json();
+        if (!up.ok) throw new Error(upData.error || 'Upload failed');
+        let url = upData.url || '';
+        if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+        await App.apiRequest(`/projects/${projectId}/files`, {
+          method: 'POST',
+          body: JSON.stringify({
+            file_url: url,
+            file_name: file.name,
+            mime_type: file.type || '',
+            file_size: file.size || 0,
+            description: desc
+          })
+        });
+      } catch (e) {
+        console.error(e);
+        App.showAlert(t('projectForm.alert.uploadFilesPartialFailed', '上傳檔案失敗（部分檔案可能已成功）'), 'danger');
+      }
+    }
+    input.value = '';
+    if (descEl) descEl.value = '';
+    const hint = qs('projectFilesHint');
+    if (hint) hint.textContent = t('projectForm.filesNotSelected', '未選擇檔案');
+    App.showAlert(t('projectForm.alert.filesUploaded', '檔案已上傳'), 'success');
+    await loadProjectFiles();
+  }
+
+  async function deleteProjectFile(fileId) {
+    if (!projectId) return;
+    if (!confirm(t('projectForm.confirmDeleteFile', '確定刪除此檔案？'))) return;
+    try {
+      await App.apiRequest(`/projects/${projectId}/files/${fileId}`, { method: 'DELETE' });
+      App.showAlert(t('common.deleteSuccess', '已刪除'), 'success');
+      await loadProjectFiles();
+    } catch (e) {
+      console.error(e);
+      App.showAlert(t('common.deleteError', '刪除失敗'), 'danger');
+    }
+  }
+
+  // ===== Project Expenses (read only list) =====
+  async function loadProjectExpenses() {
+    const tbody = qs('projectExpensesTbody');
+    if (!tbody) return;
+    if (!projectId) {
+      tbody.innerHTML = `<tr class="text-muted"><td colspan="4" class="text-center py-3">${t('projectForm.alert.saveProjectFirst', '請先保存項目')}</td></tr>`;
+      return;
+    }
+    try {
+      const res = await App.apiRequest(`/expenses?project_id=${encodeURIComponent(projectId)}&page=1&limit=20`);
+      const items = res.data || [];
+      if (!items.length) {
+        tbody.innerHTML = `<tr class="text-muted"><td colspan="4" class="text-center py-3">${t('projectForm.noExpenses', '尚無支出')}</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = items.map(x => {
+        return `
+          <tr>
+            <td class="text-muted small">${escapeHtml(x.expense_date || '')}</td>
+            <td>${escapeHtml(x.description || '')}</td>
+            <td class="text-end">$${escapeHtml(Number(x.amount || 0).toLocaleString())}</td>
+            <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" href="/expenses/${x.id}/edit" target="_blank"><i class="bi bi-pencil"></i></a>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+      tbody.innerHTML = `<tr class="text-danger"><td colspan="4" class="text-center py-3">${t('common.loadError', '載入失敗')}</td></tr>`;
+    }
+  }
+
+  // ===== Right sideform =====
+  function openSideform(kind) {
+    const overlay = document.getElementById('projectSideformOverlay');
+    const drawer = document.getElementById('projectSideformDrawer');
+    const exp = document.getElementById('projectSideformExpense');
+    const res = document.getElementById('projectSideformReservation');
+    const title = document.getElementById('projectSideformTitle');
+    if (!overlay || !drawer || !exp || !res || !title) return;
+
+    overlay.style.display = 'block';
+    exp.style.display = (kind === 'expense') ? '' : 'none';
+    res.style.display = (kind === 'reservation') ? '' : 'none';
+    title.textContent = (kind === 'expense') ? t('projectForm.addExpense', '新增支出') : t('projectForm.addReservation', '新增預留');
+
+    // click overlay to close
+    overlay.onclick = (e) => {
+      if (e.target === overlay) closeSideform();
+    };
+  }
+
+  function closeSideform() {
+    const overlay = document.getElementById('projectSideformOverlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
+  function initSideUserSelect(el) {
+    if (!el) return;
+    if (window.$ && $.fn && $.fn.select2) {
+      try { if ($(el).data('select2')) $(el).select2('destroy'); } catch {}
+      $(el).select2({
+        theme: 'bootstrap-5',
+        placeholder: t('projectForm.selectUserPlaceholder', '選擇使用者...'),
+        allowClear: true,
+        width: '100%',
+        ajax: {
+          transport: function (params, success, failure) {
+            const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+            fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+              .then(r => r.json()).then(success).catch(failure);
+          },
+          url: '/api/v1/users',
+          delay: 250,
+          data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'active' }; },
+          processResults: function (data) {
+            const results = (data.data || []).map(u => ({ id: u.id, text: (u.name || u.email || u.id) }));
+            return { results };
+          }
+        }
+      });
+    }
+  }
+
+  function initSidePaymentMethodSelect(el) {
+    if (!el) return;
+    if (window.$ && $.fn && $.fn.select2) {
+      try { if ($(el).data('select2')) $(el).select2('destroy'); } catch {}
+      $(el).select2({
+        theme: 'bootstrap-5',
+        placeholder: t('projectForm.selectPaymentMethodPlaceholder', '選擇支付方式...'),
+        allowClear: true,
+        width: '100%',
+        ajax: {
+          transport: function (params, success, failure) {
+            const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+            fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+              .then(r => r.json()).then(success).catch(failure);
+          },
+          url: '/api/v1/payment-methods',
+          delay: 250,
+          data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'active' }; },
+          processResults: function (data) {
+            const results = (data.data || []).map(m => ({ id: m.id, text: (m.name || m.id) }));
+            return { results };
+          }
+        }
+      });
+    }
+  }
+
+  function initSideBankAccountSelect(el) {
+    if (!el) return;
+    if (window.$ && $.fn && $.fn.select2) {
+      try { if ($(el).data('select2')) $(el).select2('destroy'); } catch {}
+      $(el).select2({
+        theme: 'bootstrap-5',
+        placeholder: t('projectForm.selectBankAccountPlaceholder', '選擇付款賬戶...'),
+        allowClear: true,
+        width: '100%',
+        ajax: {
+          transport: function (params, success, failure) {
+            const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+            fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+              .then(r => r.json()).then(success).catch(failure);
+          },
+          url: '/api/v1/bank-accounts',
+          delay: 250,
+          data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'active' }; },
+          processResults: function (data) {
+            const results = (data.data || []).map(a => ({ id: a.id, text: (a.name || a.id) }));
+            return { results };
+          }
+        }
+      });
+    }
+  }
+
+  function initSideResourceSelect(type) {
+    const el = document.getElementById('sf_res_resource');
+    if (!el) return;
+    if (window.$ && $.fn && $.fn.select2) {
+      try { if ($(el).data('select2')) $(el).select2('destroy'); } catch {}
+      let api = '/api/v1/rooms';
+      if (type === 'equipment') api = '/api/v1/equipments';
+      if (type === 'vehicle') api = '/api/v1/vehicles';
+      $(el).select2({
+        theme: 'bootstrap-5',
+        placeholder: t('projectForm.selectResourcePlaceholder', '選擇資源...'),
+        allowClear: true,
+        width: '100%',
+        ajax: {
+          transport: function (params, success, failure) {
+            const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+            fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+              .then(r => r.json()).then(success).catch(failure);
+          },
+          url: api,
+          delay: 250,
+          data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'available' }; },
+          processResults: function (data) {
+            const results = (data.data || []).map(m => ({ id: m.id, text: (m.name || m.code || m.id) }));
+            return { results };
+          }
+        }
+      });
+    }
+  }
+
+  async function openExpenseSideform() {
+    if (!projectId) return App.showAlert(t('projectForm.alert.saveProjectFirst', '請先保存項目'), 'warning');
+    openSideform('expense');
+    // readonly fields
+    const name = (qs('p_name')?.value || '').trim();
+    document.getElementById('sf_expense_title').value = name
+      ? `${t('projectForm.expenseTitlePrefix', '項目支出')} - ${name}`
+      : t('projectForm.expenseTitlePrefix', '項目支出');
+    document.getElementById('sf_expense_project').value = name || projectId;
+    const cat = document.getElementById('sf_expense_category');
+    if (cat) cat.value = t('projectForm.expenseCategoryProject', '項目支出');
+    document.getElementById('sf_expense_amount').value = '';
+    document.getElementById('sf_expense_reference_number').value = '';
+    document.getElementById('sf_expense_notes').value = '';
+    document.getElementById('sf_expense_attachment').value = '';
+    const d = new Date();
+    document.getElementById('sf_expense_date').value = d.toISOString().slice(0,10);
+
+    initSideUserSelect(document.getElementById('sf_expense_related_user'));
+    initSidePaymentMethodSelect(document.getElementById('sf_expense_payment_method'));
+    initSideBankAccountSelect(document.getElementById('sf_expense_bank_account'));
+
+    // default related user to current login user
+    try {
+      const me = await App.apiRequest('/user/me');
+      const el = document.getElementById('sf_expense_related_user');
+      if (me && me.id && el && window.$ && $(el).length) {
+        if ($(el).find(`option[value="${me.id}"]`).length === 0) $(el).append(new Option(me.name || me.email || me.id, me.id, true, true));
+        $(el).val(me.id).trigger('change');
+      }
+    } catch {}
+
+    // default bank account to system default payment
+    try {
+      const res = await App.apiRequest('/bank-accounts?status=active&is_default_payment=true');
+      const list = res && res.data ? res.data : [];
+      const acc = list[0];
+      const el = document.getElementById('sf_expense_bank_account');
+      if (acc && acc.id && el && window.$ && $(el).length) {
+        if ($(el).find(`option[value="${acc.id}"]`).length === 0) $(el).append(new Option(acc.name || acc.id, acc.id, true, true));
+        $(el).val(acc.id).trigger('change');
+      }
+    } catch {}
+  }
+
+  async function saveExpenseFromSideform() {
+    if (!projectId) return;
+    const btn = document.getElementById('sf_expense_save_btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> ' + t('common.processing', '保存中'); }
+    try {
+      const title = (document.getElementById('sf_expense_title').value || '').trim();
+      const amount = Number(document.getElementById('sf_expense_amount').value || 0);
+      const date = document.getElementById('sf_expense_date').value || '';
+      const relatedUserId = document.getElementById('sf_expense_related_user').value || null;
+      const paymentMethod = document.getElementById('sf_expense_payment_method').value || '';
+      const bankAccountId = document.getElementById('sf_expense_bank_account').value || null;
+      const refNo = (document.getElementById('sf_expense_reference_number').value || '').trim();
+      const notes = (document.getElementById('sf_expense_notes').value || '').trim();
+      if (!amount || amount <= 0) return App.showAlert(t('projectForm.alert.enterAmount', '請輸入金額'), 'warning');
+      if (!date) return App.showAlert(t('projectForm.alert.selectDate', '請選擇日期'), 'warning');
+
+      let attachmentUrl = '';
+      const f = document.getElementById('sf_expense_attachment').files && document.getElementById('sf_expense_attachment').files[0];
+      if (f) {
+        const formData = new FormData();
+        formData.append('file', f, f.name || 'attachment');
+        const up = await fetch('/api/v1/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token() }, body: formData });
+        const upData = await up.json();
+        if (!up.ok) throw new Error(upData.error || t('projectForm.alert.attachmentUploadFailed', '上傳附件失敗'));
+        attachmentUrl = upData.url || '';
+        if (attachmentUrl && !attachmentUrl.startsWith('http') && !attachmentUrl.startsWith('/')) attachmentUrl = '/' + attachmentUrl;
+      }
+
+      const extraFields = {};
+      if (refNo) extraFields.reference_number = refNo;
+      if (attachmentUrl) extraFields.attachment_url = attachmentUrl;
+
+      await App.apiRequest('/expenses', {
+        method: 'POST',
+        body: JSON.stringify({
+          project_id: projectId,
+          category: 'project',
+          expense_type: 'project',
+          description: title || t('projectForm.expenseTitlePrefix', '項目支出'),
+          amount,
+          expense_date: date,
+          payment_method: paymentMethod,
+          bank_account_id: bankAccountId,
+          notes,
+          related_user_id: relatedUserId,
+          extra_fields: extraFields
+        })
+      });
+
+      App.showAlert(t('projectForm.alert.expenseAdded', '已新增支出'), 'success');
+      closeSideform();
+      await loadProjectExpenses();
+    } catch (e) {
+      console.error(e);
+      App.showAlert(e.message || t('projectForm.alert.addExpenseFailed', '新增支出失敗'), 'danger');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-save"></i> ' + t('common.save', '保存'); }
+    }
+  }
+
+  async function openReservationSideform() {
+    if (!projectId) return App.showAlert(t('projectForm.alert.saveProjectFirst', '請先保存項目'), 'warning');
+    openSideform('reservation');
+    const typeEl = document.getElementById('sf_res_type');
+    if (typeEl) typeEl.value = 'room';
+    initSideResourceSelect('room');
+    initSideUserSelect(document.getElementById('sf_res_user'));
+    document.getElementById('sf_res_start').value = '';
+    document.getElementById('sf_res_end').value = '';
+    document.getElementById('sf_res_notes').value = '';
+
+    if (typeEl) {
+      typeEl.onchange = () => initSideResourceSelect(typeEl.value);
+    }
+
+    // default user to current login user
+    try {
+      const me = await App.apiRequest('/user/me');
+      const el = document.getElementById('sf_res_user');
+      if (me && me.id && el && window.$ && $(el).length) {
+        if ($(el).find(`option[value="${me.id}"]`).length === 0) $(el).append(new Option(me.name || me.email || me.id, me.id, true, true));
+        $(el).val(me.id).trigger('change');
+      }
+    } catch {}
+  }
+
+  function addReservationFromSideform() {
+    const type = document.getElementById('sf_res_type').value || 'room';
+    const resourceId = document.getElementById('sf_res_resource').value || '';
+    const userId = document.getElementById('sf_res_user').value || '';
+    const start = document.getElementById('sf_res_start').value || '';
+    const end = document.getElementById('sf_res_end').value || '';
+    const notes = (document.getElementById('sf_res_notes').value || '').trim();
+    if (!resourceId || !start || !end) return App.showAlert(t('projectForm.alert.selectResourceAndTime', '請選擇資源並填寫開始/結束時間'), 'warning');
+
+    let resourceName = resourceId;
+    let userName = userId;
+    try {
+      if (window.$ && $('#sf_res_resource').data('select2')) {
+        const d = $('#sf_res_resource').select2('data');
+        if (d && d[0] && d[0].text) resourceName = d[0].text;
+      }
+      if (window.$ && $('#sf_res_user').data('select2')) {
+        const d = $('#sf_res_user').select2('data');
+        if (d && d[0] && d[0].text) userName = d[0].text;
+      }
+    } catch {}
+
+    addReservationRow({
+      resource_type: type,
+      resource_id: resourceId,
+      resource_name: resourceName,
+      user_id: userId || '',
+      user_name: userName || '',
+      notes,
+      start_time_local: start,
+      end_time_local: end
+    });
+    closeSideform();
+  }
+
+  // ===== Resource Reservations =====
+  function ensureReservationsEmptyRow() {
+    const tbody = qs('reservationsTbody');
+    const empty = qs('reservationsEmptyRow');
+    if (!tbody || !empty) return;
+    const has = tbody.querySelectorAll('tr[data-reservation-row="1"]').length > 0;
+    empty.style.display = has ? 'none' : '';
+  }
+
+  function createResourceSelect(type) {
+    const sel = document.createElement('select');
+    sel.className = 'form-select form-select-sm res-resource';
+    setTimeout(() => {
+      if (window.$ && $.fn && $.fn.select2) {
+        let api = '/api/v1/rooms';
+        if (type === 'equipment') api = '/api/v1/equipments';
+        if (type === 'vehicle') api = '/api/v1/vehicles';
+        $(sel).select2({
+          theme: 'bootstrap-5',
+          placeholder: t('projectForm.selectResourcePlaceholder', '選擇資源...'),
+          allowClear: true,
+          width: '100%',
+          ajax: {
+            transport: function (params, success, failure) {
+              const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+              fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+                .then(r => r.json()).then(success).catch(failure);
+            },
+            url: api,
+            delay: 250,
+            data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'available' }; },
+            processResults: function (data) {
+              const results = (data.data || []).map(m => ({ id: m.id, text: m.name || m.code || m.id }));
+              return { results };
+            }
+          }
+        });
+      }
+    }, 0);
+    return sel;
+  }
+
+  function createReservationUserSelect() {
+    const sel = document.createElement('select');
+    sel.className = 'form-select form-select-sm res-user';
+    setTimeout(() => {
+      if (window.$ && $.fn && $.fn.select2) {
+        $(sel).select2({
+          theme: 'bootstrap-5',
+          placeholder: t('projectForm.selectUserPlaceholder', '選擇使用者...'),
+          allowClear: true,
+          width: '100%',
+          ajax: {
+            transport: function (params, success, failure) {
+              const url = params.url + (params.data ? ('?' + new URLSearchParams(params.data).toString()) : '');
+              fetch(url, { headers: { 'Authorization': 'Bearer ' + token() } })
+                .then(r => r.json()).then(success).catch(failure);
+            },
+            url: '/api/v1/users',
+            delay: 250,
+            data: function (params) { return { search: params.term || '', page: 1, limit: 20, status: 'active' }; },
+            processResults: function (data) {
+              const results = (data.data || []).map(u => ({ id: u.id, text: (u.name || u.email || u.id) }));
+              return { results };
+            }
+          }
+        });
+      }
+    }, 0);
+    return sel;
+  }
+
+  function addReservationRow(prefill) {
+    const tbody = qs('reservationsTbody');
+    if (!tbody) return;
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-reservation-row', '1');
+    tr.dataset.notes = (prefill && prefill.notes) ? String(prefill.notes) : '';
+
+    const typeSel = document.createElement('select');
+    typeSel.className = 'form-select form-select-sm res-type';
+    typeSel.innerHTML = `
+      <option value="room">${t('resourceUsageCalendar.room', '房間')}</option>
+      <option value="equipment">${t('resourceUsageCalendar.equipment', '設備')}</option>
+      <option value="vehicle">${t('resourceUsageCalendar.vehicle', '車輛')}</option>
+    `;
+    typeSel.value = (prefill && prefill.resource_type) ? prefill.resource_type : 'room';
+
+    let resSel = createResourceSelect(typeSel.value);
+    const userSel = createReservationUserSelect();
+
+    const start = document.createElement('input');
+    start.type = 'datetime-local';
+    start.className = 'form-control form-control-sm res-start';
+    start.value = (prefill && prefill.start_time_local) ? prefill.start_time_local : '';
+
+    const end = document.createElement('input');
+    end.type = 'datetime-local';
+    end.className = 'form-control form-control-sm res-end';
+    end.value = (prefill && prefill.end_time_local) ? prefill.end_time_local : '';
+
+    const del = document.createElement('button');
+    del.className = 'btn btn-sm btn-outline-danger';
+    del.type = 'button';
+    del.innerHTML = '<i class="bi bi-trash"></i>';
+    del.addEventListener('click', () => { tr.remove(); ensureReservationsEmptyRow(); triggerAutoSaveDraft(); });
+
+    typeSel.addEventListener('change', () => {
+      const td = tr.querySelector('td[data-cell="resource"]');
+      if (!td) return;
+      // destroy old select2
+      try { if (window.$ && $(resSel).data('select2')) $(resSel).select2('destroy'); } catch {}
+      resSel = createResourceSelect(typeSel.value);
+      td.innerHTML = '';
+      td.appendChild(resSel);
+    });
+
+    tr.innerHTML = `
+      <td></td>
+      <td data-cell="resource"></td>
+      <td data-cell="user"></td>
+      <td></td>
+      <td></td>
+      <td class="text-end"></td>
+    `;
+    tr.children[0].appendChild(typeSel);
+    tr.querySelector('td[data-cell="resource"]').appendChild(resSel);
+    tr.querySelector('td[data-cell="user"]').appendChild(userSel);
+    tr.children[3].appendChild(start);
+    tr.children[4].appendChild(end);
+    tr.children[5].appendChild(del);
+    tbody.appendChild(tr);
+    ensureReservationsEmptyRow();
+    triggerAutoSaveDraft();
+
+    // prefill resource
+    if (prefill && prefill.resource_id) {
+      const opt = new Option(prefill.resource_name || prefill.resource_id, prefill.resource_id, true, true);
+      resSel.appendChild(opt);
+      if (window.$ && $(resSel).data('select2')) $(resSel).val(prefill.resource_id).trigger('change');
+      else resSel.value = prefill.resource_id;
+    }
+
+    // prefill user
+    if (prefill && prefill.user_id) {
+      const optU = new Option(prefill.user_name || prefill.user_id, prefill.user_id, true, true);
+      userSel.appendChild(optU);
+      if (window.$ && $(userSel).data('select2')) $(userSel).val(prefill.user_id).trigger('change');
+      else userSel.value = prefill.user_id;
+    }
+  }
+
+  async function loadReservations() {
+    const tbody = qs('reservationsTbody');
+    if (!tbody) return;
+    if (!projectId) {
+      const warn = qs('reservationsNeedSave'); if (warn) warn.style.display = '';
+      return;
+    }
+    const warn = qs('reservationsNeedSave'); if (warn) warn.style.display = 'none';
+    // clear rows
+    tbody.querySelectorAll('tr[data-reservation-row="1"]').forEach(r => r.remove());
+    ensureReservationsEmptyRow();
+    try {
+      const res = await App.apiRequest(`/projects/${projectId}/reservations`);
+      const items = res.data || [];
+      items.forEach(r => {
+        const startLocal = r.start_time ? new Date(r.start_time).toISOString().slice(0,16) : '';
+        const endLocal = r.end_time ? new Date(r.end_time).toISOString().slice(0,16) : '';
+        addReservationRow({
+          resource_type: r.resource_type,
+          resource_id: r.resource_id,
+          resource_name: r.resource_name,
+          user_id: r.user_id || '',
+          user_name: r.user_name || '',
+          notes: r.notes || '',
+          start_time_local: startLocal,
+          end_time_local: endLocal
+        });
+      });
+      ensureReservationsEmptyRow();
+    } catch (e) {
+      console.error(e);
+      App.showAlert(t('projectForm.alert.loadReservationsFailed', '載入資源預留失敗'), 'danger');
+    }
+  }
+
+  async function saveReservations(opts) {
+    const silent = !!(opts && opts.silent);
+    if (!projectId) {
+      if (!silent) App.showAlert(t('projectForm.alert.saveProjectFirst', '請先保存項目'), 'warning');
+      return;
+    }
+    const rows = document.querySelectorAll('#reservationsTbody tr[data-reservation-row="1"]');
+    const reservations = [];
+    rows.forEach(tr => {
+      const t = tr.querySelector('.res-type')?.value || '';
+      const rid = tr.querySelector('.res-resource')?.value || '';
+      const uid = tr.querySelector('.res-user')?.value || '';
+      const s = tr.querySelector('.res-start')?.value || '';
+      const e = tr.querySelector('.res-end')?.value || '';
+      if (!t || !rid || !s || !e) return;
+      reservations.push({ resource_type: t, resource_id: rid, user_id: uid || null, start_time: s, end_time: e, notes: tr.dataset.notes || '' });
+    });
+    try {
+      await App.apiRequest(`/projects/${projectId}/reservations`, {
+        method: 'PUT',
+        body: JSON.stringify({ reservations })
+      });
+      if (!silent) App.showAlert(t('projectForm.alert.reservationsSaved', '已保存預留'), 'success');
+      await loadReservations();
+    } catch (e) {
+      console.error(e);
+      if (!silent) App.showAlert(e.message || t('common.saveError', '保存失敗'), 'danger');
+      if (silent) throw e;
+    }
+  }
+
+  async function loadIfEdit() {
+    if (!projectId) return;
+    const p = await App.apiRequest(`/projects/${projectId}`);
+    qs('p_name').value = p.name || '';
+    qs('p_code').value = p.code || '';
+    qs('p_status').value = p.status || 'active';
+    qs('p_budget').value = p.budget != null ? p.budget : 0;
+    qs('p_start').value = p.start_date || '';
+    qs('p_end').value = p.end_date || '';
+    qs('p_desc').value = p.description || '';
+
+    // cover
+    if (p.cover_url) {
+      let cover = String(p.cover_url || '');
+      if (cover && !cover.startsWith('http') && !cover.startsWith('/')) cover = '/' + cover;
+      qs('p_cover_url').value = cover;
+      const img = qs('p_cover_preview');
+      const ph = qs('p_cover_placeholder');
+      if (img) { img.src = cover; img.style.display = 'block'; }
+      if (ph) ph.style.display = 'none';
+    }
+
+    // type
+    if (p.project_type_id) {
+      const opt = new Option((p.project_type && p.project_type.name) ? p.project_type.name : p.project_type_id, p.project_type_id, true, true);
+      qs('p_type').appendChild(opt);
+      if (window.$ && $.fn && $(qs('p_type')).data('select2')) {
+        $(qs('p_type')).val(p.project_type_id).trigger('change');
+      } else {
+        qs('p_type').value = p.project_type_id;
+      }
+    }
+
+    if (p.owner_user_id) {
+      const opt = new Option((p.owner && p.owner.name) ? p.owner.name : p.owner_user_id, p.owner_user_id, true, true);
+      qs('p_owner').appendChild(opt);
+      if (window.$ && $.fn && $(qs('p_owner')).data('select2')) {
+        $(qs('p_owner')).val(p.owner_user_id).trigger('change');
+      } else {
+        qs('p_owner').value = p.owner_user_id;
+      }
+    }
+
+    const tasks = Array.isArray(p.tasks) ? p.tasks : [];
+    tasks.forEach(t => addTaskRow(t));
+    ensureEmptyRow();
+  }
+
+  function collectTasks() {
+    const rows = document.querySelectorAll('#tasksTbody tr[data-task-row="1"]');
+    const tasks = [];
+    let idx = 0;
+    rows.forEach(tr => {
+      const title = tr.querySelector('.task-title')?.value?.trim() || '';
+      const assignee = tr.querySelector('.task-assignee');
+      const due = tr.querySelector('.task-due')?.value || '';
+      const status = tr.querySelector('.task-status')?.value || 'todo';
+      const priority = tr.querySelector('.task-priority')?.value || 'medium';
+      const assigneeId = assignee ? (assignee.value || null) : null;
+      if (!title) return;
+      tasks.push({
+        title,
+        assignee_user_id: assigneeId || null,
+        due_date: due || '',
+        status,
+        priority,
+        sort_order: idx
+      });
+      idx++;
+    });
+    return tasks;
+  }
+
+  async function save() {
+    const btn = qs('saveProjectBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> ' + t('common.processing', '保存中...'); }
+    try {
+      const payload = {
+        name: qs('p_name').value.trim(),
+        code: qs('p_code').value.trim(),
+        cover_url: qs('p_cover_url').value || '',
+        project_type_id: qs('p_type').value || null,
+        owner_user_id: qs('p_owner').value || null,
+        status: qs('p_status').value || 'active',
+        budget: Number(qs('p_budget').value || 0),
+        start_date: qs('p_start').value || '',
+        end_date: qs('p_end').value || '',
+        description: qs('p_desc').value || '',
+        tasks: collectTasks()
+      };
+
+      if (!payload.name) {
+        App.showAlert(t('projectForm.alert.enterProjectName', '請輸入項目名稱'), 'warning');
+        return;
+      }
+
+      if (projectId) {
+        await App.apiRequest(`/projects/${projectId}`, { method: 'PUT', body: JSON.stringify(payload) });
+        // 一起保存預留（不用額外按鈕）
+        try { await saveReservations({ silent: true }); } catch (e) {}
+        App.showAlert(t('common.saveSuccess', '已保存'), 'success');
+        setTimeout(() => { if (typeof Router !== 'undefined' && Router.replace) { Router.replace('/projects'); } else { window.location.replace('/projects'); } }, 600);
+      } else {
+        const created = await App.apiRequest('/projects', { method: 'POST', body: JSON.stringify(payload) });
+        App.showAlert(t('projectForm.alert.created', '已建立'), 'success');
+        // 創建成功後刪除草稿（參考 orders/new）
+        try {
+          if (window.draftManager) {
+            // 1) 刪除當前追蹤的草稿
+            if (window.currentDraftId) {
+              draftManager.deleteDraft(pageName, window.currentDraftId);
+              window.currentDraftId = null;
+            }
+            // 2) 刪除 URL draft_id
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlDraftId = urlParams.get('draft_id');
+            if (urlDraftId) {
+              draftManager.deleteDraft(pageName, urlDraftId);
+            }
+            // 3) 刪除與當前 code 相同的草稿
+            if (payload.code) {
+              const drafts = draftManager.getDraftsForPage(pageName) || [];
+              drafts.forEach(d => {
+                if (d.data && d.data.code === payload.code) {
+                  draftManager.deleteDraft(pageName, d.id);
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.warn('刪除草稿失敗:', e);
+        }
+        setTimeout(() => { if (typeof Router !== 'undefined' && Router.replace) { Router.replace('/projects'); } else { window.location.replace('/projects'); } }, 600);
+      }
+    } catch (e) {
+      console.error(e);
+      App.showAlert(t('common.saveError', '保存失敗'), 'danger');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-save"></i> ' + t('common.save', '保存'); }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Update page title by mode (new/edit)
+    const titleEl = document.getElementById('projectFormTitle');
+    if (titleEl) {
+      titleEl.setAttribute('data-i18n', projectId ? 'projectForm.editTitle' : 'projectForm.newTitle');
+    }
+    if (typeof I18n !== 'undefined' && I18n.updatePage) {
+      I18n.updatePage();
+    }
+
+    initOwnerSelect2();
+    initTypeSelect2();
+
+    // 封面：選檔後彈出裁剪（16:9），裁完直接上傳並更新預覽/URL
+    const coverInput = qs('p_cover_file');
+    if (coverInput) {
+      coverInput.addEventListener('change', async function () {
+        const file = this.files && this.files[0];
+        if (!file) return;
+
+        // 確保 ImageCropper 類已載入
+        if (typeof ImageCropper === 'undefined') {
+          console.error('ImageCropper is not defined');
+          App.showAlert(t('projectForm.alert.cropperNotLoaded', '圖片裁剪功能未載入，請刷新頁面重試'), 'warning');
+          return;
+        }
+
+        // 驗證文件類型
+        if (!file.type || !file.type.startsWith('image/')) {
+          App.showAlert(t('projectForm.alert.selectImageOnly', '請選擇圖片文件'), 'warning');
+          this.value = '';
+          return;
+        }
+
+        // 驗證文件大小（最大 10MB）
+        if (file.size > 10 * 1024 * 1024) {
+          App.showAlert(t('projectForm.alert.imageTooLarge', '圖片大小不能超過 10MB'), 'warning');
+          this.value = '';
+          return;
+        }
+
+        try {
+          const cropper = new ImageCropper({
+            aspectRatio: 16 / 9,
+            viewMode: 1
+          });
+
+          cropper.showCropModal(file, async (croppedBlob) => {
+            try {
+              const formData = new FormData();
+              formData.append('file', croppedBlob, file.name || 'cover.jpg');
+
+              const res = await fetch('/api/v1/upload', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token() },
+                body: formData
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || t('projectForm.alert.uploadFailed', '上傳失敗'));
+
+              let url = data.url || '';
+              if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+
+              qs('p_cover_url').value = url;
+              const img = qs('p_cover_preview');
+              const ph = qs('p_cover_placeholder');
+              if (img) { img.src = url; img.style.display = 'block'; }
+              if (ph) ph.style.display = 'none';
+
+              // 清空 input（已完成上傳，避免後續手動 upload 用到舊檔）
+              this.value = '';
+
+              App.showAlert(t('projectForm.alert.coverUploaded', '封面已上傳'), 'success');
+            } catch (e) {
+              console.error(e);
+              App.showAlert(t('projectForm.alert.coverUploadFailed', '封面上傳失敗'), 'danger');
+            }
+          }, {
+            maxWidth: 1600,
+            mimeType: 'image/jpeg',
+            quality: 0.9,
+            onCancel: () => { try { this.value = ''; } catch (_) { /* ignore */ } }
+          });
+        } catch (e) {
+          console.error(e);
+          App.showAlert(t('projectForm.alert.coverCropFailed', '封面裁剪失敗'), 'danger');
+          this.value = '';
+        }
+      });
+    }
+
+    // 編輯頁：不顯示草稿按鈕（只保留 /projects/new 的草稿功能）
+    if (projectId) {
+      const draftBtn = document.getElementById('saveProjectDraftBtn');
+      if (draftBtn) draftBtn.style.display = 'none';
+    }
+    // 新增模式：支援 draft（參考 orders/new）
+    if (!projectId) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const draftId = urlParams.get('draft_id');
+      if (draftId) {
+        window.currentDraftId = draftId;
+        loadDraft(draftId);
+      }
+
+      // 若草稿未帶入 code，才補一個預留編號
+      await loadReservedProjectCode();
+
+      // 自動保存草稿（防抖 2 秒）
+      const form = document.getElementById('projectForm');
+      if (form) {
+        form.addEventListener('input', triggerAutoSaveDraft);
+        form.addEventListener('change', triggerAutoSaveDraft);
+      }
+    }
+    // 預設新增一列 task（更 user friendly）
+    if (!projectId) addTaskRow();
+    await loadIfEdit();
+    await loadProjectExpenses();
+    // lazy load files/reservations when tabs shown
+    const tabs = document.getElementById('projectTabs');
+    if (tabs) {
+      tabs.addEventListener('shown.bs.tab', function (e) {
+        const target = e.target && e.target.getAttribute('data-bs-target');
+        if (target === '#pane-files') loadProjectFiles();
+        if (target === '#pane-resources') loadReservations();
+      });
+    }
+
+    // files hint
+    const fileInput = qs('projectFilesInput');
+    const hint = qs('projectFilesHint');
+    if (fileInput && hint) {
+      fileInput.addEventListener('change', () => {
+        const files = Array.from(fileInput.files || []);
+        if (!files.length) {
+          hint.textContent = t('projectForm.filesNotSelected', '未選擇檔案');
+          return;
+        }
+        const names = files.slice(0, 3).map(f => f.name).join(', ');
+        hint.textContent = files.length <= 3
+          ? names
+          : `${names} ${t('projectForm.filesSelectedCount', '...（共 {count} 個）').replace('{count}', String(files.length))}`;
+      });
+    }
+  });
+
+  return {
+    addTaskRow, save, uploadCover, removeCover,
+    loadProjectFiles, uploadProjectFiles, deleteProjectFile,
+    loadProjectExpenses,
+    addReservationRow, loadReservations, saveReservations,
+    openExpenseSideform, openReservationSideform,
+    closeSideform, saveExpenseFromSideform, addReservationFromSideform,
+    saveDraftNow
+  };
+})();
+</script>
+{{end}}
+
+

@@ -1,0 +1,4 @@
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS contact_name VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS contact_email VARCHAR(255);
+

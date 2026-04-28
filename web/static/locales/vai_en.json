@@ -1,0 +1,1853 @@
+{
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "supportCenter": "Support Center",
+    "supportInfo": "Support Info",
+    "login": "Login",
+    "contact": "Contact Us",
+    "accountSettings": "Account Settings",
+    "billing": "Subscription",
+    "logout": "Logout",
+    "user": "User",
+    "language": "Language",
+    "about": "About"
+  },
+  "footer": {
+    "description": "V-sys uses technology to help humanity, making work and life simpler and more efficient.",
+    "products": "Products",
+    "productList": {
+      "vai": "vAI",
+      "vwork": "vWork",
+      "vmarket": "vMarket",
+      "voffice": "vOffice"
+    },
+    "info": "Information",
+    "home": "Home",
+    "support": "Support",
+    "documentation": "Support Center",
+    "contactSupport": "Contact Us",
+    "contact": "Contact Us",
+    "contactUs": "Contact Us",
+    "hours": "Monday to Friday 9:00 - 18:00",
+    "salesPartnerJoin": "Sales Partner",
+    "location": "Hong Kong",
+    "copyright": "© 2025 V-sys Limited. All rights reserved."
+  },
+  "vai": {
+    "nav": {
+      "features": "Features",
+      "demo": "Demo",
+      "login": "Login",
+      "chat": "Chat",
+      "sketch": "Sketch",
+      "video": "Video",
+      "docs": "Docs",
+      "apps": "Discover"
+    },
+    "hero": {
+      "badge": "vAI AI Assistant",
+      "title": "Your AI Work Partner",
+      "subtitle": "Let AI help you with everything from data analysis to content creation.",
+      "primaryCta": "Try Now",
+      "secondaryCta": "Learn More",
+      "titleBefore": "Your Intelligent",
+      "titleHighlight": "AI Work Partner",
+      "cta": "Get Started with vAI",
+      "learnMore": "Learn More",
+      "titleBefore2": "AI-Powered All-in-One",
+      "titleHighlight2": "Work Partner",
+      "subtitle2": "From chat and data analysis to image and video creation, order management, customer insights, and inventory tracking — no complex systems needed, just AI that gets your work done."
+    },
+    "demo": {
+      "greeting": "Hello! I'm vAI, your intelligent assistant. How can I help you today?",
+      "inputPlaceholder": "Try asking me a question...",
+      "q1": "What can you do?",
+      "q2": "Help me analyze data",
+      "q3": "How to improve work efficiency?",
+      "q1erp": "Check latest orders",
+      "q2erp": "Analyze this month's sales",
+      "q3erp": "Top customer spending",
+      "q4erp": "Inventory alerts",
+      "inputPlaceholderErp": "Ask AI anything about your business..."
+    },
+    "chatDemo": {
+      "0": {
+        "user": "Show me this week's order status",
+        "ai": "This week you have 42 orders totaling $128,500. That's 8% growth over last week, with online orders accounting for 65%. There are 3 pending returns to process."
+      },
+      "1": {
+        "user": "Which items are running low on stock?",
+        "ai": "5 items are currently below safety stock: A4 copy paper (12 boxes left), toner cartridges (3 left), screen protectors (8 left), etc. I recommend creating a purchase order now — I can auto-generate one for you."
+      }
+    },
+    "vcoinNote": "5 free queries per day. AI features are billed per use with vCoin.",
+    "vcoinLearnMore": "Learn about vCoin",
+    "vcoinModal": {
+      "title": "vCoin",
+      "whatIsTitle": "What is vCoin?",
+      "whatIsDesc": "vCoin is V-sys's AI usage token. You get 5 free queries per day. Beyond that, AI features consume vCoin.",
+      "usageTitle": "Usage Cost",
+      "simpleQuery": "Simple Query (1 vCoin)",
+      "simpleQueryDesc": "Basic Q&A, data lookup",
+      "imageGen": "Image Generation (3 vCoin)",
+      "imageGenDesc": "AI image generation",
+      "sketchGen": "Sketch Generation (3 vCoin)",
+      "sketchGenDesc": "AI sketch generation",
+      "docGen": "Document Generation (5+ vCoin)",
+      "docGenDesc": "5 vCoin per 15 pages, minimum 5 vCoin",
+      "videoGen": "Video Generation (30 vCoin)",
+      "videoGenDesc": "AI video generation (per 5-second unit)",
+      "videoExtend": "Video Extension (30 vCoin)",
+      "videoExtendDesc": "AI video extension (per 5-second unit)",
+      "ocr": "OCR (1 vCoin)",
+      "ocrDesc": "Image text recognition",
+      "stt": "Speech to Text (1 vCoin)",
+      "sttDesc": "Speech to text",
+      "matchFields": "Field Matching (1 vCoin)",
+      "matchFieldsDesc": "AI auto field matching",
+      "aiSuggestion": "AI Suggestion (1 vCoin)",
+      "aiSuggestionDesc": "AI smart suggestions and analysis",
+      "contentGen": "Content Generation",
+      "contentGenDesc": "Document generation, email writing",
+      "dailyFreeTip": "5 free queries per day (chat & image generation), resets daily. Video and document generation are not included.",
+      "buyTitle": "Buy vCoin",
+      "planSmall": "Small",
+      "planMedium": "Medium",
+      "popular": "Most Popular",
+      "planMega": "Mega",
+      "save17": "Save 17%",
+      "save30": "Save 30%",
+      "save38": "Save 38%",
+      "loginToBuy": "Log in to Buy",
+      "close": "Close"
+    },
+    "intro": {
+      "title": "Welcome to vAI",
+      "desc": "vAI is V-sys's core AI assistant, helping you with data analysis, document processing, smart conversations, and work automation. Log in to get started.",
+      "loginBtn": "Log in to get started"
+    },
+    "features": {
+      "title": "Supercharge Your Work with AI",
+      "subtitle": "vAI integrates multiple AI capabilities to make your work smarter and faster.",
+      "items": {
+        "1": { "title": "Smart Conversations", "desc": "Natural language chat for quick answers and suggestions." },
+        "2": { "title": "Data Analysis", "desc": "Analyze business data and generate reports and insights." },
+        "3": { "title": "Document Processing", "desc": "Automatically organize, classify, and summarize documents." },
+        "4": { "title": "Work Automation", "desc": "Automate daily operations and boost productivity." }
+      }
+    },
+    "integration": {
+      "badge": "vWork ERP + AI",
+      "title": "Deep Integration with vWork — Real-Time Data Access",
+      "subtitle": "vAI is more than a chatbot. It connects directly to your vWork business data, enabling AI to truly understand your operations and help you make better decisions.",
+      "orders": {
+        "title": "Order Management",
+        "desc": "Query order status in real time, auto-generate reports, and analyze sales trends and anomalies."
+      },
+      "crm": {
+        "title": "Customer CRM",
+        "desc": "Analyze customer spending behavior, auto-segment audiences, and recommend follow-up strategies."
+      },
+      "inventory": {
+        "title": "Inventory Tracking",
+        "desc": "Low stock alerts, purchase-sales-inventory analysis, and smart restocking suggestions."
+      },
+      "analytics": {
+        "title": "Smart Reports",
+        "desc": "Generate sales reports, financial analysis, and performance comparisons using natural language."
+      },
+      "pos": {
+        "title": "POS & Payments",
+        "desc": "Real-time transaction sync, daily settlement analysis, and anomalous transaction alerts."
+      },
+      "service": {
+        "title": "Service Appointments",
+        "desc": "Appointment management, staff scheduling suggestions, and service efficiency analysis."
+      }
+    },
+    "workflow": {
+      "badge": "AI Workflow",
+      "title": "One Sentence Replaces Hours of Work",
+      "subtitle": "vAI works directly with your business data — from queries to report generation, fully automated.",
+      "s1": {
+        "ask": "\"How does this month's performance compare to last month?\"",
+        "answer": "vAI automatically reads your order data, calculates month-over-month growth, analyzes channel contributions, and generates visual charts."
+      },
+      "s2": {
+        "ask": "\"Which items are running low? Create a purchase order\"",
+        "answer": "vAI scans for items below safety stock, lists them out, and can directly generate a purchase order for you."
+      },
+      "s3": {
+        "ask": "\"Generate a customer analysis report for this quarter\"",
+        "answer": "vAI reads CRM data, analyzes purchase frequency, average order value, and churn risk, then auto-generates a PPT or PDF report."
+      },
+      "s4": {
+        "ask": "\"Any abnormal POS transactions today?\"",
+        "answer": "vAI analyzes all POS transactions for the day, flags unusual refund patterns, large discounts, and other suspicious activities to protect your revenue."
+      }
+    },
+    "tools": {
+      "badge": "AI Toolkit",
+      "title": "Beyond Chat — Create Content Too",
+      "subtitle": "vAI integrates four powerful AI tools, from smart conversations to content creation, boosting your productivity across the board.",
+      "chat": {
+        "title": "AI Chat",
+        "desc": "Smart Q&A, data queries, work suggestions — real-time analysis of your business data."
+      },
+      "sketch": {
+        "title": "AI Images",
+        "desc": "Product image generation, marketing material design, sketch-to-illustration conversion."
+      },
+      "video": {
+        "title": "AI Video",
+        "desc": "Product promo videos, storyboard editing, one-click professional short video creation."
+      },
+      "docs": {
+        "title": "AI Documents",
+        "desc": "Auto-generate professional Word, Excel, PPT, and PDF documents."
+      }
+    },
+    "sidebar": {
+      "chat": "Chat",
+      "sketch": "Sketch",
+      "video": "Video",
+      "docs": "Docs",
+      "mySketches": "My Sketches",
+      "chatGeneration": "Chat Generated",
+      "myProjects": "My Projects",
+      "myDocs": "My Documents"
+    },
+    "search": {
+      "placeholder": "Search conversations...",
+      "noResults": "No results found",
+      "failed": "Search failed"
+    },
+    "common": {
+      "close": "Close",
+      "delete": "Delete",
+      "rename": "Rename",
+      "conversationList": "Conversations",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "loading": "Loading...",
+      "loadFailed": "Load failed",
+      "loadMore": "Load more",
+      "deleteFailed": "Delete failed",
+      "saveFailed": "Save failed",
+      "unnamed": "Untitled",
+      "download": "Download",
+      "upload": "Upload",
+      "productImages": "Product Images",
+      "searchProducts": "Search product name...",
+      "noProductImages": "No products with images found",
+      "noImages": "No images found",
+      "image": "Image",
+      "supportFormats": "Supports JPG, PNG, GIF, WebP",
+      "dropzoneText": "Click or drag an image here",
+      "unknownError": "Unknown error",
+      "requestFailed": "Request failed",
+      "justNow": "Just now",
+      "minutesAgo": " min ago",
+      "hoursAgo": " hr ago",
+      "daysAgo": " days ago",
+      "weeksAgo": " weeks ago",
+      "monthsAgo": " months ago",
+      "insertImage": "Insert Image",
+      "submitting": "Submitting..."
+    },
+    "chat": {
+      "title": "vAI Chat",
+      "newConversation": "New Conversation",
+      "inputPlaceholder": "Type your question...",
+      "send": "Send",
+      "startConversation": "Start a conversation with vAI",
+      "llmConfigured": "LLM Endpoint is configured by the system administrator",
+      "uploadFile": "Upload File",
+      "inputMessage": "Type a message to AI...",
+      "noConversations": "No conversations yet",
+      "noConversationsHint": "Click \"New Conversation\" to start",
+      "conversation": "Conversation",
+      "renamePrompt": "Enter new conversation name:",
+      "renameFailed": "Rename failed",
+      "deleteConfirm": "Are you sure you want to delete this conversation and all messages? This cannot be undone.",
+      "deleteFailed": "Delete failed",
+      "loadingChat": "Loading conversation...",
+      "aiThinking": "AI is thinking...",
+      "startChat": "Start a conversation with AI assistant",
+      "llmNotConfigured": "LLM Endpoint not configured, please contact your administrator",
+      "suggestionsLabel": "You can try asking:",
+      "quickGenerateImage": "Generate product promotional image",
+      "quickGenerateVideo": "Generate product promotional video",
+      "quickGeneratePptx": "Generate company development pptx",
+      "quickQueryOrders": "Query latest orders",
+      "newChat": "Start New Conversation",
+      "createFailed": "Failed to create conversation",
+      "analyzeAttachments": "Please read and analyze the attachment content",
+      "aiNoResponse": "AI did not return any content",
+      "navigating": "Navigating to page...",
+      "openInVWork": "Open in vWork",
+      "copyPaymentLink": "Copy Link",
+      "openPaymentLink": "Open",
+      "copied": "Copied!",
+      "imageGenerated": "Image generated for you:",
+      "docGenerating": "Generating {label} document \"{title}\", please wait...",
+      "docGenerated": "Your {label} document has been generated, click the card below to download.",
+      "videoGenerating": "Generating video for you, please wait...",
+      "videoGenerated": "Video has been generated, please check the player below.",
+      "aiResponseFailed": "AI response failed, please try again later",
+      "sendFailed": "Send failed, please try again later",
+      "llmApiError": "LLM API returned an error",
+      "llmParseFailed": "Unable to parse LLM response, please check API configuration",
+      "deleteMessageConfirm": "Are you sure you want to delete this message?",
+      "messageDeleted": "Message deleted",
+      "deleteMessageTitle": "Delete message",
+      "unsupportedFormat": "Unsupported file format: .{ext}",
+      "fileTooLarge": "File \"{name}\" exceeds the 20MB size limit",
+      "uploadFailed": "Failed to upload file \"{name}\": {error}",
+      "generationTimeout": "Generation timed out",
+      "generationFailed": "Generation failed",
+      "generatingProgress": "Generating... ({seconds}s)",
+      "cannotExtractVideo": "Cannot extract video",
+      "webSearch": "Web Search",
+      "webSearchSources": "Sources",
+      "voiceInput": "Voice Input",
+      "voiceInputRecording": "Recording... click to stop",
+      "voiceInputAttached": "Voice recording attached",
+      "voiceInputNotSupported": "Voice input is not supported in this browser",
+      "voiceInputPermissionDenied": "Microphone permission denied",
+      "voiceInputNoSpeech": "No speech detected",
+      "voiceInputFailed": "Voice input failed: {error}",
+      "downloadVideo": "Download Video",
+      "downloadDocument": "Download Document",
+      "document": "Document",
+      "video": "Video",
+      "recordDeleted": "Related record has been deleted",
+      "browserNoVideoSupport": "Your browser does not support video playback.",
+      "aiVideo": "AI Video",
+      "videoGeneratingStatus": "Video generating...",
+      "docGeneratingStatus": "Document generating...",
+      "videoCardHint": "Want longer, more detailed videos? <a href=\"/vai-video\">Go to vAi Video Tool</a>"
+    },
+    "sketch": {
+      "title": "vAI Sketch",
+      "newSketch": "New Sketch",
+      "save": "Save",
+      "load": "Load",
+      "delete": "Delete",
+      "generate": "AI Generate",
+      "generating": "Generating...",
+      "promptPlaceholder": "Describe the image you want to generate... (e.g. Convert sketch to beautiful illustration)",
+      "tools": {
+        "select": "Select",
+        "pen": "Pen",
+        "rectangle": "Rectangle",
+        "ellipse": "Ellipse",
+        "line": "Line",
+        "text": "Text",
+        "eraser": "Eraser",
+        "upload": "Upload Image"
+      },
+      "actions": {
+        "undo": "Undo",
+        "redo": "Redo",
+        "clear": "Clear Canvas"
+      },
+      "savedSketches": "Saved Sketches",
+      "noSketches": "No saved sketches yet",
+      "noSketchesHint": "Click \"New Sketch\" to start",
+      "untitled": "Untitled Sketch",
+      "genHistory": "Generation History",
+      "noGenHistory": "No generation history yet",
+      "addToCanvas": "Add to Canvas",
+      "replaceCanvas": "Replace Canvas",
+      "attachRef": "Attach Reference Image",
+      "removeAttachment": "Remove Attachment",
+      "maxAttachments": "Maximum 2 reference images allowed",
+      "deleteGen": "Delete",
+      "aiGenerateResult": "AI Generation Result",
+      "aiGenerating": "AI generating image...",
+      "aiGeneratingHint": "Please wait, usually takes 10-30 seconds",
+      "enterPrompt": "Please enter a description prompt",
+      "generationFailedRetry": "Generation failed, please try again later",
+      "aiGenerationFailed": "AI generation failed: ",
+      "noAiResult": "AI did not return image result",
+      "strokeColor": "Stroke",
+      "fillColor": "Fill",
+      "lineWidth": "Width",
+      "ratio": "Ratio",
+      "ratioFree": "Free",
+      "insertImage": "Insert Image",
+      "undoShortcut": "Undo (Ctrl+Z)",
+      "redoShortcut": "Redo (Ctrl+Y)",
+      "clearCanvas": "Clear Canvas",
+      "deleteSketch": "Delete Sketch",
+      "saveSketch": "Save Sketch",
+      "textInputPlaceholder": "Enter text...",
+      "duplicate": "Duplicate",
+      "sketchList": "Sketch List",
+      "generateWithAI": "Generate with AI",
+      "genHistoryBtn": "Generation History",
+      "deleteConfirm": "Are you sure you want to delete this sketch?",
+      "deleteConfirmPermanent": "Are you sure you want to delete this sketch? This cannot be undone.",
+      "canvasEmpty": "Canvas is empty, nothing to save",
+      "canvasPlaceholder": "Draw on this canvas",
+      "sketchPrefix": "Sketch ",
+      "enterSketchName": "Enter sketch name:",
+      "saved": "Sketch saved",
+      "saveFailedRetry": "Save failed, please try again later",
+      "loadSketchFailed": "Failed to load sketch",
+      "unsavedNew": "Current sketch is unsaved, are you sure you want to create a new one?",
+      "noChatGenerations": "No chat-generated images yet",
+      "noChatGenerationsHint": "Images generated in vAi Chat will appear here",
+      "deleteGenerationConfirm": "Are you sure you want to delete this generation record?",
+      "loadProductImageFailed": "Failed to load product image",
+      "props": {
+        "title": "Properties",
+        "position": "Position",
+        "width": "Width",
+        "height": "Height",
+        "strokeColor": "Stroke",
+        "fillColor": "Fill",
+        "lineWidth": "Line Width",
+        "color": "Color",
+        "fontSize": "Font Size",
+        "textContent": "Text Content",
+        "opacity": "Opacity",
+        "replaceImage": "Replace Image",
+        "removeBackground": "Remove Background",
+        "removingBackground": "Processing...",
+        "backgroundRemoved": "Background removed",
+        "removeBackgroundFailed": "Remove background failed",
+        "layerOrder": "Layer Order",
+        "bringToFront": "Bring to Front",
+        "sendToBack": "Send to Back",
+        "duplicate": "Duplicate",
+        "delete": "Delete",
+        "endpoint": "Endpoint",
+        "types": {
+          "pen": "Pen Stroke",
+          "eraser": "Eraser",
+          "rect": "Rectangle",
+          "ellipse": "Ellipse",
+          "line": "Line",
+          "text": "Text",
+          "image": "Image"
+        }
+      }
+    },
+    "video": {
+      "addShot": "Add Shot",
+      "noShots": "No shots yet",
+      "addShotHint": "Click \"Add Shot\" to start",
+      "selectShot": "Select or add a shot",
+      "aspectRatio": "Ratio",
+      "duration": "Duration",
+      "emptyTitle": "Start Making a Video",
+      "emptyDesc": "Add a video project, add shots, and use AI to generate video segments",
+      "addFirstShot": "Add First Shot",
+      "referenceImage": "Reference Image (optional)",
+      "selectImage": "Select Image",
+      "noRefImage": "No reference image (text-only generation)",
+      "prompt": "Video Description",
+      "promptPlaceholder": "Describe this shot, e.g.: A cat stretching in the sunlight, camera slowly zooming in...",
+      "generate": "AI Generate Video",
+      "generating": "Generating...",
+      "download": "Download",
+      "regenerate": "Generate & Save",
+      "deleteShot": "Delete Shot",
+      "combineAll": "Combine All Shots",
+      "combinedResult": "Combined Video Result",
+      "downloadCombined": "Download Combined Video",
+      "selectRefImage": "Select Reference Image",
+      "selectCharImage": "Select Character Image",
+      "clickToChangeImage": "Click to change image",
+      "addAttachment": "Add Attachment",
+      "productImages": "Product Images",
+      "sketchImages": "Sketches",
+      "upload": "Upload",
+      "searchProducts": "Search product name...",
+      "loadingProducts": "Loading product images...",
+      "loadingSketches": "Loading sketches...",
+      "dropzoneText": "Click or drag an image here",
+      "extendVideo": "Extend Video",
+      "extending": "Extending...",
+      "extendPromptTitle": "Enter a prompt for the extended segment",
+      "extendPromptBody": "Enter a description for the extended video (Prompt):\n\nExtending will add approximately 7 seconds to the current video",
+      "extendSuccess": "Video extended successfully!",
+      "extendFailed": "Video extend failed: ",
+      "extendTimeout": "Extend timed out",
+      "newProject": "New Video",
+      "noHistory": "No video records yet",
+      "createHint": "Click \"New Video\" to start",
+      "selectProject": "Select or create a video project",
+      "createFirst": "Create First Video",
+      "loadHistoryFailed": "Failed to load video history",
+      "noProjects": "No video projects yet",
+      "noProjectsHint": "Click \"New Project\" to start",
+      "shots": " shots",
+      "completed": " completed",
+      "deleteProject": "Delete Project",
+      "noChatVideos": "No chat-generated videos yet",
+      "noChatVideosHint": "Videos generated in vAi Chat will appear here",
+      "videoFromChat": "Video from Chat",
+      "unnamedProject": "Untitled Project",
+      "projectPrefix": "Video Project ",
+      "enterProjectName": "Enter project name:",
+      "projectCreated": "New project created",
+      "createProjectFailed": "Failed to create project",
+      "deleteProjectConfirm": "Are you sure you want to delete this video project? This cannot be undone.",
+      "toolTitle": "vAI Video Tool",
+      "projectDeleted": "Project deleted",
+      "deleteProjectFailed": "Failed to delete project",
+      "deleteChatVideoConfirm": "Are you sure you want to delete this chat video record? (Chat history will show \"Related record deleted\")",
+      "videoRecordDeleted": "Video record deleted",
+      "deleteVideoRecordFailed": "Failed to delete video record",
+      "noShotsInProject": "No shots yet, please add a shot to start",
+      "addShotTitle": "Add Shot",
+      "selectProjectFirst": "Please create or select a project first",
+      "deleteShotConfirm": "Are you sure you want to delete shot {num}?",
+      "enterDescription": "Please enter a video description",
+      "generationFailed": "Video generation failed: ",
+      "generationTimeout": "Generation timed out",
+      "generatingProgress": "Generating... ({seconds}s)",
+      "shotGenerated": "Shot {num} generated!",
+      "shotDoneNoVideo": "Shot {num} generated, but could not extract video",
+      "safetyFiltered": "Video was filtered by safety policy. Please modify your prompt and try again.",
+      "cannotExtend": "This shot has no generated video, cannot extend",
+      "cannotReadSourceVideo": "Cannot read source video",
+      "cannotReadForExtend": "Cannot read source video for extending",
+      "preparingExtend": "Preparing to extend...",
+      "extendingProgress": "Extending... ({seconds}s)",
+      "waitingApi": "Waiting for API response...",
+      "generationFailedStatus": "Generation failed",
+      "completedStatus": "Completed",
+      "aiGenerateBtn": "AI Generate Video",
+      "minShotsToCombine": "At least 2 completed shots are required to combine",
+      "combineReady": "Combine preview ready, {count} shots will play in sequence",
+      "noVideoToDownload": "This shot has no video to download",
+      "noCombinedToDownload": "No combined video to download",
+      "deleteRecord": "Delete Record",
+      "historyLabel": "History",
+      "unknownError": "Unknown error",
+      "requestFailed": "Request failed",
+      "submitting": "Submitting...",
+      "loadFailed": "Load failed",
+      "noProductImages": "No products with images found",
+      "noSketchImages": "No images found",
+      "imageFallbackTitle": "Image",
+      "timeJustNow": "Just now",
+      "timeMinutesAgo": "{n} min ago",
+      "timeHoursAgo": "{n} hr ago",
+      "timeDaysAgo": "{n} days ago",
+      "timeWeeksAgo": "{n} weeks ago",
+      "timeMonthsAgo": "{n} months ago",
+
+      "prevShotContinuity": "Continuing from previous shot",
+      "prevShotHint": "Auto-captured last frame from previous shot as reference",
+      "captureFrameFailed": "Failed to capture frame from previous shot",
+      "prevShotPromptHint": "[Continuing from previous shot's last frame — maintain character and scene continuity]",
+
+      "clickToUpload": "Click to upload image",
+      "chatWelcome": "Hi! I'm vAi Video Assistant",
+      "chatTab": "Chat",
+      "chatWelcomeDesc": "Tell me what video you want to make, and I'll automatically plan the shots and story for you. For example:",
+      "chatPlaceholder": "Describe the video you want to make, AI will plan the storyboard...",
+      "chatSuggest1": "Make a 30-second product unboxing video",
+      "chatSuggest2": "Create a short social media video introducing our new service",
+      "chatSuggest3": "Make a polished brand image promotional video",
+      "advancedEdit": "Advanced Edit",
+      "editStoryboard": "Edit Storyboard",
+      "editStoryboardHint": "Edit and click \"Save\" to apply changes. You can modify each shot's description and duration fields. Narration can be embedded directly in the description (e.g., Narration: xxx).",
+      "copyStoryboard": "Copy Storyboard JSON",
+      "copy": "Copy",
+      "storyboardCopied": "Storyboard copied to clipboard",
+      "storyboardUpdated": "Storyboard updated",
+      "cancel": "Cancel",
+      "save": "Save",
+      "noStoryboardYet": "Please describe your video idea first",
+      "storyboardTitle": "Storyboard",
+      "startGenerating": "Start Generating",
+      "regenerateStoryboard": "Regenerate",
+      "generatingVideo": "Generating video...",
+      "preparingProject": "Creating project...",
+      "generatingShot": "Generating shot",
+      "shotComplete": "Shot",
+      "shotFailed": "Shot",
+      "allShotsComplete": "All shots have been generated!",
+      "viewInEditor": "View in Editor",
+      "combineVideo": "Combine Video",
+      "batchFailed": "Generation failed",
+      "generationResumed": "Generation progress restored",
+      "pollingResumed": "Continuing to track generation status...",
+      "extendFailed": "Video extend failed, this shot was not generated",
+      "partialSuccess": "{done} shot(s) generated, {dropped} shot(s) failed",
+      "generationSlow": "AI generation is taking longer than usual, please wait...",
+      "generationCancelled": "Video generation cancelled",
+      "noDescriptionYet": "Please describe your video idea first",
+      "capturingFrame": "Capturing previous shot frame",
+      "shotTypeScene": "Scene",
+      "sendingToKling": "Submitting to AI generation...",
+      "sendingToAI": "Submitting to AI generation...",
+      "klingProcessing": "AI video generating...",
+      "klingExtending": "AI extending video...",
+      "combineAndPlay": "Play",
+      "editTitle": "Title",
+      "editSummary": "Summary",
+      "editShots": "Shot List",
+      "editDescription": "Description",
+
+      "editMinOneShot": "At least one shot required",
+      "totalDuration": "Total Duration",
+      "durationExceeded": "Total duration exceeds limit",
+
+      "characters": "Characters",
+      "charName": "Character Name",
+      "charDescription": "Detailed appearance description",
+      "downloadCompleteVideo": "Download Complete Video",
+      "pending": "Pending",
+      "noShotsToDownload": "No completed shots to download",
+      "downloadStarting": "Starting download...",
+      "downloadFailed": "Download failed",
+
+      "replay": "Replay",
+      "shots": "shots",
+      "genHistoryBtn": "Generation History",
+      "genHistory": "Generation History",
+      "noGenHistory": "No completed videos yet",
+      "play": "Play",
+      "noShotsToPlay": "No shots available to play",
+      "deleteProjectConfirm": "Are you sure you want to delete this video?",
+      "batch": "Batch",
+      "allBatchesFailed": "All batches failed to generate",
+      "partialBatchSuccess": "{done} batch(es) succeeded, {failed} batch(es) failed",
+      "aiProcessing": "AI video generating...",
+      "featureGateTitle": "vAi Video Generation",
+      "featureGateDesc": "This feature requires {plan} plan or above.<br>Please upgrade your subscription to use AI video generation.",
+      "upgradePlan": "Upgrade Plan",
+      "backToVai": "Back to vAi"
+    },
+    "docs": {
+      "newDoc": "New Document",
+      "emptyTitle": "AI Document Generation",
+      "emptyDesc": "Enter a description and let AI generate Word, Excel, PowerPoint, or PDF documents for you",
+      "createFirst": "Create First Document",
+      "selectDoc": "Please select a document",
+      "selectDocHint": "Select a document from the list on the left, or create a new one",
+      "createNew": "Create New Document",
+      "docType": "Document Type",
+      "title": "Title (optional)",
+      "titlePlaceholder": "Document title...",
+      "prompt": "Description",
+      "promptPlaceholder": "Describe the document you want to generate...\n\nFor example:\n- Create a product marketing proposal\n- Generate an employee salary details report\n- Create a quarterly performance report presentation",
+      "generate": "Generate Document",
+      "generating": "AI is generating the document, please wait...",
+      "ready": "Document generated",
+      "download": "Download Document",
+      "noDocuments": "No documents yet",
+      "noChatDocs": "No chat-generated documents yet",
+      "noChatDocsHint": "Documents generated in vAi Chat will appear here",
+      "enterDescription": "Please enter a document description",
+      "generatingBtn": "Generating...",
+      "generateSuccess": "Document generated successfully!",
+      "generateFailed": "Document generation failed",
+      "deleteConfirm": "Are you sure you want to delete this document?",
+      "deleted": "Document deleted",
+      "deleteFailed": "Delete failed",
+      "generationFailed": "Generation failed",
+      "myDocs": "My Documents",
+      "chatGeneration": "Chat Generated",
+      "statusCompleted": "Completed",
+      "statusGenerating": "Generating",
+      "statusPending": "Pending",
+      "statusFailed": "Failed"
+    },
+    "apps": {
+      "title": "AI Discover",
+      "subtitle": "Explore 130+ AI application scenarios, start a conversation with one click",
+      "searchPlaceholder": "Search apps...",
+      "noResults": "No matching apps found",
+      "tryOther": "Please try other keywords",
+      "categoryAll": "All",
+      "cat": {
+        "vwork": "vWork Tools",
+        "writing": "Writing Assistant",
+        "business": "Business Tools",
+        "development": "Development",
+        "education": "Education",
+        "marketing": "Marketing",
+        "lifestyle": "Lifestyle",
+        "support": "Customer Support",
+        "hr": "Human Resources",
+        "design": "Creative Design",
+        "legal": "Legal & Compliance",
+        "analytics": "Data Analytics",
+        "translation": "Translation"
+      },
+      "app": {
+        "vwOrderMgmt": {
+          "name": "Order Management",
+          "desc": "AI-assisted vWork order management and queries",
+          "prompt": "You are a vWork Order Management AI assistant. Please help me with the following order-related task: [create new order/check order status/batch update orders/handle order exceptions]. Order details: [order information]. Please provide operation suggestions and specific steps."
+        },
+        "vwInventory": {
+          "name": "Inventory Assistant",
+          "desc": "AI-assisted vWork inventory queries and management",
+          "prompt": "You are a vWork Inventory Management AI assistant. Please help me with the following inventory task: [check stock levels/inventory alert analysis/restock suggestions/stocktake planning]. Product info: [product name or category], warehouse: [warehouse name]. Please provide detailed inventory analysis and recommendations."
+        },
+        "vwCustomerMgmt": {
+          "name": "Customer Management",
+          "desc": "AI-assisted vWork customer data management",
+          "prompt": "You are a vWork Customer Management AI assistant. Please help me with the following customer task: [add new customer/customer segmentation analysis/follow-up reminders/customer value assessment]. Customer info: [customer details]. Please provide operation suggestions and customer engagement strategies."
+        },
+        "vwInvoice": {
+          "name": "Invoice Assistant",
+          "desc": "AI-assisted vWork invoice generation and management",
+          "prompt": "You are a vWork Invoice Processing AI assistant. Please help me with the following invoice task: [generate invoice/invoice lookup/reconciliation/overdue receivables tracking]. Details: [invoice/order information]. Please provide processing suggestions and templates."
+        },
+        "vwReport": {
+          "name": "Report Generator",
+          "desc": "AI-assisted vWork business report generation",
+          "prompt": "You are a vWork Report Analysis AI assistant. Please help me generate the following report: [sales report/revenue analysis/customer analysis/inventory report/employee performance]. Time range: [time period], dimensions to include: [dimension description]. Please provide report structure and key data interpretation suggestions."
+        },
+        "vwWorkflow": {
+          "name": "Workflow Automation",
+          "desc": "AI-assisted vWork workflow design and automation",
+          "prompt": "You are a vWork Workflow Automation AI assistant. Please help me design the following automated workflow: [auto order assignment/auto restocking/auto customer follow-up/auto notifications]. Business scenario: [scenario description], trigger conditions: [condition description]. Please provide a complete workflow design."
+        },
+        "vwSchedule": {
+          "name": "Schedule Manager",
+          "desc": "AI-assisted vWork scheduling and planning",
+          "prompt": "You are a vWork Schedule Management AI assistant. Please help me arrange the following schedule: [employee shifts/project timeline/delivery schedule/meeting arrangement]. Personnel: [personnel list], time constraints: [constraint conditions], priority: [priority description]. Please provide an optimized scheduling plan."
+        },
+        "vwApproval": {
+          "name": "Approval Workflow",
+          "desc": "AI-assisted vWork approval process design",
+          "prompt": "You are a vWork Approval Workflow AI assistant. Please help me design the following approval process: [purchase approval/expense reimbursement/leave approval/contract approval]. Org structure: [structure description], approval rules: [rule description]. Please provide a complete approval workflow design and permission configuration suggestions."
+        },
+        "vwNotification": {
+          "name": "Notification Setup",
+          "desc": "AI-assisted vWork automated notification configuration",
+          "prompt": "You are a vWork Notification Setup AI assistant. Please help me configure the following automated notifications: [order status notifications/inventory alerts/payment reminders/task due reminders]. Recipients: [recipient description], channels: [Email/Push/SMS]. Please provide notification templates and trigger condition design."
+        },
+        "vwDataImport": {
+          "name": "Data Import/Export",
+          "desc": "AI-assisted vWork data import and export",
+          "prompt": "You are a vWork Data Import/Export AI assistant. Please help me with the following data task: [import customer data/import product data/export reports/data migration]. Data format: [CSV/Excel/JSON], data fields: [field description]. Please provide data mapping suggestions and important considerations."
+        },
+        "article": {
+          "name": "Article Writing",
+          "desc": "Quickly produce well-structured articles",
+          "prompt": "Please help me write an article about [topic], including an introduction, main arguments, and conclusion. Approximately 800-1000 words, professional yet readable tone."
+        },
+        "blog": {
+          "name": "Blog Post",
+          "desc": "Write engaging blog posts",
+          "prompt": "Please help me write a blog post about [topic]. It needs a catchy title, engaging opening, practical insights and advice, and a call-to-action at the end."
+        },
+        "adCopy": {
+          "name": "Ad Copy",
+          "desc": "Write high-converting ad copy",
+          "prompt": "Please help me write ad copy for [product/service], target audience is [audience description]. Highlight selling points, persuasive tone, include call-to-action. Please provide 3 versions."
+        },
+        "productDesc": {
+          "name": "Product Description",
+          "desc": "Write compelling product descriptions",
+          "prompt": "Please help me write a product description for [product name]. Product features: [list features]. Highlight product advantages, use cases, professional and appealing tone."
+        },
+        "pressRelease": {
+          "name": "Press Release",
+          "desc": "Write professional press releases",
+          "prompt": "Please help me write a press release about [event/product launch], company name is [company name]. Include headline, lead paragraph, body, company background, and contact information."
+        },
+        "socialPost": {
+          "name": "Social Media Post",
+          "desc": "Write posts for various social platforms",
+          "prompt": "Please help me write a social media post about [topic] for [platform: Facebook/Instagram/LinkedIn/Twitter]. It should encourage engagement, include appropriate emojis and hashtags. Please provide 3 versions."
+        },
+        "seoArticle": {
+          "name": "SEO Article",
+          "desc": "Write search engine optimized articles",
+          "prompt": "Please help me write an SEO-friendly article targeting the keyword [keyword]. Include natural keyword distribution, proper heading structure (H1/H2/H3), meta description, and internal linking suggestions."
+        },
+        "story": {
+          "name": "Story Writing",
+          "desc": "Create engaging stories",
+          "prompt": "Please help me create a short story about [theme/setting], genre: [realistic/fantasy/sci-fi/mystery], approximately 1000 words. It needs vivid characters, compelling plot, and an unexpected ending."
+        },
+        "speech": {
+          "name": "Speech Writing",
+          "desc": "Write impactful speeches",
+          "prompt": "Please help me write a speech for [occasion], topic: [topic], duration approximately [X] minutes, tone [formal/casual]. It needs an attention-grabbing opening, clear arguments, and a powerful conclusion."
+        },
+        "newsletter": {
+          "name": "Newsletter",
+          "desc": "Write engaging newsletters",
+          "prompt": "Please help me write a newsletter issue, topic: [topic], audience: [audience type]. Include an eye-catching subject line, concise content summary, and clear call-to-action."
+        },
+        "bizPlan": {
+          "name": "Business Plan",
+          "desc": "Write comprehensive business plans",
+          "prompt": "Please help me write a business plan outline for [company/project], including executive summary, market analysis, product/service description, marketing strategy, financial projections, and team introduction."
+        },
+        "swot": {
+          "name": "SWOT Analysis",
+          "desc": "Conduct comprehensive SWOT analysis",
+          "prompt": "Please help me conduct a SWOT analysis for [company/product/project]. Analyze Strengths, Weaknesses, Opportunities, and Threats in detail, and provide strategic recommendations."
+        },
+        "marketAnalysis": {
+          "name": "Market Analysis",
+          "desc": "Conduct in-depth market analysis",
+          "prompt": "Please help me analyze the current state of the [industry/market], including market size, growth trends, key players, consumer behavior, entry barriers, and future outlook."
+        },
+        "meetingNotes": {
+          "name": "Meeting Notes",
+          "desc": "Organize professional meeting notes",
+          "prompt": "Please help me organize meeting notes from the following content: [meeting content]. Include meeting details, attendees, key discussion points, decisions made, and action items."
+        },
+        "proposal": {
+          "name": "Proposal",
+          "desc": "Write persuasive proposals",
+          "prompt": "Please help me write a proposal for [project/collaboration], client is [client name]. Include background analysis, solution, implementation plan, expected outcomes, and pricing overview."
+        },
+        "financialReport": {
+          "name": "Financial Report",
+          "desc": "Generate financial analysis reports",
+          "prompt": "Please help me write a financial report summary for [company/project], including revenue overview, cost analysis, profit margins, cash flow status, and financial health assessment."
+        },
+        "investPitch": {
+          "name": "Investor Pitch",
+          "desc": "Create investor pitch content",
+          "prompt": "Please help me prepare investor pitch content for [company name], including problem description, solution, market opportunity, business model, competitive advantages, team introduction, and funding requirements."
+        },
+        "competitorAnalysis": {
+          "name": "Competitor Analysis",
+          "desc": "Conduct detailed competitor analysis",
+          "prompt": "Please help me analyze the main competitors of [product/company]. Compare product features, pricing strategies, market positioning, strengths and weaknesses, and market share."
+        },
+        "okr": {
+          "name": "OKR Setting",
+          "desc": "Set team objectives and key results",
+          "prompt": "Please help me set quarterly OKRs for [department/team], role is [role description]. Include 3-5 Objectives and 3-4 Key Results for each objective."
+        },
+        "riskAssessment": {
+          "name": "Risk Assessment",
+          "desc": "Conduct project risk assessment",
+          "prompt": "Please help me conduct a risk assessment for [project/plan]. Identify potential risks, assess impact levels and probability, and propose risk mitigation strategies and contingency plans."
+        },
+        "codeGen": {
+          "name": "Code Generation",
+          "desc": "Generate code based on requirements",
+          "prompt": "Please help me write a [functionality description] program in [programming language]. Requirements: [specific requirements]. Include comments and error handling."
+        },
+        "codeReview": {
+          "name": "Code Review",
+          "desc": "Review and improve code quality",
+          "prompt": "Please review the following code and identify potential issues, performance bottlenecks, security vulnerabilities, and improvement suggestions:\n\n[paste code]"
+        },
+        "debugHelper": {
+          "name": "Debug Helper",
+          "desc": "Help troubleshoot program errors",
+          "prompt": "I encountered the following error. Please help me analyze the cause and provide a solution:\n\nError message: [error message]\nCode: [relevant code]\nEnvironment: [development environment]"
+        },
+        "apiDoc": {
+          "name": "API Documentation",
+          "desc": "Generate API documentation",
+          "prompt": "Please help me write documentation for the following API endpoint:\n\nEndpoint: [URL]\nMethod: [GET/POST/PUT/DELETE]\nFunction: [description]\n\nInclude request parameters, response format, error codes, and usage examples."
+        },
+        "sqlQuery": {
+          "name": "SQL Query",
+          "desc": "Generate and optimize SQL queries",
+          "prompt": "Please help me write a SQL query for [MySQL/PostgreSQL/etc]. Requirements: [query requirements]. Table structure: [describe table structure]. Also provide performance optimization suggestions."
+        },
+        "regex": {
+          "name": "Regular Expression",
+          "desc": "Generate and explain regular expressions",
+          "prompt": "Please help me write a regular expression for [matching requirement description]. Provide the regex, explain each part's meaning, and give test examples."
+        },
+        "architecture": {
+          "name": "System Architecture",
+          "desc": "Design system architecture",
+          "prompt": "Please help me design the architecture for [system/application]. Requirements: [requirement description], expected user volume: [user volume]. Include technology stack, system components, data flow, and scaling strategy."
+        },
+        "unitTest": {
+          "name": "Unit Testing",
+          "desc": "Generate unit test code",
+          "prompt": "Please help me write unit tests for the following code using [testing framework]. Cover normal cases, edge cases, and error handling:\n\n[paste code]"
+        },
+        "refactor": {
+          "name": "Code Refactoring",
+          "desc": "Refactor and improve code structure",
+          "prompt": "Please help me refactor the following code to improve readability, performance, and maintainability. Explain the reason for each change:\n\n[paste code]"
+        },
+        "techDoc": {
+          "name": "Technical Documentation",
+          "desc": "Write technical documentation",
+          "prompt": "Please help me write technical documentation for [system/feature], including system overview, architecture description, installation guide, API reference, FAQ, and maintenance guide."
+        },
+        "studyPlan": {
+          "name": "Study Plan",
+          "desc": "Create personalized study plans",
+          "prompt": "Please help me create a study plan for learning [topic/skill]. My current level is [level], goal is [goal], I can invest [hours] hours per week. Please arrange a [weeks]-week study plan."
+        },
+        "examPrep": {
+          "name": "Exam Preparation",
+          "desc": "Help with exam review and preparation",
+          "prompt": "Please help me prepare a review plan for [exam name], exam date is [date]. Include key point summaries, common question types, review strategies, and time schedule."
+        },
+        "thesisOutline": {
+          "name": "Thesis Outline",
+          "desc": "Create academic thesis outlines",
+          "prompt": "Please help me create a thesis outline for [research topic], discipline is [discipline]. Include research background, literature review, methodology, expected results, and conclusion."
+        },
+        "langLearn": {
+          "name": "Language Learning",
+          "desc": "Assist with foreign language learning",
+          "prompt": "I'm learning [language], current level is [beginner/intermediate/advanced]. Please help me practice conversation on the topic of [topic], and correct my mistakes and provide improvement suggestions during the dialogue."
+        },
+        "explainer": {
+          "name": "Concept Explainer",
+          "desc": "Explain complex concepts simply",
+          "prompt": "Please explain [concept/topic] in simple, easy-to-understand terms, as if explaining to a [age/level] person. Use analogies and examples to aid understanding."
+        },
+        "readingNotes": {
+          "name": "Reading Notes",
+          "desc": "Organize book highlights and insights",
+          "prompt": "Please help me organize reading notes for \"[book title]\", including book summary, chapter highlights, key insights, practical advice, and personal reflection questions."
+        },
+        "courseDesign": {
+          "name": "Course Design",
+          "desc": "Design educational course content",
+          "prompt": "Please help me design a course on [topic], target audience is [learner description], duration [hours]. Include course objectives, syllabus, learning activities, assessment methods, and references."
+        },
+        "quizGen": {
+          "name": "Quiz Generator",
+          "desc": "Automatically generate quiz questions",
+          "prompt": "Please generate [number] quiz questions for [topic/chapter], including [multiple choice/fill-in-the-blank/short answer], difficulty level [easy/medium/hard], with answers and explanations."
+        },
+        "research": {
+          "name": "Research Assistant",
+          "desc": "Assist with academic research",
+          "prompt": "I'm researching [research topic]. Please help me: 1. Organize related research directions 2. Suggest research methods 3. Propose possible hypotheses 4. Suggest data collection approaches."
+        },
+        "flashcard": {
+          "name": "Flashcards",
+          "desc": "Generate study flashcards",
+          "prompt": "Please create 20 flashcards for [topic/subject], each with a front (question/concept) and back (answer/explanation), suitable for [learning purpose]."
+        },
+        "marketingStrategy": {
+          "name": "Marketing Strategy",
+          "desc": "Develop comprehensive marketing strategies",
+          "prompt": "Please help me develop a marketing strategy for [product/service], target market is [market description], budget is [budget]. Include goal setting, channel selection, content strategy, and KPI metrics."
+        },
+        "brandNaming": {
+          "name": "Brand Naming",
+          "desc": "Creative brand name brainstorming",
+          "prompt": "Please help me brainstorm brand names for [product/service description], brand positioning is [positioning description], target audience is [audience]. Provide 10 candidate names with meaning explanations and domain suggestions."
+        },
+        "slogan": {
+          "name": "Slogan Creation",
+          "desc": "Create brand slogans and taglines",
+          "prompt": "Please create promotional slogans for [brand name], brand values are [value description], goal is [goal]. Provide 10 slogan options with applicable scenario descriptions."
+        },
+        "emailMarketing": {
+          "name": "Email Marketing",
+          "desc": "Write marketing emails",
+          "prompt": "Please help me write a [purpose: welcome/promotional/re-engagement/event invitation] marketing email for [product], audience is [audience]. Include an attractive subject line, body copy, and call-to-action."
+        },
+        "socialStrategy": {
+          "name": "Social Strategy",
+          "desc": "Develop social media strategies",
+          "prompt": "Please help me develop a social media strategy for [brand/product] on [Facebook/Instagram/LinkedIn/TikTok], goal is [goal]. Include content calendar, post types, posting frequency, and engagement strategy."
+        },
+        "kolCollab": {
+          "name": "Influencer Collab",
+          "desc": "Plan influencer collaboration campaigns",
+          "prompt": "Please help me plan an influencer marketing collaboration for [product/brand], budget is [budget], goal is [goal]. Include influencer selection criteria, collaboration models, content requirements, and performance evaluation methods."
+        },
+        "promoPlanning": {
+          "name": "Promotion Planning",
+          "desc": "Plan promotional campaign strategies",
+          "prompt": "Please help me plan a promotional campaign for [brand/product], period is [time period], target is [sales target]. Include campaign theme, promotion mechanics, promotional channels, and budget allocation."
+        },
+        "persona": {
+          "name": "User Persona",
+          "desc": "Build target user personas",
+          "prompt": "Please help me build user personas for [product/service]. Include demographics, behavioral traits, pain points and needs, spending habits, and media usage preferences. Create 3 different personas."
+        },
+        "abTest": {
+          "name": "A/B Testing",
+          "desc": "Design A/B testing plans",
+          "prompt": "Please help me design an A/B test for [website/app/email], testing goal is [conversion rate/click rate/etc]. Include hypothesis, variable settings, sample size calculation, test duration, and analysis method."
+        },
+        "adPlacement": {
+          "name": "Ad Placement",
+          "desc": "Plan digital advertising strategies",
+          "prompt": "Please help me plan a digital advertising strategy for [product/service], budget is [budget], goal is [goal]. Include platform selection, audience targeting, ad formats, bidding strategy, and expected ROAS."
+        },
+        "travelPlan": {
+          "name": "Travel Planning",
+          "desc": "Plan complete travel itineraries",
+          "prompt": "Please help me plan a trip to [destination], duration [days], number of travelers [number], budget [budget], preference [type: culture/food/nature/adventure]. Arrange daily itinerary, accommodation, and transportation suggestions."
+        },
+        "recipe": {
+          "name": "Recipe Finder",
+          "desc": "Recommend recipes based on ingredients",
+          "prompt": "I have these ingredients on hand: [list ingredients]. Please recommend 3 dishes I can make, including complete recipes: ingredient list, step-by-step instructions, cooking time, and tips."
+        },
+        "fitnessPlan": {
+          "name": "Fitness Plan",
+          "desc": "Create personalized fitness plans",
+          "prompt": "Please help me create a fitness plan, goal is [fat loss/muscle gain/maintenance], current weight [weight], can exercise [days] days per week, [duration] each time, available equipment [equipment]. Arrange daily training menu."
+        },
+        "financePlanning": {
+          "name": "Financial Planning",
+          "desc": "Personal financial planning advice",
+          "prompt": "Please help me with personal financial planning, monthly income approximately [amount], goal is [goal: buy a home/retirement/investment]. Suggest budget allocation, savings plan, investment direction, and risk management."
+        },
+        "giftIdea": {
+          "name": "Gift Ideas",
+          "desc": "Recommend suitable gift options",
+          "prompt": "Please recommend gifts suitable for [recipient: friend/family/colleague] for [occasion: birthday/holiday/anniversary], budget is [budget], their interests are [interest description]. Please provide 10 suggestions."
+        },
+        "partyPlanning": {
+          "name": "Party Planning",
+          "desc": "Plan various party events",
+          "prompt": "Please help me plan a [type] party, approximately [number] guests, budget [budget], venue [venue]. Include theme, venue decoration, activity schedule, catering menu, and considerations."
+        },
+        "homeDecor": {
+          "name": "Home Decor",
+          "desc": "Provide home decoration advice",
+          "prompt": "Please help me plan the decoration for [room type], space approximately [square feet/meters], style preference [style], budget [budget]. Suggest color scheme, furniture selection, and decoration tips."
+        },
+        "petCare": {
+          "name": "Pet Care",
+          "desc": "Provide pet care advice",
+          "prompt": "I have a [pet type and breed], age [age]. Please provide care advice including diet, exercise, grooming, health check-ups, and common disease prevention."
+        },
+        "timeManagement": {
+          "name": "Time Management",
+          "desc": "Improve time management efficiency",
+          "prompt": "Please help me improve my time management. My main challenge is [challenge description], available time per day is about [hours], tasks to complete: [task list]. Provide specific time management methods and daily schedule suggestions."
+        },
+        "habitBuilding": {
+          "name": "Habit Building",
+          "desc": "Build good habit formation plans",
+          "prompt": "I want to build the habit of [habit description]. Please help me create a 30-day formation plan, including daily specific actions, progress tracking methods, potential obstacles, and coping strategies."
+        },
+        "faqGen": {
+          "name": "FAQ Generator",
+          "desc": "Generate frequently asked questions",
+          "prompt": "Please generate a FAQ collection for [product/service], covering product usage, account management, payment methods, return/exchange policies, etc. 5 questions per category with complete answers."
+        },
+        "complaintReply": {
+          "name": "Complaint Reply",
+          "desc": "Write professional complaint responses",
+          "prompt": "Please help me reply to the following customer complaint: [complaint content]. The reply should express apology, explain the reason, propose a solution, with a professional and empathetic tone."
+        },
+        "refundProcess": {
+          "name": "Refund Process",
+          "desc": "Design refund handling processes",
+          "prompt": "Please help me design a refund handling process and templates for [product/service], including refund conditions, application steps, processing time, reply templates, and exception handling."
+        },
+        "productGuide": {
+          "name": "Product Guide",
+          "desc": "Write product usage guides",
+          "prompt": "Please help me write a usage guide for [product name], including getting started, basic operations, advanced features, troubleshooting, and FAQ. Friendly and easy-to-understand tone."
+        },
+        "serviceFlow": {
+          "name": "Service Flow",
+          "desc": "Design customer service workflows",
+          "prompt": "Please help me design a customer service workflow for [service type], including steps for each stage, script templates, escalation mechanisms, and service quality metrics."
+        },
+        "userGuide": {
+          "name": "User Manual",
+          "desc": "Write comprehensive user manuals",
+          "prompt": "Please help me write a user manual for [system/software], including system introduction, installation setup, feature descriptions, operation steps (with screenshot descriptions), and FAQ."
+        },
+        "complaintAnalysis": {
+          "name": "Complaint Analysis",
+          "desc": "Analyze complaint data and trends",
+          "prompt": "Please help me build a customer complaint analysis framework, including complaint classification system, severity rating, trend analysis methods, root cause analysis templates, and improvement recommendation report format."
+        },
+        "satisfactionSurvey": {
+          "name": "Satisfaction Survey",
+          "desc": "Design customer satisfaction surveys",
+          "prompt": "Please help me design a customer satisfaction survey for [product/service], including [NPS/CSAT/CES] metrics, rating questions for various dimensions, open-ended questions, and survey process recommendations."
+        },
+        "scriptTemplate": {
+          "name": "Script Template",
+          "desc": "Create customer service scripts",
+          "prompt": "Please create customer service script templates for [scenario: welcome/inquiry/complaint/follow-up]. Include opening, guided dialogue, solution explanation, and closing. Provide both formal and friendly versions."
+        },
+        "knowledgeBase": {
+          "name": "Knowledge Base",
+          "desc": "Build support knowledge base articles",
+          "prompt": "Please help me create a knowledge base article for [product/service], topic is [topic]. Include problem description, solution steps, considerations, and related article links. Format should be easy for support staff to quickly reference."
+        },
+        "jobDescription": {
+          "name": "Job Description",
+          "desc": "Write talent-attracting job descriptions",
+          "prompt": "Please help me write a job description for [job title], company is [company description]. Include responsibilities, qualifications, nice-to-haves, compensation and benefits, and company culture introduction."
+        },
+        "interviewQ": {
+          "name": "Interview Questions",
+          "desc": "Design interview question banks",
+          "prompt": "Please design interview questions for [job title], including behavioral, technical, situational, and culture-fit questions. 5 questions per category with scoring criteria and ideal answer key points."
+        },
+        "offerLetter": {
+          "name": "Offer Letter",
+          "desc": "Write offer letter templates",
+          "prompt": "Please help me write an offer letter for [job title], including position details, compensation and benefits, start date, probation terms, and items requiring response. Professional yet warm tone."
+        },
+        "performanceReview": {
+          "name": "Performance Review",
+          "desc": "Write performance review reports",
+          "prompt": "Please help me write an employee performance review report template, including work accomplishment review, goal achievement rate, competency assessment, improvement suggestions, and development plan."
+        },
+        "employeeHandbook": {
+          "name": "Employee Handbook",
+          "desc": "Write employee handbook content",
+          "prompt": "Please help me write the [section: attendance policy/leave policy/benefits/code of conduct] section of the company employee handbook. Must comply with [region] labor regulations."
+        },
+        "trainingPlan": {
+          "name": "Training Plan",
+          "desc": "Design employee training plans",
+          "prompt": "Please help me design a [onboarding/skill development/management training] plan for [employee type], duration [days]. Include curriculum outline, training methods, assessment criteria, and follow-up plan."
+        },
+        "exitInterview": {
+          "name": "Exit Interview",
+          "desc": "Design exit interview questionnaires",
+          "prompt": "Please design an exit interview questionnaire covering departure reasons, job satisfaction, management feedback, company improvement suggestions, etc. About 15-20 questions with guidance notes."
+        },
+        "salaryReport": {
+          "name": "Salary Report",
+          "desc": "Write salary survey reports",
+          "prompt": "Please help me write a salary survey report template for [position/industry], including market salary levels, compensation structure analysis, benefits comparison, and salary adjustment recommendations."
+        },
+        "teamBuilding": {
+          "name": "Team Building",
+          "desc": "Plan team building activities",
+          "prompt": "Please help me plan a team building activity for [number] people, budget [budget], goal is [improve communication/enhance collaboration/relieve stress]. Provide 5 activity plans including process, required materials, and expected outcomes."
+        },
+        "companyCulture": {
+          "name": "Company Culture",
+          "desc": "Build company culture documents",
+          "prompt": "Please help me build a company culture document, company mission is [mission], values are [values]. Include culture manifesto, core value descriptions, code of conduct, and culture practice examples."
+        },
+        "logoConcept": {
+          "name": "Logo Concept",
+          "desc": "Brainstorm logo design concepts",
+          "prompt": "Please brainstorm logo design concepts for [brand name], brand positioning is [positioning], target audience is [audience]. Provide 5 concept directions including design rationale, color suggestions, and style references."
+        },
+        "colorScheme": {
+          "name": "Color Scheme",
+          "desc": "Design brand color schemes",
+          "prompt": "Please design a color scheme for [brand/project], brand tone is [tone]. Include primary, secondary, and accent color HEX values, and application suggestions for different contexts (web, print, social media)."
+        },
+        "uiCopy": {
+          "name": "UI Copy",
+          "desc": "Write UI interface copy",
+          "prompt": "Please write UI copy for [app/website], page is [page description]. Include headings, button text, tooltip messages, error messages, and empty state copy. Tone: [formal/friendly/playful]."
+        },
+        "brandStory": {
+          "name": "Brand Story",
+          "desc": "Write brand stories",
+          "prompt": "Please write a brand story for [brand name], founding background is [background], core values are [values]. Needs emotional resonance and authenticity, suitable for the About Us page."
+        },
+        "namingIdea": {
+          "name": "Naming Ideas",
+          "desc": "Product or project naming brainstorm",
+          "prompt": "Please help me name [product/project/feature], characteristics are [feature description], target users are [users]. Provide 15 name suggestions with meanings and selection rationale."
+        },
+        "taglineDesign": {
+          "name": "Tagline Design",
+          "desc": "Design product tagline copy",
+          "prompt": "Please design taglines for [product/campaign], core message is [message], goal is [goal]. Provide 10 taglines in both rational and emotional appeal categories, with applicable contexts."
+        },
+        "packagingCopy": {
+          "name": "Packaging Copy",
+          "desc": "Write product packaging copy",
+          "prompt": "Please write packaging copy for [product], including product name presentation, selling point tagline, product description, usage instructions, and brand story snippet. Must match [style] style."
+        },
+        "spaceDesc": {
+          "name": "Space Description",
+          "desc": "Write space design descriptions",
+          "prompt": "Please write a space design concept description for [space type: cafe/office/exhibition], style is [style]. Include design philosophy, spatial layout, material selection, and atmosphere creation."
+        },
+        "styleGuide": {
+          "name": "Style Guide",
+          "desc": "Build brand style guides",
+          "prompt": "Please build a brand style guide for [brand name], including brand positioning, visual guidelines (colors/fonts/image style), tone of voice guidelines, application examples, and prohibited uses."
+        },
+        "creativeBrief": {
+          "name": "Creative Brief",
+          "desc": "Write creative project briefs",
+          "prompt": "Please write a creative brief for [project/campaign], including project background, objectives, target audience, core message, budget, timeline, and success metrics."
+        },
+        "contractDraft": {
+          "name": "Contract Draft",
+          "desc": "Draft basic contract documents",
+          "prompt": "Please draft a basic framework for a [contract type: service/partnership/confidentiality] contract between [Party A] and [Party B]. Include basic terms, rights and obligations, payment conditions, and breach of contract liability. (Note: This is a reference template; please consult legal professionals for formal use.)"
+        },
+        "privacyPolicy": {
+          "name": "Privacy Policy",
+          "desc": "Write privacy policies",
+          "prompt": "Please write a privacy policy for [website/app], covering data collection, purpose of use, data protection, cookie policy, third-party sharing, and user rights. Must comply with [GDPR/local privacy law] requirements."
+        },
+        "termsOfUse": {
+          "name": "Terms of Use",
+          "desc": "Write service terms of use",
+          "prompt": "Please write terms of use for [platform/service], including service description, usage rules, intellectual property, disclaimers, account management, and dispute resolution."
+        },
+        "disclaimer": {
+          "name": "Disclaimer",
+          "desc": "Write disclaimer documents",
+          "prompt": "Please write a disclaimer for [website/product/service], covering information accuracy, usage risks, third-party links, liability limitations, and governing law."
+        },
+        "nda": {
+          "name": "NDA",
+          "desc": "Draft non-disclosure agreement templates",
+          "prompt": "Please draft a Non-Disclosure Agreement (NDA) template, type is [unilateral/mutual], confidentiality period is [period]. Include definitions, confidentiality obligations, exclusion clauses, and breach liability."
+        },
+        "trademark": {
+          "name": "Trademark Filing",
+          "desc": "Assist with trademark application preparation",
+          "prompt": "Please help me prepare trademark application information for [brand/trademark name], including trademark classification suggestions, application process guide, required document checklist, and considerations."
+        },
+        "complianceCheck": {
+          "name": "Compliance Check",
+          "desc": "Conduct basic compliance checks",
+          "prompt": "Please help me check the basic compliance requirements for [business/product] in [region/industry], including necessary licenses and permits, industry regulations, data protection requirements, and filing obligations."
+        },
+        "legalOpinion": {
+          "name": "Legal Opinion",
+          "desc": "Provide basic legal issue analysis",
+          "prompt": "Please help me analyze the following legal issue: [issue description], involving [legal area]. Provide basic legal analysis, potential risks, and recommended course of action. (Note: This is general reference only; please consult a practicing attorney for formal matters.)"
+        },
+        "riskDisclosure": {
+          "name": "Risk Disclosure",
+          "desc": "Write risk disclosure documents",
+          "prompt": "Please write a risk disclosure statement for [investment/product/service], including main risk types, risk level descriptions, investor/user notices, and risk management recommendations."
+        },
+        "authorization": {
+          "name": "Authorization Letter",
+          "desc": "Write authorization letter templates",
+          "prompt": "Please write an authorization letter template for [authorization type], grantor is [Party A], grantee is [Party B], scope is [scope]. Include authorization period and restrictions."
+        },
+        "dataInterpret": {
+          "name": "Data Interpretation",
+          "desc": "Interpret and analyze data",
+          "prompt": "Please help me interpret the following data: [paste data]. Analyze key findings, trends, outliers, and provide actionable business recommendations."
+        },
+        "reportDesign": {
+          "name": "Report Design",
+          "desc": "Design data report structures",
+          "prompt": "Please help me design a data report for [business purpose], metrics to include: [metric list], audience is [report audience]. Suggest report structure, chart types, and data presentation methods."
+        },
+        "kpiSetting": {
+          "name": "KPI Setting",
+          "desc": "Set key performance indicators",
+          "prompt": "Please help me set KPI metrics for [department/project], business goal is [goal description]. Include each KPI's definition, calculation method, target value, and measurement frequency."
+        },
+        "trendAnalysis": {
+          "name": "Trend Analysis",
+          "desc": "Conduct data trend analysis",
+          "prompt": "Please analyze the trends in the following time series data: [data description], time range is [range]. Identify trend direction, seasonal patterns, turning points, and future predictions."
+        },
+        "userAnalysis": {
+          "name": "User Analysis",
+          "desc": "Conduct user behavior analysis",
+          "prompt": "Please help me design a user analysis framework for [product/platform]. Include user segmentation methods, key behavioral metrics, funnel analysis, retention analysis, and user lifecycle analysis."
+        },
+        "salesAnalysis": {
+          "name": "Sales Analysis",
+          "desc": "Conduct sales data analysis",
+          "prompt": "Please analyze the following sales data: [data description]. Include overall trends, product performance, customer analysis, regional comparison, and sales forecasting."
+        },
+        "forecastModel": {
+          "name": "Forecast Model",
+          "desc": "Design data forecasting models",
+          "prompt": "Please design a forecasting model plan for [prediction target], available data includes [data description]. Suggest suitable model methods, required data, feature engineering, and model evaluation metrics."
+        },
+        "dataCleaning": {
+          "name": "Data Cleaning",
+          "desc": "Design data cleaning workflows",
+          "prompt": "Please design a data cleaning workflow for [data source], data issues include [issue description]. Include missing value handling, outlier detection, format standardization, and quality validation steps."
+        },
+        "vizSuggestion": {
+          "name": "Visualization Advice",
+          "desc": "Suggest data visualization approaches",
+          "prompt": "I have the following data to visualize: [data description and purpose]. Suggest the most suitable chart types, tool choices, color schemes, and layout, with explanations for each recommendation."
+        },
+        "abExperiment": {
+          "name": "Experiment Design",
+          "desc": "Design data-driven experiments",
+          "prompt": "Please help me design a data-driven experiment to validate [hypothesis description]. Include experiment design, control variables, sample size estimation, statistical testing methods, and result interpretation criteria."
+        },
+        "zhEnTranslate": {
+          "name": "Chinese-English Translation",
+          "desc": "Translate between Chinese and English",
+          "prompt": "Please translate the following content into [English/Chinese], maintaining the original tone and style, ensuring the translation is natural and fluent:\n\n[paste original text]"
+        },
+        "jaTranslate": {
+          "name": "Japanese Translation",
+          "desc": "Translate between Chinese/English and Japanese",
+          "prompt": "Please translate the following content into [Japanese/English/Chinese], paying attention to honorific usage and Japanese expression conventions:\n\n[paste original text]"
+        },
+        "koTranslate": {
+          "name": "Korean Translation",
+          "desc": "Translate between Chinese/English and Korean",
+          "prompt": "Please translate the following content into [Korean/English/Chinese], paying attention to honorific levels and Korean expression conventions:\n\n[paste original text]"
+        },
+        "multiTranslate": {
+          "name": "Multi-language Translation",
+          "desc": "Translate into multiple languages simultaneously",
+          "prompt": "Please translate the following content into [language list] simultaneously. Each translation should conform to local language conventions:\n\n[paste original text]"
+        },
+        "localization": {
+          "name": "Localization",
+          "desc": "Perform content localization",
+          "prompt": "Please localize the following content for [target market]. Not just translation — also adjust cultural references, measurement units, date formats, and local conventions:\n\n[paste original text]"
+        },
+        "subtitleTranslate": {
+          "name": "Subtitle Translation",
+          "desc": "Translate video subtitles",
+          "prompt": "Please translate the following subtitles into [target language]. Note character limits per line (recommended no more than [number] characters), maintain natural line breaks aligned with timing:\n\n[paste subtitles]"
+        },
+        "bizTranslate": {
+          "name": "Business Translation",
+          "desc": "Translate business documents",
+          "prompt": "Please translate the following business document into [target language], type is [contract/report/presentation/email]. Maintain accuracy of professional terminology and formal tone:\n\n[paste original text]"
+        },
+        "techTranslate": {
+          "name": "Technical Translation",
+          "desc": "Translate technical documents",
+          "prompt": "Please translate the following technical document into [target language], field is [IT/medical/engineering/science]. Maintain accuracy and consistency of technical terminology:\n\n[paste original text]"
+        },
+        "literaryTranslate": {
+          "name": "Literary Translation",
+          "desc": "Translate literary works",
+          "prompt": "Please translate the following literary work into [target language]. Preserve the original rhetorical devices, emotional tone, and literary style. Creative adaptation is acceptable when necessary:\n\n[paste original text]"
+        },
+        "colloquialTranslate": {
+          "name": "Colloquial Translation",
+          "desc": "Translate colloquial content",
+          "prompt": "Please translate the following colloquial content into [target language] using natural everyday language rather than formal written language. Preserve the original tone and emotion:\n\n[paste original text]"
+        }
+      }
+    }
+  },
+  "login": {
+    "selectTenant": "Select Tenant",
+    "selectTenantHint": "Please select the tenant to enter",
+    "selectTenantRequired": "Please select a tenant",
+    "noTenants": "No available tenants"
+  },
+  "billing": {
+    "title": "Subscription",
+    "currentSubscription": "Current Subscription",
+    "selectPlan": "Select Plan",
+    "paymentHistoryTitle": "Payment History",
+    "checkoutSuccess": "Subscription successful! Your subscription has been activated.",
+    "checkoutCancel": "Subscription canceled. You can resubscribe anytime.",
+    "paymentHistoryError": "Failed to load payment history",
+    "paymentHistory": {
+      "date": "Date",
+      "invoice": "Invoice Number",
+      "amount": "Amount",
+      "period": "Period",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "trial": {
+      "title": "Trial Period",
+      "desc": "You are currently using the free trial version",
+      "quotaDesc": "You are currently on a free trial. Here is your quota usage",
+      "daysLeft": "Days Left",
+      "days": "days",
+      "expired": "After the trial period ends, please select a subscription plan to continue using the service",
+      "expiredWithDate": "Your trial will end on {date}. Please select a subscription plan to continue using the service.",
+      "orderQuota": "vWork Order Quota",
+      "remainOrders": "{n} orders remaining",
+      "quotaFull": "Limit reached, subscription required in 7 days"
+    },
+    "salesPartnerTrial": {
+      "title": "Partner Trial Period",
+      "desc": "You are using a trial service provided by {partner}",
+      "expiredWithDate": "Your trial will end on {date}. Please contact your partner to subscribe."
+    },
+    "monthlyBilling": "Monthly",
+    "yearlyBilling": "Yearly",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "billedYearly": "billed yearly",
+    "yearlySaveTag": "Save 34%",
+    "noDiscount": "No discount",
+    "vsuite": {
+      "name": "vSuite",
+      "monthlyPrice": "$380/month",
+      "yearlyPrice": "",
+      "yearlyTotal": "$3,000/year",
+      "yearlySavings": "Save $1,560/year",
+      "badge": "Popular",
+      "features": {
+        "0": "All features",
+        "1": "Unlimited records",
+        "2": "Ad-free",
+        "3": "1,000 vCoins/month",
+        "4": "vOffice - AI Smart Office",
+        "5": "vMarket - Product Marketplace",
+        "6": "Support services",
+        "4a": "Documents, Spreadsheets & Presentations",
+        "4b": "PDF View, Edit & Convert",
+        "4c": "Offline Desktop (Windows/macOS/Linux)",
+        "4d": "AI Write, Translate, Summarize, Analyze"
+      },
+      "button": "Subscribe Now"
+    },
+    "vsuite_pro": {
+      "name": "vSuite Pro",
+      "monthlyPrice": "$680/month",
+      "yearlyPrice": "$500/month",
+      "yearlyTotal": "$6,000/year",
+      "yearlySavings": "Save $2,160/year",
+      "badge": "Best Value",
+      "features": {
+        "0": "All vSuite features",
+        "1": "Ad-free",
+        "2": "2,000 vCoins/month",
+        "3": "vOffice - AI Smart Office",
+        "4": "vMarket - Product Marketplace",
+        "5": "Enterprise support services",
+        "6": "Data loss prevention",
+        "7": "Security controls",
+        "3a": "Documents, Spreadsheets & Presentations",
+        "3b": "PDF View, Edit & Convert",
+        "3c": "Offline Desktop (Windows/macOS/Linux)",
+        "3d": "AI Write, Translate, Summarize, Analyze"
+      },
+      "button": "Subscribe Now"
+    },
+    "advanced": {
+      "badge": "Advanced",
+      "name": "Advanced Plan"
+    },
+    "subscribed": "Subscribed",
+    "nextRenewal": "Next Renewal",
+    "cancelAtPeriodEnd": "Will be canceled at period end",
+    "cancelSubscription": "Cancel Subscription",
+    "noPlan": "You have not subscribed to any plan yet. Please select a plan to get started",
+    "noPaymentHistory": "No payment records",
+    "loading": "Loading...",
+    "loadError": "Failed to load subscription information",
+    "processing": "Processing subscription request...",
+    "subscribeError": "Subscription failed",
+    "cancelConfirm": "Are you sure you want to cancel your subscription? The subscription will be canceled at the end of the current billing period.",
+    "cancelSuccess": "Subscription has been set to cancel at period end",
+    "cancelError": "Failed to cancel subscription"
+  },
+  "aiCoins": {
+    "title": "vCoin",
+    "balance": "Current Balance",
+    "totalAvailable": "Total Available",
+    "monthlyQuota": "Monthly Quota",
+    "dailyFree": "Daily Free",
+    "purchased": "Purchased Balance",
+    "totalUsed": "Total Used",
+    "usageInfo": "Usage Info",
+    "operation": "Operation Type",
+    "coinsPerUse": "Coins per Use",
+    "description": "Description",
+    "simpleQuery": "Simple Query",
+    "simpleQueryDesc": "Basic Q&A, data lookup",
+    "imageGen": "Image Generation",
+    "imageGenDesc": "AI image generation",
+    "sketchGen": "Sketch Generation",
+    "sketchGenDesc": "AI sketch generation",
+    "docGen": "Document Generation",
+    "docGenDesc": "5 vCoin per 15 pages, minimum 5 vCoin (final cost depends on content)",
+    "videoGen": "Video Generation",
+    "videoGenDesc": "AI video generation (per 5-second unit)",
+    "videoExtend": "Video Extension",
+    "videoExtendDesc": "AI video extension (per 5-second unit)",
+    "ocr": "OCR",
+    "ocrDesc": "Image text recognition",
+    "stt": "Speech to Text",
+    "sttDesc": "Speech to text",
+    "matchFields": "Field Matching",
+    "matchFieldsDesc": "AI auto field matching",
+    "aiSuggestion": "AI Suggestion/Analysis",
+    "aiSuggestionDesc": "AI smart suggestions and analysis",
+    "analysis": "Data Analysis",
+    "analysisDesc": "Report analysis, trend prediction",
+    "generate": "Content Generation",
+    "generateDesc": "Document generation, email writing",
+    "export": "Data Export",
+    "exportDesc": "Excel/PDF export",
+    "automation": "Automation Task",
+    "automationDesc": "Batch processing, automated workflows",
+    "dailyFreeTip": "You have 5 free queries per day (chat & image generation), resets daily. Video and document generation are not included.",
+    "buyCoins": "Buy vCoin",
+    "buy": "Buy",
+    "popular": "Most Popular",
+    "transactionHistory": "Transaction History",
+    "allTypes": "All Types",
+    "typeConsume": "Usage",
+    "typePurchase": "Purchase",
+    "typeMonthlyReset": "Monthly Quota",
+    "typeBonus": "Bonus",
+    "noTransactions": "No transaction records",
+    "resetsOn": "Resets on",
+    "loadBalanceFailed": "Failed to load balance",
+    "purchaseComingSoon": "Purchase feature coming soon",
+    "purchaseFailed": "Purchase failed",
+    "planSmall": "Small",
+    "planMedium": "Medium",
+    "planMega": "Mega",
+    "save17": "Save 17%",
+    "save30": "Save 30%",
+    "save38": "Save 38%"
+  },
+  "tenantSwitch": {
+    "title": "Select Company",
+    "selectHint": "Please select the company to enter",
+    "addTenant": "Add Tenant",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "pleaseSelect": "Please select a company",
+    "switchFailed": "Failed to switch tenant"
+  },
+  "helpVai": {
+    "breadcrumb": {
+      "supportCenter": "Support Center"
+    },
+    "hub": {
+      "title": "vAI Support Center",
+      "description": "vAI is V-sys's AI assistant platform, offering intelligent chat, AI image generation, AI video creation, and AI document generation to help you work efficiently.",
+      "coreFeatures": "Core Features",
+      "chat": { "title": "vAI Chat", "item1": "Start a conversation", "item2": "Upload files for analysis", "item3": "Search chat history", "item4": "Manage conversation list" },
+      "sketch": { "title": "vAI Image", "item1": "AI image generation", "item2": "Drawing tools", "item3": "Insert & edit images", "item4": "Manage sketches" },
+      "video": { "title": "vAI Video", "item1": "AI video generation", "item2": "Scene management", "item3": "Merge & download videos", "item4": "Extend video" },
+      "docs": {
+        "title": "vAI Docs",
+        "item1": "AI document generation",
+        "item2": "Supports Word / Excel / PPT / PDF",
+        "item3": "Download & manage documents"
+      },
+      "otherTopics": "Other Topics",
+      "gettingStarted": { "title": "Getting Started" },
+      "vcoins": { "title": "vCoin Virtual Currency" },
+      "account": { "title": "Account & Subscription" },
+      "faq": { "title": "FAQ" },
+      "support": {
+        "title": "Need More Help?",
+        "description": "If you encounter a problem or need further assistance, please:",
+        "item1pre": "Go to the ",
+        "contactLink": "Contact Us",
+        "item1post": " page to submit an issue",
+        "item2": "Ask the AI assistant directly in vAI Chat for instant help",
+        "footer": "We continuously update features and documentation to provide you with a better experience."
+      }
+    },
+    "gettingStarted": {
+      "title": "Getting Started Guide",
+      "intro": "Welcome to vAI! This guide will help you quickly understand vAI's core features and begin your AI work journey.",
+      "whatIsVai": "What is vAI?",
+      "whatIsVaiDesc": "vAI is V-sys's AI assistant platform, integrating four core functions: intelligent chat, AI image generation, AI video creation, and AI document generation. Whether you need data analysis, creative design, or document processing, vAI provides efficient solutions.",
+      "registerLogin": "Register & Login",
+      "registerStep1": "Go to the vAI homepage and click the <strong>Login</strong> button in the top right",
+      "registerStep2": "If you don't have an account, click <strong>Register</strong> to create one",
+      "registerStep3": "Fill in your email, password, and other basic information to complete registration",
+      "registerStep4": "Once logged in, you can start using all vAI features",
+      "learnInterface": "Learn the Interface",
+      "learnInterfaceDesc": "After logging in, you will see the following navigation areas:",
+      "navChat": "Chat",
+      "navChatDesc": "Have intelligent conversations with AI — ask questions, analyze data, generate content",
+      "navSketch": "Image",
+      "navSketchDesc": "Use AI to generate images, or use the built-in drawing tools to create artwork",
+      "navVideo": "Video",
+      "navVideoDesc": "Use AI to generate short videos, with scene editing and merging support",
+      "navDocs": "Docs",
+      "navDocsDesc": "Use AI to automatically generate Word, Excel, PPT, and PDF documents",
+      "dailyFree": "Daily Free Quota",
+      "dailyFreeDesc": "Each account gets <strong>5 free queries per day</strong> for chat and image generation. Video and document generation are not included in the free quota. Beyond the free quota, AI features are billed in <strong>vCoin</strong>.",
+      "nextSteps": "Next Steps",
+      "nextStep1": "Try asking AI a question in <strong>Chat</strong>",
+      "nextStep2": "Go to <strong>Image</strong> and use AI to generate an image",
+      "nextStep3pre": "Learn about ",
+      "nextStep3link": "vCoin pricing"
+    },
+    "chat": {
+      "title": "vAI Chat",
+      "intro": "vAI Chat is the core feature for interacting with the AI assistant, supporting intelligent conversations, file analysis, data queries, and more.",
+      "startNew": "Start a New Conversation",
+      "startStep1": "Go to the <strong>Chat</strong> page",
+      "startStep2": "Click the <strong>New Chat</strong> button above the conversation list on the left",
+      "startStep3": "Type your question or instruction in the input box at the bottom",
+      "startStep4": "Press Enter or click the send button to submit",
+      "startStep5": "The AI will reply within a few seconds",
+      "uploadFile": "Upload Files for Analysis",
+      "uploadFileDesc": "You can upload files for the AI to analyze:",
+      "uploadStep1": "Click the <strong>Attachment button</strong> (paperclip icon) next to the input box",
+      "uploadStep2": "Select the file you want to upload",
+      "uploadStep3": "Enter what you want the AI to analyze or do with the file",
+      "uploadStep4": "Send the message and the AI will read the file content and reply with analysis results",
+      "supportedFormats": "Supported File Formats:",
+      "supportedFormatsDesc": "Excel (.xls, .xlsx), Word (.doc, .docx), PowerPoint (.ppt, .pptx), PDF (.pdf), Text (.txt), Images (.jpg, .jpeg, .png)",
+      "manageList": "Manage Conversation List",
+      "manageSwitch": "<strong>Switch conversations</strong>: Click any conversation in the left list",
+      "manageRename": "<strong>Rename a conversation</strong>: Hover over the title and click the edit icon",
+      "manageDelete": "<strong>Delete a conversation</strong>: Hover over the title and click the delete icon",
+      "search": "Search Chat History",
+      "searchStep1": "Click the <strong>Search icon</strong> in the top navigation bar",
+      "searchStep2": "Enter a keyword — the system will search all conversation titles and message content",
+      "searchStep3": "Click a search result to jump to the corresponding conversation and message, with matching text highlighted",
+      "tips": "Usage Tips",
+      "tip1": "Be as specific as possible when asking questions, e.g., \"Analyze the monthly sales trends in this Excel file\"",
+      "tip2": "You can ask AI to generate images, videos, or documents in chat — it will automatically navigate to the corresponding feature",
+      "tip3": "Each simple query consumes <strong>1 vCoin</strong>, with 5 free queries per day"
+    },
+    "sketch": {
+      "title": "vAI Image",
+      "intro": "vAI Image provides AI image generation and built-in drawing tools, letting you easily create all kinds of visual assets.",
+      "aiGenerate": "AI Image Generation",
+      "genStep1": "Go to the <strong>Image</strong> page",
+      "genStep2": "Enter an image description (Prompt) in the <strong>AI generation bar</strong> at the bottom",
+      "genStep3": "For example: \"A cat reading in a coffee shop, watercolor style\"",
+      "genStep4": "Click the generate button and wait for AI to create the image",
+      "genStep5": "Once generated, the image will appear on the canvas",
+      "genCost": "Each image generation costs <strong>3 vCoin</strong>",
+      "drawTools": "Drawing Tools",
+      "drawToolsDesc": "vAI Image has a full suite of built-in drawing tools in the toolbar above the canvas:",
+      "toolCol": "Tool",
+      "shortcutCol": "Shortcut",
+      "descCol": "Description",
+      "toolSelect": "Select",
+      "toolSelectDesc": "Select and move objects on the canvas",
+      "toolPen": "Pen",
+      "toolPenDesc": "Freehand drawing",
+      "toolRect": "Rectangle",
+      "toolRectDesc": "Draw rectangle shapes",
+      "toolEllipse": "Ellipse",
+      "toolEllipseDesc": "Draw ellipse shapes",
+      "toolLine": "Line",
+      "toolLineDesc": "Draw straight lines",
+      "toolText": "Text",
+      "toolTextDesc": "Add text to the canvas",
+      "toolEraser": "Eraser",
+      "toolEraserDesc": "Erase content from the canvas",
+      "colorSettings": "Color & Stroke Settings",
+      "strokeColor": "<strong>Stroke Color</strong>: Set the line or border color",
+      "fillColor": "<strong>Fill Color</strong>: Set the fill color for shapes",
+      "strokeWidth": "<strong>Stroke Width</strong>: Adjust the thickness of the stroke or border",
+      "canvasRatio": "Canvas Ratio",
+      "canvasRatioDesc": "Supports multiple canvas ratios for different use cases:",
+      "ratioFree": "Free",
+      "insertImage": "Insert Image",
+      "insertStep1": "Click the <strong>Insert Image</strong> button in the toolbar",
+      "insertStep2": "In the image picker that appears, you can:",
+      "insertFrom": "<strong>Select from product images</strong>: Search for product images in your system",
+      "insertUpload": "<strong>Upload an image</strong>: Drag and drop or select a local image file",
+      "insertStep3": "The image will be inserted into the canvas and can be freely resized and repositioned",
+      "objectProps": "Object Properties Panel",
+      "objectPropsDesc": "When you select an object on the canvas, a properties panel will appear on the right where you can adjust:",
+      "propPosition": "Position (X, Y coordinates) and size (width, height)",
+      "propColor": "Color and opacity",
+      "propLayer": "Layer order (move up, move down, bring to front, send to back)",
+      "propBgRemove": "Background removal (for image objects)",
+      "manageSketch": "Manage Sketches",
+      "manageSave": "<strong>Save sketch</strong>: Click the save button in the toolbar",
+      "manageMySketch": "<strong>My Sketches</strong>: View all saved sketches in the left sidebar",
+      "manageChatGen": "<strong>Chat Generated</strong>: View images generated from vAI Chat in the left sidebar",
+      "manageDelete": "<strong>Delete sketch</strong>: Click the delete button in the toolbar"
+    },
+    "video": {
+      "title": "vAI Video",
+      "intro": "vAI Video provides a scene-based AI video creation tool, letting you easily create short videos.",
+      "createProject": "Create a Video Project",
+      "createStep1": "Go to the <strong>Video</strong> page",
+      "createStep2": "Click the <strong>New Project</strong> button in the left sidebar",
+      "createStep3": "Enter a project title",
+      "createStep4": "Choose video ratio: 16:9 (landscape), 9:16 (portrait), or 1:1 (square)",
+      "createStep5": "Choose scene duration: 5, 6, 7, or 8 seconds per scene",
+      "sceneEdit": "Scene Editing",
+      "sceneEditDesc": "Each video project is composed of multiple <strong>scenes</strong>, each of which can be generated independently:",
+      "sceneRefImg": "Add Reference Image",
+      "sceneRefImgDesc": "(optional): You can provide a reference image for the scene and AI will use it when generating the video. Image sources can be:",
+      "sceneRefProduct": "Product images (search your system products)",
+      "sceneRefSketch": "Sketches (from saved sketches in vAI Image)",
+      "sceneRefUpload": "Upload image (from your computer)",
+      "scenePrompt": "<strong>Enter video description</strong>: Describe the video content you want, e.g., \"The product enters the frame from the left, with a soft gradient background\"",
+      "sceneGenerate": "Click the <strong>Generate</strong> button and AI will start creating the video clip",
+      "sceneCost": "Each video generation costs <strong>30 vCoin</strong> (per 5 seconds)",
+      "manageScene": "Manage Scenes",
+      "sceneAdd": "<strong>Add scene</strong>: Click the <strong>+</strong> button at the end of the scene strip",
+      "sceneSwitch": "<strong>Switch scenes</strong>: Click different scene thumbnails in the bottom scene strip",
+      "sceneDelete": "<strong>Delete scene</strong>: Click the delete button in the scene editing area",
+      "sceneRegenerate": "<strong>Regenerate</strong>: Click the regenerate button on an already-generated scene",
+      "extend": "Extend Video",
+      "extendDesc": "If the generated video clip is too short, you can use the <strong>Extend Video</strong> feature:",
+      "extendStep1": "Click the <strong>Extend Video</strong> button on a generated scene",
+      "extendStep2": "AI will extend the existing video by approximately 7 seconds",
+      "extendCost": "Each video extension costs <strong>30 vCoin</strong>",
+      "mergeDownload": "Merge & Download",
+      "mergeStep1": "Once all scenes are generated, click the <strong>Merge Video</strong> button",
+      "mergeStep2": "The system will merge all scenes into one complete video",
+      "mergeStep3": "After merging, you can <strong>preview</strong> and <strong>download</strong> the full video"
+    },
+    "docs": {
+      "title": "vAI Docs",
+      "intro": "vAI Docs lets you automatically generate professional documents in various formats using AI.",
+      "formats": "Supported Document Formats",
+      "generate": "Generate a New Document",
+      "genStep1": "Go to the <strong>Docs</strong> page",
+      "genStep2": "Click the <strong>New Document</strong> button",
+      "genStep3": "Select the document type (Word / Excel / PPT / PDF)",
+      "genStep4": "Enter a document title (optional)",
+      "genStep5": "Enter a description (Prompt) detailing the document content you want to generate, for example:",
+      "genExampleWord": "Word: \"Write an annual work summary report including performance review, team growth, and future outlook\"",
+      "genExampleExcel": "Excel: \"Create a monthly financial report template with three sheets: income, expenses, and profit\"",
+      "genExamplePPT": "PPT: \"Make a product launch presentation including product introduction, key features, and pricing\"",
+      "genExamplePDF": "PDF: \"Generate an employee handbook covering company culture, policies, and benefits\"",
+      "genStep6": "Click <strong>Generate</strong> and wait for AI to process",
+      "genCost": "Document generation costs <strong>5+ vCoin</strong> (5 vCoin per 15 pages, minimum 5 vCoin)",
+      "viewDownload": "View & Download Documents",
+      "viewItem1": "After generation, the document will appear in the <strong>My Documents</strong> list on the left",
+      "viewItem2": "Click a document to view details: title, type, status, generation date, original description, etc.",
+      "viewItem3": "Click the <strong>Download</strong> button to download the document to your computer",
+      "fromChat": "Generate Documents from Chat",
+      "fromChatDesc": "You can also ask AI to generate documents directly in <strong>vAI Chat</strong>. Generated documents will appear in the <strong>Chat Generated</strong> tab on the Docs page."
+    },
+    "vcoins": {
+      "title": "vCoin Virtual Currency",
+      "intro": "vCoin is vAI's virtual currency used to pay for AI feature usage.",
+      "whatIs": "What is vCoin?",
+      "whatIsDesc": "vCoin is vAI's consumption unit. Different AI operations consume different amounts of vCoin, allowing you to pay as you go.",
+      "sources": "vCoin Sources",
+      "sourceDaily": "<strong>Daily free quota</strong>: Each account gets 5 free queries per day",
+      "sourceMonthly": "<strong>Monthly quota</strong>: Subscription plans (vSuite / vSuite Pro) include a monthly vCoin quota that resets automatically each month",
+      "sourcePurchase": "<strong>Purchase vCoin</strong>: Buy additional vCoin top-ups; purchased vCoin never expires",
+      "sourceGift": "<strong>Gifts</strong>: vCoin may be gifted during events or promotions",
+      "rates": "Consumption Rates",
+      "rateColOp": "Operation Type",
+      "rateColCost": "Cost",
+      "rateColDesc": "Description",
+      "rateSimpleQuery": "Simple Query",
+      "rateSimpleQueryDesc": "Basic Q&A, data queries",
+      "rateImageGen": "Image Generation",
+      "rateImageGenDesc": "AI image generation",
+      "rateSketchGen": "Sketch Generation",
+      "rateSketchGenDesc": "AI sketch generation",
+      "rateDocGen": "Document Generation",
+      "rateDocGenDesc": "5 vCoin per 15 pages, minimum 5 vCoin",
+      "rateVideoGen": "Video Generation",
+      "rateVideoGenDesc": "AI video generation (per 5 seconds)",
+      "rateVideoExtend": "Video Extension",
+      "rateVideoExtendDesc": "AI video extension (per 5 seconds)",
+      "rateOcr": "OCR",
+      "rateOcrDesc": "Image text recognition",
+      "rateStt": "Speech to Text",
+      "rateSttDesc": "Speech to text conversion",
+      "rateFieldMatch": "Field Matching",
+      "rateFieldMatchDesc": "AI auto field matching",
+      "rateAiSuggest": "AI Suggestions/Analysis",
+      "rateAiSuggestDesc": "AI intelligent suggestions and analysis",
+      "rateLeadAnalyze": "Lead Finder AI Analysis",
+      "rateLeadAnalyzeDesc": "AI analyzes company data and generates search keywords",
+      "rateLeadSearch": "Lead Finder Search",
+      "rateLeadSearchDesc": "1 vCoin per 50 search results, rounded up",
+      "purchase": "Purchase vCoin",
+      "purchaseDesc": "You can purchase additional vCoin on the <strong>vCoin</strong> page:",
+      "planCol": "Plan",
+      "amountCol": "vCoin Amount",
+      "priceCol": "Price (USD)",
+      "noteCol": "Note",
+      "saveMedium": "Save 17%",
+      "saveLarge": "Most popular, save 30%",
+      "saveMega": "Save 38%",
+      "balance": "View Balance & Transaction History",
+      "balanceDesc": "On the <strong>vCoin</strong> page, you can view:",
+      "balanceTotal": "<strong>Total available balance</strong>: Current total usable vCoin",
+      "balanceMonthly": "<strong>Monthly quota balance</strong>: Remaining monthly quota from subscription plan and reset date",
+      "balanceDaily": "<strong>Daily free quota</strong>: Remaining free queries for today",
+      "balancePurchased": "<strong>Purchased balance</strong>: vCoin purchased and stored",
+      "balanceHistory": "<strong>Transaction history</strong>: All vCoin usage and top-up records, with filter by type"
+    },
+    "account": {
+      "title": "Account & Subscription",
+      "intro": "Manage your vAI account settings and subscription plan.",
+      "settings": "Account Settings",
+      "settingsDesc": "Click the user avatar in the top right and select <strong>Account Settings</strong> to:",
+      "settingsItem1": "Edit personal information (name, email, phone, etc.)",
+      "settingsItem2": "Change password",
+      "settingsItem3": "Upload or update your avatar",
+      "settingsItem4": "Set language preference",
+      "plans": "Subscription Plans",
+      "plansDesc": "vAI offers the following subscription plans:",
+      "planCol": "Plan",
+      "monthlyCol": "Monthly",
+      "yearlyCol": "Yearly",
+      "vcoinCol": "Monthly vCoin Quota",
+      "featuresCol": "Key Features",
+      "month": "mo",
+      "vsuiteSave": "Annual $3,000, save $1,560",
+      "vsuiteFeatures": "All features, unlimited records, no ads, vOffice AI smart office",
+      "vsuiteProSave": "Annual $6,000, save $2,160",
+      "vsuiteProFeatures": "All vSuite features + enterprise support, data loss prevention, security controls",
+      "plansNote": "The monthly vCoin quota included in subscription plans resets automatically each month.",
+      "manageSubscription": "Manage Subscription",
+      "manageStep1": "Click the user avatar in the top right and select <strong>Subscription</strong>",
+      "manageStep2": "View your current plan and expiration date",
+      "manageStep3": "Upgrade or downgrade your subscription plan",
+      "manageStep4": "Manage payment methods",
+      "logout": "Logout",
+      "logoutDesc": "Click the user avatar in the top right and select <strong>Logout</strong> to securely log out. The system supports synchronized logout across tabs — logging out in one tab will automatically log out all other tabs."
+    },
+    "faq": {
+      "title": "FAQ",
+      "intro": "Here are the most frequently asked questions from vAI users.",
+      "q1": "Is vAI free?",
+      "a1": "vAI provides 5 free queries per day. Beyond the free quota, vCoin is required. You can subscribe to a vSuite plan for a monthly vCoin quota, or purchase vCoin separately.",
+      "q2": "Do vCoins expire?",
+      "a2": "<strong>Purchased vCoin never expires</strong> and can be used indefinitely. Monthly quota from subscription plans resets each month — unused quota does not carry over. Daily free quota resets every day.",
+      "q3": "What file formats are supported for upload?",
+      "a3desc": "vAI Chat supports uploading the following file formats for analysis:",
+      "a3docs": "<strong>Documents</strong>: .xls, .xlsx, .doc, .docx, .ppt, .pptx, .pdf, .txt",
+      "a3images": "<strong>Images</strong>: .jpg, .jpeg, .png",
+      "q4": "What if I'm not satisfied with the quality of AI-generated images/videos/documents?",
+      "a4desc": "You can:",
+      "a4item1": "Try <strong>modifying the description (Prompt)</strong> to provide more specific details and requirements",
+      "a4item2": "Use the <strong>Regenerate</strong> feature",
+      "a4item3": "For images, you can use the built-in drawing tools to further edit",
+      "a4item4": "For videos, you can use the <strong>Extend Video</strong> feature to increase length",
+      "a4note": "Note: Regenerating will consume vCoin again.",
+      "q5": "How do I generate images or videos from vAI Chat?",
+      "a5desc": "In vAI Chat, you can directly use natural language to ask AI to generate images or videos. For example:",
+      "a5ex1": "\"Help me generate a product promotion image\"",
+      "a5ex2": "\"Help me generate a product promotional video\"",
+      "a5ex3": "\"Help me create a company development presentation\"",
+      "a5note": "AI will automatically invoke the corresponding feature. Generated results can be found in the <strong>Chat Generated</strong> tab on the Image/Video/Docs page.",
+      "q6": "Can I use vAI on multiple devices?",
+      "a6": "Yes. vAI is a web-based application, so you can log in from any device's browser. Your chat history, sketches, video projects, and documents are all synced and saved in the cloud.",
+      "q7": "What is the relationship between vAI and vWork?",
+      "a7": "vAI and vWork are both V-sys products. vAI is a standalone AI assistant platform, while vWork is an enterprise management system (ERP/CMS/POS). They share the same account system, and you can query and analyze vWork business data (such as orders, customers, and sales) from within vAI.",
+      "q8": "What should I do if I encounter other issues?",
+      "a8desc": "If your question is not listed above, feel free to contact us through:",
+      "a8contact": "Contact Us",
+      "a8contactPost": " to submit an issue",
+      "a8email": "Send an email to "
+    },
+    "notFound": {
+      "title": "Category Not Found",
+      "desc": "Sorry, the help category you requested could not be found. Please return to the vAI Support Center to browse all categories."
+    },
+    "detail": {
+      "support": {
+        "title": "Need More Help?",
+        "desc": "If the above content didn't answer your question, feel free to ",
+        "link": "Contact Us"
+      }
+    }
+  }
+}

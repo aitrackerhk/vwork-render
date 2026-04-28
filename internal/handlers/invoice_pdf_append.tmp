@@ -1,0 +1,567 @@
+
+// ---------------------------------------------------------------------------
+// buildShippingNotePDF generates a PDF for a shipping note (發貨單).
+// ---------------------------------------------------------------------------
+func buildShippingNotePDF(
+	order models.Order,
+	shippingNote map[string]interface{},
+	shippingNumber string,
+	settings models.DocumentSettings,
+	enterprise models.Enterprise,
+	headers []string,
+	rows [][]string,
+) ([]byte, error) {
+	pdf := gofpdf.New("P", "pt", "A4", "")
+	pdf.SetMargins(36, 36, 36)
+	pdf.SetAutoPageBreak(true, 36)
+
+	fontName, hasBold := setupCJKFont(pdf)
+
+	pdf.AddPage()
+	margin := 36.0
+	pageW, pageH := pdf.GetPageSize()
+	usableW := pageW - margin*2
+	lineH := 14.0
+	currentY := margin
+
+	// ---- Title ----
+	if hasBold {
+		pdf.SetFont(fontName, "B", 20)
+	} else {
+		pdf.SetFont(fontName, "", 20)
+	}
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH*1.5, "發貨單", "", 0, "C", false, 0, "")
+	pdf.SetFont(fontName, "", 16)
+	pdf.SetXY(margin, currentY+lineH*1.5)
+	pdf.CellFormat(usableW, lineH, "SHIPPING NOTE", "", 0, "C", false, 0, "")
+	currentY += lineH * 3
+
+	// ---- Enterprise logo / name ----
+	logoHeight, logoCleanup := drawEnterpriseLogoOrName(pdf, enterprise, fontName, hasBold, margin, currentY, usableW, lineH)
+	if logoCleanup != nil {
+		defer logoCleanup()
+	}
+	currentY += logoHeight
+
+	pdf.SetFont(fontName, "", 10)
+	enterpriseAddr := getEnterpriseAddress(enterprise)
+	if enterpriseAddr != "" {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, enterpriseAddr, "", 1, "L", false, 0, "")
+		currentY += lineH
+	}
+	currentY += lineH * 0.5
+
+	// ---- Shipping info ----
+	pdf.SetFont(fontName, "", 10)
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW/2, lineH, fmt.Sprintf("發貨單號：%s", shippingNumber), "", 0, "L", false, 0, "")
+
+	shippingDate := ""
+	if d, ok := shippingNote["shipping_date"].(string); ok {
+		shippingDate = d
+	}
+	pdf.SetXY(margin+usableW/2, currentY)
+	pdf.CellFormat(usableW/2, lineH, fmt.Sprintf("發貨日期：%s", shippingDate), "", 1, "L", false, 0, "")
+	currentY += lineH
+
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH, fmt.Sprintf("訂單編號：%s", order.OrderNumber), "", 1, "L", false, 0, "")
+	currentY += lineH
+
+	// Logistics info
+	if company, ok := shippingNote["shipping_company"].(string); ok && company != "" {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW/2, lineH, fmt.Sprintf("物流公司：%s", company), "", 0, "L", false, 0, "")
+		if tracking, ok2 := shippingNote["tracking_number"].(string); ok2 && tracking != "" {
+			pdf.SetXY(margin+usableW/2, currentY)
+			pdf.CellFormat(usableW/2, lineH, fmt.Sprintf("追蹤號碼：%s", tracking), "", 1, "L", false, 0, "")
+		}
+		currentY += lineH
+	}
+	currentY += lineH * 0.5
+
+	// ---- Recipient info ----
+	if hasBold {
+		pdf.SetFont(fontName, "B", 12)
+	} else {
+		pdf.SetFont(fontName, "", 12)
+	}
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH, "收件人信息", "", 1, "L", false, 0, "")
+	currentY += lineH
+
+	pdf.SetFont(fontName, "", 10)
+	contactName := order.ContactName
+	if contactName == "" && order.Customer != nil {
+		contactName = order.Customer.Name
+	}
+	if contactName != "" {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, fmt.Sprintf("收件人：%s", contactName), "", 1, "L", false, 0, "")
+		currentY += lineH
+	}
+
+	shippingAddr := ""
+	if addr, ok := shippingNote["shipping_address"].(string); ok && addr != "" {
+		shippingAddr = addr
+	} else if order.ContactAddress != "" {
+		shippingAddr = order.ContactAddress
+	} else if order.Customer != nil {
+		shippingAddr = order.Customer.Address
+	}
+	if shippingAddr != "" {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, fmt.Sprintf("地址：%s", shippingAddr), "", 1, "L", false, 0, "")
+		currentY += lineH
+	}
+
+	contactPhone := order.ContactPhone
+	if contactPhone == "" && order.Customer != nil {
+		contactPhone = order.Customer.Phone
+	}
+	if contactPhone != "" {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, fmt.Sprintf("電話：%s", contactPhone), "", 1, "L", false, 0, "")
+		currentY += lineH
+	}
+	currentY += lineH * 0.5
+
+	// ---- Items table ----
+	numCols := len(headers)
+	colW := make([]float64, numCols)
+	if numCols == 2 {
+		colW[0] = usableW * 0.7
+		colW[1] = usableW * 0.3
+	} else {
+		each := usableW / float64(numCols)
+		for i := range colW {
+			colW[i] = each
+		}
+	}
+
+	// Table header
+	if hasBold {
+		pdf.SetFont(fontName, "B", 10)
+	} else {
+		pdf.SetFont(fontName, "", 10)
+	}
+	pdf.SetFillColor(240, 240, 240)
+	pdf.SetDrawColor(200, 200, 200)
+	pdf.SetXY(margin, currentY)
+	for i, h := range headers {
+		align := "L"
+		if i == numCols-1 {
+			align = "C"
+		}
+		ln := 0
+		if i == numCols-1 {
+			ln = 1
+		}
+		pdf.CellFormat(colW[i], lineH*1.2, h, "1", ln, align, true, 0, "")
+	}
+	currentY += lineH * 1.2
+
+	// Table rows
+	pdf.SetFont(fontName, "", 10)
+	pdf.SetFillColor(255, 255, 255)
+	for _, row := range rows {
+		if currentY > pageH-margin-lineH*5 {
+			pdf.AddPage()
+			currentY = margin
+		}
+		pdf.SetXY(margin, currentY)
+		for i, cell := range row {
+			if i >= numCols {
+				break
+			}
+			align := "L"
+			if i == numCols-1 {
+				align = "C"
+			}
+			ln := 0
+			if i == numCols-1 {
+				ln = 1
+			}
+			pdf.CellFormat(colW[i], lineH, cell, "1", ln, align, false, 0, "")
+		}
+		currentY += lineH
+	}
+	currentY += lineH
+
+	// ---- Terms ----
+	if settings.Terms != "" {
+		if currentY > pageH-margin-lineH*5 {
+			pdf.AddPage()
+			currentY = margin
+		}
+		if hasBold {
+			pdf.SetFont(fontName, "B", 10)
+		} else {
+			pdf.SetFont(fontName, "", 10)
+		}
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, "條款", "", 1, "L", false, 0, "")
+		currentY += lineH
+		pdf.SetFont(fontName, "", 9)
+		pdf.MultiCell(usableW, lineH*0.8, settings.Terms, "", "L", false)
+		currentY = pdf.GetY() + lineH*0.5
+	}
+
+	// ---- Notes ----
+	if settings.Notes != "" {
+		if currentY > pageH-margin-lineH*5 {
+			pdf.AddPage()
+			currentY = margin
+		}
+		if hasBold {
+			pdf.SetFont(fontName, "B", 10)
+		} else {
+			pdf.SetFont(fontName, "", 10)
+		}
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, "備註", "", 1, "L", false, 0, "")
+		currentY += lineH
+		pdf.SetFont(fontName, "", 9)
+		pdf.MultiCell(usableW, lineH*0.8, settings.Notes, "", "L", false)
+	}
+
+	var buf bytes.Buffer
+	if err := pdf.Output(&buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// ---------------------------------------------------------------------------
+// buildReceivingNotePDF generates a PDF for a receiving note (收貨單).
+// ---------------------------------------------------------------------------
+func buildReceivingNotePDF(
+	po models.PurchaseOrder,
+	receivingNote map[string]interface{},
+	receivingNumber string,
+	enterprise models.Enterprise,
+	headers []string,
+	rows [][]string,
+) ([]byte, error) {
+	pdf := gofpdf.New("P", "pt", "A4", "")
+	pdf.SetMargins(36, 36, 36)
+	pdf.SetAutoPageBreak(true, 36)
+
+	fontName, hasBold := setupCJKFont(pdf)
+
+	pdf.AddPage()
+	margin := 36.0
+	pageW, pageH := pdf.GetPageSize()
+	usableW := pageW - margin*2
+	lineH := 14.0
+	currentY := margin
+
+	// ---- Title ----
+	if hasBold {
+		pdf.SetFont(fontName, "B", 20)
+	} else {
+		pdf.SetFont(fontName, "", 20)
+	}
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH*1.5, "收貨單", "", 0, "C", false, 0, "")
+	pdf.SetFont(fontName, "", 16)
+	pdf.SetXY(margin, currentY+lineH*1.5)
+	pdf.CellFormat(usableW, lineH, "RECEIVING NOTE", "", 0, "C", false, 0, "")
+	currentY += lineH * 3
+
+	// ---- Enterprise logo / name ----
+	logoHeight, logoCleanup := drawEnterpriseLogoOrName(pdf, enterprise, fontName, hasBold, margin, currentY, usableW, lineH)
+	if logoCleanup != nil {
+		defer logoCleanup()
+	}
+	currentY += logoHeight
+
+	pdf.SetFont(fontName, "", 10)
+	enterpriseAddr := getEnterpriseAddress(enterprise)
+	if enterpriseAddr != "" {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, enterpriseAddr, "", 1, "L", false, 0, "")
+		currentY += lineH
+	}
+	currentY += lineH * 0.5
+
+	// ---- Receiving info ----
+	pdf.SetFont(fontName, "", 10)
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW/2, lineH, fmt.Sprintf("收貨單號：%s", receivingNumber), "", 0, "L", false, 0, "")
+
+	receivingDate := ""
+	if d, ok := receivingNote["receiving_date"].(string); ok {
+		receivingDate = d
+	}
+	pdf.SetXY(margin+usableW/2, currentY)
+	pdf.CellFormat(usableW/2, lineH, fmt.Sprintf("收貨日期：%s", receivingDate), "", 1, "L", false, 0, "")
+	currentY += lineH
+
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH, fmt.Sprintf("採購單號：%s", po.OrderNumber), "", 1, "L", false, 0, "")
+	currentY += lineH * 1.5
+
+	// ---- Supplier info ----
+	if hasBold {
+		pdf.SetFont(fontName, "B", 12)
+	} else {
+		pdf.SetFont(fontName, "", 12)
+	}
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH, "供應商信息", "", 1, "L", false, 0, "")
+	currentY += lineH
+
+	pdf.SetFont(fontName, "", 10)
+	if po.Supplier != nil {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, fmt.Sprintf("供應商：%s", po.Supplier.Name), "", 1, "L", false, 0, "")
+		currentY += lineH
+
+		if po.Supplier.ContactName != "" {
+			pdf.SetXY(margin, currentY)
+			pdf.CellFormat(usableW, lineH, fmt.Sprintf("聯絡人：%s", po.Supplier.ContactName), "", 1, "L", false, 0, "")
+			currentY += lineH
+		}
+		if po.Supplier.Phone != "" {
+			pdf.SetXY(margin, currentY)
+			pdf.CellFormat(usableW, lineH, fmt.Sprintf("電話：%s", po.Supplier.Phone), "", 1, "L", false, 0, "")
+			currentY += lineH
+		}
+		if po.Supplier.Address != "" {
+			pdf.SetXY(margin, currentY)
+			pdf.CellFormat(usableW, lineH, fmt.Sprintf("地址：%s", po.Supplier.Address), "", 1, "L", false, 0, "")
+			currentY += lineH
+		}
+	}
+	currentY += lineH * 0.5
+
+	// ---- Items table ----
+	numCols := len(headers)
+	colW := make([]float64, numCols)
+	if numCols == 2 {
+		colW[0] = usableW * 0.7
+		colW[1] = usableW * 0.3
+	} else {
+		each := usableW / float64(numCols)
+		for i := range colW {
+			colW[i] = each
+		}
+	}
+
+	// Table header
+	if hasBold {
+		pdf.SetFont(fontName, "B", 10)
+	} else {
+		pdf.SetFont(fontName, "", 10)
+	}
+	pdf.SetFillColor(240, 240, 240)
+	pdf.SetDrawColor(200, 200, 200)
+	pdf.SetXY(margin, currentY)
+	for i, h := range headers {
+		align := "L"
+		if i == numCols-1 {
+			align = "C"
+		}
+		ln := 0
+		if i == numCols-1 {
+			ln = 1
+		}
+		pdf.CellFormat(colW[i], lineH*1.2, h, "1", ln, align, true, 0, "")
+	}
+	currentY += lineH * 1.2
+
+	// Table rows
+	pdf.SetFont(fontName, "", 10)
+	pdf.SetFillColor(255, 255, 255)
+	for _, row := range rows {
+		if currentY > pageH-margin-lineH*5 {
+			pdf.AddPage()
+			currentY = margin
+		}
+		pdf.SetXY(margin, currentY)
+		for i, cell := range row {
+			if i >= numCols {
+				break
+			}
+			align := "L"
+			if i == numCols-1 {
+				align = "C"
+			}
+			ln := 0
+			if i == numCols-1 {
+				ln = 1
+			}
+			pdf.CellFormat(colW[i], lineH, cell, "1", ln, align, false, 0, "")
+		}
+		currentY += lineH
+	}
+
+	// ---- Notes from receivingNote ----
+	if notes, ok := receivingNote["notes"].(string); ok && notes != "" {
+		currentY += lineH
+		if currentY > pageH-margin-lineH*5 {
+			pdf.AddPage()
+			currentY = margin
+		}
+		if hasBold {
+			pdf.SetFont(fontName, "B", 10)
+		} else {
+			pdf.SetFont(fontName, "", 10)
+		}
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, "備註", "", 1, "L", false, 0, "")
+		currentY += lineH
+		pdf.SetFont(fontName, "", 9)
+		pdf.MultiCell(usableW, lineH*0.8, notes, "", "L", false)
+	}
+
+	var buf bytes.Buffer
+	if err := pdf.Output(&buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+// ---------------------------------------------------------------------------
+// buildRefundNotePDF generates a PDF for a refund note (退款單).
+// Shared by both order refunds and service-order refunds.
+// The title is pre-formatted by the caller (e.g. "退款單 #1（訂單 ORD-001 / 客戶名）").
+// The rows already include the "合計" total row and optional "額外款項" row.
+// ---------------------------------------------------------------------------
+func buildRefundNotePDF(
+	title string,
+	enterprise models.Enterprise,
+	headers []string,
+	rows [][]string,
+) ([]byte, error) {
+	pdf := gofpdf.New("P", "pt", "A4", "")
+	pdf.SetMargins(36, 36, 36)
+	pdf.SetAutoPageBreak(true, 36)
+
+	fontName, hasBold := setupCJKFont(pdf)
+
+	pdf.AddPage()
+	margin := 36.0
+	pageW, pageH := pdf.GetPageSize()
+	usableW := pageW - margin*2
+	lineH := 14.0
+	currentY := margin
+
+	// ---- Title ----
+	if hasBold {
+		pdf.SetFont(fontName, "B", 20)
+	} else {
+		pdf.SetFont(fontName, "", 20)
+	}
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH*1.5, "退款單", "", 0, "C", false, 0, "")
+	pdf.SetFont(fontName, "", 16)
+	pdf.SetXY(margin, currentY+lineH*1.5)
+	pdf.CellFormat(usableW, lineH, "REFUND NOTE", "", 0, "C", false, 0, "")
+	currentY += lineH * 3
+
+	// ---- Enterprise logo / name ----
+	logoHeight, logoCleanup := drawEnterpriseLogoOrName(pdf, enterprise, fontName, hasBold, margin, currentY, usableW, lineH)
+	if logoCleanup != nil {
+		defer logoCleanup()
+	}
+	currentY += logoHeight
+
+	pdf.SetFont(fontName, "", 10)
+	enterpriseAddr := getEnterpriseAddress(enterprise)
+	if enterpriseAddr != "" {
+		pdf.SetXY(margin, currentY)
+		pdf.CellFormat(usableW, lineH, enterpriseAddr, "", 1, "L", false, 0, "")
+		currentY += lineH
+	}
+	currentY += lineH * 0.5
+
+	// ---- Subtitle (contains refund number, order number, customer) ----
+	pdf.SetFont(fontName, "", 11)
+	pdf.SetXY(margin, currentY)
+	pdf.CellFormat(usableW, lineH, title, "", 1, "L", false, 0, "")
+	currentY += lineH * 1.5
+
+	// ---- Items table ----
+	numCols := len(headers)
+	colW := make([]float64, numCols)
+	if numCols == 4 {
+		// 產品/服務, 數量, 單價, 小計
+		colW[0] = usableW * 0.4
+		colW[1] = usableW * 0.15
+		colW[2] = usableW * 0.2
+		colW[3] = usableW * 0.25
+	} else {
+		each := usableW / float64(numCols)
+		for i := range colW {
+			colW[i] = each
+		}
+	}
+
+	// Column alignments for refund tables
+	colAlign := make([]string, numCols)
+	if numCols == 4 {
+		colAlign[0] = "L"
+		colAlign[1] = "C"
+		colAlign[2] = "R"
+		colAlign[3] = "R"
+	} else {
+		for i := range colAlign {
+			colAlign[i] = "L"
+		}
+	}
+
+	// Table header
+	if hasBold {
+		pdf.SetFont(fontName, "B", 10)
+	} else {
+		pdf.SetFont(fontName, "", 10)
+	}
+	pdf.SetFillColor(240, 240, 240)
+	pdf.SetDrawColor(200, 200, 200)
+	pdf.SetXY(margin, currentY)
+	for i, h := range headers {
+		ln := 0
+		if i == numCols-1 {
+			ln = 1
+		}
+		pdf.CellFormat(colW[i], lineH*1.2, h, "1", ln, colAlign[i], true, 0, "")
+	}
+	currentY += lineH * 1.2
+
+	// Table rows — last row (合計) is rendered in bold
+	pdf.SetFillColor(255, 255, 255)
+	for rowIdx, row := range rows {
+		if currentY > pageH-margin-lineH*5 {
+			pdf.AddPage()
+			currentY = margin
+		}
+		isLastRow := rowIdx == len(rows)-1
+		if isLastRow && hasBold {
+			pdf.SetFont(fontName, "B", 10)
+		} else {
+			pdf.SetFont(fontName, "", 10)
+		}
+		pdf.SetXY(margin, currentY)
+		for i, cell := range row {
+			if i >= numCols {
+				break
+			}
+			ln := 0
+			if i == numCols-1 {
+				ln = 1
+			}
+			pdf.CellFormat(colW[i], lineH, cell, "1", ln, colAlign[i], false, 0, "")
+		}
+		currentY += lineH
+	}
+
+	var buf bytes.Buffer
+	if err := pdf.Output(&buf); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}

@@ -1,0 +1,867 @@
+{{ define "pages/auto_outreach" }}
+<!-- ==================== LIST VIEW ==================== -->
+<div id="listView">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">
+            <i class="bi bi-robot me-2"></i>
+            <span data-i18n-field="自動搵客">自動搵客</span>
+        </h3>
+        <button class="btn btn-primary" onclick="showCreateForm()">
+            <i class="bi bi-plus-lg me-1"></i><span data-i18n-field="新增">新增</span>
+        </button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-muted small" data-i18n-field="總活動數">總活動數</div>
+                    <div class="fs-3 fw-bold" id="statTotal">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-muted small" data-i18n-field="進行中">進行中</div>
+                    <div class="fs-3 fw-bold text-success" id="statActive">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="text-muted small" data-i18n-field="總發送數">總發送數</div>
+                    <div class="fs-3 fw-bold text-primary" id="statSent">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th data-i18n-field="名稱">名稱</th>
+                            <th data-i18n-field="頻道">頻道</th>
+                            <th data-i18n-field="狀態">狀態</th>
+                            <th data-i18n-field="已找到">已找到</th>
+                            <th data-i18n-field="已發送">已發送</th>
+                            <th data-i18n-field="上次執行">上次執行</th>
+                            <th data-i18n-field="操作">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campaignTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                <span data-i18n-field="載入中...">載入中...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== FORM VIEW ==================== -->
+<div id="formView" style="display:none;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">
+            <i class="bi bi-robot me-2"></i>
+            <span id="formTitle" data-i18n-field="新增自動外展">新增自動外展</span>
+        </h3>
+        <button class="btn btn-outline-secondary" onclick="showListView()">
+            <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n-field="返回列表">返回列表</span>
+        </button>
+    </div>
+
+    <form id="campaignForm" class="needs-validation" novalidate>
+        <input type="hidden" id="campaignId" value="">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <!-- Card 1: Basic Info -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i><span data-i18n-field="基本資訊">基本資訊</span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n-field="活動名稱">活動名稱</label>
+                            <input type="text" class="form-control" id="campaignName" required maxlength="100" placeholder="例如：香港餐廳推廣">
+                            <div class="invalid-feedback">請填寫活動名稱</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n-field="描述">描述</label>
+                            <textarea class="form-control" id="campaignDesc" rows="3" maxlength="500" placeholder="簡要描述此活動的目的"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Search Settings (same as Lead Finder) -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-search me-2"></i><span data-i18n="autoOutreach.searchSettings">搜尋設定</span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted" data-i18n="leadFinder.targetCountry">目標國家</label>
+                                <select class="form-select" id="aoRegion"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted" data-i18n="leadFinder.product">指定產品</label>
+                                <select class="form-select" id="aoProductId">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted" data-i18n="leadFinder.contactType">聯絡方式</label>
+                                <select class="form-select" id="aoContactType">
+                                    <option value="" data-i18n="common.all">不限</option>
+                                    <option value="email" data-i18n="leadFinder.emailOnly">只要電郵</option>
+                                    <option value="phone" data-i18n="leadFinder.phoneOnly">只要電話</option>
+                                    <option value="both" data-i18n="leadFinder.emailAndPhone">電郵+電話</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted">Lead 數量上限</label>
+                                <select class="form-select" id="aoResultLimit">
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="500">500</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" type="button" id="btnAoAnalyze" onclick="aoAnalyze()">
+                                    <i class="bi bi-robot me-1"></i> <span data-i18n="leadFinder.aiAnalyze">AI 分析</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- AI Analysis Result (hidden by default) -->
+                        <div class="d-none mt-3" id="aoAnalysisCard">
+                            <hr>
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <div class="bg-light rounded-3 p-3 h-100">
+                                        <div class="text-muted small mb-1"><i class="bi bi-building me-1"></i><span data-i18n="leadFinder.targetIndustry">目標行業</span></div>
+                                        <div class="fw-semibold" id="aoTargetIndustry">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="bg-light rounded-3 p-3 h-100">
+                                        <div class="text-muted small mb-1"><i class="bi bi-person-badge me-1"></i><span data-i18n="leadFinder.targetProfile">目標客戶畫像</span></div>
+                                        <div class="fw-semibold" id="aoTargetProfile">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="text-muted small mb-1"><i class="bi bi-chat-left-text me-1"></i><span data-i18n="leadFinder.reasoning">分析推理</span></div>
+                                <div class="small text-secondary" id="aoReasoning">-</div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="text-muted small mb-2"><i class="bi bi-tags me-1"></i><span data-i18n="leadFinder.keywords">搜尋關鍵字</span></div>
+                                <div id="aoKeywordsBadges" class="d-flex flex-wrap gap-1"></div>
+                            </div>
+                        </div>
+
+                        <!-- Loading overlay for AI analysis -->
+                        <div class="d-none mt-3" id="aoAnalyzeLoading">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary mb-2" role="status" style="width:2rem;height:2rem;"></div>
+                                <div class="text-muted small" data-i18n="leadFinder.analyzing">AI 正在分析中...</div>
+                            </div>
+                        </div>
+
+                        <!-- Keywords input (always visible) -->
+                        <div class="mt-3">
+                            <label class="form-label small text-muted" data-i18n="leadFinder.editKeywords">編輯關鍵字（可修改後再搜尋）</label>
+                            <input type="text" class="form-control" id="searchKeywords" required placeholder="用逗號分隔關鍵字，或按「AI 分析」自動生成">
+                            <div class="invalid-feedback">請填寫搜尋關鍵字</div>
+                        </div>
+
+                        <!-- Hidden field to store search_region for backward compat -->
+                        <input type="hidden" id="searchRegion" value="">
+                    </div>
+                </div>
+
+                <!-- Card 3: Send Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-send me-2"></i><span data-i18n-field="發送設定">發送設定</span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n-field="發送頻道">發送頻道</label>
+                            <select class="form-select" id="channelSelect" required>
+                                <option value="email">Email</option>
+                                <option value="whatsapp">WhatsApp</option>
+                                <option value="both">Email + WhatsApp</option>
+                            </select>
+                        </div>
+                        <div class="mb-3" id="emailSubjectRow">
+                            <label class="form-label" data-i18n-field="電郵主旨">電郵主旨</label>
+                            <input type="text" class="form-control" id="emailSubject" maxlength="200" placeholder="例如：專屬優惠方案">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n-field="發送內容">發送內容</label>
+                            <textarea class="form-control" id="messageContent" rows="8" placeholder="輸入要發送的內容"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-outline-info" id="aiGenerateBtn" onclick="generateContent()">
+                            <i class="bi bi-stars me-1"></i><span data-i18n-field="AI 自動生成內容">AI 自動生成內容</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 4: Schedule Settings -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock me-2"></i><span data-i18n-field="排程設定">排程設定</span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n-field="執行間隔(分鐘)">執行間隔(分鐘)</label>
+                                <input type="number" class="form-control" id="intervalMinutes" min="60" value="60" required>
+                                <div class="form-text">最少 60 分鐘</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n-field="每次最多尋找">每次最多尋找</label>
+                                <input type="number" class="form-control" id="maxLeadsPerRun" min="1" value="10">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n-field="每次最多發送">每次最多發送</label>
+                                <input type="number" class="form-control" id="maxSendsPerRun" min="1" value="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Summary -->
+            <div class="col-lg-4">
+                <div class="card mb-4" style="position: sticky; top: 1rem;">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clipboard-check me-2"></i><span data-i18n-field="設定摘要">設定摘要</span></h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">地區</span>
+                            <span id="summaryRegion">-</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">頻道</span>
+                            <span id="summaryChannel">Email</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">執行間隔</span>
+                            <span id="summaryInterval">60 分鐘</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">每次尋找</span>
+                            <span id="summaryLeads">10</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">每次發送</span>
+                            <span id="summarySends">10</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">關鍵字</span>
+                            <span id="summaryKeywords" class="text-end" style="max-width:60%;">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Buttons -->
+        <div class="d-flex gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary" onclick="showListView()">
+                <i class="bi bi-x-circle me-1"></i><span data-i18n-field="取消">取消</span>
+            </button>
+            <button type="button" class="btn btn-primary" onclick="saveCampaign()">
+                <i class="bi bi-check-circle me-1"></i><span data-i18n-field="儲存">儲存</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- ==================== LOGS MODAL ==================== -->
+<div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="logsModalLabel">
+                    <i class="bi bi-journal-text me-2"></i><span data-i18n-field="執行日誌">執行日誌</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th data-i18n-field="時間">時間</th>
+                                <th data-i18n-field="尋找">尋找</th>
+                                <th>Email</th>
+                                <th>WhatsApp</th>
+                                <th data-i18n-field="失敗">失敗</th>
+                                <th data-i18n-field="狀態">狀態</th>
+                                <th data-i18n-field="訊息">訊息</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-3">載入中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3" id="logsPagination">
+                    <button class="btn btn-sm btn-outline-secondary" id="logsPrev" onclick="loadLogs(currentLogCampaignId, logsPage - 1)" disabled>
+                        <i class="bi bi-chevron-left"></i> <span data-i18n-field="上一頁">上一頁</span>
+                    </button>
+                    <span class="text-muted small" id="logsPageInfo"></span>
+                    <button class="btn btn-sm btn-outline-secondary" id="logsNext" onclick="loadLogs(currentLogCampaignId, logsPage + 1)">
+                        <span data-i18n-field="下一頁">下一頁</span> <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // ==================== State ====================
+    let campaigns = [];
+    let editingId = null;
+    let currentLogCampaignId = null;
+    let logsPage = 1;
+    const logsLimit = 20;
+    const t = (k, fb) => { if (typeof I18n === 'undefined' || !I18n.t) return fb; const v = I18n.t(k); return (v && v !== k) ? v : (fb || k); };
+    const qs = id => document.getElementById(id);
+
+    // Make pagination vars available globally for onclick handlers
+    window.currentLogCampaignId = null;
+    window.logsPage = 1;
+
+    // ==================== Init ====================
+    loadCampaigns();
+    initSearchFields();
+
+    // Channel toggle for email subject visibility
+    document.getElementById('channelSelect').addEventListener('change', updateChannelUI);
+
+    // Summary live update
+    ['channelSelect', 'intervalMinutes', 'maxLeadsPerRun', 'maxSendsPerRun', 'searchKeywords'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateSummary);
+        if (el) el.addEventListener('change', updateSummary);
+    });
+
+    // ==================== Search Fields Init (same as Lead Finder) ====================
+    async function initSearchFields() {
+        await Promise.all([loadCountries(), loadProducts()]);
+    }
+
+    async function loadCountries() {
+        const sel = qs('aoRegion');
+        try {
+            const lang = (typeof I18n !== 'undefined' && I18n.currentLang) ? I18n.currentLang : 'zh';
+            const resp = await App.apiRequest('/api/v1/countries?lang=' + encodeURIComponent(lang) + '&limit=300');
+            const countries = (resp && resp.data) ? resp.data : [];
+            sel.innerHTML = '<option value=""></option>' + countries.map(function(c) {
+                const code = (c && c.code) ? String(c.code) : '';
+                const name = (c && c.name) ? String(c.name) : code;
+                return '<option value="' + name + '" data-code="' + code + '">' + name + ' (' + code + ')</option>';
+            }).join('');
+            if (typeof $ !== 'undefined') {
+                $(sel).select2({ theme: 'bootstrap-5', placeholder: t('leadFinder.selectCountry', '選擇國家...'), allowClear: true, width: '100%' });
+                if ($(sel).find('option[data-code="HK"]').length) {
+                    $(sel).val($(sel).find('option[data-code="HK"]').val()).trigger('change');
+                }
+            }
+        } catch(e) {
+            console.error('Failed to load countries:', e);
+            sel.innerHTML = '<option value="">--</option>';
+        }
+    }
+
+    async function loadProducts() {
+        try {
+            const sel = qs('aoProductId');
+            if (typeof $ !== 'undefined') {
+                $(sel).select2({
+                    theme: 'bootstrap-5',
+                    placeholder: t('leadFinder.allProducts', '全部產品'),
+                    allowClear: true,
+                    width: '100%',
+                    ajax: {
+                        url: '/api/v1/products',
+                        dataType: 'json',
+                        delay: 250,
+                        headers: {
+                            'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || ''),
+                            'X-Tenant-Subdomain': localStorage.getItem('tenant_subdomain') || ''
+                        },
+                        data: function(params) {
+                            return { search: params.term || '', limit: 50, page: params.page || 1 };
+                        },
+                        processResults: function(data, params) {
+                            params.page = params.page || 1;
+                            var items = data.data || [];
+                            return {
+                                results: items.map(function(p) {
+                                    return { id: p.id, text: p.name + (p.category ? ' (' + p.category + ')' : '') };
+                                }),
+                                pagination: { more: items.length === 50 }
+                            };
+                        },
+                        cache: true
+                    },
+                    minimumInputLength: 0
+                });
+            }
+        } catch(e) { console.error('Failed to init product select:', e); }
+    }
+
+    // ==================== AI Analyze (same as Lead Finder) ====================
+    window.aoAnalyze = async function() {
+        const productId = qs('aoProductId').value;
+        const region = typeof $ !== 'undefined' ? $(qs('aoRegion')).val() || '' : qs('aoRegion').value;
+
+        qs('aoAnalysisCard').classList.add('d-none');
+        qs('aoAnalyzeLoading').classList.remove('d-none');
+        qs('btnAoAnalyze').disabled = true;
+
+        try {
+            const res = await App.apiRequest('/lead-finder/analyze', {
+                method: 'POST',
+                body: JSON.stringify({ product_id: productId, region: region }),
+            });
+            var analysis = res.analysis;
+
+            qs('aoTargetIndustry').textContent = analysis.target_industry || '-';
+            qs('aoTargetProfile').textContent = analysis.target_profile || '-';
+            qs('aoReasoning').textContent = analysis.reasoning_notes || '-';
+
+            var kwContainer = qs('aoKeywordsBadges');
+            kwContainer.innerHTML = '';
+            (analysis.search_keywords || []).forEach(function(kw) {
+                var badge = document.createElement('span');
+                badge.className = 'badge bg-primary bg-opacity-75';
+                badge.style.cursor = 'pointer';
+                badge.textContent = kw;
+                kwContainer.appendChild(badge);
+            });
+
+            qs('searchKeywords').value = (analysis.search_keywords || []).join(', ');
+            // Store region in hidden field for save
+            qs('searchRegion').value = region;
+            qs('aoAnalysisCard').classList.remove('d-none');
+            updateSummary();
+        } catch(e) {
+            console.error(e);
+            App.showError(e.message || t('leadFinder.analyzeFailed', 'AI 分析失敗'));
+        } finally {
+            qs('aoAnalyzeLoading').classList.add('d-none');
+            qs('btnAoAnalyze').disabled = false;
+        }
+    };
+
+    // ==================== List View ====================
+    window.showListView = function() {
+        document.getElementById('listView').style.display = '';
+        document.getElementById('formView').style.display = 'none';
+        editingId = null;
+        loadCampaigns();
+    };
+
+    window.showCreateForm = function() {
+        editingId = null;
+        document.getElementById('campaignId').value = '';
+        document.getElementById('formTitle').textContent = '新增自動外展';
+        resetForm();
+        document.getElementById('listView').style.display = 'none';
+        document.getElementById('formView').style.display = '';
+        updateChannelUI();
+        updateSummary();
+        // Reset AI analysis panel
+        qs('aoAnalysisCard').classList.add('d-none');
+        qs('aoAnalyzeLoading').classList.add('d-none');
+        // Reset select2 fields
+        if (typeof $ !== 'undefined') {
+            $(qs('aoRegion')).val('').trigger('change');
+            $(qs('aoProductId')).val(null).trigger('change');
+            // Default to HK
+            var hkOpt = $(qs('aoRegion')).find('option[data-code="HK"]');
+            if (hkOpt.length) $(qs('aoRegion')).val(hkOpt.val()).trigger('change');
+        }
+        qs('aoContactType').value = '';
+        qs('aoResultLimit').value = '50';
+    };
+
+    window.showEditForm = async function(id) {
+        try {
+            var campaign = await App.apiRequest('/auto-outreach/' + id);
+            editingId = id;
+            document.getElementById('campaignId').value = id;
+            document.getElementById('formTitle').textContent = '編輯自動外展';
+            document.getElementById('campaignName').value = campaign.name || '';
+            document.getElementById('campaignDesc').value = campaign.description || '';
+            document.getElementById('searchKeywords').value = campaign.search_keywords || '';
+            document.getElementById('searchRegion').value = campaign.search_region || '';
+            document.getElementById('channelSelect').value = campaign.channel || 'email';
+            document.getElementById('emailSubject').value = campaign.email_subject || '';
+            document.getElementById('messageContent').value = campaign.message_content || '';
+            document.getElementById('intervalMinutes').value = campaign.interval_minutes || 60;
+            document.getElementById('maxLeadsPerRun').value = campaign.max_leads_per_run || 10;
+            document.getElementById('maxSendsPerRun').value = campaign.max_sends_per_run || 10;
+
+            // Restore search fields
+            qs('aoContactType').value = campaign.contact_type || '';
+            qs('aoResultLimit').value = String(campaign.result_limit || 50);
+
+            // Set region in select2
+            if (typeof $ !== 'undefined' && campaign.search_region) {
+                var regionSel = $(qs('aoRegion'));
+                // Try to find matching option
+                var found = false;
+                regionSel.find('option').each(function() {
+                    if ($(this).val() === campaign.search_region) {
+                        regionSel.val(campaign.search_region).trigger('change');
+                        found = true;
+                        return false;
+                    }
+                });
+                if (!found) {
+                    // Add option manually
+                    var newOpt = new Option(campaign.search_region, campaign.search_region, true, true);
+                    regionSel.append(newOpt).trigger('change');
+                }
+            }
+
+            // Set product in select2
+            if (typeof $ !== 'undefined' && campaign.product_id) {
+                // Fetch product name for display
+                try {
+                    var prodResp = await App.apiRequest('/api/v1/products/' + campaign.product_id);
+                    if (prodResp && prodResp.id) {
+                        var prodOpt = new Option(prodResp.name + (prodResp.category ? ' (' + prodResp.category + ')' : ''), prodResp.id, true, true);
+                        $(qs('aoProductId')).append(prodOpt).trigger('change');
+                    }
+                } catch(e) { /* product may have been deleted */ }
+            } else if (typeof $ !== 'undefined') {
+                $(qs('aoProductId')).val(null).trigger('change');
+            }
+
+            // Show keywords if they exist
+            if (campaign.search_keywords) {
+                qs('aoAnalysisCard').classList.remove('d-none');
+            } else {
+                qs('aoAnalysisCard').classList.add('d-none');
+            }
+            qs('aoAnalyzeLoading').classList.add('d-none');
+
+            document.getElementById('listView').style.display = 'none';
+            document.getElementById('formView').style.display = '';
+            updateChannelUI();
+            updateSummary();
+        } catch (err) {
+            App.showError(err.error || '載入失敗');
+        }
+    };
+
+    // ==================== Load Campaigns ====================
+    async function loadCampaigns() {
+        try {
+            var res = await App.apiRequest('/auto-outreach');
+            campaigns = res.data || [];
+            renderCampaignTable(campaigns);
+            updateStats(campaigns);
+        } catch (err) {
+            App.showError(err.error || '載入失敗');
+        }
+    }
+
+    function updateStats(list) {
+        document.getElementById('statTotal').textContent = list.length;
+        var activeCount = list.filter(function(c) { return c.status === 'active'; }).length;
+        document.getElementById('statActive').textContent = activeCount;
+        var totalSent = list.reduce(function(sum, c) { return sum + (c.total_sent_count || 0); }, 0);
+        document.getElementById('statSent').textContent = totalSent;
+    }
+
+    function getStatusBadge(status) {
+        var map = {
+            active: '<span class="badge bg-success">Active</span>',
+            paused: '<span class="badge bg-warning text-dark">Paused</span>',
+            quota_exceeded: '<span class="badge bg-danger">Quota Exceeded</span>'
+        };
+        return map[status] || '<span class="badge bg-secondary">' + status + '</span>';
+    }
+
+    function getChannelBadge(channel) {
+        var map = {
+            email: '<span class="badge bg-primary">Email</span>',
+            whatsapp: '<span class="badge bg-success">WhatsApp</span>',
+            both: '<span class="badge bg-info">Email + WhatsApp</span>'
+        };
+        return map[channel] || '<span class="badge bg-secondary">' + channel + '</span>';
+    }
+
+    function formatTime(ts) {
+        if (!ts) return '-';
+        var d = new Date(ts);
+        return d.toLocaleString();
+    }
+
+    function renderCampaignTable(list) {
+        var tbody = document.getElementById('campaignTableBody');
+        if (!list || list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">' +
+                '<i class="bi bi-inbox fs-1 d-block mb-2"></i>尚無活動，點擊「新增」開始</td></tr>';
+            return;
+        }
+        var html = '';
+        list.forEach(function(c) {
+            var toggleIcon = c.status === 'active' ? 'bi-pause-circle' : 'bi-play-circle';
+            var toggleTitle = c.status === 'active' ? '暫停' : '啟動';
+            html += '<tr>';
+            html += '<td><strong>' + escapeHtml(c.name) + '</strong></td>';
+            html += '<td>' + getChannelBadge(c.channel) + '</td>';
+            html += '<td>' + getStatusBadge(c.status) + '</td>';
+            html += '<td>' + (c.total_leads_found || 0) + '</td>';
+            html += '<td>' + (c.total_sent_count || 0) + '</td>';
+            html += '<td><small>' + formatTime(c.last_run_at) + '</small></td>';
+            html += '<td class="text-nowrap">';
+            html += '<button class="btn btn-sm btn-outline-secondary me-1" title="' + toggleTitle + '" onclick="toggleCampaign(\'' + c.id + '\')">';
+            html += '<i class="bi ' + toggleIcon + '"></i></button>';
+            html += '<button class="btn btn-sm btn-outline-primary me-1" title="編輯" onclick="showEditForm(\'' + c.id + '\')">';
+            html += '<i class="bi bi-pencil"></i></button>';
+            html += '<button class="btn btn-sm btn-outline-info me-1" title="日誌" onclick="showLogs(\'' + c.id + '\')">';
+            html += '<i class="bi bi-journal-text"></i></button>';
+            html += '<button class="btn btn-sm btn-outline-danger" title="刪除" onclick="deleteCampaign(\'' + c.id + '\')">';
+            html += '<i class="bi bi-trash"></i></button>';
+            html += '</td>';
+            html += '</tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        var div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ==================== Toggle / Delete ====================
+    window.toggleCampaign = async function(id) {
+        try {
+            await App.apiRequest('/auto-outreach/' + id + '/toggle', { method: 'PUT' });
+            App.showSuccess('已更新狀態');
+            loadCampaigns();
+        } catch (err) {
+            App.showError(err.error || '操作失敗');
+        }
+    };
+
+    window.deleteCampaign = async function(id) {
+        if (!confirm('確定要刪除此活動？')) return;
+        try {
+            await App.apiRequest('/auto-outreach/' + id, { method: 'DELETE' });
+            App.showSuccess('已刪除');
+            loadCampaigns();
+        } catch (err) {
+            App.showError(err.error || '刪除失敗');
+        }
+    };
+
+    // ==================== Save Campaign ====================
+    window.saveCampaign = async function() {
+        var form = document.getElementById('campaignForm');
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        // Get region from select2
+        var region = typeof $ !== 'undefined' ? $(qs('aoRegion')).val() || '' : qs('searchRegion').value;
+
+        var payload = {
+            name: document.getElementById('campaignName').value.trim(),
+            description: document.getElementById('campaignDesc').value.trim(),
+            search_keywords: document.getElementById('searchKeywords').value.trim(),
+            search_region: region,
+            product_id: qs('aoProductId').value || '',
+            contact_type: qs('aoContactType').value || '',
+            result_limit: parseInt(qs('aoResultLimit').value) || 50,
+            channel: document.getElementById('channelSelect').value,
+            email_subject: document.getElementById('emailSubject').value.trim(),
+            message_content: document.getElementById('messageContent').value.trim(),
+            interval_minutes: parseInt(document.getElementById('intervalMinutes').value) || 60,
+            max_leads_per_run: parseInt(document.getElementById('maxLeadsPerRun').value) || 10,
+            max_sends_per_run: parseInt(document.getElementById('maxSendsPerRun').value) || 10
+        };
+
+        try {
+            if (editingId) {
+                await App.apiRequest('/auto-outreach/' + editingId, {
+                    method: 'PUT',
+                    body: JSON.stringify(payload)
+                });
+                App.showSuccess('已更新活動');
+            } else {
+                await App.apiRequest('/auto-outreach', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                App.showSuccess('已建立活動');
+            }
+            showListView();
+        } catch (err) {
+            App.showError(err.error || '儲存失敗');
+        }
+    };
+
+    // ==================== AI Generate Content ====================
+    window.generateContent = async function() {
+        var btn = document.getElementById('aiGenerateBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>生成中...';
+
+        var region = typeof $ !== 'undefined' ? $(qs('aoRegion')).val() || '' : qs('searchRegion').value;
+        var payload = {
+            channel: document.getElementById('channelSelect').value,
+            product_id: qs('aoProductId').value || '',
+            keywords: document.getElementById('searchKeywords').value.trim(),
+            region: region,
+            tone: 'professional'
+        };
+
+        try {
+            var res = await App.apiRequest('/auto-outreach/generate-content', {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            if (res.email_subject) {
+                document.getElementById('emailSubject').value = res.email_subject;
+            }
+            var channel = document.getElementById('channelSelect').value;
+            if (channel === 'whatsapp') {
+                document.getElementById('messageContent').value = res.whatsapp_content || '';
+            } else {
+                document.getElementById('messageContent').value = res.email_content || '';
+            }
+            App.showSuccess('AI 內容已生成');
+        } catch (err) {
+            App.showError(err.error || 'AI 生成失敗');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-stars me-1"></i>AI 自動生成內容';
+        }
+    };
+
+    // ==================== Logs ====================
+    window.showLogs = function(campaignId) {
+        currentLogCampaignId = campaignId;
+        window.currentLogCampaignId = campaignId;
+        logsPage = 1;
+        window.logsPage = 1;
+        loadLogs(campaignId, 1);
+        var modal = new bootstrap.Modal(document.getElementById('logsModal'));
+        modal.show();
+    };
+
+    window.loadLogs = async function(campaignId, page) {
+        if (page < 1) return;
+        logsPage = page;
+        window.logsPage = page;
+        var tbody = document.getElementById('logsTableBody');
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">載入中...</td></tr>';
+
+        try {
+            var res = await App.apiRequest('/auto-outreach/' + campaignId + '/logs?page=' + page + '&limit=' + logsLimit);
+            var logs = res.data || [];
+            var total = res.total || 0;
+            var totalPages = Math.ceil(total / logsLimit) || 1;
+
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-3">無日誌記錄</td></tr>';
+            } else {
+                var html = '';
+                logs.forEach(function(log) {
+                    var statusBadge = log.status === 'success'
+                        ? '<span class="badge bg-success">Success</span>'
+                        : '<span class="badge bg-danger">Failed</span>';
+                    html += '<tr>';
+                    html += '<td><small>' + formatTime(log.created_at) + '</small></td>';
+                    html += '<td>' + (log.leads_found || 0) + '</td>';
+                    html += '<td>' + (log.emails_sent || 0) + '</td>';
+                    html += '<td>' + (log.whatsapp_sent || 0) + '</td>';
+                    html += '<td>' + (log.fail_count || 0) + '</td>';
+                    html += '<td>' + statusBadge + '</td>';
+                    html += '<td><small>' + escapeHtml(log.message || '') + '</small></td>';
+                    html += '</tr>';
+                });
+                tbody.innerHTML = html;
+            }
+
+            document.getElementById('logsPrev').disabled = (page <= 1);
+            document.getElementById('logsNext').disabled = (page >= totalPages);
+            document.getElementById('logsPageInfo').textContent = page + ' / ' + totalPages;
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-3">載入失敗</td></tr>';
+        }
+    };
+
+    // ==================== UI Helpers ====================
+    function updateChannelUI() {
+        var channel = document.getElementById('channelSelect').value;
+        var emailRow = document.getElementById('emailSubjectRow');
+        emailRow.style.display = (channel === 'whatsapp') ? 'none' : '';
+    }
+
+    function updateSummary() {
+        var channelMap = { email: 'Email', whatsapp: 'WhatsApp', both: 'Email + WhatsApp' };
+        document.getElementById('summaryChannel').textContent = channelMap[document.getElementById('channelSelect').value] || '-';
+        document.getElementById('summaryInterval').textContent = (document.getElementById('intervalMinutes').value || 60) + ' 分鐘';
+        document.getElementById('summaryLeads').textContent = document.getElementById('maxLeadsPerRun').value || 10;
+        document.getElementById('summarySends').textContent = document.getElementById('maxSendsPerRun').value || 10;
+        var kw = document.getElementById('searchKeywords').value.trim();
+        document.getElementById('summaryKeywords').textContent = kw || '-';
+        var region = typeof $ !== 'undefined' ? $(qs('aoRegion')).val() || '' : '';
+        document.getElementById('summaryRegion').textContent = region || '-';
+    }
+
+    function resetForm() {
+        document.getElementById('campaignForm').reset();
+        document.getElementById('campaignForm').classList.remove('was-validated');
+        document.getElementById('campaignName').value = '';
+        document.getElementById('campaignDesc').value = '';
+        document.getElementById('searchKeywords').value = '';
+        document.getElementById('searchRegion').value = '';
+        document.getElementById('channelSelect').value = 'email';
+        document.getElementById('emailSubject').value = '';
+        document.getElementById('messageContent').value = '';
+        document.getElementById('intervalMinutes').value = 60;
+        document.getElementById('maxLeadsPerRun').value = 10;
+        document.getElementById('maxSendsPerRun').value = 10;
+        qs('aoContactType').value = '';
+        qs('aoResultLimit').value = '50';
+    }
+
+});
+</script>
+{{ end }}

@@ -1,0 +1,368 @@
+{{ define "pages/accounting" }}
+<style>
+    .report-period-selector {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stats-card.danger {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stats-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stats-card.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .card-buttons {
+        display: flex;
+        gap: 0;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .card-buttons a {
+        flex: 1;
+        width: 50%;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-graph-up me-2"></i><span data-i18n="accounting.overview">會計總覽</span></h2>
+    </div>
+
+    <!-- 日期範圍選擇 -->
+    <div class="report-period-selector">
+        <div class="row align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="accounting.startDate">開始日期</label>
+                <input type="date" class="form-control" id="startDate" onchange="loadSummary()">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="accounting.endDate">結束日期</label>
+                <input type="date" class="form-control" id="endDate" onchange="loadSummary()">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">&nbsp;</label>
+                <button type="button" class="btn btn-primary w-100" onclick="loadSummary()">
+                    <i class="bi bi-search"></i> <span data-i18n="accounting.search">查詢</span>
+                </button>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold">&nbsp;</label>
+                <button type="button" class="btn btn-outline-secondary w-100" onclick="resetDateRange()">
+                    <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="accounting.reset">重置</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="stats-card success">
+                <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                        <div class="text-white-50 small" data-i18n="accounting.totalIncome">總收入</div>
+                        <div class="h3 mb-0" id="totalIncome">$0.00</div>
+                    </div>
+                    <i class="bi bi-arrow-down-circle fs-1 opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-buttons">
+                <a href="/incomes" class="btn btn-sm btn-success" style="border-radius: 5px 0 0 5px;">
+                    <i class="bi bi-list"></i> <span data-i18n="accounting.viewIncomes">查看收入</span>
+                </a>
+                <a href="/incomes/new" class="btn btn-sm btn-outline-success" style="border-radius: 0 5px 5px 0;">
+                    <i class="bi bi-plus-circle"></i> <span data-i18n="accounting.addIncome">新增收入</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card danger">
+                <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                        <div class="text-white-50 small" data-i18n="accounting.totalExpense">總支出</div>
+                        <div class="h3 mb-0" id="totalExpense">$0.00</div>
+                    </div>
+                    <i class="bi bi-arrow-up-circle fs-1 opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-buttons">
+                <a href="/expenses" class="btn btn-sm btn-danger" style="border-radius: 5px 0 0 5px;">
+                    <i class="bi bi-list"></i> <span data-i18n="accounting.viewExpenses">查看支出</span>
+                </a>
+                <a href="/expenses/new" class="btn btn-sm btn-outline-danger" style="border-radius: 0 5px 5px 0;">
+                    <i class="bi bi-plus-circle"></i> <span data-i18n="accounting.addExpense">新增支出</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card info">
+                <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                        <div class="text-white-50 small" data-i18n="accounting.purchaseTotal">採購總額</div>
+                        <div class="h3 mb-0" id="purchaseTotal">$0.00</div>
+                    </div>
+                    <i class="bi bi-cart-plus fs-1 opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-buttons">
+                <a href="/purchase-orders" class="btn btn-sm btn-info" style="border-radius: 5px 0 0 5px;">
+                    <i class="bi bi-list"></i> <span data-i18n="accounting.viewPurchases">查看採購</span>
+                </a>
+                <a href="/purchase-orders/new" class="btn btn-sm btn-outline-info" style="border-radius: 0 5px 5px 0;">
+                    <i class="bi bi-plus-circle"></i> <span data-i18n="accounting.addPurchase">新增採購</span>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="stats-card primary" id="netProfitCard">
+                <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                        <div class="text-white-50 small" data-i18n="accounting.netProfit">淨利潤</div>
+                        <div class="h3 mb-0" id="netProfit">$0.00</div>
+                    </div>
+                    <i class="bi bi-graph-up fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 趨勢圖表 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" data-i18n="accounting.trendChart">財務趨勢圖</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="accountingChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/vendor/chartjs/chart.umd.min.js"></script>
+<script>
+    let accountingChart = null;
+    let __lastAccountingChartData = null;
+
+    // 翻譯小工具：避免 i18n 未就緒或 key 缺失時，chart label 顯示 key
+    function t(key, fallback) {
+        try {
+            if (typeof I18n === 'undefined' || typeof I18n.t !== 'function') return fallback;
+            const v = I18n.t(key);
+            if (!v || v === key) return fallback;
+            return v;
+        } catch (e) {
+            return fallback;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // 等 i18n 載入完成再渲染圖表文字，降低「偶發翻譯缺失」
+        if (typeof I18n !== 'undefined' && typeof I18n.whenReady === 'function') {
+            await I18n.whenReady(5000);
+        }
+        
+        // 設置默認日期範圍（本月）
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
+        document.getElementById('endDate').value = now.toISOString().split('T')[0];
+        
+        loadSummary();
+    });
+
+    function resetDateRange() {
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
+        document.getElementById('endDate').value = now.toISOString().split('T')[0];
+        loadSummary();
+    }
+
+    async function loadSummary() {
+        try {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            let url = '/accounting/summary';
+            if (startDate) url += `?start_date=${startDate}`;
+            if (endDate) url += (startDate ? '&' : '?') + `end_date=${endDate}`;
+            
+            const data = await App.apiRequest(url);
+            
+            document.getElementById('totalIncome').textContent = '$' + (data.total_income || 0).toFixed(2);
+            document.getElementById('totalExpense').textContent = '$' + (data.total_expense || 0).toFixed(2);
+            document.getElementById('purchaseTotal').textContent = '$' + (data.purchase_total || 0).toFixed(2);
+            document.getElementById('netProfit').textContent = '$' + (data.net_profit || 0).toFixed(2);
+            
+            // 根據淨利潤設置顏色
+            const netProfitCard = document.getElementById('netProfitCard');
+            if (data.net_profit > 0) {
+                netProfitCard.className = 'stats-card success';
+            } else if (data.net_profit < 0) {
+                netProfitCard.className = 'stats-card danger';
+            } else {
+                netProfitCard.className = 'stats-card primary';
+            }
+            
+            // 繪製趨勢圖表
+            __lastAccountingChartData = data.daily_chart || [];
+            renderAccountingChart(__lastAccountingChartData);
+        } catch (error) {
+            console.error('載入統計失敗:', error);
+            const msg = t('accounting.loadFailed', '載入統計失敗');
+            App.showAlert(msg + ': ' + error.message, 'danger');
+        }
+    }
+    
+    function renderAccountingChart(data) {
+        const ctx = document.getElementById('accountingChart');
+        if (!ctx) return;
+        
+        // 銷毀舊圖表
+        if (accountingChart) {
+            accountingChart.destroy();
+        }
+        
+        // 如果沒有數據，創建空數據
+        if (!data || data.length === 0) {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                data = [];
+                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                    data.push({
+                        date: d.toISOString().split('T')[0],
+                        income: 0,
+                        expense: 0,
+                        purchase: 0,
+                        net_profit: 0
+                    });
+                }
+            } else {
+                // 如果沒有日期範圍，顯示本月數據
+                const now = new Date();
+                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                data = [];
+                for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
+                    data.push({
+                        date: d.toISOString().split('T')[0],
+                        income: 0,
+                        expense: 0,
+                        purchase: 0,
+                        net_profit: 0
+                    });
+                }
+            }
+        }
+        
+        const labels = data.map(item => {
+            const date = new Date(item.date);
+            return (date.getMonth() + 1) + '/' + date.getDate();
+        });
+        const incomeData = data.map(item => item.income || 0);
+        const expenseData = data.map(item => item.expense || 0);
+        const netProfitData = data.map(item => item.net_profit || 0);
+        
+        accountingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: t('accounting.chart.totalIncome', '總收入'),
+                        data: incomeData,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: t('accounting.chart.totalExpense', '總支出'),
+                        data: expenseData,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.1
+                    },
+                    {
+                        label: t('accounting.chart.netProfit', '淨利潤'),
+                        data: netProfitData,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                // mobile 下避免高度被壓扁：讓高度跟隨 canvas/CSS
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString('zh-TW', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString('zh-TW');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 若語言檔較慢，載入完成後補一次重繪（避免 chart label 留在 key）
+    window.addEventListener('languageChanged', () => {
+        try {
+            if (__lastAccountingChartData) renderAccountingChart(__lastAccountingChartData);
+        } catch (e) {
+            console.warn('re-render accounting chart on languageChanged failed', e);
+        }
+    });
+</script>
+{{ end }}
+

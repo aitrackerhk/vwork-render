@@ -1,0 +1,375 @@
+{{define "pages/notifications"}}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0"><i class="bi bi-exclamation-square"></i> <span data-i18n="notifications.title">提示資訊</span></h4>
+        <div class="notifications-actions">
+            <button class="btn btn-sm btn-outline-primary" onclick="markAllAsRead()" id="markAllReadBtn">
+                <i class="bi bi-check-all"></i> <span data-i18n="notifications.markAllRead">全部標記為已讀</span>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="loadNotifications()">
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="common.refresh">刷新</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 過濾標籤 -->
+    <div class="mb-3">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-sm btn-outline-primary active" onclick="filterNotifications('all')" id="filterAll">
+                <span data-i18n="common.all">全部</span>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterNotifications('unread')" id="filterUnread">
+                <span data-i18n="notifications.unread">未讀</span>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterNotifications('read')" id="filterRead">
+                <span data-i18n="notifications.read">已讀</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 提示資訊列表 -->
+    <div id="notificationsContainer" class="row g-3">
+        <div class="col-12 text-center p-5 text-muted">
+            <i class="bi bi-exclamation-square fs-1"></i>
+            <p class="mt-2" data-i18n="notifications.loading">載入提示資訊中...</p>
+        </div>
+    </div>
+
+    <!-- 分頁 -->
+    <div class="d-flex justify-content-between align-items-center mt-4" id="paginationContainer" style="display: none !important;">
+        <div class="text-muted" id="paginationInfo"></div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+let currentFilter = 'all';
+let currentPage = 1;
+const pageSize = 20;
+let notifications = []; // 保存當前通知列表，用於 viewNotification 函數
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadNotifications();
+    
+    // 每30秒自動刷新
+    setInterval(loadNotifications, 30000);
+});
+
+async function loadNotifications() {
+    try {
+        const container = document.getElementById('notificationsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12 text-center p-5 text-muted">
+                    <i class="bi bi-exclamation-square fs-1"></i>
+                    <p class="mt-2" data-i18n="notifications.loading">載入提示資訊中...</p>
+                </div>
+            `;
+        }
+        
+        const params = new URLSearchParams({
+            page: currentPage,
+            limit: pageSize
+        });
+        
+        if (currentFilter === 'unread') {
+            params.append('is_read', 'false');
+        } else if (currentFilter === 'read') {
+            params.append('is_read', 'true');
+        }
+        
+        const response = await App.apiRequest(`/notifications?${params.toString()}`);
+        console.log('Notifications API response:', response);
+        
+        if (response && response.data) {
+            notifications = response.data; // 保存通知列表
+            renderNotifications(response.data, response.total || 0);
+        } else {
+            console.error('Invalid response format:', response);
+            notifications = [];
+            renderNotifications([], 0);
+        }
+    } catch (error) {
+        console.error('載入提示資訊失敗:', error);
+        const container = document.getElementById('notificationsContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="col-12 text-center p-5 text-danger">
+                    <i class="bi bi-exclamation-triangle fs-1"></i>
+                    <p class="mt-2">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.loadFailed') : '載入提示資訊失敗'}</p>
+                </div>
+            `;
+        }
+        App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.loadFailed') : '載入提示資訊失敗', 'danger');
+    }
+}
+
+function renderNotifications(notifications, total) {
+    const container = document.getElementById('notificationsContainer');
+    if (!container) {
+        console.error('找不到 notificationsContainer 元素');
+        return;
+    }
+    
+    if (!notifications || notifications.length === 0) {
+        container.innerHTML = `
+            <div class="col-12 text-center p-5 text-muted">
+                <i class="bi bi-bell-slash fs-1"></i>
+                <p class="mt-2">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.noNotifications') : '暫無提示資訊'}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = notifications.map(alert => {
+        const locale = (typeof I18n !== 'undefined' && I18n.currentLang === 'en') ? 'en-US' : 'zh-TW';
+        const timeStr = new Date(alert.created_at).toLocaleString(locale, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const readClass = alert.is_read ? 'bg-light' : 'bg-white border-start border-primary border-3';
+        const readIcon = alert.is_read ? '' : '<i class="bi bi-circle-fill text-primary" style="font-size: 0.5rem;"></i>';
+        
+        // 安全地转义字符串用于 onclick 属性（转义单引号和反斜杠）
+        const escapeJs = (str) => {
+            if (!str) return '';
+            return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '\\"');
+        };
+        const safeId = escapeJs(alert.id);
+        const safeLink = escapeJs(alert.link || '');
+        const safeType = escapeJs(alert.type || '');
+        
+        return `
+            <div class="col-12">
+                <div class="card ${readClass} shadow-sm notification-card" onclick="viewNotification('${safeId}', '${safeLink}', '${safeType}')" style="cursor: pointer;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    ${readIcon}
+                                    <h6 class="mb-0 ${alert.is_read ? 'text-muted' : 'fw-bold'}">${escapeHtml(alert.title)}</h6>
+                                    <span class="badge bg-secondary">${(() => { const typeKey = 'notifications.types.' + alert.type; const translated = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(typeKey) : alert.type; return escapeHtml(translated === typeKey ? alert.type : translated); })()}</span>
+                                </div>
+                                <p class="mb-2 text-muted">${escapeHtml(alert.message)}</p>
+                                <small class="text-muted">${timeStr}</small>
+                            </div>
+                            <div class="ms-3">
+                                ${!alert.is_read ? `
+                                    <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); markAsRead('${alert.id}')" title="${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.markAsRead') : '標記為已讀'}">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterNotifications(filter) {
+    currentFilter = filter;
+    currentPage = 1;
+    
+    // 更新按鈕狀態
+    document.querySelectorAll('[onclick^="filterNotifications"]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`filter${filter.charAt(0).toUpperCase() + filter.slice(1)}`).classList.add('active');
+    
+    loadNotifications();
+}
+
+async function markAsRead(alertId) {
+    try {
+        await App.apiRequest(`/notifications/${alertId}/read`, {
+            method: 'PUT'
+        });
+        
+        // 更新未讀數
+        if (typeof loadUnreadNotificationCount === 'function') {
+            loadUnreadNotificationCount();
+        }
+        
+        // 重新載入列表
+        loadNotifications();
+    } catch (error) {
+        console.error('標記為已讀失敗:', error);
+        App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.markReadFailed') : '標記為已讀失敗', 'danger');
+    }
+}
+
+async function markAllAsRead() {
+    try {
+        const btn = document.getElementById('markAllReadBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> ' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.processing') : '處理中...');
+        
+        await App.apiRequest('/notifications/read-all', {
+            method: 'PUT'
+        });
+        
+        // 更新未讀數
+        if (typeof loadUnreadNotificationCount === 'function') {
+            loadUnreadNotificationCount();
+        }
+        
+        // 重新載入列表
+        loadNotifications();
+        
+        App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.allMarkedRead') : '已全部標記為已讀', 'success');
+    } catch (error) {
+        console.error('標記全部為已讀失敗:', error);
+        App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.markAllFailed') : '標記全部為已讀失敗', 'danger');
+    } finally {
+        const btn = document.getElementById('markAllReadBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-all"></i> ' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('notifications.markAllRead') : '全部標記為已讀');
+    }
+}
+
+async function viewNotification(alertId, link, alertType) {
+    // 標記為已讀（如果尚未已讀）
+    try {
+        await App.apiRequest(`/notifications/${alertId}/read`, {
+            method: 'PUT'
+        });
+        
+        // 更新未讀數
+        if (typeof loadUnreadNotificationCount === 'function') {
+            loadUnreadNotificationCount();
+        }
+        
+        // 更新本地狀態（不重新載入整個列表，提升體驗）
+        // 使用 data 屬性來查找對應的卡片
+        const cards = document.querySelectorAll('.notification-card');
+        for (const card of cards) {
+            const onclickAttr = card.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes(alertId)) {
+                card.classList.remove('bg-white', 'border-start', 'border-primary', 'border-3');
+                card.classList.add('bg-light');
+                const title = card.querySelector('h6');
+                if (title) {
+                    title.classList.remove('fw-bold');
+                    title.classList.add('text-muted');
+                }
+                const readIcon = card.querySelector('.bi-circle-fill');
+                if (readIcon) {
+                    readIcon.remove();
+                }
+                const markBtn = card.querySelector('[onclick*="markAsRead"]');
+                if (markBtn) {
+                    markBtn.remove();
+                }
+                break;
+            }
+        }
+    } catch (error) {
+        console.error('標記為已讀失敗:', error);
+        // 即使標記失敗，也允許跳轉
+    }
+    
+    // 構建跳轉連結
+    let targetLink = link;
+    
+    if (link && alertType) {
+        // 從 link 中提取 ID
+        let entityId = null;
+        
+        // 處理訂單通知
+        if (alertType === 'order_created' || alertType.includes('order')) {
+            const match = link.match(/[?&]order_id=([^&]+)/);
+            if (match) {
+                entityId = match[1];
+                targetLink = `/orders/${entityId}/edit`;
+            }
+        }
+        // 處理服務單通知
+        else if (alertType === 'service_order_created' || alertType.includes('service_order')) {
+            const match = link.match(/[?&]service_order_id=([^&]+)/);
+            if (match) {
+                entityId = match[1];
+                targetLink = `/service-orders/${entityId}/edit`;
+            }
+        }
+        // 處理預約通知
+        else if (alertType.includes('appointment')) {
+            const match = link.match(/[?&]appointment_id=([^&]+)/);
+            if (match) {
+                entityId = match[1];
+                targetLink = `/appointments/${entityId}/edit`;
+            }
+        }
+        // 處理項目通知
+        else if (alertType.includes('project')) {
+            const match = link.match(/[?&]project_id=([^&]+)/);
+            if (match) {
+                entityId = match[1];
+                targetLink = `/projects/${entityId}/edit`;
+            }
+        }
+        // 處理任務通知
+        else if (alertType.includes('task')) {
+            const match = link.match(/[?&]task_id=([^&]+)/);
+            if (match) {
+                entityId = match[1];
+                targetLink = `/projects/${entityId}/edit`; // 任務通常在項目頁面中
+            }
+        }
+        // 處理客戶通知
+        else if (alertType.includes('customer')) {
+            const match = link.match(/[?&]customer_id=([^&]+)/);
+            if (match) {
+                entityId = match[1];
+                targetLink = `/customers/${entityId}/edit`;
+            }
+        }
+        // 處理產品通知
+        else if (alertType.includes('product') || alertType.includes('low_stock')) {
+            const match = link.match(/[?&]product_id=([^&]+)/);
+            if (match) {
+                entityId = match[1];
+                targetLink = `/products/${entityId}/edit`;
+            }
+        }
+    }
+    
+    // 如果有目標連結，跳轉
+    if (targetLink) {
+        if (typeof Router !== 'undefined' && Router.go) { Router.go(targetLink); } else { window.location.href = targetLink; }
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+
+<style>
+.notification-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.notification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* Mobile 响应式样式 */
+@media (max-width: 767.98px) {
+    .notifications-actions {
+        margin-top: 10px;
+    }
+}
+</style>
+{{end}}
+

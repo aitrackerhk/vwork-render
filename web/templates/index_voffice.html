@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vOffice - 智能辦公套件</title>
+  {{template "partials/seo_head" .}}
+  <link rel="icon" type="image/png" href="/static/vofficeicon.png">
+  <link rel="apple-touch-icon" href="/static/vofficeicon.png">
+  <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/custom.css">
+  <link rel="stylesheet" href="/static/css/voffice.css">
+  <style>
+    body.i18n-loading [data-i18n],
+    body.i18n-loading [data-i18n-placeholder],
+    body.i18n-loading [data-i18n-title] {
+      visibility: hidden;
+    }
+  </style>
+  <script>
+    (function() {
+      const savedLang = localStorage.getItem('u-nai_lang');
+      const browserLang = navigator.language || navigator.userLanguage;
+      let currentLang = 'zh';
+
+      if (savedLang) {
+        currentLang = savedLang;
+      } else {
+        if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+          currentLang = 'zh-CN';
+        } else if (browserLang.startsWith('zh')) {
+          currentLang = 'zh';
+        } else {
+          currentLang = 'en';
+        }
+        localStorage.setItem('u-nai_lang', currentLang);
+      }
+
+      window.__INITIAL_LANG__ = currentLang;
+
+      // Detect ?partner=1 URL parameter and store in localStorage
+      var urlParams = new URLSearchParams(window.location.search);
+      var partnerParam = urlParams.get('partner');
+      if (partnerParam) {
+        localStorage.setItem('partner', partnerParam);
+      }
+
+      (function checkBody() {
+        if (document.body) {
+          document.body.classList.add('i18n-loading');
+
+          var style = document.createElement('style');
+          style.textContent = '#voffice-pricing, a[href="#voffice-pricing"], #vofficeBillingMenuItem, .voffice-ai-pricing-note { display: none !important; }';
+          document.head.appendChild(style);
+          document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('a[href="#voffice-pricing"]').forEach(function(el) {
+              var li = el.closest('li');
+              if (li) li.style.display = 'none';
+            });
+          });
+
+          setTimeout(function() {
+            if (document.body && document.body.classList.contains('i18n-loading')) {
+              document.body.classList.remove('i18n-loading');
+            }
+          }, 5000);
+        } else {
+          requestAnimationFrame(checkBody);
+        }
+      })();
+    })();
+  </script>
+</head>
+<body class="voffice-body">
+  <nav class="navbar navbar-expand-lg fixed-top voffice-navbar">
+    <div class="container-fluid px-3">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="/static/vofficelogo.png" alt="vOffice" class="voffice-logo" style="height: 20px;">
+      </a>
+      <!-- Mobile: App Switcher, Menu Toggle (visible on mobile only) -->
+      <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+        <li class="nav-item dropdown" id="mobileAppSwitcherVoffice">
+          <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+            <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+            <div class="app-switcher-grid">
+              <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                <span class="app-switcher-label">vAI</span>
+              </a>
+              <a href="/" class="app-switcher-item" data-app="vwork">
+                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                <span class="app-switcher-label">vWork</span>
+              </a>
+              <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                <span class="app-switcher-label">vMarket</span>
+              </a>
+              <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                <span class="app-switcher-label">vOffice</span>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item" id="goToSystemBtnMobileVoffice">
+          <a class="nav-link" href="/voffice-download" title="進入系統">
+            <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <button class="navbar-toggler" type="button" id="vofficeMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+            <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+          </button>
+        </li>
+      </ul>
+      <!-- Desktop: Full menu -->
+      <div class="collapse navbar-collapse d-none d-lg-block" id="vofficeNavbar">
+        <ul class="navbar-nav me-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="#voffice-features" data-i18n="voffice.nav.features">功能</a></li>
+          <li class="nav-item"><a class="nav-link" href="#voffice-ai" data-i18n="voffice.ai.nav">AI 功能</a></li>
+          <li class="nav-item d-none"><a style="display: none !important;" class="nav-link" href="#voffice-pricing" data-i18n="voffice.nav.pricing">定價</a></li>
+          <li class="nav-item"><a class="nav-link" href="#download" data-i18n="voffice.nav.download">下載</a></li>
+          <li class="nav-item"><a class="nav-link" href="#support" data-i18n="voffice.nav.support">支援</a></li>
+        </ul>
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <!-- 未登入時顯示 -->
+          <li class="nav-item" id="tryFreeBtn">
+            <a class="btn btn-sm btn-outline-secondary" href="/login?product=voffice" data-i18n="nav.tryFree" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">免費試用</a>
+          </li>
+          <!-- 已登入時顯示 -->
+          <li class="nav-item" id="goToSystemBtn" style="display: none;">
+            <a class="btn btn-sm btn-outline-secondary" href="/voffice-download" data-i18n="nav.goToSystem" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">前往系統</a>
+          </li>
+          <li class="nav-item">
+            <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+              <div class="dropdown" style="position: relative;">
+                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                </a>
+                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                    <div class="app-switcher-grid">
+                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                            <span class="app-switcher-label">vAI</span>
+                        </a>
+                        <a href="/" class="app-switcher-item" data-app="vwork">
+                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                            <span class="app-switcher-label">vWork</span>
+                        </a>
+                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                            <span class="app-switcher-label">vMarket</span>
+                        </a>
+                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                            <span class="app-switcher-label">vOffice</span>
+                        </a>
+                    </div>
+                </div>
+              </div>
+              <div class="dropdown" style="position: relative;">
+                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                  <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                  <li><a class="dropdown-item" href="/help/voffice" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                  <li><a class="dropdown-item" href="/contact?product=voffice" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                </ul>
+              </div>
+              <div class="dropdown" style="position: relative;">
+                <a class="nav-link dropdown-toggle" href="#" id="vofficeLangDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                  <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="vofficeLangDropdown">
+                  <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                  <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                  <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                </ul>
+              </div>
+              <a class="nav-link" href="/login?product=voffice" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+              </a>
+              <div class="dropdown" style="position: relative;">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                  <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                  <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li id="publicAICoinsDisplay" style="display: none;">
+                    <a class="dropdown-item" href="/voffice-vcoins">
+                      <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                      <span class="fw-bold" id="publicAICoinsBalance">0</span>
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+                  <li><a class="dropdown-item" href="/voffice-personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                  <li id="vofficeBillingMenuItem"><a class="dropdown-item" href="/voffice-billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar Overlay for mobile -->
+  <div class="sidebar-overlay" id="vofficeSidebarOverlay"></div>
+
+  <!-- vOffice Sidebar Menu for mobile -->
+  <div class="sidebar" id="vofficeSidebar">
+    <nav class="sidebar-nav">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="#voffice-features">
+            <i class="bi bi-star"></i> <span data-i18n="voffice.nav.features">功能</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#voffice-ai">
+            <i class="bi bi-robot"></i> <span data-i18n="voffice.ai.nav">AI 功能</span>
+          </a>
+        </li>
+        <li class="d-none nav-item">
+          <a class="nav-link d-none" href="#voffice-pricing">
+            <i class="bi bi-tag"></i> <span data-i18n="voffice.nav.pricing">定價</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#download">
+            <i class="bi bi-download"></i> <span data-i18n="voffice.nav.download">下載</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#support">
+            <i class="bi bi-headset"></i> <span data-i18n="voffice.nav.support">支援</span>
+          </a>
+        </li>
+        <li class="nav-item nav-group" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+          <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vofficeMobileSupportSubmenu" aria-expanded="false">
+            <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse" id="vofficeMobileSupportSubmenu">
+            <ul class="nav flex-column submenu">
+              <li class="nav-item">
+                <a class="nav-link" href="/help/voffice" target="_blank">
+                  <i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/contact?product=voffice" target="_blank">
+                  <i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item nav-group">
+          <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vofficeLanguageSubmenu" aria-expanded="false">
+            <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse" id="vofficeLanguageSubmenu">
+            <ul class="nav flex-column submenu">
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="en">English</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item nav-group" id="vofficeUserDropdownItem" style="display: none;">
+          <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vofficeUserSubmenu" aria-expanded="false">
+            <img id="vofficeUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+            <i class="bi bi-person-circle" id="vofficeUserIcon"></i> <span id="vofficeUserName" data-i18n="nav.user">用戶</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse" id="vofficeUserSubmenu">
+            <ul class="nav flex-column submenu">
+              <li class="nav-item">
+                <a class="nav-link" href="/voffice-personal-data">
+                  <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/voffice-billing">
+                  <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" id="vofficeLogoutBtn">
+                  <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" id="vofficeLoginItem">
+          <a class="nav-link" href="/login?product=voffice">
+            <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">登錄</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <header class="voffice-hero" id="home">
+    <div class="container-fluid px-3">
+      <div class="row align-items-center">
+        <div class="col-lg-6 hero-content">
+          <div class="badge rounded-pill text-bg-dark mb-3" data-i18n="voffice.hero.badge">vOffice 企業版</div>
+          <div class="badge rounded-pill text-bg-dark mb-3" data-i18n="voffice.hero.badge2">免費辦公軟件</div>
+          <h1 class="display-5 fw-bold mb-3" data-i18n="voffice.hero.title">AI 驅動的智慧辦公軟件</h1>
+          <p class="lead text-muted mb-4" data-i18n="voffice.hero.subtitle">整合文件、表格與簡報，支援團隊協作與離線工作。</p>
+          <div class="d-flex flex-wrap gap-3">
+            <a class="voffice-btn-primary" href="#download" data-i18n="voffice.hero.primaryCta">立即下載</a>
+            <a class="voffice-btn-secondary" href="#voffice-features" data-i18n="voffice.hero.secondaryCta">看看功能</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="voffice-docs-stack">
+      <!-- PDF card -->
+      <div class="voffice-doc-card voffice-doc-card--pdf">
+        <div class="voffice-doc-card__header">
+          <div class="voffice-doc-card__icon"><i class="bi bi-file-earmark-pdf"></i></div>
+          <div>
+            <div class="voffice-doc-card__title">Contract.pdf</div>
+            <div class="voffice-doc-card__subtitle">PDF Document</div>
+          </div>
+        </div>
+        <div class="voffice-doc-card__lines">
+          <div class="voffice-doc-card__line" style="width:95%"></div>
+          <div class="voffice-doc-card__line" style="width:70%"></div>
+          <div class="voffice-doc-card__line" style="width:80%"></div>
+          <div class="voffice-doc-card__line" style="width:55%"></div>
+        </div>
+      </div>
+      <!-- Excel spreadsheet card -->
+      <div class="voffice-doc-card voffice-doc-card--excel">
+        <div class="voffice-doc-card__header">
+          <div class="voffice-doc-card__icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+          <div>
+            <div class="voffice-doc-card__title">Q4 Report.xlsx</div>
+            <div class="voffice-doc-card__subtitle">Spreadsheet</div>
+          </div>
+        </div>
+        <div class="voffice-doc-card__grid">
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+          <div class="voffice-doc-card__cell"></div>
+        </div>
+      </div>
+      <!-- PowerPoint card -->
+      <div class="voffice-doc-card voffice-doc-card--ppt">
+        <div class="voffice-doc-card__header">
+          <div class="voffice-doc-card__icon"><i class="bi bi-file-earmark-slides"></i></div>
+          <div>
+            <div class="voffice-doc-card__title">Pitch Deck.pptx</div>
+            <div class="voffice-doc-card__subtitle">Presentation</div>
+          </div>
+        </div>
+        <div class="voffice-doc-card__slide">
+          <div class="voffice-doc-card__slide-title"></div>
+          <div class="voffice-doc-card__slide-body"></div>
+          <div class="voffice-doc-card__slide-body"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="voffice-features" class="voffice-section">
+    <div class="container-fluid px-3">
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <h2 class="fw-semibold" data-i18n="voffice.features.title">為企業打造的重點功能</h2>
+          <p class="text-muted" data-i18n="voffice.features.subtitle">讓文件協作、版本控管與安全管理更輕鬆。</p>
+        </div>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card voffice-card h-100">
+            <div class="card-body">
+              <div class="voffice-icon"><i class="bi bi-gift"></i></div>
+              <h5 class="card-title" data-i18n="voffice.features.items.1.title">免費使用</h5>
+              <p class="text-muted mb-0" data-i18n="voffice.features.items.1.desc">所有辦公功能完全免費，僅 AI 功能需額外付費。</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card voffice-card h-100">
+            <div class="card-body">
+              <div class="voffice-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+              <h5 class="card-title" data-i18n="voffice.features.items.2.title">支援 PDF</h5>
+              <p class="text-muted mb-0" data-i18n="voffice.features.items.2.desc">完整支援 PDF 檢視、編輯與轉換，輕鬆處理各種文件格式。</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card voffice-card h-100">
+            <div class="card-body">
+              <div class="voffice-icon"><i class="bi bi-cloud-arrow-down"></i></div>
+              <h5 class="card-title" data-i18n="voffice.features.items.3.title">離線下載</h5>
+              <p class="text-muted mb-0" data-i18n="voffice.features.items.3.desc">支援 Windows 離線安裝。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="voffice-ai" class="voffice-section voffice-ai-section">
+    <div class="container-fluid px-3">
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <div class="badge rounded-pill voffice-ai-badge mb-3" data-i18n="voffice.ai.badge">AI 助手</div>
+          <h2 class="fw-semibold" data-i18n="voffice.ai.title">內建 AI，讓辦公更聰明</h2>
+          <p class="text-muted" data-i18n="voffice.ai.subtitle">vOffice 內建 AI 助手，直接在文件中為你撰寫、翻譯、摘要與分析，不用切換工具。</p>
+        </div>
+      </div>
+
+      <!-- AI Chat Demo (animated) -->
+      <div class="voffice-ai-grid">
+        <!-- Main card: AI Chat Demo -->
+        <div class="voffice-ai-main-card">
+          <div class="voffice-ai-demo-card">
+            <div class="voffice-ai-demo-header">
+              <div class="voffice-ai-demo-avatar">
+                <i class="bi bi-robot"></i>
+              </div>
+              <div>
+                <div class="voffice-ai-demo-name">vOffice AI</div>
+                <div class="voffice-ai-demo-status" data-i18n="voffice.ai.demo.status">隨時待命</div>
+              </div>
+            </div>
+            <div class="voffice-ai-demo-messages" id="vofficeAiChatDemo">
+              <!-- Messages are dynamically generated by JS animation -->
+            </div>
+            <div class="voffice-ai-demo-input">
+              <span data-i18n="voffice.ai.demo.placeholder">輸入指令，讓 AI 幫你完成...</span>
+            </div>
+            <div class="voffice-ai-chat-overlay"></div>
+          </div>
+        </div>
+        <!-- Small card 1 -->
+        <div class="voffice-ai-small-card" style="grid-column: 7 / 10; grid-row: 1 / 2;">
+          <div class="card border-0 shadow-lg h-100" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(-2deg);">
+            <div class="card-body text-center p-4">
+              <div class="mb-3">
+                <i class="bi bi-pencil-square fs-1" style="color: #FF4000;"></i>
+              </div>
+              <h5 class="mb-2" style="color: #333;" data-i18n="voffice.ai.features.write.title">AI 撰寫</h5>
+              <p class="text-muted mb-0 small" data-i18n="voffice.ai.features.write.desc">自動生成信件、報告與文案，快速完成初稿。</p>
+            </div>
+          </div>
+        </div>
+        <!-- Small card 2 -->
+        <div class="voffice-ai-small-card" style="grid-column: 10 / 13; grid-row: 1 / 2;">
+          <div class="card border-0 shadow-lg h-100" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(2deg);">
+            <div class="card-body text-center p-4">
+              <div class="mb-3">
+                <i class="bi bi-translate fs-1" style="color: #FF6B35;"></i>
+              </div>
+              <h5 class="mb-2" style="color: #333;" data-i18n="voffice.ai.features.translate.title">AI 翻譯</h5>
+              <p class="text-muted mb-0 small" data-i18n="voffice.ai.features.translate.desc">支援多語言即時翻譯，保留原始排版格式。</p>
+            </div>
+          </div>
+        </div>
+        <!-- Small card 3 -->
+        <div class="voffice-ai-small-card" style="grid-column: 7 / 10; grid-row: 2 / 3;">
+          <div class="card border-0 shadow-lg h-100" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(1.5deg);">
+            <div class="card-body text-center p-4">
+              <div class="mb-3">
+                <i class="bi bi-journal-text fs-1" style="color: #e63600;"></i>
+              </div>
+              <h5 class="mb-2" style="color: #333;" data-i18n="voffice.ai.features.summary.title">AI 摘要</h5>
+              <p class="text-muted mb-0 small" data-i18n="voffice.ai.features.summary.desc">一鍵生成文件摘要與重點提取，節省閱讀時間。</p>
+            </div>
+          </div>
+        </div>
+        <!-- Small card 4 -->
+        <div class="voffice-ai-small-card" style="grid-column: 10 / 13; grid-row: 2 / 3;">
+          <div class="card border-0 shadow-lg h-100" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 1rem; transform: rotate(-1.5deg);">
+            <div class="card-body text-center p-4">
+              <div class="mb-3">
+                <i class="bi bi-table fs-1" style="color: #FF4000;"></i>
+              </div>
+              <h5 class="mb-2" style="color: #333;" data-i18n="voffice.ai.features.analysis.title">AI 分析</h5>
+              <p class="text-muted mb-0 small" data-i18n="voffice.ai.features.analysis.desc">智能分析表格數據，自動生成圖表與洞察建議。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Pricing note -->
+      <div class="row">
+        <div class="col-12">
+          <div class="voffice-ai-pricing-note">
+            <i class="bi bi-info-circle me-2"></i>
+            <span data-i18n="voffice.ai.pricingNote">辦公功能完全免費，AI 功能以 vCoin 按量計費，靈活無負擔。</span>
+            <a href="#" class="voffice-ai-pricing-link ms-2" data-bs-toggle="modal" data-bs-target="#vcoinModal" data-i18n="voffice.ai.learnMore">了解 vCoin</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="voffice-pricing" class="voffice-section voffice-pricing-section">
+    <div class="container-fluid px-3">
+      <div class="text-center mb-5">
+        <h2 class="fw-semibold" data-i18n="pricing.title">定價方案</h2>
+        <p class="text-muted" data-i18n="pricing.subtitle">選擇適合您企業的方案</p>
+        <!-- Welcome Bonus Banner -->
+        <div class="d-inline-flex align-items-center gap-2 mt-2 mb-1 px-3 py-2" style="background: linear-gradient(135deg, #fff8e1, #fff3cd); border-radius: 50px; border: 1px solid #ffc107;">
+          <svg class="vcoin-icon" width="22" height="22" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+          <span class="fw-semibold" style="color: #b8860b; font-size: 0.95rem;" data-i18n="pricing.welcomeBonus">註冊即送 50 vCoin，立即體驗 AI 功能！</span>
+        </div>
+        <!-- Monthly / Yearly Toggle -->
+        <div class="d-flex justify-content-center align-items-center mt-3">
+          <div class="pricing-toggle" id="vofficePricingToggle">
+            <div class="pricing-toggle-slider" id="vofficePricingToggleSlider"></div>
+            <button type="button" class="pricing-toggle-opt" id="vofficePricingOptMonthly" data-i18n="pricing.monthlyBilling">月付</button>
+            <button type="button" class="pricing-toggle-opt active" id="vofficePricingOptYearly" data-i18n="pricing.yearlyBilling">年付</button>
+          </div>
+          <span class="pricing-toggle-save" id="vofficePricingToggleSave" data-i18n="pricing.yearlySaveTag">省 34%</span>
+        </div>
+      </div>
+      <!-- Free plan - horizontal card above paid plans -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card shadow-sm" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0;">
+            <div class="card-body py-3 px-4">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div>
+                  <div class="badge bg-secondary mb-1" data-i18n="pricing.free.badge">免費</div>
+                  <h4 class="mb-0" data-i18n="pricing.free.name">免費方案</h4>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-check-circle me-1 text-muted"></i><span data-i18n="pricing.free.features.0">基本辦公功能</span></span>
+                  <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-file-earmark-text me-1 text-muted"></i><span data-i18n="pricing.free.features.1">文件、表格、簡報編輯</span></span>
+                  <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-file-pdf me-1 text-muted"></i><span data-i18n="pricing.free.features.2">PDF 檢視</span></span>
+                  <span class="badge rounded-pill bg-light text-dark border" style="font-size: 0.8rem; font-weight: 500; padding: 0.4em 0.8em;"><i class="bi bi-star text-info me-1"></i><span data-i18n="pricing.free.features.3">AI 每日 5 問</span></span>
+                </div>
+                <a href="/login?product=voffice" class="btn btn-outline-secondary" data-i18n="pricing.free.button">開始免費使用</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row g-4 justify-content-center">
+        <!-- vSuite -->
+        <div class="col-xl col-md-6">
+          <div class="card shadow-sm h-100">
+            <div class="card-body text-center p-4">
+              <div class="badge bg-primary mb-2" data-i18n="pricing.vsuite.badge">基本</div>
+              <h3 data-i18n="pricing.vsuite.name">vSuite</h3>
+              <div class="voffice-pricing-monthly">
+                <div class="display-4 fw-bold">
+                  <span data-i18n="pricing.vsuite.monthlyPrice">$380</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                </div>
+              </div>
+              <div class="voffice-pricing-yearly">
+                <div class="display-4 fw-bold">
+                  <span data-i18n="pricing.vsuite.yearlyPrice">$250</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                </div>
+                <div class="text-muted small" data-i18n="pricing.vsuite.yearlyTotal">年付 $3,000</div>
+                <div class="alert alert-success py-1 px-2 mb-0 mt-1" style="font-size: 0.8125rem;">
+                  <strong data-i18n="pricing.vsuite.yearlySavings">節省 $1,560/年</strong>
+                </div>
+              </div>
+              <ul class="list-unstyled mb-4 mt-3">
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite.features.0">所有基本功能</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite.features.1">無限記錄</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite.features.2">無廣告</span></li>
+                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <strong>500</strong> <span data-i18n="pricing.vsuite.features.3">vCoins/月</span></li>
+                <li class="mb-2"><i class="bi bi-file-earmark-text text-warning"></i> <span data-i18n="pricing.vsuite.features.4">vOffice - AI 智慧辦公</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-file-earmark-richtext"></i> <span data-i18n="pricing.vsuite.features.4a">文件、表格、簡報編輯</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-file-pdf"></i> <span data-i18n="pricing.vsuite.features.4b">PDF 檢視、編輯與轉換</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-pc-display"></i> <span data-i18n="pricing.vsuite.features.4c">離線桌面版（Windows）</span></li>
+                <li class="mb-2 ps-4 small text-muted"><i class="bi bi-robot"></i> <span data-i18n="pricing.vsuite.features.4d">AI 撰寫、翻譯、摘要、分析</span></li>
+                <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <span data-i18n="pricing.vsuite.features.5">vWork - ERP 企業管理</span></li>
+                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="pricing.vsuite.features.6">vMarket - 商品市集</span></li>
+              </ul>
+              <a href="/login?product=voffice" class="btn btn-primary" data-i18n="pricing.vsuite.button">立即訂閱</a>
+            </div>
+          </div>
+        </div>
+        <!-- vSuite Pro -->
+        <div class="col-xl col-md-6">
+          <div class="card shadow h-100 position-relative" style="border: 2px solid #0d6efd;">
+            <div class="card-body text-center p-4">
+              <div class="badge bg-success mb-2" data-i18n="pricing.vsuite_pro.badge">熱門</div>
+              <h3 data-i18n="pricing.vsuite_pro.name">vSuite Pro</h3>
+              <div class="voffice-pricing-monthly">
+                <div class="display-4 fw-bold">
+                  <span data-i18n="pricing.vsuite_pro.monthlyPrice">$880</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                </div>
+              </div>
+              <div class="voffice-pricing-yearly">
+                <div class="display-4 fw-bold">
+                  <span data-i18n="pricing.vsuite_pro.yearlyPrice">$800</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                </div>
+                <div class="text-muted small" data-i18n="pricing.vsuite_pro.yearlyTotal">年付 $9,600</div>
+                <div class="alert alert-success py-1 px-2 mb-0 mt-1" style="font-size: 0.8125rem;">
+                  <strong data-i18n="pricing.vsuite_pro.yearlySavings">節省 $960/年</strong>
+                </div>
+              </div>
+              <ul class="list-unstyled mb-4 mt-3">
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.0">所有 vSuite 功能</span></li>
+                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <strong>1,000</strong> <span data-i18n="pricing.vsuite_pro.features.2">vCoins/月</span></li>
+                <li class="mb-2"><i class="bi bi-camera-video text-primary"></i> <span data-i18n="pricing.vsuite_pro.features.video">vAi 影片生成</span></li>
+                <li class="mb-2"><i class="bi bi-file-earmark-text text-warning"></i> <span data-i18n="pricing.vsuite_pro.features.3">vOffice - AI 智慧辦公</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-file-earmark-richtext"></i> <span data-i18n="pricing.vsuite_pro.features.3a">文件、表格、簡報編輯</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-file-pdf"></i> <span data-i18n="pricing.vsuite_pro.features.3b">PDF 檢視、編輯與轉換</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-pc-display"></i> <span data-i18n="pricing.vsuite_pro.features.3c">離線桌面版（Windows）</span></li>
+                <li class="mb-2 ps-4 small text-muted"><i class="bi bi-robot"></i> <span data-i18n="pricing.vsuite_pro.features.3d">AI 撰寫、翻譯、摘要、分析</span></li>
+                <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <span data-i18n="pricing.vsuite_pro.features.4">vWork - ERP 企業管理</span></li>
+                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="pricing.vsuite_pro.features.5">vMarket - 商品市集</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.6">企業支援服務</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.7">資料遺失防護</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro.features.8">安全控管服務</span></li>
+              </ul>
+              <a href="/login?product=voffice" class="btn btn-success" data-i18n="pricing.vsuite_pro.button">立即訂閱</a>
+            </div>
+          </div>
+        </div>
+        <!-- vSuite Pro+ -->
+        <div class="col-xl col-md-6">
+          <div class="card shadow h-100 position-relative" style="border: 2px solid #6f42c1;">
+            <div class="card-body text-center p-4">
+              <div class="badge mb-2" style="background: #6f42c1;" data-i18n="pricing.vsuite_pro_plus.badge">最強方案</div>
+              <h3 data-i18n="pricing.vsuite_pro_plus.name">vSuite Pro+</h3>
+              <div class="voffice-pricing-monthly">
+                <div class="display-4 fw-bold">
+                  <span data-i18n="pricing.vsuite_pro_plus.monthlyPrice">$2,500</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                </div>
+              </div>
+              <div class="voffice-pricing-yearly">
+                <div class="display-4 fw-bold">
+                  <span data-i18n="pricing.vsuite_pro_plus.yearlyPrice">$2,200</span><span class="fs-6" data-i18n="pricing.perMonth">/月</span>
+                </div>
+                <div class="text-muted small" data-i18n="pricing.vsuite_pro_plus.yearlyTotal">年付 $26,400</div>
+                <div class="alert alert-success py-1 px-2 mb-0 mt-1" style="font-size: 0.8125rem;">
+                  <strong data-i18n="pricing.vsuite_pro_plus.yearlySavings">節省 $3,600/年</strong>
+                </div>
+              </div>
+              <ul class="list-unstyled mb-4 mt-3">
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.0">所有 vSuite Pro 功能</span></li>
+                <li class="mb-2"><svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg> <span data-i18n="pricing.vsuite_pro_plus.features.1">每月 3,000 vCoins</span></li>
+                <li class="mb-2"><i class="bi bi-search text-danger"></i> <span data-i18n="pricing.vsuite_pro_plus.features.leadFinder">自動搵客系統</span></li>
+                <li class="mb-2"><i class="bi bi-file-earmark-text text-warning"></i> <span data-i18n="pricing.vsuite_pro_plus.features.3">vOffice - AI 智慧辦公</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-file-earmark-richtext"></i> <span data-i18n="pricing.vsuite_pro_plus.features.3a">文件、表格、簡報編輯</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-file-pdf"></i> <span data-i18n="pricing.vsuite_pro_plus.features.3b">PDF 檢視、編輯與轉換</span></li>
+                <li class="mb-1 ps-4 small text-muted"><i class="bi bi-pc-display"></i> <span data-i18n="pricing.vsuite_pro_plus.features.3c">離線桌面版（Windows）</span></li>
+                <li class="mb-2 ps-4 small text-muted"><i class="bi bi-robot"></i> <span data-i18n="pricing.vsuite_pro_plus.features.3d">AI 撰寫、翻譯、摘要、分析</span></li>
+                <li class="mb-2"><i class="bi bi-briefcase text-primary"></i> <span data-i18n="pricing.vsuite_pro_plus.features.4">vWork - ERP 企業管理</span></li>
+                <li class="mb-2"><i class="bi bi-shop text-success"></i> <span data-i18n="pricing.vsuite_pro_plus.features.5">vMarket - 商品市集</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.6">企業支援服務</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.7">資料遺失防護</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.vsuite_pro_plus.features.8">安全控管服務</span></li>
+              </ul>
+              <a href="/login?product=voffice" class="btn" style="background: #6f42c1; color: #fff;" data-i18n="pricing.vsuite_pro_plus.button">立即訂閱</a>
+            </div>
+          </div>
+        </div>
+        <!-- Custom -->
+        <div class="col-xl col-md-6">
+          <div class="card shadow-sm h-100" style="border: 2px solid #dee2e6;">
+            <div class="card-body text-center p-4">
+              <div class="badge mb-2 bg-dark" data-i18n="pricing.custom.badge">專屬定制</div>
+              <h3 data-i18n="pricing.custom.name">自訂方案</h3>
+              <div class="display-4 fw-bold mb-3">
+                <span data-i18n="pricing.custom.price">客製化</span>
+              </div>
+              <ul class="list-unstyled mb-4">
+                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.0">完全定制系統</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.1">專屬技術支持</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.2">個性化功能開發</span></li>
+                <li class="mb-2">✓ <span data-i18n="pricing.custom.features.3">專屬顧問服務</span></li>
+              </ul>
+              <a href="/contact?product=voffice" class="btn btn-dark" data-i18n="pricing.custom.button">聯繫我們</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="voffice-section">
+    <div class="container-fluid px-3">
+      <div class="row align-items-center">
+        <div class="col-lg-6">
+          <h2 class="fw-semibold" data-i18n="voffice.download.title">下載 vOffice</h2>
+          <p class="text-muted mb-4" data-i18n="voffice.download.subtitle">下載 Windows 版本並開始使用。</p>
+          <div id="voffice-download-buttons" class="d-flex flex-wrap gap-2">
+            <span class="btn btn-dark disabled" style="opacity: 0.65; pointer-events: none;" data-i18n="voffice.download.windows">Windows - 即將推出</span>
+            <span class="btn btn-outline-dark disabled" style="opacity: 0.65; pointer-events: none;" data-i18n="voffice.download.mac">macOS - 即將推出</span>
+            <span class="btn btn-outline-dark disabled" style="opacity: 0.65; pointer-events: none;" data-i18n="voffice.download.linux">Linux - 即將推出</span>
+          </div>
+        </div>
+        <div class="col-lg-6 mt-4 mt-lg-0">
+          <div class="voffice-download-card">
+            <div class="d-flex align-items-center gap-3">
+              <div class="voffice-icon-lg"><i class="bi bi-download"></i></div>
+              <div>
+                <h5 class="mb-1" data-i18n="voffice.download.cardTitle">最新版 vOffice</h5>
+                <p id="voffice-download-version" class="text-muted mb-0" data-i18n="voffice.download.cardSubtitle">完整離線安裝包，支援企業部署。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="support" class="voffice-section">
+    <div class="container-fluid px-3">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h2 class="fw-semibold" data-i18n="voffice.support.title">需要協助？</h2>
+          <p class="text-muted mb-0" data-i18n="voffice.support.subtitle">我們提供導入與客製化支援，歡迎與我們聯絡。</p>
+        </div>
+        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+          <a href="/contact?product=voffice" class="btn btn-outline-primary" data-i18n="voffice.support.contactUs">聯絡我們</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- vCoin Modal -->
+  <div class="modal fade" id="vcoinModal" tabindex="-1" aria-labelledby="vcoinModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content vcoin-modal-content">
+        <div class="modal-header vcoin-modal-header">
+          <h5 class="modal-title" id="vcoinModalLabel">
+            <svg class="vcoin-icon me-2" width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/>
+              <path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/>
+            </svg>
+            <span data-i18n="voffice.vcoinModal.title">vCoin</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body vcoin-modal-body">
+          <!-- What is vCoin -->
+          <div class="vcoin-intro mb-4">
+            <h6 class="fw-semibold mb-2" data-i18n="voffice.vcoinModal.whatIsTitle">vCoin 是什麼？</h6>
+            <p class="text-muted mb-0" data-i18n="voffice.vcoinModal.whatIsDesc">vCoin 是 V-sys 的 AI 使用代幣。辦公功能完全免費，當你使用 AI 助手（撰寫、翻譯、摘要、分析等）時，會消耗 vCoin。每天有 5 次免費查詢額度。</p>
+          </div>
+
+          <!-- Usage info -->
+          <div class="vcoin-usage mb-4">
+            <h6 class="fw-semibold mb-3" data-i18n="voffice.vcoinModal.usageTitle">消耗說明</h6>
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="vcoin-usage-card">
+                  <div class="vcoin-usage-icon"><i class="bi bi-chat-dots text-primary"></i></div>
+                  <div class="vcoin-usage-label" data-i18n="voffice.vcoinModal.simpleQuery">簡單查詢</div>
+                  <div class="vcoin-usage-cost"><span class="badge bg-success">1 coin</span></div>
+                  <div class="vcoin-usage-desc text-muted small" data-i18n="voffice.vcoinModal.simpleQueryDesc">基本問答、資料查詢</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="vcoin-usage-card">
+                  <div class="vcoin-usage-icon"><i class="bi bi-file-earmark-text text-success"></i></div>
+                  <div class="vcoin-usage-label" data-i18n="voffice.vcoinModal.contentGen">內容生成</div>
+                  <div class="vcoin-usage-cost"><span class="badge bg-warning text-dark">5 coins</span></div>
+                  <div class="vcoin-usage-desc text-muted small" data-i18n="voffice.vcoinModal.contentGenDesc">文件生成、郵件撰寫</div>
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-info mt-3 mb-0 small">
+              <i class="bi bi-lightbulb me-1"></i>
+              <span data-i18n="voffice.vcoinModal.dailyFreeTip">每天有 5 次免費查詢（交談及圖片生成），每日重置。不包含影片和文件生成。</span>
+            </div>
+          </div>
+
+          <!-- Purchase plans -->
+          <div class="vcoin-plans">
+            <h6 class="fw-semibold mb-3" data-i18n="voffice.vcoinModal.buyTitle">購買 vCoin</h6>
+            <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card text-center">
+                  <div class="badge bg-secondary mb-2" data-i18n="voffice.vcoinModal.planSmall">Small</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>100</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$20</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card text-center">
+                  <div class="badge bg-info mb-2" data-i18n="voffice.vcoinModal.planMedium">Medium</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>300</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$50</div>
+                  <div class="badge bg-success mt-1" data-i18n="voffice.vcoinModal.save17">省 17%</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card vcoin-plan-card--popular text-center">
+                  <div class="badge bg-primary mb-2" data-i18n="voffice.vcoinModal.popular">最熱門</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>700</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$100</div>
+                  <div class="badge bg-success mt-1" data-i18n="voffice.vcoinModal.save30">省 30%</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card text-center">
+                  <div class="badge bg-warning text-dark mb-2" data-i18n="voffice.vcoinModal.planMega">Mega</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>1,600</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$200</div>
+                  <div class="badge bg-success mt-1" data-i18n="voffice.vcoinModal.save38">省 38%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer vcoin-modal-footer">
+          <a href="/login?product=voffice" class="btn btn-primary" data-i18n="voffice.vcoinModal.loginToBuy">登錄購買</a>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="voffice.vcoinModal.close">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer-light">
+    <div class="container-fluid px-3">
+      <div class="row g-4">
+        <div class="col-lg-3 col-md-6">
+          <div class="d-flex align-items-center mb-3">
+            <a href="/" id="footerLogoLink" style="text-decoration: none;">
+              <img src="/static/vlogo.png" alt="vOffice Logo" style="height: auto; max-height: 24px; display: block;">
+            </a>
+          </div>
+          <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+          <div class="mt-3">
+            <a href="https://www.vsysai.com" id="vworkFooterWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
+            <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
+            <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
+            <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
+            <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#voffice-features" class="text-muted text-decoration-none" data-i18n="voffice.nav.features">功能</a></li>
+            <li class="mb-2"><a href="#voffice-ai" class="text-muted text-decoration-none" data-i18n="voffice.ai.nav">AI 功能</a></li>
+            <li class="d-none mb-2"><a style="display: none !important;" href="#voffice-pricing" class="text-muted text-decoration-none" data-i18n="voffice.nav.pricing">定價</a></li>
+            <li class="mb-2"><a href="#download" class="text-muted text-decoration-none" data-i18n="voffice.nav.download">下載</a></li>
+            <li class="mb-2"><a href="#support" class="text-muted text-decoration-none" data-i18n="voffice.nav.support">支援</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="/help/voffice" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+            <li class="mb-2"><a href="/contact?product=voffice" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+            <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+            <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h6 class="mb-3" data-i18n="footer.contact">聯繫我們</h6>
+          <ul class="list-unstyled text-muted">
+            <li class="mb-2">
+              <i class="bi bi-envelope me-2"></i>
+              <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.email">info@vsysai.com</a>
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-geo-alt me-2"></i>
+              <span data-i18n="footer.location">香港</span>
+            </li>
+            <li class="mb-2">
+              <i class="bi bi-clock me-2"></i>
+              <span data-i18n="footer.workingHours">週一至週五 9:00 - 18:00</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <hr class="my-4">
+      <div class="row align-items-center">
+        <div class="col-12 text-center text-muted">
+          <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 V-sys Limited. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/i18n.js"></script>
+  <script src="/static/js/sso.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script>
+    (function() {
+      // Footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+
+      // === Desktop language dropdown ===
+      document.querySelectorAll('[data-lang]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const lang = this.getAttribute('data-lang');
+          if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+            I18n.switchLanguage(lang);
+          }
+        });
+      });
+
+      // === Mobile sidebar toggle ===
+      const vofficeMobileMenuToggle = document.getElementById('vofficeMobileMenuToggle');
+      const vofficeSidebar = document.getElementById('vofficeSidebar');
+      const vofficeSidebarOverlay = document.getElementById('vofficeSidebarOverlay');
+
+      function toggleVofficeSidebar() {
+        if (vofficeSidebar) vofficeSidebar.classList.toggle('show');
+        if (vofficeSidebarOverlay) vofficeSidebarOverlay.classList.toggle('show');
+      }
+
+      function closeVofficeSidebar() {
+        if (vofficeSidebar) vofficeSidebar.classList.remove('show');
+        if (vofficeSidebarOverlay) vofficeSidebarOverlay.classList.remove('show');
+      }
+
+      if (vofficeMobileMenuToggle) {
+        vofficeMobileMenuToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          toggleVofficeSidebar();
+        });
+      }
+
+      if (vofficeSidebarOverlay) {
+        vofficeSidebarOverlay.addEventListener('click', closeVofficeSidebar);
+      }
+
+      // Close sidebar when clicking nav links (except collapse toggles)
+      document.querySelectorAll('#vofficeSidebar .nav-link:not(.nav-group-toggle)').forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (!this.hasAttribute('data-lang')) {
+            closeVofficeSidebar();
+          }
+        });
+      });
+
+      // Sidebar language links
+      document.querySelectorAll('#vofficeLanguageSubmenu .nav-link[data-lang]').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const lang = this.getAttribute('data-lang');
+          if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+            I18n.switchLanguage(lang);
+          }
+          closeVofficeSidebar();
+        });
+      });
+
+      // Sidebar logout button
+      const vofficeLogoutBtn = document.getElementById('vofficeLogoutBtn');
+      if (vofficeLogoutBtn) {
+        vofficeLogoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (typeof App !== 'undefined' && App.logout) {
+            App.logout();
+          } else {
+            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+              .finally(function() {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('tenant_subdomain');
+                window.location.replace(window.location.pathname + '?logged_out=1');
+              });
+          }
+        });
+      }
+
+      // === 載入 vCoin 餘額 ===
+      async function loadPublicAICoinsBalance() {
+        try {
+          const headers = { 'Accept': 'application/json' };
+          const token = localStorage.getItem('auth_token');
+          if (!token || token === 'temp_token') return;
+          headers['Authorization'] = `Bearer ${token}`;
+          const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+          if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+          const resp = await fetch('/api/v1/ai-coins/balance', { headers });
+          if (!resp.ok) return;
+          const data = await resp.json();
+          const balance = data.balance || 0;
+          const aiCoinsDisplay = document.getElementById('publicAICoinsDisplay');
+          const aiCoinsBalance = document.getElementById('publicAICoinsBalance');
+          const aiCoinsDivider = document.getElementById('publicAICoinsDivider');
+          if (aiCoinsDisplay && aiCoinsBalance) {
+            aiCoinsBalance.textContent = balance;
+            aiCoinsDisplay.style.display = 'block';
+            if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
+          }
+        } catch (e) { console.error('載入 vCoin 餘額失敗:', e); }
+      }
+
+      // === 登入狀態檢查與 UI 更新 ===
+      async function checkAuthAndUpdateNav() {
+        const userDropdownNav = document.getElementById('userDropdown');
+        const userNameSpan = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginLink = document.getElementById('loginLink');
+        const tryFreeBtn = document.getElementById('tryFreeBtn');
+        const goToSystemBtn = document.getElementById('goToSystemBtn');
+        const goToSystemBtnMobileVoffice = document.getElementById('goToSystemBtnMobileVoffice');
+        const vofficeUserDropdownItem = document.getElementById('vofficeUserDropdownItem');
+        const vofficeLoginItem = document.getElementById('vofficeLoginItem');
+
+        async function fetchCurrentUserSilently() {
+          try {
+            const headers = { 'Accept': 'application/json' };
+            const token = localStorage.getItem('auth_token');
+            if (token && token !== 'temp_token') {
+              headers['Authorization'] = `Bearer ${token}`;
+            } else {
+              return null;
+            }
+            const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+            if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+            const resp = await fetch('/api/v1/user/me', { headers });
+            if (!resp.ok) return null;
+            const user = await resp.json();
+            try {
+              if (user) localStorage.setItem('user', JSON.stringify(user));
+              if (user && user.tenant && user.tenant.subdomain) {
+                localStorage.setItem('tenant_subdomain', String(user.tenant.subdomain));
+              }
+            } catch (_e) {}
+            return user;
+          } catch (_e) {
+            return null;
+          }
+        }
+
+        const user = await fetchCurrentUserSilently();
+        let finalUser = user;
+        if (!finalUser) {
+          // If we had a token but the API rejected it (401 = SSO global logout or token expired),
+          // clear stale localStorage to prevent showing old user data.
+          const hadToken = localStorage.getItem('auth_token');
+          if (hadToken) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('tenant_subdomain');
+          }
+        }
+        const isLoggedIn = !!(finalUser && finalUser.name);
+
+        // Update app-switcher links based on login state
+        if (typeof App !== 'undefined' && typeof App.updateAppSwitcherLinks === 'function') {
+            App.updateAppSwitcherLinks(isLoggedIn);
+        }
+
+        if (isLoggedIn) {
+          // Desktop navbar
+          if (userDropdownNav) userDropdownNav.style.display = '';
+          if (loginLink) loginLink.style.display = 'none';
+          if (tryFreeBtn) tryFreeBtn.style.display = 'none';
+          if (goToSystemBtn) goToSystemBtn.style.display = 'list-item';
+          if (userNameSpan && finalUser.name) userNameSpan.textContent = finalUser.name;
+
+          // Mobile sidebar
+          if (vofficeUserDropdownItem) vofficeUserDropdownItem.style.display = 'block';
+          if (vofficeLoginItem) vofficeLoginItem.style.display = 'none';
+          if (goToSystemBtnMobileVoffice) goToSystemBtnMobileVoffice.style.display = 'list-item';
+
+          // Sidebar user name
+          const vofficeUserName = document.getElementById('vofficeUserName');
+          if (vofficeUserName && finalUser.name) {
+            vofficeUserName.textContent = finalUser.name;
+            vofficeUserName.removeAttribute('data-i18n');
+          }
+
+          loadPublicAICoinsBalance();
+
+          // Desktop avatar
+          const avatarImg = document.getElementById('publicUserAvatar');
+          const avatarIcon = document.getElementById('publicUserIcon');
+          if (avatarImg) {
+            let url = (finalUser && finalUser.profile_pic) ? String(finalUser.profile_pic) : '';
+            if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+            if (url) {
+              avatarImg.src = url;
+              avatarImg.style.display = 'inline-block';
+              if (avatarIcon) avatarIcon.style.display = 'none';
+              avatarImg.onerror = function() {
+                this.style.display = 'none';
+                if (avatarIcon) avatarIcon.style.display = '';
+                this.onerror = null;
+              };
+            } else {
+              avatarImg.style.display = 'none';
+              if (avatarIcon) avatarIcon.style.display = '';
+            }
+          }
+
+          // Sidebar avatar
+          const vofficeAvatarImg = document.getElementById('vofficeUserAvatar');
+          const vofficeAvatarIcon = document.getElementById('vofficeUserIcon');
+          if (vofficeAvatarImg) {
+            let url = (finalUser && finalUser.profile_pic) ? String(finalUser.profile_pic) : '';
+            if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+            if (url) {
+              vofficeAvatarImg.src = url;
+              vofficeAvatarImg.style.display = 'inline-block';
+              if (vofficeAvatarIcon) vofficeAvatarIcon.style.display = 'none';
+              vofficeAvatarImg.onerror = function() {
+                vofficeAvatarImg.style.display = 'none';
+                if (vofficeAvatarIcon) vofficeAvatarIcon.style.display = '';
+              };
+            } else {
+              vofficeAvatarImg.style.display = 'none';
+              if (vofficeAvatarIcon) vofficeAvatarIcon.style.display = '';
+            }
+          }
+
+          if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+            logoutBtn.setAttribute('data-bound', 'true');
+            logoutBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              if (typeof App !== 'undefined' && App.logout) {
+                App.logout();
+              } else {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tenant_subdomain');
+                    window.location.replace(window.location.pathname + '?logged_out=1');
+                  });
+              }
+            });
+          }
+        } else {
+          // Desktop navbar
+          if (userDropdownNav) userDropdownNav.style.display = 'none';
+          if (loginLink) loginLink.style.display = '';
+          if (tryFreeBtn) tryFreeBtn.style.display = 'list-item';
+          if (goToSystemBtn) goToSystemBtn.style.display = 'none';
+
+          // Mobile sidebar
+          if (vofficeUserDropdownItem) vofficeUserDropdownItem.style.display = 'none';
+          if (vofficeLoginItem) vofficeLoginItem.style.display = 'block';
+          // goToSystemBtnMobileVoffice always visible
+          if (goToSystemBtnMobileVoffice) goToSystemBtnMobileVoffice.style.display = 'list-item';
+        }
+      }
+
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'auth_token' && !e.newValue) {
+          fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+            .finally(function() { checkAuthAndUpdateNav(); });
+        } else if (e.key === null) {
+          fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+            .finally(function() { checkAuthAndUpdateNav(); });
+        } else if (e.key === 'auth_token') {
+          checkAuthAndUpdateNav();
+        }
+      });
+
+      checkAuthAndUpdateNav();
+    })();
+  </script>
+  <script>
+    // Navbar scroll shadow (matches main homepage behaviour)
+    (function() {
+      const navbar = document.querySelector('.navbar');
+      if (!navbar) return;
+
+      function handleScroll() {
+        if (window.scrollY > 60) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      }
+
+      handleScroll();
+      window.addEventListener('scroll', handleScroll, { passive: true });
+    })();
+  </script>
+  <script>
+    // vOffice AI Chat Demo Animation (typewriter effect)
+    (function() {
+      const chatContainer = document.getElementById('vofficeAiChatDemo');
+      if (!chatContainer) return;
+
+      // Get conversation content (with i18n support)
+      function i18nGet(key, fallback) {
+        if (typeof I18n === 'undefined' || !I18n._ready) return fallback;
+        var val = I18n.t(key);
+        return (val && val !== key) ? val : fallback;
+      }
+
+      function getConversations() {
+        return [
+          {
+            user: i18nGet('voffice.ai.demo.userMsg', '幫我把這段報告翻譯成英文'),
+            ai: i18nGet('voffice.ai.demo.aiMsg', '好的，我已將選取的段落翻譯成英文並保持原始格式。需要我調整語氣或用詞嗎？')
+          },
+          {
+            user: i18nGet('voffice.ai.demo.userMsg2', '幫我摘要這份 20 頁的合約重點'),
+            ai: i18nGet('voffice.ai.demo.aiMsg2', '已為您提取 5 個關鍵條款摘要，包含付款條件、違約責任與保密條款。')
+          }
+        ];
+      }
+
+      let conversations = getConversations();
+      let currentConversationIndex = 0;
+      let isTyping = false;
+
+      // Typewriter animation
+      function typeText(element, text, speed, callback) {
+        speed = speed || 30;
+        let index = 0;
+        element.textContent = '';
+        isTyping = true;
+
+        function type() {
+          if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            setTimeout(type, speed);
+          } else {
+            isTyping = false;
+            if (callback) callback();
+          }
+        }
+        type();
+      }
+
+      // Create message element
+      function createMessage(isUser, content, showTyping) {
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'voffice-ai-demo-msg ' + (isUser ? 'voffice-ai-demo-msg--user' : 'voffice-ai-demo-msg--ai');
+
+        var avatarHtml = '';
+        if (!isUser) {
+          avatarHtml = '<div class="voffice-ai-msg-avatar"><i class="bi bi-robot"></i></div>';
+        }
+
+        var contentHtml = showTyping
+          ? '<div class="voffice-typing-indicator"><span class="voffice-typing-dot"></span><span class="voffice-typing-dot"></span><span class="voffice-typing-dot"></span></div>'
+          : '<div class="voffice-msg-text"></div>';
+
+        messageDiv.innerHTML = avatarHtml + '<div class="voffice-msg-bubble">' + contentHtml + '</div>' +
+          (isUser ? '<div class="voffice-ai-msg-avatar voffice-ai-msg-avatar--user"><i class="bi bi-person"></i></div>' : '');
+
+        return messageDiv;
+      }
+
+      // Scroll to bottom
+      function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      // Show conversation
+      function showConversation(index) {
+        conversations = getConversations();
+        if (index >= conversations.length) return;
+
+        var conversation = conversations[index];
+
+        // Show user message
+        var userMessage = createMessage(true, conversation.user);
+        chatContainer.appendChild(userMessage);
+        scrollToBottom();
+
+        // Type user message
+        var userBubble = userMessage.querySelector('.voffice-msg-text');
+        typeText(userBubble, conversation.user, 30, function() {
+          // After user message, show AI thinking
+          setTimeout(function() {
+            var thinkingMessage = createMessage(false, '', true);
+            chatContainer.appendChild(thinkingMessage);
+            scrollToBottom();
+
+            // After delay, show AI response
+            setTimeout(function() {
+              thinkingMessage.remove();
+
+              var aiMessage = createMessage(false, conversation.ai);
+              chatContainer.appendChild(aiMessage);
+              scrollToBottom();
+
+              var aiBubble = aiMessage.querySelector('.voffice-msg-text');
+              typeText(aiBubble, conversation.ai, 20, function() {
+                // Move to next conversation
+                setTimeout(function() {
+                  currentConversationIndex++;
+                  if (currentConversationIndex < conversations.length) {
+                    showConversation(currentConversationIndex);
+                  }
+                }, 1500);
+              });
+            }, 1500);
+          }, 500);
+        });
+      }
+
+      // Start when element enters viewport (IntersectionObserver)
+      var hasStarted = false;
+      var pageLoaded = false;
+
+      if (document.readyState !== 'loading') {
+        pageLoaded = true;
+      } else {
+        document.addEventListener('DOMContentLoaded', function() {
+          pageLoaded = true;
+        }, { once: true });
+      }
+
+      function startIfNeeded() {
+        if (hasStarted || currentConversationIndex !== 0 || !pageLoaded) return;
+        hasStarted = true;
+        setTimeout(function() {
+          showConversation(0);
+        }, 300);
+      }
+
+      if (typeof IntersectionObserver !== 'undefined') {
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (!entry.isIntersecting) return;
+            startIfNeeded();
+            if (hasStarted) observer.unobserve(entry.target);
+          });
+        }, { threshold: 0.3, rootMargin: '-50px 0px' });
+
+        observer.observe(chatContainer);
+      } else {
+        var tick = function() {
+          if (hasStarted) return;
+          var rect = chatContainer.getBoundingClientRect();
+          var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+          if (rect.top < vh && rect.bottom > 0) {
+            startIfNeeded();
+          }
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    })();
+  </script>
+  <script>
+    // vOffice Pricing toggle script
+    (function() {
+      var pricingIsYearly = true;
+
+      function positionPricingSlider() {
+        var slider = document.getElementById('vofficePricingToggleSlider');
+        var optM = document.getElementById('vofficePricingOptMonthly');
+        var optY = document.getElementById('vofficePricingOptYearly');
+        if (!slider || !optM || !optY) return;
+        var active = pricingIsYearly ? optY : optM;
+        slider.style.left = active.offsetLeft + 'px';
+        slider.style.width = active.offsetWidth + 'px';
+      }
+
+      function updatePricingDisplay() {
+        var optM = document.getElementById('vofficePricingOptMonthly');
+        var optY = document.getElementById('vofficePricingOptYearly');
+        var saveTag = document.getElementById('vofficePricingToggleSave');
+        if (!optM || !optY) return;
+
+        optM.classList.toggle('active', !pricingIsYearly);
+        optY.classList.toggle('active', pricingIsYearly);
+        if (saveTag) {
+          if (pricingIsYearly) {
+            saveTag.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pricing.yearlySaveTag', '省 34%') : '省 34%';
+            saveTag.style.opacity = '1';
+            saveTag.style.color = '#059669';
+            saveTag.style.background = 'rgba(5, 150, 105, 0.1)';
+          } else {
+            saveTag.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pricing.noDiscount', '沒有優惠') : '沒有優惠';
+            saveTag.style.opacity = '1';
+            saveTag.style.color = '#94a3b8';
+            saveTag.style.background = 'rgba(148, 163, 184, 0.1)';
+          }
+        }
+
+        positionPricingSlider();
+
+        var monthlyEls = document.querySelectorAll('#voffice-pricing .voffice-pricing-monthly');
+        var yearlyEls = document.querySelectorAll('#voffice-pricing .voffice-pricing-yearly');
+        for (var i = 0; i < monthlyEls.length; i++) {
+          monthlyEls[i].style.display = pricingIsYearly ? 'none' : 'block';
+        }
+        for (var j = 0; j < yearlyEls.length; j++) {
+          yearlyEls[j].style.display = pricingIsYearly ? 'block' : 'none';
+        }
+      }
+
+      var optM = document.getElementById('vofficePricingOptMonthly');
+      var optY = document.getElementById('vofficePricingOptYearly');
+      if (optM) optM.addEventListener('click', function() { pricingIsYearly = false; updatePricingDisplay(); });
+      if (optY) optY.addEventListener('click', function() { pricingIsYearly = true; updatePricingDisplay(); });
+
+      updatePricingDisplay();
+      window.addEventListener('resize', positionPricingSlider);
+      window.addEventListener('languageChanged', function() {
+        setTimeout(positionPricingSlider, 50);
+      });
+    })();
+
+    // V-SYS: Dynamically load download links from latest release API
+    (function() {
+      var platformConfig = {
+        windows: { icon: 'bi-windows', label: 'Windows', btnClass: 'btn-dark' },
+        macos:   { icon: 'bi-apple',   label: 'macOS',   btnClass: 'btn-outline-dark' },
+        linux:   { icon: 'bi-ubuntu',   label: 'Linux',   btnClass: 'btn-outline-dark' }
+      };
+      var comingSoonText = '即將推出';
+
+      fetch('/api/v1/voffice/latest-release')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var releases = data.releases || {};
+          var container = document.getElementById('voffice-download-buttons');
+          if (!container) return;
+
+          var hasAnyDownload = false;
+          var html = '';
+          ['windows', 'macos', 'linux'].forEach(function(p) {
+            var cfg = platformConfig[p];
+            var rel = releases[p];
+            if (rel && rel.download_url) {
+              hasAnyDownload = true;
+              var sizeStr = rel.file_size ? ' (' + (rel.file_size / 1048576).toFixed(0) + ' MB)' : '';
+              html += '<a href="' + rel.download_url + '" class="btn ' + cfg.btnClass + '" target="_blank" rel="noopener">'
+                    + '<i class="bi ' + cfg.icon + ' me-1"></i> ' + cfg.label + ' v' + rel.version + sizeStr + '</a>';
+            } else {
+              html += '<span class="btn ' + cfg.btnClass + ' disabled" style="opacity: 0.65; pointer-events: none;">'
+                    + '<i class="bi ' + cfg.icon + ' me-1"></i> ' + cfg.label + ' - ' + comingSoonText + '</span>';
+            }
+          });
+          container.innerHTML = html;
+
+          // If no platform has a download, switch subtitle and cardSubtitle to "coming soon" text
+          var t = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t : null;
+          if (!hasAnyDownload) {
+            var subtitleEl = document.querySelector('[data-i18n="voffice.download.subtitle"]');
+            if (subtitleEl) {
+              subtitleEl.setAttribute('data-i18n', 'voffice.download.subtitleComingSoon');
+              subtitleEl.textContent = t ? t('voffice.download.subtitleComingSoon', '即將推出，敬請期待。') : '即將推出，敬請期待。';
+            }
+            var cardSubEl = document.getElementById('voffice-download-version');
+            if (cardSubEl) {
+              cardSubEl.setAttribute('data-i18n', 'voffice.download.cardSubtitleComingSoon');
+              cardSubEl.textContent = t ? t('voffice.download.cardSubtitleComingSoon', '即將推出，敬請期待。') : '即將推出，敬請期待。';
+            }
+          }
+
+          // Update version text in download card
+          var firstRelease = releases.windows || releases.macos || releases.linux;
+          if (firstRelease) {
+            var versionEl = document.getElementById('voffice-download-version');
+            if (versionEl) {
+              versionEl.textContent = (t ? t('voffice.download.latestVersion', '最新版本') : '最新版本') + ': v' + firstRelease.version;
+            }
+          }
+        })
+        .catch(function() {
+          // On error, switch to "coming soon" text
+          var t = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t : null;
+          var subtitleEl = document.querySelector('[data-i18n="voffice.download.subtitle"]');
+          if (subtitleEl) {
+            subtitleEl.setAttribute('data-i18n', 'voffice.download.subtitleComingSoon');
+            subtitleEl.textContent = t ? t('voffice.download.subtitleComingSoon', '即將推出，敬請期待。') : '即將推出，敬請期待。';
+          }
+          var cardSubEl = document.getElementById('voffice-download-version');
+          if (cardSubEl) {
+            cardSubEl.setAttribute('data-i18n', 'voffice.download.cardSubtitleComingSoon');
+            cardSubEl.textContent = t ? t('voffice.download.cardSubtitleComingSoon', '即將推出，敬請期待。') : '即將推出，敬請期待。';
+          }
+        });
+    })();
+  </script>
+</body>
+</html>

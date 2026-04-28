@@ -1,0 +1,719 @@
+{{ define "pages/payrolls_new" }}
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 id="pageTitle">新增薪資記錄</h3>
+        <a href="/payrolls" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span>
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="payrollForm">
+                <input type="hidden" id="payrollId">
+                
+                <!-- Tab 導航 -->
+                <ul class="nav nav-tabs mb-4" id="payrollTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#data-pane" type="button" role="tab" aria-controls="data-pane" aria-selected="true">資料</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment-pane" type="button" role="tab" aria-controls="payment-pane" aria-selected="false">支出記錄</button>
+                    </li>
+                </ul>
+                
+                <!-- Tab 內容 -->
+                <div class="tab-content" id="payrollTabContent">
+                    <!-- 資料 Tab -->
+                    <div class="tab-pane fade show active" id="data-pane" role="tabpanel" aria-labelledby="data-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">員工 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="userId" required style="width: 100%;">
+                                    <option value="">請選擇員工</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">發薪期間 (YYYY-MM) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="payPeriod" required placeholder="例如: 2024-01">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">基本薪金 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="baseSalary" required step="0.01">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">加班時數</label>
+                                <input type="number" class="form-control" id="otHours" step="0.01" value="0">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">加班倍率</label>
+                                <input type="number" class="form-control" id="otRate" step="0.01" value="1.5" placeholder="默認1.5倍">
+                            </div>
+                        </div>
+
+                        <!-- 津貼/扣除不再單獨顯示，改為全部由「附加項目」計算 -->
+                        <input type="hidden" id="allowances" value="0">
+                        <input type="hidden" id="deductions" value="0">
+
+                        <div class="row mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">狀態</label>
+                                <select class="form-select" id="status">
+                                    <option value="draft">草稿</option>
+                                    <option value="confirmed">已確認</option>
+                                    <option value="paid">已發放</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">備註</label>
+                            <textarea class="form-control" id="notes" rows="3"></textarea>
+                        </div>
+
+                        <!-- 附加項目（多 row）放最後 -->
+                        <div class="d-flex justify-content-between align-items-center mt-3 mb-2">
+                            <div>
+                                <div class="fw-semibold">附加項目</div>
+                                <div class="text-muted small">可用「%（以基本薪金計）」或「實額」進行加/減；會自動計入總額。</div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addAdjustmentRow()">
+                                <i class="bi bi-plus-lg"></i> 新增
+                            </button>
+                        </div>
+                        <div class="table-responsive mb-3">
+                            <table class="table table-sm align-middle">
+                                <thead class="text-muted small">
+                                    <tr>
+                                        <th>名稱</th>
+                                        <th style="width:120px;">加/減</th>
+                                        <th style="width:140px;">模式</th>
+                                        <th style="width:160px;">數值</th>
+                                        <th style="width:140px;" class="text-end">計算金額</th>
+                                        <th style="width:60px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adjustmentsTbody">
+                                    <tr class="text-muted" id="adjustmentsEmptyRow"><td colspan="6" class="text-center py-3">尚無附加項目</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 總額顯示放最底 -->
+                        <div class="card mt-2">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="text-muted small">本次薪資總額（已計入津貼/扣除/加班）</div>
+                                    <div class="fs-4 fw-semibold">$<span id="totalAmountText">0.00</span></div>
+                                </div>
+                                <input type="hidden" id="totalAmount" value="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 支出記錄 Tab -->
+                    <div class="tab-pane fade" id="payment-pane" role="tabpanel" aria-labelledby="payment-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>支出記錄</h5>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addPayrollExpense()" id="addExpenseBtn">
+                                <i class="bi bi-plus-circle"></i> 添加支付記錄
+                            </button>
+                        </div>
+                        <div class="table-responsive mb-3">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>支付日期</th>
+                                        <th>支付方式</th>
+                                        <th>付款賬戶</th>
+                                        <th>金額</th>
+                                        <th>狀態</th>
+                                        <th>備註</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expensesTable">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">暫無支付記錄，請點擊「添加支付記錄」</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end"><strong>已付總額：</strong></td>
+                                        <td><strong id="totalPaidAmount">$0.00</strong></td>
+                                        <td colspan="3" class="text-start"><span id="totalDueAmount" class="text-muted"></span></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">保存</button>
+                    <a href="/payrolls" class="btn btn-secondary">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    const PAGE_NAME = 'payrolls';
+    let payrollId = null;
+    let expenses = [];
+    let adjustments = [];
+    let adjustmentPresets = [];
+    let paymentMethods = [];
+    let bankAccounts = [];
+    let users = [];
+    let expenseSaveTimers = {}; // debounce timers per row
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // 載入「薪資附加項目」preset（用於名稱 autocomplete，可選也可不選）
+        try {
+            const res = await App.apiRequest('/payroll-adjustment-presets?status=active&limit=1000');
+            adjustmentPresets = res.data || [];
+            // 簡單用 datalist 做建議（不強制選）
+            let dl = document.getElementById('payrollAdjustmentPresetNames');
+            if (!dl) {
+                dl = document.createElement('datalist');
+                dl.id = 'payrollAdjustmentPresetNames';
+                document.body.appendChild(dl);
+            }
+            dl.innerHTML = adjustmentPresets.map(p => `<option value="${String(p.name || '').replace(/"/g,'&quot;')}"></option>`).join('');
+        } catch (e) {
+            console.warn('載入薪資附加項目 presets 失敗', e);
+            adjustmentPresets = [];
+        }
+
+        // 載入用戶列表
+        try {
+            const usersData = await App.apiRequest('/users?limit=1000');
+            users = usersData.data || [];
+            $('#userId').select2({
+                theme: 'bootstrap-5',
+                placeholder: '請選擇員工',
+                allowClear: true,
+                data: users.map(u => ({ id: u.id, text: u.name }))
+            });
+            
+            // 選擇員工時自動帶入薪資
+            $('#userId').on('select2:select', async function(e) {
+                const userId = e.params.data.id;
+                if (userId) {
+                    try {
+                        const user = await App.apiRequest(`/users/${userId}`);
+                        if (user && user.salary != null) {
+                            document.getElementById('baseSalary').value = user.salary;
+                        }
+                    } catch (err) {
+                        console.warn('載入員工薪資失敗', err);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Failed to load users:', error);
+        }
+
+        // 載入付款方式和銀行賬戶
+        try {
+            const [paymentMethodsData, bankAccountsData] = await Promise.all([
+                App.apiRequest('/payment-methods?limit=1000'),
+                App.apiRequest('/bank-accounts?limit=1000')
+            ]);
+            paymentMethods = paymentMethodsData.data || [];
+            bankAccounts = bankAccountsData.data || [];
+        } catch (error) {
+            console.error('Failed to load payment methods or bank accounts:', error);
+        }
+
+        // 檢查是否為編輯模式（放到載入下拉資料之後，避免 render 時 options 為空）
+        const pathParts = window.location.pathname.split('/').filter(p => p);
+        const isEdit = pathParts.length === 3 && pathParts[0] === 'payrolls' && pathParts[2] === 'edit';
+        if (isEdit) {
+            payrollId = pathParts[1];
+            document.getElementById('payrollId').value = payrollId;
+            document.getElementById('pageTitle').textContent = '編輯薪資記錄';
+            await loadPayrollData();
+            // 確保 paymentMethods/bankAccounts 已載入後再 render 一次
+            renderExpenses();
+        }
+
+        // 添加事件監聽器來計算總數和更新需付
+        ['baseSalary', 'otHours', 'otRate'].forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.addEventListener('input', calculateTotal);
+                field.addEventListener('change', calculateTotal);
+            }
+        });
+        
+        // 初始化計算
+        calculateTotal();
+
+        // 表單提交
+        document.getElementById('payrollForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                user_id: $('#userId').val(),
+                pay_period: document.getElementById('payPeriod').value,
+                base_salary: parseFloat(document.getElementById('baseSalary').value) || 0,
+                ot_hours: parseFloat(document.getElementById('otHours').value) || 0,
+                ot_rate: parseFloat(document.getElementById('otRate').value) || 1.5,
+                allowances: 0,
+                deductions: 0,
+                adjustments: adjustments.map(a => ({
+                    name: a.name || '',
+                    direction: a.direction || 'add',
+                    mode: a.mode || 'fixed',
+                    rate: Number(a.rate || 0),
+                    amount: Number(a.amount || 0)
+                })),
+                status: document.getElementById('status').value,
+                notes: document.getElementById('notes').value
+            };
+
+            try {
+                if (payrollId) {
+                    await App.apiRequest(`/payrolls/${payrollId}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(data)
+                    });
+                    App.showAlert('更新成功', 'success');
+
+                    // 同步尚未保存的支付記錄
+                    if (expenses && expenses.length > 0) {
+                        for (let i = 0; i < expenses.length; i++) {
+                            if (!expenses[i].id) {
+                                scheduleSyncExpense(i);
+                            }
+                        }
+                    }
+                } else {
+                    const result = await App.apiRequest('/payrolls', {
+                        method: 'POST',
+                        body: JSON.stringify(data)
+                    });
+                    payrollId = result.id;
+                    document.getElementById('payrollId').value = payrollId;
+                    App.showAlert('創建成功', 'success');
+                    
+                    // 如果有本地支付記錄，創建它們
+                    if (expenses && expenses.length > 0) {
+                        for (let i = 0; i < expenses.length; i++) {
+                            scheduleSyncExpense(i);
+                        }
+                        // 等待一下讓後台完成建立，再重新載入一次（拿到 id）
+                        setTimeout(async () => {
+                            await loadExpenses();
+                        }, 600);
+                    }
+                }
+                setTimeout(() => {
+                    if (!payrollId) {
+                        if (typeof Router !== 'undefined' && Router.go) { Router.go('/payrolls'); } else { window.location.href = '/payrolls'; }
+                    }
+                }, 1000);
+            } catch (error) {
+                App.showAlert('保存失敗: ' + error.message, 'danger');
+            }
+        });
+    });
+
+    function ensureAdjustmentsEmptyRow() {
+        const tbody = document.getElementById('adjustmentsTbody');
+        const empty = document.getElementById('adjustmentsEmptyRow');
+        if (!tbody || !empty) return;
+        const has = tbody.querySelectorAll('tr[data-adjustment-row="1"]').length > 0;
+        empty.style.display = has ? 'none' : '';
+    }
+
+    function computeAdjustmentAmount(a, baseSalary) {
+        const mode = a.mode || 'fixed';
+        if (mode === 'percent') return (Number(baseSalary || 0) * Number(a.rate || 0));
+        return Number(a.amount || 0);
+    }
+
+    function recalcAdjustmentsTotals() {
+        const baseSalary = parseFloat(document.getElementById('baseSalary').value) || 0;
+        let addTotal = 0;
+        let subTotal = 0;
+        adjustments.forEach(a => {
+            const val = computeAdjustmentAmount(a, baseSalary);
+            if ((a.direction || 'add') === 'subtract') subTotal += val;
+            else addTotal += val;
+        });
+        // 保留 hidden 欄位（兼容舊欄位），但 UI/計算不再依賴它
+        const al = document.getElementById('allowances');
+        const de = document.getElementById('deductions');
+        if (al) al.value = addTotal.toFixed(2);
+        if (de) de.value = subTotal.toFixed(2);
+        calculateTotal();
+    }
+
+    function renderAdjustments() {
+        const tbody = document.getElementById('adjustmentsTbody');
+        if (!tbody) return;
+        tbody.querySelectorAll('tr[data-adjustment-row="1"]').forEach(r => r.remove());
+        adjustments.forEach((a, idx) => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-adjustment-row', '1');
+
+            const name = document.createElement('input');
+            name.className = 'form-control form-control-sm';
+            name.value = a.name || '';
+            name.placeholder = '例如：交通津貼 / 罰款';
+            name.addEventListener('input', () => { a.name = name.value; });
+            // autocomplete suggestions
+            name.setAttribute('list', 'payrollAdjustmentPresetNames');
+            name.addEventListener('change', () => {
+                const v = (name.value || '').trim();
+                if (!v) return;
+                const preset = (adjustmentPresets || []).find(p => String(p.name || '').trim().toLowerCase() === v.toLowerCase());
+                if (!preset) return; // 可不選，保持原樣
+                a.direction = preset.direction || 'add';
+                a.mode = preset.mode || 'fixed';
+                if ((preset.mode || 'fixed') === 'percent') {
+                    // preset 存的是 % 數字，轉成 payroll adjustment 的 rate（小數）
+                    a.rate = Number(preset.rate_percent || 0) / 100;
+                    a.amount = 0;
+                } else {
+                    a.amount = Number(preset.amount || 0);
+                    a.rate = 0;
+                }
+                recalcAdjustmentsTotals();
+                renderAdjustments();
+            });
+
+            const dir = document.createElement('select');
+            dir.className = 'form-select form-select-sm';
+            dir.innerHTML = `<option value="add">加</option><option value="subtract">減</option>`;
+            dir.value = a.direction || 'add';
+            dir.addEventListener('change', () => { a.direction = dir.value; recalcAdjustmentsTotals(); renderAdjustments(); });
+
+            const mode = document.createElement('select');
+            mode.className = 'form-select form-select-sm';
+            mode.innerHTML = `<option value="fixed">實額</option><option value="percent">%（基本薪金）</option>`;
+            mode.value = a.mode || 'fixed';
+            mode.addEventListener('change', () => {
+                a.mode = mode.value;
+                recalcAdjustmentsTotals();
+                renderAdjustments();
+            });
+
+            const valWrap = document.createElement('div');
+            valWrap.className = 'input-group input-group-sm';
+            const val = document.createElement('input');
+            val.type = 'number';
+            val.step = '0.0001';
+            val.className = 'form-control';
+            const suffix = document.createElement('span');
+            suffix.className = 'input-group-text';
+            if ((a.mode || 'fixed') === 'percent') {
+                val.value = Number(a.rate || 0);
+                suffix.textContent = '%';
+            } else {
+                val.value = Number(a.amount || 0);
+                suffix.textContent = '$';
+                val.step = '0.01';
+            }
+            val.addEventListener('input', () => {
+                if ((a.mode || 'fixed') === 'percent') a.rate = Number(val.value || 0) / 100;
+                else a.amount = Number(val.value || 0);
+                recalcAdjustmentsTotals();
+                renderAdjustments();
+            });
+            valWrap.appendChild(val);
+            valWrap.appendChild(suffix);
+
+            const baseSalary = parseFloat(document.getElementById('baseSalary').value) || 0;
+            const computed = computeAdjustmentAmount(a, baseSalary);
+            const computedTd = document.createElement('td');
+            computedTd.className = 'text-end text-muted small';
+            computedTd.textContent = '$' + computed.toFixed(2);
+
+            const del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'btn btn-sm btn-outline-danger';
+            del.innerHTML = '<i class="bi bi-trash"></i>';
+            del.addEventListener('click', () => {
+                adjustments.splice(idx, 1);
+                renderAdjustments();
+                recalcAdjustmentsTotals();
+                ensureAdjustmentsEmptyRow();
+            });
+
+            tr.innerHTML = `<td></td><td></td><td></td><td></td><td></td><td class="text-end"></td>`;
+            tr.children[0].appendChild(name);
+            tr.children[1].appendChild(dir);
+            tr.children[2].appendChild(mode);
+            tr.children[3].appendChild(valWrap);
+            tr.children[4].replaceWith(computedTd);
+            tr.children[5].appendChild(del);
+            tbody.appendChild(tr);
+        });
+        ensureAdjustmentsEmptyRow();
+    }
+
+    function addAdjustmentRow(prefill) {
+        const a = Object.assign({ name: '', direction: 'add', mode: 'fixed', rate: 0, amount: 0 }, prefill || {});
+        adjustments.push(a);
+        renderAdjustments();
+        recalcAdjustmentsTotals();
+    }
+
+    // base salary changed -> recompute
+    document.getElementById('baseSalary')?.addEventListener('input', () => {
+        renderAdjustments();
+        recalcAdjustmentsTotals();
+    });
+
+    async function loadPayrollData() {
+        try {
+            const payroll = await App.apiRequest(`/payrolls/${payrollId}`);
+            
+            $('#userId').val(payroll.user_id).trigger('change');
+            document.getElementById('payPeriod').value = payroll.pay_period || '';
+            document.getElementById('baseSalary').value = payroll.base_salary || 0;
+            document.getElementById('otHours').value = payroll.ot_hours || 0;
+            document.getElementById('otRate').value = payroll.ot_rate || 1.5;
+            // 附加項目
+            adjustments = (payroll.adjustments || []).map(a => ({
+                name: a.name || '',
+                direction: a.direction || 'add',
+                mode: a.mode || 'fixed',
+                rate: Number(a.rate || 0),
+                amount: Number(a.amount || 0)
+            }));
+            renderAdjustments();
+            recalcAdjustmentsTotals();
+            document.getElementById('status').value = payroll.status || 'draft';
+            document.getElementById('notes').value = payroll.notes || '';
+            
+            // 觸發總數計算
+            if (typeof calculateTotal === 'function') {
+                calculateTotal();
+            }
+            
+            await loadExpenses();
+        } catch (error) {
+            App.showAlert('載入失敗: ' + error.message, 'danger');
+        }
+    }
+
+    async function loadExpenses() {
+        if (!payrollId) return;
+        
+        try {
+            const expensesData = await App.apiRequest(`/expenses?reference_type=payroll&reference_id=${payrollId}&limit=1000`);
+            expenses = expensesData.data || [];
+            renderExpenses();
+        } catch (error) {
+            console.error('Failed to load expenses:', error);
+            expenses = [];
+            renderExpenses();
+        }
+    }
+
+    function renderExpenses() {
+        const tbody = document.getElementById('expensesTable');
+        
+        if (expenses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">暫無支付記錄，請點擊「添加支付記錄」</td></tr>';
+            document.getElementById('totalPaidAmount').textContent = '$0.00';
+            updateDueAmount();
+            return;
+        }
+
+        // 一律使用可編輯模式（參考 orders/new 付款記錄）
+        tbody.innerHTML = expenses.map((expense, index) => {
+            return `
+                <tr>
+                    <td><input type="date" class="form-control form-control-sm" value="${expense.expense_date ? new Date(expense.expense_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}" onchange="updateExpense(${index}, 'expense_date', this.value)"></td>
+                    <td>
+                        <select class="form-select form-select-sm" onchange="updateExpense(${index}, 'payment_method_id', this.value)">
+                            <option value="">請選擇</option>
+                            ${paymentMethods.map(m => `<option value="${m.id}" ${(expense.payment_method_id === m.id || expense.payment_method === m.code) ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm" onchange="updateExpense(${index}, 'bank_account_id', this.value)">
+                            <option value="">請選擇</option>
+                            ${bankAccounts.map(b => `<option value="${b.id}" ${expense.bank_account_id === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td><input type="number" class="form-control form-control-sm" value="${expense.amount || 0}" step="0.01" onchange="updateExpense(${index}, 'amount', this.value)"></td>
+                    <td>
+                        <select class="form-select form-select-sm" onchange="updateExpense(${index}, 'status', this.value)">
+                            <option value="pending" ${expense.status === 'pending' ? 'selected' : ''}>待確認</option>
+                            <option value="confirmed" ${expense.status === 'confirmed' ? 'selected' : ''}>已確認</option>
+                            <option value="cancelled" ${expense.status === 'cancelled' ? 'selected' : ''}>已取消</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control form-control-sm" value="${expense.notes || ''}" onchange="updateExpense(${index}, 'notes', this.value)" placeholder="備註"></td>
+                    <td class="text-nowrap">
+                        ${expense.id ? `<span class="badge bg-light text-dark border me-2">已保存</span>` : `<span class="badge bg-light text-muted border me-2">未保存</span>`}
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExpense(${index})">
+                            <i class="bi bi-trash"></i> 刪除
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        const total = expenses.reduce((sum, e) => sum + (parseFloat(e.amount || 0) || 0), 0);
+        document.getElementById('totalPaidAmount').textContent = '$' + total.toFixed(2);
+        
+        // 更新需付金額
+        updateDueAmount();
+    }
+
+    function buildExpensePayload(expense) {
+        return {
+            reference_type: 'payroll',
+            reference_id: payrollId,
+            expense_type: 'salary',
+            category: '薪資',
+            expense_date: expense.expense_date,
+            payment_method: expense.payment_method || null,
+            payment_method_id: expense.payment_method_id || null,
+            bank_account_id: expense.bank_account_id || null,
+            amount: parseFloat(expense.amount || 0) || 0,
+            status: expense.status || 'pending',
+            notes: expense.notes || null
+        };
+    }
+
+    function scheduleSyncExpense(index) {
+        // payroll 未建立前，先只留在本地；按「保存」後會批次建立
+        if (!payrollId) return;
+        if (expenseSaveTimers[index]) {
+            clearTimeout(expenseSaveTimers[index]);
+        }
+        expenseSaveTimers[index] = setTimeout(async () => {
+            const expense = expenses[index];
+            if (!expense) return;
+            try {
+                const payload = buildExpensePayload(expense);
+                if (expense.id) {
+                    await App.apiRequest(`/expenses/${expense.id}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    const created = await App.apiRequest('/expenses', {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    // 兼容回傳 {id} 或 {data:{id}}
+                    expense.id = created?.id || created?.data?.id || expense.id;
+                }
+                renderExpenses();
+            } catch (e) {
+                console.warn('同步支付記錄失敗', e);
+            }
+        }, 300);
+    }
+
+    function addPayrollExpense() {
+        const today = new Date().toISOString().split('T')[0];
+        // 獲取默認付款方式
+        const defaultMethod = paymentMethods.find(m => m.is_default);
+        
+        expenses.push({
+            id: null,
+            expense_date: today,
+            payment_method: defaultMethod ? defaultMethod.code : '',
+            payment_method_id: defaultMethod ? defaultMethod.id : '',
+            bank_account_id: '',
+            amount: 0,
+            status: 'pending',
+            notes: ''
+        });
+        renderExpenses();
+        scheduleSyncExpense(expenses.length - 1);
+    }
+
+    function removeExpense(index) {
+        const expense = expenses[index];
+        if (!expense) return;
+        // 已保存：同步刪除
+        if (payrollId && expense.id) {
+            App.apiRequest(`/expenses/${expense.id}`, { method: 'DELETE' })
+                .catch(err => console.warn('刪除支付記錄失敗', err))
+                .finally(() => {
+                    expenses.splice(index, 1);
+                    renderExpenses();
+                });
+            return;
+        }
+        expenses.splice(index, 1);
+        renderExpenses();
+    }
+
+    function updateExpense(index, field, value) {
+        const expense = expenses[index];
+        if (!expense) return;
+        
+        if (field === 'amount') {
+            expense[field] = parseFloat(value) || 0;
+        } else if (field === 'payment_method_id') {
+            expense[field] = value;
+            const method = paymentMethods.find(m => m.id === value);
+            expense.payment_method = method ? method.code : '';
+        } else {
+            expense[field] = value;
+        }
+        renderExpenses();
+        scheduleSyncExpense(index);
+    }
+
+    // 計算薪資總數
+    function calculateTotal() {
+        const baseSalary = parseFloat(document.getElementById('baseSalary')?.value) || 0;
+        const otHours = parseFloat(document.getElementById('otHours')?.value) || 0;
+        const otRate = parseFloat(document.getElementById('otRate')?.value) || 1.5;
+        // 津貼/扣除一律由 adjustments 計算（不再使用手動輸入）
+        let addTotal = 0;
+        let subTotal = 0;
+        adjustments.forEach(a => {
+            const val = computeAdjustmentAmount(a, baseSalary);
+            if ((a.direction || 'add') === 'subtract') subTotal += val;
+            else addTotal += val;
+        });
+
+        // 簡單假設：月工時 160（20天*8小時），加班時數按基本薪金折算時薪後乘倍率
+        const STANDARD_MONTHLY_HOURS = 160;
+        const hourlyRate = STANDARD_MONTHLY_HOURS > 0 ? (baseSalary / STANDARD_MONTHLY_HOURS) : 0;
+        const otPay = otHours * hourlyRate * otRate;
+
+        const total = baseSalary + otPay + addTotal - subTotal;
+        const totalEl = document.getElementById('totalAmount');
+        if (totalEl) totalEl.value = total.toFixed(2);
+        const totalTextEl = document.getElementById('totalAmountText');
+        if (totalTextEl) totalTextEl.textContent = total.toFixed(2);
+
+        updateDueAmount();
+    }
+
+    // 更新需付金額（總數 - 已付）
+    function updateDueAmount() {
+        const total = parseFloat(document.getElementById('totalAmount')?.value) || 0;
+        const totalPaid = expenses.reduce((sum, e) => sum + (parseFloat(e.amount || 0) || 0), 0);
+        const due = Math.max(0, total - totalPaid);
+
+        const dueEl = document.getElementById('totalDueAmount');
+        if (dueEl) {
+            dueEl.textContent = `需付：$${due.toFixed(2)}`;
+            dueEl.className = 'text-dark';
+        }
+    }
+</script>
+{{ end }}
+

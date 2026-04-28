@@ -1,0 +1,48 @@
+{{define "pages/dns_setup"}}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">DNS 設定教學（只需設定 www）</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        目標：把你的 <span class="fw-semibold">www</span> 網域指向系統提供的目標，讓網站可以在自訂網域上線。
+                    </p>
+
+                    <div class="alert alert-light border">
+                        <div class="fw-semibold mb-2">請新增一筆 CNAME</div>
+                        <div class="row g-2">
+                            <div class="col-12 col-md-4">
+                                <div class="small text-muted">名稱（Host）</div>
+                                <div class="font-monospace">www</div>
+                            </div>
+                            <div class="col-12 col-md-8">
+                                <div class="small text-muted">指向（Value / Target）</div>
+                                <div class="font-monospace">{{.CustomDomainCnameTarget}}</div>
+                            </div>
+                        </div>
+                        <div class="small text-muted mt-2">
+                            提示：如果你的 DNS 介面要求完整名稱，通常是 <span class="fw-semibold">www.yourdomain.com</span>。
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4">常見問題</h5>
+                    <ul class="text-muted">
+                        <li>如果 www 已經有 A/CNAME 記錄：先刪除舊的再新增（同一個主機名不能同時存在多種衝突記錄）。</li>
+                        <li>DNS 生效時間：通常 5–60 分鐘，最慢可到 24 小時（視 TTL 與 DNS 供應商）。</li>
+                        <li>設定完成後：回到「自訂網域 & SSL」頁面按「檢查 www DNS」確認是否 OK。</li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <a class="btn btn-primary" href="/website-domains">返回自訂網域設定</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+

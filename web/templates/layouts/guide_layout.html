@@ -1,0 +1,124 @@
+{{define "layouts/guide_layout"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{if .PageName}}<meta name="page-name" content="{{.PageName}}">{{end}}
+    <title>{{if .Title}}{{.Title}} - {{end}}vWork</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <!-- i18n 防闪烁样式 -->
+    <style>
+        /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+    </style>
+    <!-- i18n 初始化脚本 - 在页面渲染前执行，避免闪烁 -->
+    <script>
+        (function() {
+            // 立即读取语言设置（不等待 DOMContentLoaded）
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            
+            let currentLang = 'zh'; // 默认中文
+            
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) {
+                    localStorage.setItem('u-nai_lang', currentLang);
+                }
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                // 检测浏览器语言
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+                    currentLang = 'zh-CN';
+                } else if (browserLang.startsWith('zh')) {
+                    currentLang = 'zh';
+                } else {
+                    currentLang = 'en';
+                }
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            
+            // 将语言设置存储到全局变量，供 i18n.js 使用
+            window.__INITIAL_LANG__ = currentLang;
+            
+            // 无论什么语言，都在 body 渲染后立即添加 i18n-loading 类来隐藏内容
+            // 这样可以防止在翻译应用前显示原始内容（避免繁简切换时的闪烁）
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    
+                    // 添加超时保护：如果 5 秒后 i18n-loading 类还在，自动移除
+                    // 这样可以防止 i18n.js 加载失败时页面内容永远被隐藏
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            console.warn('i18n-loading class still present after 5 seconds, removing it to prevent blank page');
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    // 如果 body 还没渲染，使用 requestAnimationFrame 快速检查
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+    <script>
+        // 如果是 profile_guide 頁面，添加特殊 class
+        if (typeof window !== 'undefined' && window.location && window.location.pathname === '/profile-guide') {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.add('profile-guide-page');
+            });
+        }
+    </script>
+</head>
+<body style="margin: 0; padding: 0;" class="{{if eq .PageName "profile_guide"}}profile-guide-page{{end}}">
+    <!-- 將 TenantSubdomain 和 BaseDomain 存儲到 JavaScript 變量中 -->
+    {{if .TenantSubdomain}}
+    <script>
+        window.tenantSubdomain = "{{.TenantSubdomain}}";
+    </script>
+    {{end}}
+    {{if .BaseDomain}}
+    <script>
+        window.baseDomain = "{{.BaseDomain}}";
+    </script>
+    {{end}}
+    
+    <div style="min-height: 100vh; width: 100%;">
+        <!-- Alert Container -->
+        <div id="alertContainer" class="position-fixed start-50 translate-middle-x" style="z-index: 9999; max-width: 500px; top: 20px; margin-top: 10px;"></div>
+        {{embed}}
+    </div>
+    
+    <!-- jQuery -->
+    <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        // 初始化 i18n
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof I18n !== 'undefined') {
+                I18n.init();
+            }
+        });
+    </script>
+</body>
+</html>
+{{end}}
+
+
+
+

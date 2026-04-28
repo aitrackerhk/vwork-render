@@ -1,0 +1,273 @@
+{{ define "pages/point_settings" }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-gear me-2"></i><span data-i18n="pointSettings">積分設置</span></h2>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> <span data-i18n="pointSettings">積分設置</span></h5>
+                </div>
+                <div class="card-body">
+                    <div id="alertContainer"></div>
+                    <form id="pointSettingsForm">
+                        <h5 class="mb-3" data-i18n="pointSettingsPage.earnPointsTitle">積分獲得開關</h5>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableOrderEarnPoints" checked>
+                                <label class="form-check-label" for="enableOrderEarnPoints">
+                                    <span data-i18n="pointSettingsPage.enableOrderEarnPoints">開啟訂單消費獲得積分</span>
+                                </label>
+                            </div>
+                            <div class="form-text" data-i18n="pointSettingsPage.enableOrderEarnPointsDesc">如果開啟，POS 與訂單開單時客戶可獲得積分</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableServiceOrderEarnPoints" checked>
+                                <label class="form-check-label" for="enableServiceOrderEarnPoints">
+                                    <span data-i18n="pointSettingsPage.enableServiceOrderEarnPoints">開啟服務單消費獲得積分</span>
+                                </label>
+                            </div>
+                            <div class="form-text" data-i18n="pointSettingsPage.enableServiceOrderEarnPointsDesc">如果開啟，服務單開單時客戶可獲得積分</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enablePointsAdjustmentOnEdit" checked>
+                                <label class="form-check-label" for="enablePointsAdjustmentOnEdit">
+                                    <span data-i18n="pointSettingsPage.enablePointsAdjustmentOnEdit">編輯訂單時補發積分差值</span>
+                                </label>
+                            </div>
+                            <div class="form-text" data-i18n="pointSettingsPage.enablePointsAdjustmentOnEditDesc">如果開啟，編輯訂單/服務單時若積分增加，會補發差值到客戶積分</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><span data-i18n="pointSettingsPage.pointsPerDollar">每消費 1 元獲得積分</span> <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="pointsPerDollar" step="0.01" min="0" required>
+                                <span class="input-group-text" data-i18n="pointSettingsPage.pointsPerDollarUnit">積分/元</span>
+                            </div>
+                            <div class="form-text" data-i18n="pointSettingsPage.pointsPerDollarDesc">例如：1 表示消費 1 元獲得 1 積分，10 表示消費 1 元獲得 10 積分</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label"><span data-i18n="pointSettingsPage.dollarPerPoint">積分轉換比例</span> <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="dollarPerPoint" step="0.0001" min="0.0001" required>
+                                <span class="input-group-text" data-i18n="pointSettingsPage.dollarPerPointUnit">元/積分</span>
+                            </div>
+                            <div class="form-text" data-i18n="pointSettingsPage.dollarPerPointDesc">例如：0.01 表示 1 積分 = 0.01 元（100 積分 = 1 元）</div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        <h5 class="mb-3" data-i18n="pointSettingsPage.referralTitle">介紹人獎勵積分開關</h5>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableOrderReferralBonus" checked>
+                                <label class="form-check-label" for="enableOrderReferralBonus">
+                                    <span data-i18n="pointSettingsPage.enableOrderReferralBonus">開啟訂單介紹人獎勵積分</span>
+                                </label>
+                            </div>
+                            <div class="form-text" data-i18n="pointSettingsPage.enableOrderReferralBonusDesc">如果開啟，POS 與訂單開單時介紹人可獲得積分</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableServiceOrderReferralBonus" checked>
+                                <label class="form-check-label" for="enableServiceOrderReferralBonus">
+                                    <span data-i18n="pointSettingsPage.enableServiceOrderReferralBonus">開啟服務單介紹人獎勵積分</span>
+                                </label>
+                            </div>
+                            <div class="form-text" data-i18n="pointSettingsPage.enableServiceOrderReferralBonusDesc">如果開啟，服務單開單時介紹人可獲得積分</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pointSettingsPage.referralBonus">介紹人獎勵積分</label>
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <select class="form-select" id="referralBonusMode">
+                                        <option value="fixed" data-i18n="pointSettingsPage.bonusMode.fixed">定額</option>
+                                        <option value="percent" data-i18n="pointSettingsPage.bonusMode.percent">百分比 (%)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="referralBonusValue" min="0" value="0" step="1">
+                                        <span class="input-group-text" id="referralBonusUnit" data-i18n="pointsHistoryPage.pointsUnit">積分</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-text">
+                                <span data-i18n="pointSettingsPage.referralBonusDesc">定額：每次獎勵固定積分；百分比：按「推介客戶本單消費獲得的積分」比例計算。</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pointSettingsPage.referralCountPolicy">介紹人積分計算策略</label>
+                            <select class="form-select" id="referralCountPolicy">
+                                <option value="all" data-i18n="pointSettingsPage.referralCountPolicyOptions.all">計算所有訂單</option>
+                                <option value="first_only" data-i18n="pointSettingsPage.referralCountPolicyOptions.firstOnly">僅計算第一單</option>
+                            </select>
+                            <div class="form-text" data-i18n="pointSettingsPage.referralCountPolicyDesc">設置介紹人積分是計算所有訂單還是僅計算第一單</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pointSettingsPage.minPointsToUse">最低使用積分</label>
+                            <input type="number" class="form-control" id="minPointsToUse" min="0" value="0">
+                            <div class="form-text" data-i18n="pointSettingsPage.minPointsToUseDesc">客戶使用積分時的最低要求</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pointSettingsPage.maxPointsPercent">積分最大抵扣百分比 (%)</label>
+                            <input type="number" class="form-control" id="maxPointsPercent" step="0.01" min="0" max="100">
+                            <div class="form-text" data-i18n="pointSettingsPage.maxPointsPercentDesc">積分最多可抵扣訂單金額的百分比（留空表示無限制）</div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> <span data-i18n="common.save">保存</span>
+                        </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> <span data-i18n="common.help">說明</span></h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">
+                        <strong data-i18n="pointSettingsPage.help.pointsPerDollarTitle">每消費獲得積分：</strong>
+                        <span data-i18n="pointSettingsPage.help.pointsPerDollarDesc">設置客戶每消費 1 元可獲得多少積分。</span><br><br>
+                        <strong data-i18n="pointSettingsPage.help.dollarPerPointTitle">積分轉換比例：</strong>
+                        <span data-i18n="pointSettingsPage.help.dollarPerPointDesc">設置積分與現金的轉換比例，用於計算積分抵扣金額。</span><br><br>
+                        <strong data-i18n="pointSettingsPage.help.minPointsToUseTitle">最低使用積分：</strong>
+                        <span data-i18n="pointSettingsPage.help.minPointsToUseDesc">客戶使用積分時的最低要求。</span><br><br>
+                        <strong data-i18n="pointSettingsPage.help.maxPointsPercentTitle">最大抵扣百分比：</strong>
+                        <span data-i18n="pointSettingsPage.help.maxPointsPercentDesc">限制積分最多可抵扣訂單金額的百分比。</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        const apiPath = '/point-settings';
+        
+        // 載入積分設置
+        async function loadPointSettings() {
+            try {
+                const settings = await App.apiRequest(apiPath);
+                if (settings.points_per_dollar !== undefined) {
+                    document.getElementById('pointsPerDollar').value = settings.points_per_dollar;
+                }
+                if (settings.dollar_per_point !== undefined) {
+                    document.getElementById('dollarPerPoint').value = settings.dollar_per_point;
+                }
+                if (settings.min_points_to_use !== undefined) {
+                    document.getElementById('minPointsToUse').value = settings.min_points_to_use;
+                }
+                if (settings.max_points_percent !== undefined && settings.max_points_percent !== null) {
+                    document.getElementById('maxPointsPercent').value = settings.max_points_percent;
+                }
+                // 介紹人獎勵：新欄位優先，舊欄位向後兼容
+                const mode = settings.referral_bonus_mode || 'fixed';
+                document.getElementById('referralBonusMode').value = mode;
+                const val = (settings.referral_bonus_value !== undefined && settings.referral_bonus_value !== null)
+                    ? settings.referral_bonus_value
+                    : (settings.referral_bonus_points || 0);
+                document.getElementById('referralBonusValue').value = val;
+                if (settings.referral_count_policy !== undefined) {
+                    document.getElementById('referralCountPolicy').value = settings.referral_count_policy || 'all';
+                }
+                if (settings.enable_order_earn_points !== undefined) {
+                    document.getElementById('enableOrderEarnPoints').checked = settings.enable_order_earn_points !== false;
+                }
+                if (settings.enable_service_order_earn_points !== undefined) {
+                    document.getElementById('enableServiceOrderEarnPoints').checked = settings.enable_service_order_earn_points !== false;
+                }
+                if (settings.enable_order_referral_bonus !== undefined) {
+                    document.getElementById('enableOrderReferralBonus').checked = settings.enable_order_referral_bonus !== false;
+                }
+                if (settings.enable_service_order_referral_bonus !== undefined) {
+                    document.getElementById('enableServiceOrderReferralBonus').checked = settings.enable_service_order_referral_bonus !== false;
+                }
+                if (settings.enable_points_adjustment_on_edit !== undefined) {
+                    document.getElementById('enablePointsAdjustmentOnEdit').checked = settings.enable_points_adjustment_on_edit !== false;
+                }
+            } catch (error) {
+                console.error('載入積分設置失敗:', error);
+            }
+        }
+
+        // mode 切換時更新 unit/step/max
+        function syncReferralBonusModeUI() {
+            const mode = document.getElementById('referralBonusMode').value;
+            const input = document.getElementById('referralBonusValue');
+            const unit = document.getElementById('referralBonusUnit');
+            if (mode === 'percent') {
+                unit.textContent = '%';
+                input.step = '0.01';
+                input.max = '100';
+            } else {
+                unit.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pointsHistoryPage.pointsUnit') : '積分';
+                input.step = '1';
+                input.removeAttribute('max');
+            }
+        }
+
+        // 保存積分設置
+        document.getElementById('pointSettingsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                points_per_dollar: parseFloat(document.getElementById('pointsPerDollar').value) || 0,
+                dollar_per_point: parseFloat(document.getElementById('dollarPerPoint').value) || 0,
+                min_points_to_use: parseInt(document.getElementById('minPointsToUse').value) || 0,
+                max_points_percent: document.getElementById('maxPointsPercent').value ? parseFloat(document.getElementById('maxPointsPercent').value) : null,
+                referral_bonus_mode: document.getElementById('referralBonusMode').value || 'fixed',
+                referral_bonus_value: parseFloat(document.getElementById('referralBonusValue').value) || 0,
+                // 舊欄位向後兼容（fixed 模式才同步）
+                referral_bonus_points: (document.getElementById('referralBonusMode').value === 'fixed')
+                    ? (parseInt(document.getElementById('referralBonusValue').value) || 0)
+                    : 0,
+                referral_count_policy: document.getElementById('referralCountPolicy').value || 'all',
+                enable_order_earn_points: document.getElementById('enableOrderEarnPoints').checked,
+                enable_service_order_earn_points: document.getElementById('enableServiceOrderEarnPoints').checked,
+                enable_order_referral_bonus: document.getElementById('enableOrderReferralBonus').checked,
+                enable_service_order_referral_bonus: document.getElementById('enableServiceOrderReferralBonus').checked,
+                enable_points_adjustment_on_edit: document.getElementById('enablePointsAdjustmentOnEdit').checked
+            };
+
+            if (data.points_per_dollar < 0 || data.dollar_per_point <= 0) {
+                App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pointSettingsPage.invalidSettings') : '請輸入有效的積分設置', 'warning');
+                return;
+            }
+
+            try {
+                await App.apiRequest(apiPath, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pointSettingsPage.saved') : '積分設置已保存', 'success');
+            } catch (error) {
+                const failed = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.saveFailed') : '保存失敗';
+                App.showAlert(failed + ': ' + error.message, 'danger');
+            }
+        });
+
+        // 初始載入
+        await loadPointSettings();
+        syncReferralBonusModeUI();
+        document.getElementById('referralBonusMode').addEventListener('change', syncReferralBonusModeUI);
+    });
+</script>
+{{ end }}
+

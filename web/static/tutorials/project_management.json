@@ -1,0 +1,23 @@
+{
+  "name": "project_management",
+  "title": "項目管理",
+  "version": 4,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/projects" },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "highlight", "selector": "#projectsList", "text": { "zh": "項目總覽：卡片展示進度與負責人", "zh-CN": "项目总览：卡片展示进度与负责人", "en": "Project overview: cards show progress and owner" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "#projectsSearch", "text": { "zh": "搜尋項目編號或名稱", "zh-CN": "搜索项目编号或名称", "en": "Search by project code or name" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "#projectsStatus", "text": { "zh": "按狀態篩選：進行中、暫停、已完成", "zh-CN": "按状态筛选：进行中、暂停、已完成", "en": "Filter by status: active, on hold, completed" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "highlight", "selector": "a.btn.btn-primary[href='/projects/new']", "text": { "zh": "新增項目：設定名稱、任務、預算", "zh-CN": "新增项目：设定名称、任务、预算", "en": "Create project: set name, tasks, budget" } },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "click", "selector": "a.btn.btn-primary[href='/projects/new']" },
+    { "action": "sleep", "ms": 2000 },
+    { "action": "highlight", "selector": "#projectForm", "text": { "zh": "項目表單：填寫資料並管理任務與支出", "zh-CN": "项目表单：填写资料并管理任务与支出", "en": "Project form: fill details, manage tasks and expenses" } },
+    { "action": "sleep", "ms": 3000 },
+    { "action": "done" }
+  ]
+}

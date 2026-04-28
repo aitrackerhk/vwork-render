@@ -1,0 +1,136 @@
+{{define "partials/vmarket_company_grid"}}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  {{if eq .Active "products"}}
+    <h2 class="vmarket-section-title h4 mb-0" data-i18n="vmarket.productList.title">提供商品的公司</h2>
+    <span class="text-muted small"><span data-i18n="vmarket.companyList.totalPrefix">共</span> {{len .Companies}} <span data-i18n="vmarket.companyList.totalSuffix">間</span></span>
+  {{else if eq .Active "services"}}
+    <h2 class="vmarket-section-title h4 mb-0" data-i18n="vmarket.serviceList.title">提供服務的公司</h2>
+    <span class="text-muted small"><span data-i18n="vmarket.companyList.totalPrefix">共</span> {{len .Companies}} <span data-i18n="vmarket.companyList.totalSuffix">間</span></span>
+  {{else}}
+    <h2 class="vmarket-section-title h4 mb-0" data-i18n="vmarket.companyList.title">VMarket 公司清單</h2>
+    <span class="text-muted small"><span data-i18n="vmarket.companyList.totalPrefix">共</span> {{len .Companies}} <span data-i18n="vmarket.companyList.totalSuffix">間</span></span>
+  {{end}}
+</div>
+{{if .Companies}}
+  <div class="d-flex gap-4">
+    <div class="flex-grow-1" style="min-width: 0;">
+      <div class="row g-4">
+        {{range .Companies}}
+          <div class="col-12 col-md-6 col-xl-4">
+            <div class="card vmarket-card h-100">
+              <div class="card-body d-flex flex-column">
+                <!-- Header: Logo + Name -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <div class="vmarket-logo-badge">
+                    {{if .LogoURL}}
+                      <img src="{{.LogoURL}}" alt="{{.EnterpriseName}}">
+                    {{else}}
+                      <i class="bi bi-building fs-3 text-secondary"></i>
+                    {{end}}
+                  </div>
+                  <div style="min-width: 0;">
+                    <h5 class="card-title mb-0 text-truncate">{{.Name}}</h5>
+                    {{if .Category}}<div class="text-muted small text-truncate">{{.Category}}</div>{{end}}
+                  </div>
+                </div>
+                <!-- Stats -->
+                <div class="d-flex gap-3 mb-3">
+                  {{if .ProductCount}}
+                  <div class="vmarket-stat">
+                    <span class="vmarket-stat-num">{{.ProductCount}}</span>
+                    <span class="vmarket-stat-label" data-i18n="vmarket.card.products">商品</span>
+                  </div>
+                  {{end}}
+                  {{if .ServiceCount}}
+                  <div class="vmarket-stat">
+                    <span class="vmarket-stat-num">{{.ServiceCount}}</span>
+                    <span class="vmarket-stat-label" data-i18n="vmarket.card.services">服務</span>
+                  </div>
+                  {{end}}
+                </div>
+                <!-- Actions -->
+                <div class="vmarket-link-group mt-auto d-flex flex-wrap gap-2">
+                  {{if .ProductURL}}<a class="btn btn-sm vmarket-btn-action" href="{{.ProductURL}}" target="_blank" rel="noopener"><i class="bi bi-box-seam me-1"></i><span data-i18n="vmarket.nav.products">商品</span></a>{{end}}
+                  {{if .ServiceURL}}<a class="btn btn-sm vmarket-btn-action" href="{{.ServiceURL}}" target="_blank" rel="noopener"><i class="bi bi-tools me-1"></i><span data-i18n="vmarket.nav.services">服務</span></a>{{end}}
+                  {{if .CompanyURL}}<a class="btn btn-sm vmarket-btn-secondary" href="{{.CompanyURL}}" target="_blank" rel="noopener"><i class="bi bi-info-circle me-1"></i><span data-i18n="vmarket.nav.companies">公司</span></a>{{end}}
+                </div>
+              </div>
+            </div>
+          </div>
+        {{end}}
+      </div>
+    </div>
+    <!-- Ad Sidebar (hidden for paid subscribers) -->
+    <aside class="vmarket-ad d-none d-lg-block" id="vmarketAdSidebar">
+      <div class="vmarket-ad-inner">
+        <div class="ad-promo-card ad-promo-big" id="vmarketAdPromo">
+          <div class="ad-promo-icon"><i class="bi bi-rocket-takeoff"></i></div>
+          <div class="ad-promo-title" data-i18n="ad.upgradeTitle">升級 vSuite</div>
+          <div class="ad-promo-desc" data-i18n="ad.upgradeDesc">解鎖所有功能，無限記錄，無廣告體驗</div>
+          <div class="ad-promo-divider"></div>
+          <ul class="ad-promo-features">
+            <li data-i18n="ad.feature1">所有功能</li>
+            <li data-i18n="ad.feature2">無限記錄</li>
+            <li data-i18n="ad.feature3">無廣告</li>
+            <li data-i18n="ad.feature4">每月 1,000 vCoins</li>
+            <li data-i18n="ad.feature5">vOffice - AI 智慧辦公</li>
+            <li data-i18n="ad.feature6">vMarket - 商品市集</li>
+            <li data-i18n="ad.feature7">支援服務</li>
+          </ul>
+          <div class="ad-promo-divider"></div>
+          <div class="ad-promo-price" data-i18n="ad.priceFrom">低至 HK$250/月</div>
+          <a href="/billing" class="ad-promo-btn" data-i18n="ad.upgradeBtn">立即升級</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+{{else}}
+  <div class="d-flex gap-4">
+    <div class="flex-grow-1" style="min-width: 0;">
+      <div class="vmarket-empty vmarket-empty-tall">
+        {{if eq $.Active "products"}}
+          <i class="bi bi-box-seam mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+          <div data-i18n="vmarket.productList.empty">目前沒有公司在 VMarket 上架商品。</div>
+        {{else if eq $.Active "services"}}
+          <i class="bi bi-tools mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+          <div data-i18n="vmarket.serviceList.empty">目前沒有公司在 VMarket 上架服務。</div>
+        {{else}}
+          <i class="bi bi-building mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+          <div data-i18n="vmarket.companyList.empty">目前沒有可顯示的公司。</div>
+        {{end}}
+      </div>
+    </div>
+    <!-- Ad Sidebar (hidden for paid subscribers) -->
+    <aside class="vmarket-ad d-none d-lg-block" id="vmarketAdSidebarEmpty">
+      <div class="vmarket-ad-inner">
+        <div class="ad-promo-card ad-promo-big" id="vmarketAdPromoEmpty">
+          <div class="ad-promo-icon"><i class="bi bi-rocket-takeoff"></i></div>
+          <div class="ad-promo-title" data-i18n="ad.upgradeTitle">升級 vSuite</div>
+          <div class="ad-promo-desc" data-i18n="ad.upgradeDesc">解鎖所有功能，無限記錄，無廣告體驗</div>
+          <div class="ad-promo-divider"></div>
+          <ul class="ad-promo-features">
+            <li data-i18n="ad.feature1">所有功能</li>
+            <li data-i18n="ad.feature2">無限記錄</li>
+            <li data-i18n="ad.feature3">無廣告</li>
+            <li data-i18n="ad.feature4">每月 1,000 vCoins</li>
+            <li data-i18n="ad.feature5">vOffice - AI 智慧辦公</li>
+            <li data-i18n="ad.feature6">vMarket - 商品市集</li>
+            <li data-i18n="ad.feature7">支援服務</li>
+          </ul>
+          <div class="ad-promo-divider"></div>
+          <div class="ad-promo-price" data-i18n="ad.priceFrom">低至 HK$250/月</div>
+          <a href="/billing" class="ad-promo-btn" data-i18n="ad.upgradeBtn">立即升級</a>
+        </div>
+      </div>
+    </aside>
+  </div>
+{{end}}
+{{end}}
+
+{{define "partials/vmarket_company_list"}}
+<section class="mt-4">
+  <div class="container">
+    {{template "partials/vmarket_company_grid" .}}
+  </div>
+</section>
+{{end}}

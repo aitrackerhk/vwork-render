@@ -1,0 +1,1169 @@
+{{ define "pages/inventory_processing" }}
+<!-- html5-qrcode for QR code scanning -->
+<script src="/static/vendor/html5-qrcode/html5-qrcode.min.js"></script>
+<style>
+    .processing-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .scan-input-container {
+        position: relative;
+    }
+    
+    .scan-input-container input {
+        font-size: 1.5rem;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .scan-input-container .scan-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.5rem;
+        color: #6c757d;
+    }
+    
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.75rem;
+    }
+    
+    .status-processing { background-color: #ffc107; color: #000; }
+    .status-completed { background-color: #28a745; color: #fff; }
+    
+    .scan-mode-selector .btn {
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .scan-mode-selector .btn.active {
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    }
+    
+    .scan-result {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .scan-result.success {
+        background-color: #d1e7dd;
+        border: 1px solid #badbcc;
+    }
+    
+    .scan-result.error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c2c7;
+    }
+    
+    .scan-result.info {
+        background-color: #cff4fc;
+        border: 1px solid #b6effb;
+    }
+    
+    .item-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .item-list-item {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .item-list-item:last-child {
+        border-bottom: none;
+    }
+    
+    .item-list-item.scanned {
+        background-color: #d1e7dd;
+    }
+    
+    .item-list-item.pending {
+        background-color: #fff3cd;
+    }
+    
+    .current-note-info {
+        background-color: #e7f1ff;
+        border: 2px solid #0d6efd;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* 相機掃描區域樣式 */
+    .inv-qr-scanner-area {
+        position: relative;
+        min-height: 150px;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 0.5rem;
+    }
+    
+    .inv-qr-scanner-area.active {
+        border-color: #28a745;
+        background: #000;
+    }
+    
+    .inv-qr-scanner-area #qr-reader {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .inv-qr-scanner-area #qr-reader__dashboard_section {
+        padding: 0.5rem;
+    }
+    
+    .inv-qr-scanner-area #qr-reader__dashboard_section_csr {
+        margin-bottom: 0.5rem;
+    }
+    
+    .inv-qr-scanner-area #qrScannerPlaceholder {
+        padding: 0.25rem 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    .inv-qr-scanner-toggle-btn {
+        margin-top: 0.5rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    /* 產品相機掃描區域（續件模式） */
+    .inv-product-qr-scanner-area {
+        position: relative;
+        min-height: 120px;
+        border: 2px dashed #28a745;
+        border-radius: 8px;
+        background: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .inv-product-qr-scanner-area.active {
+        border-color: #28a745;
+        background: #000;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-box-seam"></i> <span data-i18n="inventoryProcessing.title">出入庫處理</span></h2>
+        <a href="/inventory-settings" class="btn btn-outline-secondary">
+            <i class="bi bi-gear"></i> 出入庫設定
+        </a>
+    </div>
+
+    <!-- 掃碼區域 -->
+    <div class="processing-card">
+        <div class="row mb-3">
+            <!-- 掃碼輸入 -->
+            <div class="col-lg-8 col-md-12 mb-3 mb-lg-0">
+                <h5 class="mb-3"><i class="bi bi-upc-scan"></i> 掃碼處理</h5>
+                <label class="form-label fw-bold" id="scanInputLabel">掃描出入貨 QR Code / 單號</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-qr-code-scan"></i></span>
+                    <input type="text" class="form-control form-control-lg" id="scanInput" 
+                           placeholder="掃描 QR Code 或輸入單號..." autofocus
+                           onkeypress="if(event.key==='Enter') processScan()">
+                    <button type="button" class="btn btn-primary" onclick="processScan()">
+                        <i class="bi bi-check-circle"></i> 確認
+                    </button>
+                </div>
+            </div>
+            <!-- 相機掃描區域 -->
+            <div class="col-lg-4 col-md-12">
+                <label class="form-label fw-bold"><i class="bi bi-camera-video"></i> 相機掃描</label>
+                <div class="inv-qr-scanner-area" id="qrScannerArea">
+                    <div id="qr-reader" style="display: none;"></div>
+                    <div id="qrScannerPlaceholder" class="text-center">
+                        <i class="bi bi-camera-video" style="font-size: 1.5rem; color: #667eea;"></i>
+                        <p class="mt-1 mb-0 small text-muted">點擊按鈕開始掃描</p>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-primary inv-qr-scanner-toggle-btn" id="qrScannerToggleBtn" onclick="toggleQRScanner()">
+                        <i class="bi bi-camera-video"></i> 開始掃描
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 掃碼結果 -->
+        <div id="scanResult" style="display: none;"></div>
+    </div>
+    
+    <!-- 續件模式：當前處理的單據 -->
+    <div class="processing-card" id="itemByItemPanel" style="display: none;">
+        <h5 class="mb-3"><i class="bi bi-list-check"></i> 續件掃碼處理</h5>
+        
+        <div class="current-note-info" id="currentNoteInfo">
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>單號：</strong><span id="currentNoteNumber">-</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>類型：</strong><span id="currentNoteType">-</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>倉庫：</strong><span id="currentNoteWarehouse">-</span>
+                </div>
+            </div>
+            <div class="mt-2">
+                <strong>進度：</strong><span id="currentNoteProgress">0/0</span>
+                <div class="progress mt-1">
+                    <div class="progress-bar bg-success" id="currentNoteProgressBar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 產品掃碼輸入 -->
+        <div class="row mb-3">
+            <div class="col-lg-8 col-md-12 mb-3 mb-lg-0">
+                <label class="form-label fw-bold">掃描產品條碼 / QR Code</label>
+                <div class="scan-input-container">
+                    <i class="bi bi-upc scan-icon"></i>
+                    <input type="text" class="form-control form-control-lg" id="productScanInput" 
+                           placeholder="掃描產品條碼..."
+                           onkeypress="if(event.key==='Enter') processProductScan()">
+                </div>
+            </div>
+            <!-- 產品相機掃描區域 -->
+            <div class="col-lg-4 col-md-12">
+                <label class="form-label fw-bold"><i class="bi bi-camera-video"></i> 相機掃描產品</label>
+                <div class="inv-product-qr-scanner-area" id="productQrScannerArea">
+                    <div id="product-qr-reader" style="display: none;"></div>
+                    <div id="productQrScannerPlaceholder" class="text-center">
+                        <i class="bi bi-camera-video" style="font-size: 1.2rem; color: #28a745;"></i>
+                        <p class="mt-1 mb-0 small text-muted">點擊開始掃描產品</p>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-success inv-qr-scanner-toggle-btn" id="productQrScannerToggleBtn" onclick="toggleProductQRScanner()">
+                        <i class="bi bi-camera-video"></i> 開始掃描
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-6">
+                <button type="button" class="btn btn-success btn-lg w-100" onclick="processProductScan()">
+                    <i class="bi bi-check"></i> 確認掃碼
+                </button>
+            </div>
+            <div class="col-6">
+                <button type="button" class="btn btn-outline-secondary btn-lg w-100" onclick="cancelItemByItem()">
+                    <i class="bi bi-x-circle"></i> 取消
+                </button>
+            </div>
+        </div>
+        
+        <!-- 待掃產品列表 -->
+        <h6>待處理產品</h6>
+        <div class="item-list border rounded" id="pendingItemsList">
+            <div class="text-center text-muted py-3">暫無待處理產品</div>
+        </div>
+        
+        <div class="mt-3">
+            <button type="button" class="btn btn-primary w-100" onclick="completeItemByItem()" id="completeItemByItemBtn" disabled>
+                <i class="bi bi-check-circle"></i> 全部完成
+            </button>
+        </div>
+    </div>
+    
+    <!-- 待處理列表 -->
+    <div class="processing-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">
+                <i class="bi bi-clock-history"></i> 待處理記錄
+                <span class="badge bg-secondary ms-2" id="pendingTotalCount">0</span>
+            </h5>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="loadPendingRecords()">
+                <i class="bi bi-arrow-clockwise"></i> 刷新
+            </button>
+        </div>
+        
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="outbound-tab" data-bs-toggle="tab" data-bs-target="#outbound-pane" type="button" role="tab">
+                    <i class="bi bi-box-arrow-up text-danger"></i> 待出庫 <span class="badge bg-danger" id="pendingOutboundCount">0</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="inbound-tab" data-bs-toggle="tab" data-bs-target="#inbound-pane" type="button" role="tab">
+                    <i class="bi bi-box-arrow-in-down text-success"></i> 待入庫 <span class="badge bg-success" id="pendingInboundCount">0</span>
+                </button>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- 待出庫 -->
+            <div class="tab-pane fade show active" id="outbound-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>訂單號</th>
+                                <th>發貨單號</th>
+                                <th>倉庫</th>
+                                <th>產品數</th>
+                                <th>發貨日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingOutboundTable">
+                            <tr><td colspan="6" class="text-center text-muted py-3">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 待入庫 -->
+            <div class="tab-pane fade" id="inbound-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>採購單號</th>
+                                <th>收貨單號</th>
+                                <th>倉庫</th>
+                                <th>產品數</th>
+                                <th>收貨日期</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingInboundTable">
+                            <tr><td colspan="6" class="text-center text-muted py-3">載入中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let warehouses = [];
+    let products = [];
+    let inventorySettings = null;
+    let pendingOutbound = [];
+    let pendingInbound = [];
+    
+    // 續件模式狀態
+    let currentNote = null;
+    let currentNoteItems = [];
+    let scannedItems = [];
+    
+    // QR Code 掃描器變量（主區域）
+    let qrScanner = null;
+    let isScanning = false;
+    
+    // QR Code 掃描器變量（產品區域）
+    let productQrScanner = null;
+    let isProductScanning = false;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        try {
+            const [warehousesData, productsData, settingsData] = await Promise.all([
+                App.apiRequest('/warehouses?limit=1000'),
+                App.apiRequest('/products?limit=1000'),
+                App.apiRequest('/inventory-settings')
+            ]);
+            warehouses = warehousesData.data || [];
+            products = productsData.data || [];
+            inventorySettings = settingsData;
+        } catch (error) {
+            console.error('Failed to load data:', error);
+        }
+
+        await loadPendingRecords();
+        document.getElementById('scanInput').focus();
+    });
+
+    // 自動從 QR Code 前綴判斷操作類型
+    function detectOperationType(code) {
+        if (code.startsWith('SHIP-')) return 'outbound';
+        if (code.startsWith('RECV-')) return 'inbound';
+        // 如果沒有前綴，嘗試從待處理清單中查找
+        for (const item of pendingOutbound) {
+            if (item.shippingNumber === code || item.orderNumber === code) return 'outbound';
+        }
+        for (const item of pendingInbound) {
+            if (item.receivingNumber === code || item.orderNumber === code) return 'inbound';
+        }
+        return null;
+    }
+    
+    // 根據設定和操作類型決定掃碼模式
+    function getScanModeBySettings(operationType) {
+        if (operationType === 'outbound') {
+            return inventorySettings.requires_item_by_item_outbound ? 'itemByItem' : 'auto';
+        } else {
+            return inventorySettings.requires_item_by_item_inbound ? 'itemByItem' : 'auto';
+        }
+    }
+
+    async function processScan() {
+        const input = document.getElementById('scanInput');
+        const code = input.value.trim();
+        
+        if (!code) {
+            showScanResult('請輸入或掃描 QR Code / 單號', 'error');
+            return;
+        }
+        
+        // 自動偵測操作類型
+        const operationType = detectOperationType(code);
+        
+        if (!operationType) {
+            showScanResult(`無法識別的單號：${code}（請掃描 SHIP- 或 RECV- 開頭的 QR Code）`, 'error');
+            return;
+        }
+        
+        // 根據設定決定掃碼模式
+        const scanMode = getScanModeBySettings(operationType);
+        
+        try {
+            const noteInfo = await findNoteByCode(code, operationType);
+            
+            if (!noteInfo) {
+                showScanResult(`找不到對應的${operationType === 'outbound' ? '發貨單' : '收貨單'}：${code}`, 'error');
+                return;
+            }
+            
+            if (scanMode === 'auto') {
+                await completeNote(noteInfo);
+                showScanResult(`${operationType === 'outbound' ? '出庫' : '入庫'}已完成：${noteInfo.noteNumber}`, 'success');
+                input.value = '';
+                await loadPendingRecords();
+            } else {
+                startItemByItem(noteInfo);
+                input.value = '';
+            }
+        } catch (error) {
+            showScanResult('處理失敗：' + error.message, 'error');
+        }
+        
+        input.focus();
+    }
+    
+    async function findNoteByCode(code, operationType) {
+        if (operationType === 'outbound') {
+            if (code.startsWith('SHIP-')) {
+                const parts = code.split('-');
+                if (parts.length >= 3) {
+                    const orderId = parts[1];
+                    const noteIndex = parseInt(parts[2]);
+                    return await getShippingNoteByOrderAndIndex(orderId, noteIndex);
+                }
+            }
+            
+            for (const item of pendingOutbound) {
+                if (item.shippingNumber === code || item.orderNumber === code) {
+                    return item;
+                }
+            }
+        } else {
+            if (code.startsWith('RECV-')) {
+                const parts = code.split('-');
+                if (parts.length >= 3) {
+                    const poId = parts[1];
+                    const noteIndex = parseInt(parts[2]);
+                    return await getReceivingNoteByPOAndIndex(poId, noteIndex);
+                }
+            }
+            
+            for (const item of pendingInbound) {
+                if (item.receivingNumber === code || item.orderNumber === code) {
+                    return item;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    async function getShippingNoteByOrderAndIndex(orderId, noteIndex) {
+        try {
+            const order = await App.apiRequest(`/orders/${orderId}`);
+            if (!order || !order.extra_fields || !order.extra_fields.shipping_notes) return null;
+            
+            const note = order.extra_fields.shipping_notes[noteIndex];
+            if (!note) return null;
+            
+            const warehouse = warehouses.find(w => w.id === note.warehouse_id);
+            return {
+                type: 'outbound',
+                orderId: order.id,
+                orderNumber: order.order_number,
+                noteIndex: noteIndex,
+                shippingNumber: note.shipping_number || `SHIP-${noteIndex + 1}`,
+                noteNumber: note.shipping_number || `SHIP-${noteIndex + 1}`,
+                warehouseId: note.warehouse_id,
+                warehouseName: warehouse ? warehouse.name : '',
+                shippingDate: note.shipping_date || '',
+                items: note.items || [],
+                status: note.status || 'processing'
+            };
+        } catch (error) {
+            console.error('Failed to get shipping note:', error);
+            return null;
+        }
+    }
+    
+    async function getReceivingNoteByPOAndIndex(poId, noteIndex) {
+        try {
+            const po = await App.apiRequest(`/purchase-orders/${poId}`);
+            if (!po || !po.extra_fields || !po.extra_fields.receiving_notes) return null;
+            
+            const note = po.extra_fields.receiving_notes[noteIndex];
+            if (!note) return null;
+            
+            const warehouse = warehouses.find(w => w.id === note.warehouse_id);
+            return {
+                type: 'inbound',
+                purchaseOrderId: po.id,
+                orderNumber: po.order_number,
+                noteIndex: noteIndex,
+                receivingNumber: note.receiving_number || `RECV-${noteIndex + 1}`,
+                noteNumber: note.receiving_number || `RECV-${noteIndex + 1}`,
+                warehouseId: note.warehouse_id,
+                warehouseName: warehouse ? warehouse.name : '',
+                receivingDate: note.receiving_date || '',
+                items: note.items || [],
+                status: note.status || 'processing'
+            };
+        } catch (error) {
+            console.error('Failed to get receiving note:', error);
+            return null;
+        }
+    }
+    
+    async function completeNote(noteInfo) {
+        if (noteInfo.type === 'outbound') {
+            await completeOutbound(noteInfo.orderId, noteInfo.noteIndex);
+        } else {
+            await completeInbound(noteInfo.purchaseOrderId, noteInfo.noteIndex);
+        }
+    }
+    
+    function startItemByItem(noteInfo) {
+        currentNote = noteInfo;
+        currentNoteItems = (noteInfo.items || []).map((item, idx) => ({
+            ...item,
+            index: idx,
+            scanned: false,
+            product: products.find(p => p.id === item.product_id)
+        }));
+        scannedItems = [];
+        
+        document.getElementById('itemByItemPanel').style.display = 'block';
+        document.getElementById('currentNoteNumber').textContent = noteInfo.noteNumber;
+        document.getElementById('currentNoteType').textContent = noteInfo.type === 'outbound' ? '出庫' : '入庫';
+        document.getElementById('currentNoteWarehouse').textContent = noteInfo.warehouseName;
+        
+        updateItemByItemProgress();
+        renderPendingItems();
+        
+        document.getElementById('productScanInput').focus();
+    }
+    
+    function updateItemByItemProgress() {
+        const total = currentNoteItems.length;
+        const scanned = scannedItems.length;
+        
+        document.getElementById('currentNoteProgress').textContent = `${scanned}/${total}`;
+        const percent = total > 0 ? (scanned / total * 100) : 0;
+        document.getElementById('currentNoteProgressBar').style.width = `${percent}%`;
+        
+        document.getElementById('completeItemByItemBtn').disabled = scanned < total;
+    }
+    
+    function renderPendingItems() {
+        const container = document.getElementById('pendingItemsList');
+        
+        if (currentNoteItems.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-3">暫無待處理產品</div>';
+            return;
+        }
+        
+        container.innerHTML = currentNoteItems.map(item => {
+            const product = item.product;
+            const productName = product ? product.name : item.product_id;
+            const productCode = product ? (product.barcode || product.sku || product.code) : '';
+            const isScanned = item.scanned;
+            
+            return `
+                <div class="item-list-item ${isScanned ? 'scanned' : 'pending'}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${productName}</strong>
+                            ${productCode ? `<br><small class="text-muted">${productCode}</small>` : ''}
+                        </div>
+                        <div class="text-end">
+                            <span class="badge ${isScanned ? 'bg-success' : 'bg-warning'}">
+                                ${isScanned ? '已掃描' : '待掃描'}
+                            </span>
+                            <br>
+                            <small>數量: ${item.quantity || 1}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    function processProductScan() {
+        const input = document.getElementById('productScanInput');
+        const code = input.value.trim();
+        
+        if (!code) {
+            showScanResult('請輸入或掃描產品條碼', 'error');
+            return;
+        }
+        
+        const matchedItem = currentNoteItems.find(item => {
+            if (item.scanned) return false;
+            const product = item.product;
+            if (!product) return false;
+            return product.barcode === code || product.sku === code || product.code === code || product.id === code;
+        });
+        
+        if (!matchedItem) {
+            showScanResult(`找不到匹配的產品或已掃描：${code}`, 'error');
+            input.value = '';
+            input.focus();
+            return;
+        }
+        
+        matchedItem.scanned = true;
+        scannedItems.push(matchedItem);
+        
+        showScanResult(`已掃描：${matchedItem.product ? matchedItem.product.name : matchedItem.product_id}`, 'success');
+        
+        updateItemByItemProgress();
+        renderPendingItems();
+        
+        input.value = '';
+        input.focus();
+        
+        if (scannedItems.length === currentNoteItems.length) {
+            showScanResult('所有產品已掃描完成！點擊「全部完成」確認出入庫', 'info');
+        }
+    }
+    
+    async function completeItemByItem() {
+        if (scannedItems.length < currentNoteItems.length) {
+            App.showAlert('尚有產品未掃描', 'warning');
+            return;
+        }
+        
+        try {
+            await completeNote(currentNote);
+            showScanResult(`${currentNote.type === 'outbound' ? '出庫' : '入庫'}已完成：${currentNote.noteNumber}`, 'success');
+            cancelItemByItem();
+            await loadPendingRecords();
+        } catch (error) {
+            App.showAlert('完成失敗：' + error.message, 'danger');
+        }
+    }
+    
+    function cancelItemByItem() {
+        currentNote = null;
+        currentNoteItems = [];
+        scannedItems = [];
+        document.getElementById('itemByItemPanel').style.display = 'none';
+        document.getElementById('scanInput').focus();
+    }
+
+    function showScanResult(message, type) {
+        const container = document.getElementById('scanResult');
+        container.style.display = 'block';
+        container.className = `scan-result ${type}`;
+        container.innerHTML = `<i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle'}"></i> ${message}`;
+        
+        setTimeout(() => { container.style.display = 'none'; }, 5000);
+    }
+
+    async function loadPendingRecords() {
+        await Promise.all([loadPendingOutbound(), loadPendingInbound()]);
+        const total = pendingOutbound.length + pendingInbound.length;
+        document.getElementById('pendingTotalCount').textContent = total;
+    }
+
+    async function loadPendingOutbound() {
+        const tbody = document.getElementById('pendingOutboundTable');
+        
+        try {
+            const ordersData = await App.apiRequest('/orders?limit=500&status=confirmed,processing');
+            const orders = ordersData.data || [];
+            
+            pendingOutbound = [];
+            
+            for (const order of orders) {
+                if (!order.extra_fields || !order.extra_fields.shipping_notes) continue;
+                
+                const shippingNotes = order.extra_fields.shipping_notes || [];
+                shippingNotes.forEach((note, noteIndex) => {
+                    const status = note.status || 'processing';
+                    if (status !== 'completed') {
+                        const warehouse = warehouses.find(w => w.id === note.warehouse_id);
+                        const items = note.items || [];
+                        
+                        pendingOutbound.push({
+                            type: 'outbound',
+                            orderId: order.id,
+                            orderNumber: order.order_number,
+                            noteIndex: noteIndex,
+                            shippingNumber: note.shipping_number || '',
+                            noteNumber: note.shipping_number || `SHIP-${noteIndex + 1}`,
+                            warehouseId: note.warehouse_id,
+                            warehouseName: warehouse ? warehouse.name : '',
+                            shippingDate: note.shipping_date || '',
+                            items: items,
+                            itemCount: items.length,
+                            status: status
+                        });
+                    }
+                });
+            }
+            
+            document.getElementById('pendingOutboundCount').textContent = pendingOutbound.length;
+            
+            if (pendingOutbound.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">暫無待處理出庫</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = pendingOutbound.map(item => `
+                <tr>
+                    <td><a href="/orders/${item.orderId}/edit" target="_blank">${item.orderNumber}</a></td>
+                    <td>${item.shippingNumber || '-'}</td>
+                    <td>${item.warehouseName}</td>
+                    <td>${item.itemCount}</td>
+                    <td>${item.shippingDate}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="printQRCode('outbound', '${item.orderId}', ${item.noteIndex})">
+                            <i class="bi bi-qr-code"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success" onclick="quickComplete('outbound', '${item.orderId}', ${item.noteIndex})">
+                            <i class="bi bi-check"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Failed to load pending outbound:', error);
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-3">載入失敗</td></tr>';
+        }
+    }
+
+    async function loadPendingInbound() {
+        const tbody = document.getElementById('pendingInboundTable');
+        
+        try {
+            const purchaseOrdersData = await App.apiRequest('/purchase-orders?limit=500&status=confirmed,processing');
+            const purchaseOrders = purchaseOrdersData.data || [];
+            
+            pendingInbound = [];
+            
+            for (const po of purchaseOrders) {
+                if (!po.extra_fields || !po.extra_fields.receiving_notes) continue;
+                
+                const receivingNotes = po.extra_fields.receiving_notes || [];
+                receivingNotes.forEach((note, noteIndex) => {
+                    const status = note.status || 'processing';
+                    if (status !== 'completed') {
+                        const warehouse = warehouses.find(w => w.id === note.warehouse_id);
+                        const items = note.items || [];
+                        
+                        pendingInbound.push({
+                            type: 'inbound',
+                            purchaseOrderId: po.id,
+                            orderNumber: po.order_number,
+                            noteIndex: noteIndex,
+                            receivingNumber: note.receiving_number || '',
+                            noteNumber: note.receiving_number || `RECV-${noteIndex + 1}`,
+                            warehouseId: note.warehouse_id,
+                            warehouseName: warehouse ? warehouse.name : '',
+                            receivingDate: note.receiving_date || '',
+                            items: items,
+                            itemCount: items.length,
+                            status: status
+                        });
+                    }
+                });
+            }
+            
+            document.getElementById('pendingInboundCount').textContent = pendingInbound.length;
+            
+            if (pendingInbound.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">暫無待處理入庫</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = pendingInbound.map(item => `
+                <tr>
+                    <td><a href="/purchase-orders/${item.purchaseOrderId}/edit" target="_blank">${item.orderNumber}</a></td>
+                    <td>${item.receivingNumber || '-'}</td>
+                    <td>${item.warehouseName}</td>
+                    <td>${item.itemCount}</td>
+                    <td>${item.receivingDate}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="printQRCode('inbound', '${item.purchaseOrderId}', ${item.noteIndex})">
+                            <i class="bi bi-qr-code"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-success" onclick="quickComplete('inbound', '${item.purchaseOrderId}', ${item.noteIndex})">
+                            <i class="bi bi-check"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (error) {
+            console.error('Failed to load pending inbound:', error);
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-3">載入失敗</td></tr>';
+        }
+    }
+
+    async function quickComplete(type, id, noteIndex) {
+        try {
+            if (type === 'outbound') {
+                await completeOutbound(id, noteIndex);
+            } else {
+                await completeInbound(id, noteIndex);
+            }
+            App.showAlert(`${type === 'outbound' ? '出庫' : '入庫'}已完成`, 'success');
+            await loadPendingRecords();
+        } catch (error) {
+            App.showAlert('操作失敗：' + error.message, 'danger');
+        }
+    }
+
+    async function completeOutbound(orderId, noteIndex) {
+        const order = await App.apiRequest(`/orders/${orderId}`);
+        if (!order || !order.extra_fields || !order.extra_fields.shipping_notes) {
+            throw new Error('訂單資料無效');
+        }
+        
+        const shippingNotes = order.extra_fields.shipping_notes;
+        if (shippingNotes[noteIndex]) {
+            shippingNotes[noteIndex].status = 'completed';
+        }
+        
+        await App.apiRequest(`/orders/${orderId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                extra_fields: { ...order.extra_fields, shipping_notes: shippingNotes }
+            })
+        });
+    }
+
+    async function completeInbound(purchaseOrderId, noteIndex) {
+        const po = await App.apiRequest(`/purchase-orders/${purchaseOrderId}`);
+        if (!po || !po.extra_fields || !po.extra_fields.receiving_notes) {
+            throw new Error('採購單資料無效');
+        }
+        
+        const receivingNotes = po.extra_fields.receiving_notes;
+        if (receivingNotes[noteIndex]) {
+            receivingNotes[noteIndex].status = 'completed';
+        }
+        
+        await App.apiRequest(`/purchase-orders/${purchaseOrderId}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                extra_fields: { ...po.extra_fields, receiving_notes: receivingNotes }
+            })
+        });
+    }
+
+    function printQRCode(type, id, noteIndex) {
+        const qrCode = type === 'outbound' ? `SHIP-${id}-${noteIndex}` : `RECV-${id}-${noteIndex}`;
+        
+        let record;
+        if (type === 'outbound') {
+            record = pendingOutbound.find(r => r.orderId === id && r.noteIndex === noteIndex);
+        } else {
+            record = pendingInbound.find(r => r.purchaseOrderId === id && r.noteIndex === noteIndex);
+        }
+        
+        const noteNumber = record ? record.noteNumber : qrCode;
+        const orderNumber = record ? record.orderNumber : '';
+        const warehouseName = record ? record.warehouseName : '';
+        
+        const printWindow = window.open('', '_blank', 'width=400,height=500');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>QR Code - ${noteNumber}</title>
+                <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"><\/script>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+                    .qr-container { margin: 20px auto; }
+                    .info { margin-top: 15px; }
+                    .info-row { margin: 5px 0; }
+                    .label { font-weight: bold; }
+                    @media print { body { padding: 10px; } .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <h3>${type === 'outbound' ? '出庫單' : '入庫單'}</h3>
+                <div class="qr-container"><canvas id="qrCanvas"></canvas></div>
+                <div class="info">
+                    <div class="info-row"><span class="label">單號：</span>${noteNumber}</div>
+                    <div class="info-row"><span class="label">${type === 'outbound' ? '訂單號' : '採購單號'}：</span>${orderNumber}</div>
+                    <div class="info-row"><span class="label">倉庫：</span>${warehouseName}</div>
+                    <div class="info-row"><span class="label">QR Code：</span>${qrCode}</div>
+                </div>
+                <div class="no-print" style="margin-top: 20px;">
+                    <button onclick="window.print()">列印</button>
+                    <button onclick="window.close()">關閉</button>
+                </div>
+                <script>
+                    QRCode.toCanvas(document.getElementById('qrCanvas'), '${qrCode}', { width: 200 }, function(error) {
+                        if (error) console.error(error);
+                    });
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+    
+    // ===== 相機掃描功能（主區域 - 掃描單號） =====
+    
+    // 頁面卸載時停止掃描器
+    window.addEventListener('beforeunload', async () => {
+        if (qrScanner && isScanning) {
+            try {
+                await qrScanner.stop();
+                qrScanner.clear();
+            } catch (error) {
+                console.error('停止掃描器失敗:', error);
+            }
+        }
+        if (productQrScanner && isProductScanning) {
+            try {
+                await productQrScanner.stop();
+                productQrScanner.clear();
+            } catch (error) {
+                console.error('停止產品掃描器失敗:', error);
+            }
+        }
+    });
+    
+    // 切換 QR Code 掃描器（主區域）
+    async function toggleQRScanner() {
+        const scannerArea = document.getElementById('qrScannerArea');
+        const qrReader = document.getElementById('qr-reader');
+        const placeholder = document.getElementById('qrScannerPlaceholder');
+        const toggleBtn = document.getElementById('qrScannerToggleBtn');
+        
+        if (!isScanning) {
+            // 開始掃描
+            try {
+                // 檢查是否支持 html5-qrcode
+                if (typeof Html5Qrcode === 'undefined') {
+                    App.showAlert('QR Code 掃描庫未載入', 'warning');
+                    return;
+                }
+                
+                // 創建掃描器實例
+                qrScanner = new Html5Qrcode("qr-reader");
+                
+                // 顯示掃描區域
+                qrReader.style.display = 'block';
+                placeholder.style.display = 'none';
+                scannerArea.classList.add('active');
+                toggleBtn.innerHTML = '<i class="bi bi-stop-circle"></i> 停止掃描';
+                
+                // 開始掃描
+                await qrScanner.start(
+                    { facingMode: "environment" }, // 使用後置攝像頭
+                    {
+                        fps: 10,
+                        qrbox: { width: 200, height: 200 },
+                        aspectRatio: 1.0
+                    },
+                    (decodedText, decodedResult) => {
+                        // 掃描成功
+                        handleQRCodeScanned(decodedText);
+                    },
+                    (errorMessage) => {
+                        // 掃描錯誤（忽略，因為會持續掃描）
+                    }
+                );
+                
+                isScanning = true;
+            } catch (error) {
+                console.error('啟動 QR Code 掃描失敗:', error);
+                App.showAlert('無法啟動攝像頭: ' + error.message, 'danger');
+                // 恢復狀態
+                qrReader.style.display = 'none';
+                placeholder.style.display = 'block';
+                scannerArea.classList.remove('active');
+                toggleBtn.innerHTML = '<i class="bi bi-camera-video"></i> 開始掃描';
+            }
+        } else {
+            // 停止掃描
+            await stopQRScanner();
+        }
+    }
+    
+    async function stopQRScanner() {
+        try {
+            if (qrScanner) {
+                await qrScanner.stop();
+                qrScanner.clear();
+                qrScanner = null;
+            }
+            
+            const qrReader = document.getElementById('qr-reader');
+            const placeholder = document.getElementById('qrScannerPlaceholder');
+            const scannerArea = document.getElementById('qrScannerArea');
+            const toggleBtn = document.getElementById('qrScannerToggleBtn');
+            
+            qrReader.style.display = 'none';
+            placeholder.style.display = 'block';
+            scannerArea.classList.remove('active');
+            toggleBtn.innerHTML = '<i class="bi bi-camera-video"></i> 開始掃描';
+            isScanning = false;
+        } catch (error) {
+            console.error('停止 QR Code 掃描失敗:', error);
+        }
+    }
+    
+    // 處理掃描到的 QR Code（單號掃描）
+    async function handleQRCodeScanned(decodedText) {
+        console.log('掃描到 QR Code:', decodedText);
+        
+        // 停止掃描（避免重複掃描）
+        await stopQRScanner();
+        
+        // 設置輸入框值並觸發處理
+        const scanInput = document.getElementById('scanInput');
+        scanInput.value = decodedText.trim();
+        
+        // 執行掃描處理
+        await processScan();
+    }
+    
+    // ===== 相機掃描功能（產品區域 - 續件模式） =====
+    
+    // 切換產品 QR Code 掃描器
+    async function toggleProductQRScanner() {
+        const scannerArea = document.getElementById('productQrScannerArea');
+        const qrReader = document.getElementById('product-qr-reader');
+        const placeholder = document.getElementById('productQrScannerPlaceholder');
+        const toggleBtn = document.getElementById('productQrScannerToggleBtn');
+        
+        if (!isProductScanning) {
+            // 開始掃描
+            try {
+                // 檢查是否支持 html5-qrcode
+                if (typeof Html5Qrcode === 'undefined') {
+                    App.showAlert('QR Code 掃描庫未載入', 'warning');
+                    return;
+                }
+                
+                // 創建掃描器實例
+                productQrScanner = new Html5Qrcode("product-qr-reader");
+                
+                // 顯示掃描區域
+                qrReader.style.display = 'block';
+                placeholder.style.display = 'none';
+                scannerArea.classList.add('active');
+                toggleBtn.innerHTML = '<i class="bi bi-stop-circle"></i> 停止掃描';
+                
+                // 開始掃描
+                await productQrScanner.start(
+                    { facingMode: "environment" }, // 使用後置攝像頭
+                    {
+                        fps: 10,
+                        qrbox: { width: 180, height: 180 },
+                        aspectRatio: 1.0
+                    },
+                    (decodedText, decodedResult) => {
+                        // 掃描成功
+                        handleProductQRCodeScanned(decodedText);
+                    },
+                    (errorMessage) => {
+                        // 掃描錯誤（忽略，因為會持續掃描）
+                    }
+                );
+                
+                isProductScanning = true;
+            } catch (error) {
+                console.error('啟動產品 QR Code 掃描失敗:', error);
+                App.showAlert('無法啟動攝像頭: ' + error.message, 'danger');
+                // 恢復狀態
+                qrReader.style.display = 'none';
+                placeholder.style.display = 'block';
+                scannerArea.classList.remove('active');
+                toggleBtn.innerHTML = '<i class="bi bi-camera-video"></i> 開始掃描';
+            }
+        } else {
+            // 停止掃描
+            await stopProductQRScanner();
+        }
+    }
+    
+    async function stopProductQRScanner() {
+        try {
+            if (productQrScanner) {
+                await productQrScanner.stop();
+                productQrScanner.clear();
+                productQrScanner = null;
+            }
+            
+            const qrReader = document.getElementById('product-qr-reader');
+            const placeholder = document.getElementById('productQrScannerPlaceholder');
+            const scannerArea = document.getElementById('productQrScannerArea');
+            const toggleBtn = document.getElementById('productQrScannerToggleBtn');
+            
+            qrReader.style.display = 'none';
+            placeholder.style.display = 'block';
+            scannerArea.classList.remove('active');
+            toggleBtn.innerHTML = '<i class="bi bi-camera-video"></i> 開始掃描';
+            isProductScanning = false;
+        } catch (error) {
+            console.error('停止產品 QR Code 掃描失敗:', error);
+        }
+    }
+    
+    // 處理掃描到的產品 QR Code（續件模式）
+    async function handleProductQRCodeScanned(decodedText) {
+        console.log('掃描到產品 QR Code:', decodedText);
+        
+        // 不停止掃描，繼續掃描下一個產品（提高效率）
+        // 設置輸入框值並觸發處理
+        const productScanInput = document.getElementById('productScanInput');
+        productScanInput.value = decodedText.trim();
+        
+        // 執行產品掃描處理
+        processProductScan();
+        
+        // 如果所有產品已掃描完成，停止掃描器
+        if (scannedItems.length === currentNoteItems.length) {
+            await stopProductQRScanner();
+        }
+    }
+</script>
+{{ end }}

@@ -1,0 +1,460 @@
+{{ define "pages/products_edit" }}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-box"></i> <span id="pageTitle">產品管理</span></h3>
+        <div>
+            <a href="/products" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                
+                <!-- Tab 導航 -->
+                <ul class="nav nav-tabs mb-4" id="productTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#data-pane" type="button" role="tab" aria-controls="data-pane" aria-selected="true">資料</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="movements-tab" data-bs-toggle="tab" data-bs-target="#movements-pane" type="button" role="tab" aria-controls="movements-pane" aria-selected="false">出入貨記錄</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="inventory-tab" data-bs-toggle="tab" data-bs-target="#inventory-pane" type="button" role="tab" aria-controls="inventory-pane" aria-selected="false">庫存報告</button>
+                    </li>
+                </ul>
+                
+                <!-- Tab 內容 -->
+                <div class="tab-content" id="productTabContent">
+                    <!-- 資料 Tab -->
+                    <div class="tab-pane fade show active" id="data-pane" role="tabpanel" aria-labelledby="data-tab">
+                        <div id="productFormContainer">
+                            <!-- 動態表單將在這裡渲染 -->
+                        </div>
+                    </div>
+
+                    <!-- 出入貨記錄 Tab -->
+                    <div class="tab-pane fade" id="movements-pane" role="tabpanel" aria-labelledby="movements-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">開始日期</label>
+                                <input type="date" class="form-control" id="movementsStartDate">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">結束日期</label>
+                                <input type="date" class="form-control" id="movementsEndDate">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">類型</label>
+                                <select class="form-select" id="movementsType">
+                                    <option value="">全部</option>
+                                    <option value="shipping">出貨</option>
+                                    <option value="receiving">入貨</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">倉庫</label>
+                                <select class="form-select" id="movementsWarehouse" style="width: 100%;">
+                                    <option value="">全部</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" class="btn btn-primary w-100" onclick="loadProductMovements()">
+                                    <i class="bi bi-search"></i> 搜索
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>類型</th>
+                                        <th>倉庫</th>
+                                        <th>數量</th>
+                                        <th>來源單號</th>
+                                        <th>備註</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productMovementsTable">
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">請先保存產品資料</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 庫存報告 Tab -->
+                    <div class="tab-pane fade" id="inventory-pane" role="tabpanel" aria-labelledby="inventory-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label">開始日期</label>
+                                <input type="date" class="form-control" id="inventoryStartDate">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">結束日期</label>
+                                <input type="date" class="form-control" id="inventoryEndDate">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" class="btn btn-primary" onclick="loadInventoryReport()">
+                                    <i class="bi bi-search"></i> 生成報告
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 庫存不足提示 -->
+                        <div id="lowStockAlert" class="alert alert-warning d-none">
+                            <h5><i class="bi bi-exclamation-triangle"></i> 庫存不足</h5>
+                            <div id="lowStockContent"></div>
+                        </div>
+
+                        <!-- 庫存報告表格 -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>倉庫</th>
+                                        <th>當前庫存</th>
+                                        <th>入貨數量</th>
+                                        <th>出貨數量</th>
+                                        <th>淨變化</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryReportTable">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">請先保存產品資料，然後選擇日期範圍生成報告</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 form-buttons-container">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> 保存
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="if(typeof Router!=='undefined'&&Router.go){Router.go('/products')}else{window.location.href='/products'}">
+                        <i class="bi bi-x"></i> 取消
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let productId = null;
+    let warehouses = [];
+    let productData = null;
+    let dynamicForm = null;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // 檢查是新建還是編輯
+        const pathParts = window.location.pathname.split('/').filter(p => p);
+        const isEdit = pathParts.length === 3 && pathParts[2] === 'edit';
+        productId = isEdit ? pathParts[1] : null;
+
+        // 載入倉庫列表
+        try {
+            const warehousesData = await App.apiRequest('/warehouses?limit=1000');
+            warehouses = warehousesData.data || [];
+            
+            // 初始化倉庫選擇器
+            $('#movementsWarehouse').select2({
+                theme: 'bootstrap-5',
+                placeholder: '請選擇倉庫',
+                allowClear: true,
+                data: warehouses.map(w => ({ id: w.id, text: w.name })),
+                width: '100%'
+            });
+        } catch (error) {
+            console.error('Failed to load warehouses:', error);
+        }
+
+        // 設置默認日期範圍（最近30天）
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+        document.getElementById('movementsEndDate').value = endDate.toISOString().split('T')[0];
+        document.getElementById('movementsStartDate').value = startDate.toISOString().split('T')[0];
+        document.getElementById('inventoryEndDate').value = endDate.toISOString().split('T')[0];
+        document.getElementById('inventoryStartDate').value = startDate.toISOString().split('T')[0];
+
+        // 初始化動態表單
+        if (typeof DynamicForm !== 'undefined') {
+            // 等待DOM完全加載
+            await new Promise(resolve => setTimeout(resolve, 100));
+            dynamicForm = new DynamicForm({
+                pageName: 'products',
+                containerId: 'productFormContainer',
+                isEdit: isEdit,
+                itemId: productId
+            });
+            // 等待動態表單初始化完成
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        // 如果是編輯模式，載入產品資料
+        if (isEdit && productId) {
+            await loadProductData();
+        }
+
+        // 綁定表單提交事件
+        document.getElementById('productForm').addEventListener('submit', handleSubmit);
+    });
+
+    async function loadProductData() {
+        try {
+            productData = await App.apiRequest(`/products/${productId}`);
+            if (productData) {
+                // 載入出入貨記錄
+                await loadProductMovements();
+                // 載入庫存報告
+                await loadInventoryReport();
+            }
+        } catch (error) {
+            App.showAlert('載入產品資料失敗: ' + error.message, 'danger');
+        }
+    }
+
+    async function loadProductMovements() {
+        if (!productId) {
+            document.getElementById('productMovementsTable').innerHTML = '<tr><td colspan="6" class="text-center text-muted">請先保存產品資料</td></tr>';
+            return;
+        }
+
+        const startDate = document.getElementById('movementsStartDate').value;
+        const endDate = document.getElementById('movementsEndDate').value;
+        const movementType = document.getElementById('movementsType').value;
+        const warehouseID = $('#movementsWarehouse').val();
+
+        const params = new URLSearchParams({
+            page: '1',
+            limit: '100',
+            product_id: productId
+        });
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+        if (movementType) params.append('type', movementType);
+        if (warehouseID) params.append('warehouse_id', warehouseID);
+
+        try {
+            App.showLoading('載入中...');
+            const response = await App.apiRequest(`/inventory-movements?${params.toString()}`);
+            App.hideLoading();
+
+            const movements = response.data || [];
+            renderProductMovements(movements);
+        } catch (error) {
+            App.hideLoading();
+            App.showAlert('載入失敗: ' + error.message, 'danger');
+        }
+    }
+
+    function renderProductMovements(movements) {
+        const tbody = document.getElementById('productMovementsTable');
+        if (!tbody) return;
+
+        if (movements.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">暫無記錄</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = movements.map(movement => {
+            const warehouse = warehouses.find(w => w.id === movement.warehouse_id);
+            const typeBadge = movement.type === 'shipping' 
+                ? '<span class="badge bg-danger">出貨</span>' 
+                : '<span class="badge bg-success">入貨</span>';
+            
+            const referenceLink = movement.reference_type === 'order'
+                ? `<a href="/orders/${movement.reference_id}/edit" target="_blank">${movement.order_number || movement.reference_id}</a>`
+                : `<a href="/purchase-orders/${movement.reference_id}/edit" target="_blank">${movement.order_number || movement.reference_id}</a>`;
+
+            return `
+                <tr>
+                    <td>${movement.date || ''}</td>
+                    <td>${typeBadge}</td>
+                    <td>${warehouse ? warehouse.name : movement.warehouse_id || ''}</td>
+                    <td>${movement.quantity || 0}</td>
+                    <td>${referenceLink}</td>
+                    <td>${movement.notes || ''}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function loadInventoryReport() {
+        if (!productId) {
+            document.getElementById('inventoryReportTable').innerHTML = '<tr><td colspan="5" class="text-center text-muted">請先保存產品資料</td></tr>';
+            return;
+        }
+
+        const startDate = document.getElementById('inventoryStartDate').value;
+        const endDate = document.getElementById('inventoryEndDate').value;
+
+        try {
+            App.showLoading('生成報告中...');
+            
+            // 獲取產品在各倉庫的當前庫存
+            const stocksResponse = await App.apiRequest(`/product-warehouse-stocks?product_id=${productId}`);
+            const stocks = stocksResponse.data || [];
+
+            // 獲取出入貨記錄
+            const params = new URLSearchParams({
+                page: '1',
+                limit: '1000',
+                product_id: productId
+            });
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+
+            const movementsResponse = await App.apiRequest(`/inventory-movements?${params.toString()}`);
+            const movements = movementsResponse.data || [];
+
+            // 計算每個倉庫的統計
+            const warehouseStats = {};
+            warehouses.forEach(w => {
+                warehouseStats[w.id] = {
+                    warehouse: w,
+                    currentStock: 0,
+                    receiving: 0,
+                    shipping: 0,
+                    netChange: 0
+                };
+            });
+
+            // 填充當前庫存
+            stocks.forEach(stock => {
+                if (warehouseStats[stock.warehouse_id]) {
+                    warehouseStats[stock.warehouse_id].currentStock = stock.quantity || 0;
+                }
+            });
+
+            // 計算出入貨
+            movements.forEach(movement => {
+                const warehouseId = movement.warehouse_id;
+                if (warehouseStats[warehouseId]) {
+                    if (movement.type === 'receiving') {
+                        warehouseStats[warehouseId].receiving += movement.quantity || 0;
+                    } else if (movement.type === 'shipping') {
+                        warehouseStats[warehouseId].shipping += movement.quantity || 0;
+                    }
+                }
+            });
+
+            // 計算淨變化
+            Object.keys(warehouseStats).forEach(warehouseId => {
+                const stats = warehouseStats[warehouseId];
+                stats.netChange = stats.receiving - stats.shipping;
+            });
+
+            App.hideLoading();
+            renderInventoryReport(warehouseStats);
+            checkLowStock(warehouseStats);
+        } catch (error) {
+            App.hideLoading();
+            App.showAlert('生成報告失敗: ' + error.message, 'danger');
+        }
+    }
+
+    function renderInventoryReport(warehouseStats) {
+        const tbody = document.getElementById('inventoryReportTable');
+        if (!tbody) return;
+
+        const statsArray = Object.values(warehouseStats).filter(s => s.currentStock > 0 || s.receiving > 0 || s.shipping > 0);
+        
+        if (statsArray.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">暫無庫存記錄</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = statsArray.map(stats => {
+            const netChangeClass = stats.netChange > 0 ? 'text-success' : stats.netChange < 0 ? 'text-danger' : '';
+            return `
+                <tr>
+                    <td>${stats.warehouse.name}</td>
+                    <td>${stats.currentStock}</td>
+                    <td class="text-success">+${stats.receiving}</td>
+                    <td class="text-danger">-${stats.shipping}</td>
+                    <td class="${netChangeClass}">${stats.netChange > 0 ? '+' : ''}${stats.netChange}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function checkLowStock(warehouseStats) {
+        // 檢查是否有庫存不足的情況（這裡假設最低庫存為0，可以根據產品設置調整）
+        const lowStockWarehouses = Object.values(warehouseStats).filter(s => s.currentStock <= 0);
+        
+        if (lowStockWarehouses.length > 0) {
+            const totalNeeded = lowStockWarehouses.reduce((sum, s) => sum + Math.abs(s.currentStock), 0);
+            const alertDiv = document.getElementById('lowStockAlert');
+            const contentDiv = document.getElementById('lowStockContent');
+            
+            contentDiv.innerHTML = `
+                <p>以下倉庫庫存不足或為零：</p>
+                <ul>
+                    ${lowStockWarehouses.map(s => `<li>${s.warehouse.name}: 當前庫存 ${s.currentStock}</li>`).join('')}
+                </ul>
+                <p><strong>建議採購數量：${totalNeeded > 0 ? totalNeeded : 10}</strong></p>
+                <button type="button" class="btn btn-primary btn-sm" onclick="createPurchaseOrder(${totalNeeded > 0 ? totalNeeded : 10})">
+                    <i class="bi bi-cart-plus"></i> 快速建立採購單
+                </button>
+            `;
+            alertDiv.classList.remove('d-none');
+        } else {
+            document.getElementById('lowStockAlert').classList.add('d-none');
+        }
+    }
+
+    function createPurchaseOrder(quantity) {
+        if (!productId || !productData) {
+            App.showAlert('無法建立採購單：產品資料不完整', 'warning');
+            return;
+        }
+
+        // 構建採購單URL，預填產品和數量
+        const params = new URLSearchParams({
+            product_id: productId,
+            quantity: quantity
+        });
+        
+        // 如果有預設供應商，也帶上
+        if (productData.default_supplier_id) {
+            params.append('supplier_id', productData.default_supplier_id);
+        }
+
+        window.open(`/purchase-orders/new?${params.toString()}`, '_blank');
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        
+        if (!dynamicForm) {
+            App.showAlert('表單未初始化', 'danger');
+            return;
+        }
+
+        try {
+            await dynamicForm.submitForm();
+            // 保存成功後，如果是新建，更新productId並載入資料
+            if (!productId && dynamicForm.itemId) {
+                productId = dynamicForm.itemId;
+                await loadProductData();
+            }
+        } catch (error) {
+            App.showAlert('保存失敗: ' + error.message, 'danger');
+        }
+    }
+</script>
+{{ end }}
+

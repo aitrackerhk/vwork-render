@@ -1,0 +1,17 @@
+{
+  "providerId": "vwork",
+  "serviceId": "www-cname",
+  "version": 1,
+  "syncBlock": false,
+  "description": "Create a CNAME record for www to point to vWork SaaS target.",
+  "recordTemplates": [
+    {
+      "type": "CNAME",
+      "host": "www",
+      "pointsTo": "cname.vworkai.com",
+      "ttl": 1800
+    }
+  ]
+}
+
+

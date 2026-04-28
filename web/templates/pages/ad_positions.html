@@ -1,0 +1,304 @@
+{{define "pages/ad_positions"}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-collection me-2"></i><span data-i18n="pages.adPositions.title">廣告位置管理</span></h2>
+    <button class="btn btn-primary" onclick="showCreateAdPositionModal()">
+      <i class="bi bi-plus-lg me-1"></i>
+      <span data-i18n="pages.adPositions.create">新增廣告位置</span>
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <!-- 搜索 -->
+      <div class="mb-4">
+        <div class="search-box-wrapper">
+          <div class="input-group search-box">
+            <input type="text" class="form-control" id="searchInput" 
+                   placeholder="搜索名稱或代碼..." data-i18n-placeholder="pages.adPositions.searchPlaceholder"
+                   onkeydown="handleSearchKey(event)">
+            <button class="btn btn-outline-secondary border-start-0 border-end-0" type="button" id="clearSearchBtn" style="display: none;" onclick="document.getElementById('searchInput').value=''; loadAdPositions(); this.style.display='none';">
+              <i class="bi bi-x-lg"></i>
+            </button>
+            <button class="btn btn-outline-secondary border-0" type="button" id="searchBtn" onclick="loadAdPositions()">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 列表 -->
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th data-i18n="pages.adPositions.name">名稱</th>
+              <th data-i18n="pages.adPositions.code">代碼</th>
+              <th data-i18n="pages.adPositions.slideInterval">輪播間隔</th>
+              <th data-i18n="pages.adPositions.adCount">廣告數量</th>
+              <th data-i18n="common.actions">操作</th>
+            </tr>
+          </thead>
+          <tbody id="adPositionsList">
+            <tr>
+              <td colspan="5" class="text-center text-muted" data-i18n="common.loading">載入中...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<!-- 創建/編輯 Modal -->
+<div class="modal fade" id="adPositionModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="adPositionModalTitle" data-i18n="pages.adPositions.create">新增廣告位置</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="adPositionId">
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.adPositions.name">名稱</label>
+          <input type="text" class="form-control" id="adPositionName" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.adPositions.code">代碼</label>
+          <input type="text" class="form-control" id="adPositionCode" required placeholder="例如: lobby_screen_1">
+          <small class="text-muted" data-i18n="pages.adPositions.codeHint">唯一識別碼，用於 API 調用</small>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.adPositions.description">描述</label>
+          <textarea class="form-control" id="adPositionDescription" rows="2"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.adPositions.slideInterval">輪播間隔 (秒)</label>
+          <input type="number" class="form-control" id="adPositionSlideInterval" value="5" min="1" max="300">
+          <small class="text-muted" data-i18n="pages.adPositions.slideIntervalHint">每張圖片顯示的時間，影片會播放完整長度</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" onclick="saveAdPosition()" data-i18n="common.save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function wdT(key, fallback) { return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback; }
+let adPositionModal;
+let adPositions = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+  adPositionModal = new bootstrap.Modal(document.getElementById('adPositionModal'));
+  // Ensure static data-i18n elements are translated after i18n is ready
+  if (window.I18n && I18n.whenReady) {
+    I18n.whenReady().then(() => { if (I18n.updatePage) I18n.updatePage(); });
+  }
+  loadAdPositions();
+
+  // 搜索輸入監聽 - 控制清除按鈕顯示
+  const searchInput = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearSearchBtn');
+  searchInput.addEventListener('input', function() {
+    clearBtn.style.display = this.value ? 'block' : 'none';
+  });
+});
+
+// Enter 鍵搜尋
+function handleSearchKey(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    loadAdPositions();
+  }
+}
+
+async function loadAdPositions() {
+  const search = document.getElementById('searchInput').value;
+  // 更新清除按鈕顯示狀態
+  document.getElementById('clearSearchBtn').style.display = search ? 'block' : 'none';
+  try {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    
+    const resp = await App.apiRequest(`/api/v1/ad-positions?${params}`);
+    adPositions = resp.data || [];
+    renderAdPositions();
+  } catch (error) {
+    console.error('Load ad positions failed:', error);
+    App.showError(wdT('pages.adPositions.loadFailed', '載入廣告位置失敗'));
+  }
+}
+
+function renderAdPositions() {
+  const tbody = document.getElementById('adPositionsList');
+  if (!adPositions.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted" data-i18n="pages.adPositions.noData">暫無廣告位置</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = adPositions.map(pos => `
+    <tr>
+      <td>
+        <a href="/ad-positions/${pos.id}/ads" class="text-decoration-none fw-medium">${escapeHtml(pos.name)}</a>
+      </td>
+      <td><code>${escapeHtml(pos.code)}</code></td>
+      <td>${pos.slide_interval} ${wdT('pages.adPositions.seconds', '秒')}</td>
+      <td>
+        <span class="badge bg-secondary">${pos.ads ? pos.ads.length : 0}</span>
+      </td>
+      <td class="actions-cell">
+        <div class="btn-group btn-group-sm">
+          <a href="/ad-positions/${pos.id}/ads" class="btn btn-outline-primary" title="${wdT('pages.adPositions.manageAds', '管理廣告與設定')}">
+            <i class="bi bi-collection-play me-1"></i><span>${wdT('pages.adPositions.manage', '管理')}</span>
+          </a>
+          <button class="btn btn-outline-secondary" onclick="editAdPosition('${pos.id}')" title="${wdT('common.edit', '編輯')}">
+            <i class="bi bi-pencil me-1"></i><span>${wdT('common.edit', '編輯')}</span>
+          </button>
+          <button class="btn btn-outline-danger" onclick="deleteAdPosition('${pos.id}')" title="${wdT('common.delete', '刪除')}">
+            <i class="bi bi-trash me-1"></i><span>${wdT('common.delete', '刪除')}</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  // 自動計算操作列寬度
+  calculateActionColumnWidth();
+  // Re-apply translations to any data-i18n elements rendered into the DOM
+  if (window.I18n && I18n.updatePage) I18n.updatePage();
+}
+
+function calculateActionColumnWidth() {
+  setTimeout(() => {
+    const actionCells = document.querySelectorAll('#adPositionsList .actions-cell');
+    if (actionCells.length === 0) return;
+    
+    let maxWidth = 0;
+    
+    actionCells.forEach(cell => {
+      const buttons = cell.querySelectorAll('button, a.btn');
+      if (buttons.length === 0) return;
+      
+      let totalButtonWidth = 0;
+      buttons.forEach(btn => {
+        void btn.offsetWidth;
+        totalButtonWidth += btn.offsetWidth || btn.scrollWidth || 0;
+      });
+      
+      const buttonSpacing = buttons.length * 10;
+      const cellWidth = totalButtonWidth + buttonSpacing;
+      
+      if (cellWidth > maxWidth) {
+        maxWidth = cellWidth;
+      }
+    });
+    
+    const calculatedWidth = maxWidth || 0;
+    
+    const table = document.querySelector('.table');
+    if (table) {
+      const thead = table.querySelector('thead');
+      if (thead) {
+        const actionHeader = thead.querySelector('th:last-child');
+        if (actionHeader) {
+          actionHeader.style.width = calculatedWidth + 'px';
+          actionHeader.style.maxWidth = calculatedWidth + 'px';
+          
+          actionCells.forEach(cell => {
+            cell.style.width = calculatedWidth + 'px';
+          });
+        }
+      }
+    }
+  }, 150);
+}
+
+function showCreateAdPositionModal() {
+  document.getElementById('adPositionId').value = '';
+  document.getElementById('adPositionName').value = '';
+  document.getElementById('adPositionCode').value = '';
+  document.getElementById('adPositionDescription').value = '';
+  document.getElementById('adPositionSlideInterval').value = '5';
+  document.getElementById('adPositionModalTitle').textContent = wdT('pages.adPositions.create', '新增廣告位置');
+  adPositionModal.show();
+}
+
+function editAdPosition(id) {
+  const pos = adPositions.find(p => p.id === id);
+  if (!pos) return;
+
+  document.getElementById('adPositionId').value = pos.id;
+  document.getElementById('adPositionName').value = pos.name;
+  document.getElementById('adPositionCode').value = pos.code;
+  document.getElementById('adPositionDescription').value = pos.description || '';
+  document.getElementById('adPositionSlideInterval').value = pos.slide_interval;
+  document.getElementById('adPositionModalTitle').textContent = wdT('pages.adPositions.edit', '編輯廣告位置');
+  adPositionModal.show();
+}
+
+async function saveAdPosition() {
+  const id = document.getElementById('adPositionId').value;
+  const data = {
+    name: document.getElementById('adPositionName').value,
+    code: document.getElementById('adPositionCode').value,
+    description: document.getElementById('adPositionDescription').value,
+    slide_interval: parseInt(document.getElementById('adPositionSlideInterval').value) || 5
+  };
+
+  if (!data.name || !data.code) {
+    App.showError(wdT('pages.adPositions.fillNameCode', '請填寫名稱和代碼'));
+    return;
+  }
+
+  try {
+    if (id) {
+      await App.apiRequest(`/api/v1/ad-positions/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+    } else {
+      await App.apiRequest('/api/v1/ad-positions', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+    }
+    adPositionModal.hide();
+    App.showSuccess(wdT('pages.adPositions.saveSuccess', '保存成功'));
+    loadAdPositions();
+  } catch (error) {
+    console.error('Save ad position failed:', error);
+    App.showError(error.message || wdT('pages.adPositions.saveFailed', '保存失敗'));
+  }
+}
+
+async function deleteAdPosition(id) {
+  if (!confirm(wdT('pages.adPositions.confirmDelete', '確定要刪除此廣告位置嗎？相關廣告也會被刪除。'))) return;
+
+  try {
+    await App.apiRequest(`/api/v1/ad-positions/${id}`, { method: 'DELETE' });
+    App.showSuccess(wdT('pages.adPositions.deleteSuccess', '刪除成功'));
+    loadAdPositions();
+  } catch (error) {
+    console.error('Delete ad position failed:', error);
+    App.showError(wdT('pages.adPositions.deleteFailed', '刪除失敗'));
+  }
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+{{end}}

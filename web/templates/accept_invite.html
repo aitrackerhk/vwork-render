@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vWork - Accept Invite</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body.login-page{margin:0;min-height:100vh;background:linear-gradient(135deg,#fff 0%,#fff 40%,#f8fafc 65%,#eef2ff 82%,#fff 100%);background-size:400% 400%;animation:lgf 22s ease infinite;overflow-x:hidden}
+        @keyframes lgf{0%{background-position:0% 50%}25%{background-position:100% 50%}50%{background-position:100% 100%}75%{background-position:0% 100%}100%{background-position:0% 50%}}
+        body.login-page::before,body.login-page::after{content:"";position:fixed;inset:-40%;pointer-events:none;z-index:0;background:radial-gradient(circle at 20% 50%,rgba(99,102,241,.05) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(139,92,246,.05) 0%,transparent 50%);animation:lgm 30s linear infinite;opacity:1}
+        body.login-page::after{animation-duration:42s;opacity:.7;filter:blur(2px)}
+        @keyframes lgm{0%{transform:translate(0,0) scale(1) rotate(0deg)}50%{transform:translate(80px,60px) scale(1.08) rotate(180deg)}100%{transform:translate(0,0) scale(1) rotate(360deg)}}
+        body.login-page>*{position:relative;z-index:1}
+        body.login-page .card{background:rgba(255,255,255,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6)}
+        .card{border-radius:30px !important}
+        @media(max-width:768px){.card-body{padding-left:1.25rem !important;padding-right:1.25rem !important}}
+    </style>
+</head>
+<body class="login-page">
+    <div id="alertContainer" class="position-fixed start-50 translate-middle-x" style="z-index:9999;max-width:500px;top:60px;margin-top:10px;"></div>
+
+    <!-- Top bar: back + language -->
+    <div class="d-flex justify-content-between align-items-center" style="position:absolute;top:20px;left:20px;right:20px;z-index:1000;">
+        <a href="/" class="btn btn-outline-dark btn-sm"><i class="bi bi-arrow-left"></i> <span data-i18n="login.back">返回</span></a>
+        <div class="dropdown">
+            <a class="btn btn-sm btn-outline-primary dropdown-toggle" href="#" role="button" id="aiLangDropdown" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span></a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="aiLangDropdown">
+                <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center min-vh-100" style="padding-top:10px;padding-bottom:80px;">
+            <div class="col-md-6 col-lg-5" style="display:flex;align-items:center;">
+                <div style="width:100%;">
+                <div class="card shadow">
+                    <div class="card-body p-4 p-lg-5">
+                        <!-- Header -->
+                        <div class="text-center mb-4">
+                            <div class="d-flex align-items-end justify-content-center mb-3" style="gap:8px;">
+                                <img src="/static/logo3.png" alt="vWork" style="height:auto;max-height:32px;display:block;">
+                            </div>
+                            <h4 class="mb-1" data-i18n="acceptInvite.title">接受團隊邀請</h4>
+                            <p class="text-muted mb-0" data-i18n="acceptInvite.subtitle">您被邀請加入一個團隊</p>
+                            {{if .TenantName}}
+                            <div class="alert alert-info mt-2 mb-0" style="font-size:.875rem;">
+                                <i class="bi bi-building me-1"></i>
+                                {{if .InviterName}}<strong>{{.InviterName}}</strong> <span data-i18n="acceptInvite.invitedYouTo">邀請您加入</span>{{else}}<span data-i18n="acceptInvite.youAreInvitedTo">您被邀請加入</span>{{end}}: <strong>{{.TenantName}}</strong>
+                            </div>
+                            {{end}}
+                        </div>
+
+                        <!-- Invalid token message -->
+                        <div id="invalidTokenMessage" style="display:none;">
+                            <div class="alert alert-danger text-center"><i class="bi bi-exclamation-triangle-fill me-1"></i><span data-i18n="acceptInvite.invalidToken">此邀請連結無效或已過期。</span></div>
+                            <div class="text-center mt-3"><a href="/login" class="btn btn-primary" style="border-radius:100px;"><i class="bi bi-box-arrow-in-right"></i> <span data-i18n="acceptInvite.goToLogin">前往登入</span></a></div>
+                        </div>
+
+                        <!-- Accept container -->
+                        <div id="acceptContainer">
+                            <input type="hidden" id="inviteToken" value="{{.Token}}" />
+                            <input type="hidden" id="inviteEmail" value="{{.InviteEmail}}" />
+                            <input type="hidden" id="hasAccount" value="{{.HasAccount}}" />
+
+                            <!-- Auth section -->
+                            <div id="authSection">
+                                <!-- Login form -->
+                                <div id="loginSection">
+                                    <p class="text-muted small mb-2" id="authHint"></p>
+                                    <form id="loginForm">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label" data-i18n="login.email">電子郵件</label>
+                                            <div class="input-group"><span class="input-group-text"><i class="bi bi-envelope"></i></span><input type="email" class="form-control" id="email" required></div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label" data-i18n="login.password">密碼</label>
+                                            <div class="input-group"><span class="input-group-text"><i class="bi bi-lock"></i></span><input type="password" class="form-control" id="password" required></div>
+                                        </div>
+                                        <div class="d-grid mb-3"><button type="submit" class="btn btn-primary" id="loginBtn" style="border-radius:100px;"><i class="bi bi-box-arrow-in-right"></i> <span data-i18n="login.loginBtn">登入</span></button></div>
+                                    </form>
+                                    <div class="position-relative mb-3"><hr><span class="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted small" data-i18n="login.or">或</span></div>
+                                    <div class="d-grid mb-3"><button type="button" class="btn btn-outline-secondary" id="btnGoogleLogin" style="border-radius:100px;"><svg width="18" height="18" viewBox="0 0 18 18" style="margin-right:8px;vertical-align:middle;"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.348 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/></svg> <span data-i18n="login.googleLogin">使用 Google 帳號</span></button></div>
+                                    <div class="text-center"><a href="#" id="switchToRegister" class="text-decoration-none small" data-i18n="acceptInvite.noAccount">沒有帳戶？立即註冊</a></div>
+                                </div>
+
+                                <!-- Register form -->
+                                <div id="registerSection" style="display:none;">
+                                    <form id="registerForm">
+                                        <div class="mb-3"><label for="regName" class="form-label" data-i18n="register.name">姓名</label><input type="text" class="form-control" id="regName" required maxlength="50"></div>
+                                        <div class="mb-3"><label for="regEmail" class="form-label" data-i18n="login.email">電子郵件</label><input type="email" class="form-control" id="regEmail" required></div>
+                                        <div class="mb-3"><label for="regPassword" class="form-label" data-i18n="login.password">密碼</label><input type="password" class="form-control" id="regPassword" required minlength="6" maxlength="20"><div class="form-text" data-i18n="setPassword.passwordHint">密碼長度 6-20 位</div></div>
+                                        <div class="d-grid mb-3"><button type="submit" class="btn btn-primary" id="registerBtn" style="border-radius:100px;"><i class="bi bi-person-plus"></i> <span data-i18n="register.registerBtn">註冊</span></button></div>
+                                    </form>
+                                    <div class="position-relative mb-3"><hr><span class="position-absolute top-50 start-50 translate-middle bg-white px-2 text-muted small" data-i18n="login.or">或</span></div>
+                                    <div class="d-grid mb-3"><button type="button" class="btn btn-outline-secondary" id="btnGoogleRegister" style="border-radius:100px;"><svg width="18" height="18" viewBox="0 0 18 18" style="margin-right:8px;vertical-align:middle;"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.348 6.175 0 7.55 0 9s.348 2.825.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z"/></svg> <span data-i18n="login.googleLogin">使用 Google 帳號</span></button></div>
+                                    <div class="text-center"><a href="#" id="switchToLogin" class="text-decoration-none small" data-i18n="acceptInvite.hasAccount">已有帳戶？返回登入</a></div>
+                                </div>
+                            </div>
+
+                            <!-- Joining spinner -->
+                            <div id="joiningSection" style="display:none;">
+                                <div class="text-center py-4">
+                                    <div class="spinner-border text-primary mb-3" role="status"></div>
+                                    <p class="text-muted" data-i18n="acceptInvite.joining">正在加入團隊...</p>
+                                </div>
+                            </div>
+
+                            <!-- Success -->
+                            <div id="successSection" style="display:none;">
+                                <div class="alert alert-success text-center"><i class="bi bi-check-circle-fill me-1"></i><span data-i18n="acceptInvite.success">成功加入團隊！正在跳轉...</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="text-center text-muted mt-3"><p class="mb-0 small">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}. All rights reserved.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script>
+    /* ── accept_invite.html inline script ── */
+    const t = (key, fallback) => {
+        try {
+            if (typeof I18n === 'undefined' || !I18n.t) return (fallback ?? key);
+            const v = I18n.t(key);
+            if (!v || v === key) return (fallback ?? key);
+            return v;
+        } catch (_e) { return (fallback ?? key); }
+    };
+
+    // ── DOM refs ──
+    const $token       = document.getElementById('inviteToken');
+    const $email       = document.getElementById('inviteEmail');
+    const $hasAccount  = document.getElementById('hasAccount');
+    const $invalidMsg  = document.getElementById('invalidTokenMessage');
+    const $acceptCtr   = document.getElementById('acceptContainer');
+    const $authSection = document.getElementById('authSection');
+    const $loginSec    = document.getElementById('loginSection');
+    const $registerSec = document.getElementById('registerSection');
+    const $joiningSec  = document.getElementById('joiningSection');
+    const $successSec  = document.getElementById('successSection');
+    const $authHint    = document.getElementById('authHint');
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', function() {
+        // Language switcher
+        document.querySelectorAll('#aiLangDropdown + ul .dropdown-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                if (typeof I18n !== 'undefined' && I18n.switchLanguage) I18n.switchLanguage(lang);
+            });
+        });
+
+        const token = ($token ? $token.value : '').trim();
+        if (!token) {
+            $acceptCtr.style.display = 'none';
+            $invalidMsg.style.display = 'block';
+            return;
+        }
+
+        // Pre-fill email
+        const invEmail = ($email ? $email.value : '').trim();
+        if (invEmail) {
+            const emailInput = document.getElementById('email');
+            if (emailInput) emailInput.value = invEmail;
+            const regEmailInput = document.getElementById('regEmail');
+            if (regEmailInput) regEmailInput.value = invEmail;
+        }
+
+        // Show login or register based on hasAccount
+        const has = ($hasAccount ? $hasAccount.value : '') === 'true';
+        if (has) {
+            $loginSec.style.display = '';
+            $registerSec.style.display = 'none';
+            $authHint.textContent = t('acceptInvite.stepAuth', '請先登入您的帳號以加入團隊');
+        } else {
+            $loginSec.style.display = 'none';
+            $registerSec.style.display = '';
+            $authHint.textContent = t('acceptInvite.stepAuth', '請先建立帳號以加入團隊');
+        }
+
+        // Load Google OAuth
+        loadGoogleOAuthConfig();
+    });
+
+    // ── Switch login/register ──
+    document.getElementById('switchToRegister').addEventListener('click', function(e) {
+        e.preventDefault();
+        $loginSec.style.display = 'none';
+        $registerSec.style.display = '';
+    });
+    document.getElementById('switchToLogin').addEventListener('click', function(e) {
+        e.preventDefault();
+        $loginSec.style.display = '';
+        $registerSec.style.display = 'none';
+    });
+
+    // ── Accept invite API call ──
+    async function callAcceptInvite() {
+        $authSection.style.display = 'none';
+        $joiningSec.style.display = '';
+
+        const token = $token.value.trim();
+        try {
+            const res = await fetch('/api/v1/auth/accept-invite', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ token: token })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                $joiningSec.style.display = 'none';
+                $authSection.style.display = '';
+                App.showAlert(data.error || t('acceptInvite.joinFailed', '加入團隊失敗'), 'danger');
+                return;
+            }
+            // Save tokens
+            if (data.token) localStorage.setItem('auth_token', data.token);
+            if (data.tenant_id) localStorage.setItem('tenant_id', data.tenant_id);
+
+            $joiningSec.style.display = 'none';
+            $successSec.style.display = '';
+            setTimeout(() => { window.location.replace(data.redirect || '/dashboard'); }, 1500);
+        } catch (err) {
+            $joiningSec.style.display = 'none';
+            $authSection.style.display = '';
+            App.showAlert(t('acceptInvite.networkError', '網路錯誤，請稍後再試'), 'danger');
+        }
+    }
+
+    // ── Login form ──
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const emailVal = document.getElementById('email').value.trim();
+        const passVal = document.getElementById('password').value;
+        if (!emailVal || !passVal) return;
+
+        const btn = document.getElementById('loginBtn');
+        const origHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        try {
+            const res = await fetch('/api/v1/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ email: emailVal, password: passVal })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                App.showAlert(data.error || t('login.loginFailed', '登入失敗'), 'danger');
+                btn.disabled = false;
+                btn.innerHTML = origHTML;
+                return;
+            }
+            // Login succeeded, save token then accept invite
+            if (data.token) localStorage.setItem('auth_token', data.token);
+            if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+
+            await callAcceptInvite();
+        } catch (err) {
+            App.showAlert(t('login.networkError', '網路錯誤'), 'danger');
+            btn.disabled = false;
+            btn.innerHTML = origHTML;
+        }
+    });
+
+    // ── Register form ──
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const emailVal = document.getElementById('regEmail').value.trim();
+        const passVal = document.getElementById('regPassword').value;
+
+        if (!name || !emailVal || !passVal) return;
+        if (passVal.length < 6 || passVal.length > 20) {
+            App.showAlert(t('setPassword.passwordLengthError', '密碼長度需為 6-20 位'), 'danger');
+            return;
+        }
+
+        const btn = document.getElementById('registerBtn');
+        const origHTML = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+        try {
+            // Step 1: Register
+            const regRes = await fetch('/api/v1/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ name: name, email: emailVal, password: passVal })
+            });
+            const regData = await regRes.json().catch(() => ({}));
+            if (!regRes.ok) {
+                App.showAlert(regData.error || t('register.registerFailed', '註冊失敗'), 'danger');
+                btn.disabled = false;
+                btn.innerHTML = origHTML;
+                return;
+            }
+
+            // Registration succeeded — now login to get auth cookie
+            if (regData.token) {
+                localStorage.setItem('auth_token', regData.token);
+                if (regData.user) localStorage.setItem('user', JSON.stringify(regData.user));
+                // Auth cookie should already be set by register response
+                await callAcceptInvite();
+            } else {
+                // If register doesn't return token, do an explicit login
+                const loginRes = await fetch('/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email: emailVal, password: passVal })
+                });
+                const loginData = await loginRes.json().catch(() => ({}));
+                if (!loginRes.ok) {
+                    App.showAlert(loginData.error || t('login.loginFailed', '登入失敗'), 'danger');
+                    btn.disabled = false;
+                    btn.innerHTML = origHTML;
+                    return;
+                }
+                if (loginData.token) localStorage.setItem('auth_token', loginData.token);
+                if (loginData.user) localStorage.setItem('user', JSON.stringify(loginData.user));
+                await callAcceptInvite();
+            }
+        } catch (err) {
+            App.showAlert(t('register.networkError', '網路錯誤'), 'danger');
+            btn.disabled = false;
+            btn.innerHTML = origHTML;
+        }
+    });
+
+    // ── Google OAuth ──
+    let googleOAuthConfig = null;
+    let googleClientID = null;
+
+    async function loadGoogleOAuthConfig() {
+        try {
+            const response = await fetch('/api/v1/auth/google/config');
+            if (response.ok) {
+                const data = await response.json();
+                googleOAuthConfig = data;
+                googleClientID = data.client_id;
+                if (data.enabled && data.client_id) {
+                    const waitForSDK = (max = 20, attempt = 0) => {
+                        if (window.google && window.google.accounts && window.google.accounts.id) {
+                            initializeGoogleSignIn();
+                        } else if (attempt < max) {
+                            setTimeout(() => waitForSDK(max, attempt + 1), 500);
+                        }
+                    };
+                    waitForSDK();
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load Google OAuth config:', error);
+        }
+    }
+
+    function initializeGoogleSignIn() {
+        if (!googleClientID) return;
+        try {
+            window.google.accounts.id.initialize({
+                client_id: googleClientID,
+                callback: handleGoogleSignIn,
+                auto_select: false,
+                cancel_on_tap_outside: true,
+                itp_support: true,
+                use_fedcm_for_prompt: false
+            });
+            window.google.accounts.id.disableAutoSelect();
+        } catch (error) {
+            console.error('Failed to initialize Google Sign-In:', error);
+        }
+    }
+
+    async function handleGoogleSignIn(response) {
+        try {
+            if (!response.credential) throw new Error('No credential from Google');
+
+            const apiRes = await fetch('/api/v1/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ token: response.credential })
+            });
+            const data = await apiRes.json();
+            if (!apiRes.ok) throw new Error(data.error || 'Google login failed');
+
+            if (data.token) localStorage.setItem('auth_token', data.token);
+            if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+            if (data.tenant) {
+                if (data.tenant.subdomain) localStorage.setItem('tenant_subdomain', data.tenant.subdomain);
+                if (data.tenant.id) localStorage.setItem('tenant_id', data.tenant.id);
+                if (data.tenant.name) localStorage.setItem('tenant_name', data.tenant.name);
+            }
+
+            // After Google auth, accept the invite
+            await callAcceptInvite();
+        } catch (error) {
+            console.error('Google login error:', error);
+            App.showAlert(error.message || t('login.googleLoginFailed', 'Google 登錄失敗'), 'danger');
+        }
+    }
+
+    function triggerGoogleSignIn() {
+        if (!googleOAuthConfig || !googleOAuthConfig.enabled) {
+            App.showAlert(t('login.googleOAuthNotEnabled', 'Google 登錄功能未啟用'), 'warning');
+            return;
+        }
+        if (!googleClientID) {
+            App.showAlert(t('login.googleOAuthNotConfigured', 'Google 登錄未配置'), 'warning');
+            return;
+        }
+        if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+            App.showAlert(t('login.googleSDKNotLoaded', 'Google SDK 未加載'), 'warning');
+            return;
+        }
+        try {
+            let container = document.getElementById('google-signin-button-hidden');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'google-signin-button-hidden';
+                container.style.cssText = 'display:none;position:absolute;top:-9999px;left:-9999px;';
+                document.body.appendChild(container);
+            }
+            container.innerHTML = '';
+            setTimeout(() => {
+                try {
+                    window.google.accounts.id.renderButton(container, {
+                        theme: 'outline', size: 'large', text: 'signin_with', width: 300, type: 'standard'
+                    });
+                    setTimeout(() => {
+                        const button = container.querySelector('div[role="button"]');
+                        if (button) button.click();
+                        else App.showAlert(t('login.googleLoginFailed', 'Google 登錄失敗'), 'danger');
+                    }, 200);
+                } catch (renderError) {
+                    console.error('Failed to render button:', renderError);
+                    App.showAlert(t('login.googleLoginFailed', 'Google 登錄失敗'), 'danger');
+                }
+            }, 100);
+        } catch (error) {
+            console.error('Google sign-in error:', error);
+            App.showAlert(error.message || t('login.googleLoginFailed', 'Google 登錄失敗'), 'danger');
+        }
+    }
+
+    // Bind Google buttons
+    const btnGL = document.getElementById('btnGoogleLogin');
+    if (btnGL) btnGL.addEventListener('click', triggerGoogleSignIn);
+    const btnGR = document.getElementById('btnGoogleRegister');
+    if (btnGR) btnGR.addEventListener('click', triggerGoogleSignIn);
+    </script>
+</body>
+</html>

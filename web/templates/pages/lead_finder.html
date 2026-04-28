@@ -1,0 +1,498 @@
+{{ define "pages/lead_finder" }}
+
+{{if not .HasLeadFinder}}
+<!-- Feature Gate Overlay: Lead Finder requires vSuite Pro+ -->
+<div id="featureGateOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:#fff;border-radius:1rem;max-width:480px;width:100%;padding:2.5rem 2rem;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+        <div style="font-size:3rem;margin-bottom:1rem;"><i class="bi bi-search-heart text-primary"></i></div>
+        <h4 style="font-weight:700;margin-bottom:0.5rem;">自動搵客 Lead Finder</h4>
+        <p style="color:#64748b;font-size:0.9375rem;margin-bottom:1.5rem;">此功能需要 <strong>{{.RequiredPlan}}</strong> 方案。<br>請升級您的訂閱以使用自動搵客功能。</p>
+        <a href="/billing" class="btn btn-primary btn-lg w-100" style="font-weight:600;">
+            <i class="bi bi-arrow-up-circle me-2"></i>升級方案
+        </a>
+        <div style="margin-top:1rem;">
+            <a href="/dashboard" style="color:#64748b;font-size:0.875rem;text-decoration:none;">
+                <i class="bi bi-arrow-left me-1"></i>返回主頁
+            </a>
+        </div>
+    </div>
+</div>
+{{end}}
+<style>
+  .lf-step-number {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 600; flex-shrink: 0;
+  }
+  .lf-step-active .lf-step-number { background: var(--bs-primary); color: #fff; }
+  .lf-step-done .lf-step-number   { background: var(--bs-success); color: #fff; }
+  .lf-step-wait .lf-step-number   { background: var(--bs-light); color: var(--bs-gray-500); border: 1px solid var(--bs-gray-300); }
+  .lf-kw-badge { cursor: pointer; user-select: none; transition: opacity .15s; }
+  .lf-kw-badge:hover { opacity: .8; }
+  .lf-search-row { transition: background .15s; cursor: pointer; }
+  .lf-search-row:hover { background: var(--bs-light); }
+  .lf-stat { text-align: center; padding: 0.5rem 0; }
+  .lf-stat .fs-4 { line-height: 1; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-search-heart me-2 text-primary"></i><span data-i18n="leadFinder.title">搵客工具</span></h3>
+  <div class="d-flex gap-2">
+    <a href="/lead-finder/results" class="btn btn-outline-primary btn-sm"><i class="bi bi-person-lines-fill"></i> <span data-i18n="menu.leadList">Lead 列表</span></a>
+  </div>
+</div>
+
+<div class="row g-4">
+
+  <!-- ======== LEFT: Finder Panel ======== -->
+  <div class="col-lg-7 col-xl-8">
+
+    <!-- Step 1: Filters -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="lf-step-number lf-step-active" id="lfStep1Badge">1</span>
+          <span class="fw-semibold" data-i18n="leadFinder.stepSetup">設定搜尋條件</span>
+        </div>
+      </div>
+      <div class="card-body pt-2">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small text-muted" data-i18n="leadFinder.targetCountry">目標國家</label>
+            <select class="form-select" id="lfRegion"></select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small text-muted" data-i18n="leadFinder.product">指定產品</label>
+            <select class="form-select" id="lfProductId">
+              <option value=""></option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small text-muted" data-i18n="leadFinder.contactType">聯絡方式</label>
+            <select class="form-select" id="lfContactType">
+              <option value="" data-i18n="leadFinder.anyContact">有電郵或電話</option>
+              <option value="email" data-i18n="leadFinder.emailOnly" selected>只要電郵</option>
+              <option value="phone" data-i18n="leadFinder.phoneOnly">只要電話</option>
+              <option value="both" data-i18n="leadFinder.emailAndPhone">電郵+電話</option>
+            </select>
+            <div class="form-text" data-i18n="leadFinder.contactTypeHint">所有 Lead 都保證有對應的聯絡方式</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small text-muted">Lead 數量上限</label>
+            <select class="form-select" id="lfResultLimit">
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="500">500</option>
+            </select>
+            <div class="form-text" data-i18n="leadFinder.resultLimitHint">系統會盡最大努力搜尋到指定數量的有效 Lead（含聯絡方式）。</div>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="lfExcludeInstitutional" checked>
+              <label class="form-check-label small" for="lfExcludeInstitutional" data-i18n="leadFinder.excludeInstitutional">排除政府/機構網站 (.gov, .org, .edu)</label>
+            </div>
+            <div class="form-text" data-i18n="leadFinder.excludeInstitutionalHint">這些網站通常排名靠前但不是真正的潛在客戶。</div>
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="lfSkipDuplicates" checked>
+              <label class="form-check-label small" for="lfSkipDuplicates" data-i18n="leadFinder.skipDuplicates">排除已有的 Lead</label>
+            </div>
+            <div class="form-text" data-i18n="leadFinder.skipDuplicatesHint">自動跳過之前搜尋已找到的重複 Lead，只保留全新結果。</div>
+          </div>
+          <div class="col-12 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="button" id="btnAnalyze" onclick="LeadFinder.analyze()">
+              <i class="bi bi-robot me-1"></i> <span data-i18n="leadFinder.aiAnalyze">AI 分析</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: AI Analysis Result -->
+    <div class="card border-0 shadow-sm mb-3 d-none" id="lfAnalysisCard">
+      <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="lf-step-number lf-step-active" id="lfStep2Badge">2</span>
+          <span class="fw-semibold" data-i18n="leadFinder.aiAnalysisResult">AI 分析結果</span>
+        </div>
+      </div>
+      <div class="card-body pt-2">
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <div class="bg-light rounded-3 p-3 h-100">
+              <div class="text-muted small mb-1"><i class="bi bi-building me-1"></i><span data-i18n="leadFinder.targetIndustry">目標行業</span></div>
+              <div class="fw-semibold" id="lfTargetIndustry">-</div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="bg-light rounded-3 p-3 h-100">
+              <div class="text-muted small mb-1"><i class="bi bi-person-badge me-1"></i><span data-i18n="leadFinder.targetProfile">目標客戶畫像</span></div>
+              <div class="fw-semibold" id="lfTargetProfile">-</div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="text-muted small mb-1"><i class="bi bi-chat-left-text me-1"></i><span data-i18n="leadFinder.reasoning">分析推理</span></div>
+          <div class="small text-secondary" id="lfReasoning">-</div>
+        </div>
+        <!-- Keywords are managed internally — hidden from user -->
+        <div id="lfKeywords" class="d-none"></div>
+        <input type="hidden" id="lfKeywordsInput">
+        <hr class="my-3">
+        <button class="btn btn-success w-100" type="button" id="btnSearch" onclick="LeadFinder.search()">
+          <i class="bi bi-search me-1"></i> <span data-i18n="leadFinder.searchNow">開始搜尋</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="d-none" id="lfLoading">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+          <div class="spinner-border text-primary mb-3" role="status" style="width:3rem;height:3rem;"></div>
+          <div class="text-muted" id="lfLoadingText" data-i18n="leadFinder.analyzing">AI 正在分析中...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ======== RIGHT: Past Searches ======== -->
+  <div class="col-lg-5 col-xl-4">
+    <div class="card border-0 shadow-sm" style="position:sticky;top:1rem;">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-clock-history me-1"></i> <span data-i18n="leadFinder.pastSearches">過往搜尋記錄</span></span>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-sm btn-outline-secondary" id="lfTrashToggle" onclick="LeadFinder.toggleTrash()" title="">
+            <i class="bi bi-trash3"></i>
+          </button>
+          <span class="badge bg-secondary" id="lfSearchCount">0</span>
+        </div>
+      </div>
+      <div class="card-body p-0" style="max-height:calc(100vh - 160px);overflow-y:auto;">
+        <div id="lfSearchesList">
+          <div class="text-center text-muted py-4">
+            <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+            <div class="small" data-i18n="common.loading">載入中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const LeadFinder = (() => {
+  const qs = id => document.getElementById(id);
+  const t = (k, fb) => { if (typeof I18n === 'undefined' || !I18n.t) return fb; const v = I18n.t(k); return (v && v !== k) ? v : (fb || k); };
+  let currentAnalysis = null;
+  let trashMode = false;
+
+  async function init() {
+    if (!App.checkAuth()) return;
+    await Promise.all([loadCountries(), loadProducts(), loadSearches()]);
+  }
+
+  /* ---- Load country dropdown (same pattern as setup-tenant) ---- */
+  async function loadCountries() {
+    const sel = qs('lfRegion');
+    try {
+      const lang = (typeof I18n !== 'undefined' && I18n.currentLang) ? I18n.currentLang : 'zh';
+      const resp = await App.apiRequest(`/api/v1/countries?lang=${encodeURIComponent(lang)}&limit=300`);
+      const countries = (resp && resp.data) ? resp.data : [];
+      sel.innerHTML = '<option value=""></option>' + countries.map(c => {
+        const code = (c && c.code) ? String(c.code) : '';
+        const name = (c && c.name) ? String(c.name) : code;
+        return `<option value="${name}" data-code="${code}">${name} (${code})</option>`;
+      }).join('');
+      // Default to HK
+      if (typeof $ !== 'undefined') {
+        $(sel).select2({ theme: 'bootstrap-5', placeholder: t('leadFinder.selectCountry', '選擇國家...'), allowClear: true, width: '100%' });
+        if ($(sel).find('option[data-code="HK"]').length) {
+          $(sel).val($(sel).find('option[data-code="HK"]').val()).trigger('change');
+        }
+      }
+    } catch(e) {
+      console.error('Failed to load countries:', e);
+      sel.innerHTML = '<option value="">--</option>';
+    }
+  }
+
+  async function loadProducts() {
+    try {
+      const sel = qs('lfProductId');
+      if (typeof $ !== 'undefined') {
+        $(sel).select2({
+          theme: 'bootstrap-5',
+          placeholder: t('leadFinder.allProducts', '全部產品'),
+          allowClear: true,
+          width: '100%',
+          ajax: {
+            url: '/api/v1/products',
+            dataType: 'json',
+            delay: 250,
+            headers: {
+              'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || ''),
+              'X-Tenant-Subdomain': localStorage.getItem('tenant_subdomain') || ''
+            },
+            data: function(params) {
+              return { search: params.term || '', limit: 50, page: params.page || 1 };
+            },
+            processResults: function(data, params) {
+              params.page = params.page || 1;
+              var items = data.data || [];
+              return {
+                results: items.map(function(p) {
+                  return { id: p.id, text: p.name + (p.category ? ' (' + p.category + ')' : '') };
+                }),
+                pagination: { more: items.length === 50 }
+              };
+            },
+            cache: true
+          },
+          minimumInputLength: 0
+        });
+      }
+    } catch(e) { console.error('Failed to init product select:', e); }
+  }
+
+  async function loadSearches() {
+    const container = qs('lfSearchesList');
+    try {
+      const res = await App.apiRequest('/lead-finder/searches');
+      const rows = res.data || [];
+      qs('lfSearchCount').textContent = rows.length;
+
+      if (!rows.length) {
+        container.innerHTML = `
+          <div class="text-center text-muted py-5">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <div class="small">${t('common.noData','暫無搜尋記錄')}</div>
+          </div>`;
+        return;
+      }
+
+      const statusIcon = { pending: 'hourglass-split', searching: 'arrow-repeat', completed: 'check-circle-fill', failed: 'x-circle-fill' };
+      const statusColor = { pending: 'text-secondary', searching: 'text-primary', completed: 'text-success', failed: 'text-danger' };
+
+      container.innerHTML = '<div class="list-group list-group-flush">' + rows.map(s => {
+        const icon = statusIcon[s.status] || 'question-circle';
+        const color = statusColor[s.status] || 'text-secondary';
+        const date = new Date(s.created_at);
+        const dateStr = date.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }) + ' ' + date.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
+        const isCompleted = s.status === 'completed';
+        const ef = s.extra_fields || {};
+        const vcoinSearch = ef.vcoin_cost || 0;
+        const vcoinTotal = vcoinSearch + 1; // +1 for AI analysis
+          const label = s.target_industry || s.keywords || dateStr;
+        return `
+          <div class="list-group-item lf-search-row px-3 py-2 ${isCompleted ? '' : 'opacity-75'}">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <a href="${isCompleted ? '/lead-finder/results/' + s.id : '#'}" class="small text-decoration-none fw-semibold ${isCompleted ? '' : 'pe-none text-muted'}" style="max-width:80%;">
+                ${label}
+              </a>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-${icon} ${color}"></i>
+                <button class="btn btn-link btn-sm text-danger p-0" onclick="event.stopPropagation();LeadFinder.deleteSearch('${s.id}')" title="${t('leadFinder.delete','刪除')}"><i class="bi bi-trash"></i></button>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="${isCompleted ? '/lead-finder/results/' + s.id : '#'}" class="text-muted text-decoration-none ${isCompleted ? '' : 'pe-none'}" style="font-size:.75rem;">${s.region || ''} &middot; ${dateStr}</a>
+              <div class="d-flex align-items-center gap-2">
+                ${isCompleted ? `<span class="badge bg-warning bg-opacity-10 text-warning" title="${t('leadFinder.vcoinCost','vCoin 成本')}"><i class="bi bi-coin me-1"></i>${vcoinTotal}</span>` : ''}
+                <span class="badge bg-light text-dark">${s.result_count || 0} ${t('leadFinder.resultsLabel', '筆')}</span>
+              </div>
+            </div>
+          </div>`;
+      }).join('') + '</div>';
+    } catch(e) {
+      console.error(e);
+      container.innerHTML = `<div class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle"></i> ${t('common.loadError','載入失敗')}</div>`;
+    }
+  }
+
+  async function analyze() {
+    const productId = qs('lfProductId').value;
+    const region = typeof $ !== 'undefined' ? $(qs('lfRegion')).val() || '' : qs('lfRegion').value;
+    const contactType = qs('lfContactType').value;
+
+    qs('lfAnalysisCard').classList.add('d-none');
+    qs('lfLoading').classList.remove('d-none');
+    qs('lfLoadingText').textContent = t('leadFinder.analyzing', 'AI 正在分析中...');
+    qs('btnAnalyze').disabled = true;
+
+    try {
+      const res = await App.apiRequest('/lead-finder/analyze', {
+        method: 'POST',
+        body: JSON.stringify({ product_id: productId, region: region }),
+      });
+      currentAnalysis = res.analysis;
+
+      qs('lfTargetIndustry').textContent = res.analysis.target_industry || '-';
+      qs('lfTargetProfile').textContent = res.analysis.target_profile || '-';
+      qs('lfReasoning').textContent = res.analysis.reasoning_notes || '-';
+
+      const kwContainer = qs('lfKeywords');
+      kwContainer.innerHTML = '';
+      (res.analysis.search_keywords || []).forEach(kw => {
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-primary bg-opacity-75 lf-kw-badge';
+        badge.textContent = kw;
+        kwContainer.appendChild(badge);
+      });
+
+      qs('lfKeywordsInput').value = (res.analysis.search_keywords || []).join(', ');
+      qs('lfAnalysisCard').classList.remove('d-none');
+
+      // Update step badges
+      qs('lfStep1Badge').className = 'lf-step-number lf-step-done';
+      qs('lfStep1Badge').innerHTML = '<i class="bi bi-check"></i>';
+
+    } catch(e) {
+      console.error(e);
+      App.showAlert(e.message || t('leadFinder.analyzeFailed', 'AI 分析失敗'), 'danger');
+    } finally {
+      qs('lfLoading').classList.add('d-none');
+      qs('btnAnalyze').disabled = false;
+    }
+  }
+
+  async function search() {
+    const keywords = qs('lfKeywordsInput').value.trim();
+    if (!keywords) {
+      App.showAlert(t('leadFinder.keywordsRequired', '請輸入搜尋關鍵字'), 'warning');
+      return;
+    }
+    const productId = qs('lfProductId').value;
+    const region = typeof $ !== 'undefined' ? $(qs('lfRegion')).val() || '' : qs('lfRegion').value;
+    const contactType = qs('lfContactType').value;
+    const resultLimit = parseInt(qs('lfResultLimit').value || '50', 10);
+    const excludeInstitutional = qs('lfExcludeInstitutional').checked;
+    const skipDuplicates = qs('lfSkipDuplicates').checked;
+    const targetIndustry = qs('lfTargetIndustry').textContent.trim();
+    const target_industry = (targetIndustry && targetIndustry !== '-') ? targetIndustry : '';
+
+    qs('lfLoading').classList.remove('d-none');
+    qs('lfLoadingText').textContent = t('leadFinder.searching', '正在搜尋潛在客戶...');
+    qs('btnSearch').disabled = true;
+
+    try {
+      const res = await App.apiRequest('/lead-finder/search', {
+        method: 'POST',
+        body: JSON.stringify({ keywords, product_id: productId, region, target_industry, contact_type: contactType, result_limit: resultLimit, exclude_institutional: excludeInstitutional, skip_duplicates: skipDuplicates }),
+      });
+      App.showAlert(t('leadFinder.searchComplete', `搜尋完成，找到 ${res.results?.length || 0} 個結果`), 'success');
+      if (res.search && res.search.id) {
+        window.location.href = `/lead-finder/results/${res.search.id}`;
+      } else {
+        await loadSearches();
+      }
+    } catch(e) {
+      console.error(e);
+      App.showAlert(e.message || t('leadFinder.searchFailed', '搜尋失敗'), 'danger');
+    } finally {
+      qs('lfLoading').classList.add('d-none');
+      qs('btnSearch').disabled = false;
+    }
+  }
+
+  async function deleteSearch(searchId) {
+    if (!confirm(t('leadFinder.confirmTrashSearch','確定要將此搜尋記錄移至垃圾筒？（7天內可還原）'))) return;
+    try {
+      await App.apiRequest(`/lead-finder/searches/${searchId}`, { method: 'DELETE' });
+      App.showAlert(t('leadFinder.trashedSuccess','已移至垃圾筒'), 'success');
+      await loadSearches();
+    } catch(e) {
+      App.showAlert(e.message || t('leadFinder.deleteFailed','刪除失敗'), 'danger');
+    }
+  }
+
+  function toggleTrash() {
+    trashMode = !trashMode;
+    const btn = qs('lfTrashToggle');
+    if (trashMode) {
+      btn.classList.remove('btn-outline-secondary');
+      btn.classList.add('btn-danger');
+      loadTrashedSearches();
+    } else {
+      btn.classList.remove('btn-danger');
+      btn.classList.add('btn-outline-secondary');
+      loadSearches();
+    }
+  }
+
+  async function loadTrashedSearches() {
+    const container = qs('lfSearchesList');
+    container.innerHTML = '<div class="text-center text-muted py-4"><div class="spinner-border spinner-border-sm mb-2" role="status"></div></div>';
+    try {
+      const res = await App.apiRequest('/trash/lead-finder-searches?limit=50');
+      const rows = res.data || [];
+      qs('lfSearchCount').textContent = rows.length;
+
+      if (!rows.length) {
+        container.innerHTML = `
+          <div class="text-center text-muted py-5">
+            <i class="bi bi-trash3 fs-1 d-block mb-2"></i>
+            <div class="small">${t('leadFinder.trashEmpty','垃圾筒是空的')}</div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="alert alert-warning small m-2 py-2">
+          <i class="bi bi-info-circle me-1"></i>${t('leadFinder.trashInfo','垃圾筒內的記錄將在 7 天後自動清除')}
+        </div>
+        <div class="list-group list-group-flush">` + rows.map(s => {
+          const date = new Date(s.trashed_at);
+          const dateStr = date.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' }) + ' ' + date.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
+        const label = s.target_industry || s.keywords || dateStr;
+          return `
+            <div class="list-group-item px-3 py-2">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <div class="small fw-semibold text-muted" style="max-width:60%;">
+                  ${label}
+                </div>
+                <div class="d-flex align-items-center gap-1">
+                  <button class="btn btn-link btn-sm text-success p-0" onclick="event.stopPropagation();LeadFinder.restoreSearch('${s.id}')" title="${t('leadFinder.restore','還原')}"><i class="bi bi-arrow-counterclockwise"></i></button>
+                  <button class="btn btn-link btn-sm text-danger p-0" onclick="event.stopPropagation();LeadFinder.permanentDeleteSearch('${s.id}')" title="${t('leadFinder.permanentDelete','永久刪除')}"><i class="bi bi-x-circle"></i></button>
+                </div>
+              </div>
+              <div class="text-muted" style="font-size:.75rem;">${s.region || ''} &middot; ${t('leadFinder.trashedAt','刪除於')} ${dateStr} &middot; ${s.result_count || 0} ${t('leadFinder.resultsLabel','筆')}</div>
+            </div>`;
+        }).join('') + '</div>';
+    } catch(e) {
+      console.error(e);
+      container.innerHTML = `<div class="text-center text-danger py-4"><i class="bi bi-exclamation-triangle"></i> ${t('common.loadError','載入失敗')}</div>`;
+    }
+  }
+
+  async function restoreSearch(searchId) {
+    try {
+      await App.apiRequest(`/trash/lead-finder-searches/${searchId}/restore`, { method: 'POST' });
+      App.showAlert(t('leadFinder.restored','已還原'), 'success');
+      await loadTrashedSearches();
+    } catch(e) {
+      App.showAlert(e.message || t('leadFinder.restoreFailed','還原失敗'), 'danger');
+    }
+  }
+
+  async function permanentDeleteSearch(searchId) {
+    if (!confirm(t('leadFinder.confirmPermanentDelete','確定要永久刪除此搜尋記錄？此操作不可還原。'))) return;
+    try {
+      await App.apiRequest(`/trash/lead-finder-searches/${searchId}`, { method: 'DELETE' });
+      App.showAlert(t('leadFinder.permanentDeleted','已永久刪除'), 'success');
+      await loadTrashedSearches();
+    } catch(e) {
+      App.showAlert(e.message || t('leadFinder.deleteFailed','刪除失敗'), 'danger');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  return { analyze, search, deleteSearch, toggleTrash, restoreSearch, permanentDeleteSearch };
+})();
+</script>
+{{ end }}

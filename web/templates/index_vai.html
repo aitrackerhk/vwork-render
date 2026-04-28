@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vAI - 智能 AI 助手</title>
+  {{template "partials/seo_head" .}}
+  <link rel="icon" type="image/png" href="/static/vaiicon.png">
+  <link rel="apple-touch-icon" href="/static/vaiicon.png">
+  <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+  <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/custom.css">
+  <link rel="stylesheet" href="/static/css/vai-landing.css">
+  <script>
+    (function() {
+      const savedLang = localStorage.getItem('u-nai_lang');
+      const browserLang = navigator.language || navigator.userLanguage;
+      let currentLang = 'zh';
+      if (savedLang) {
+        currentLang = savedLang;
+      } else {
+        if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+          currentLang = 'zh-CN';
+        } else if (browserLang.startsWith('zh')) {
+          currentLang = 'zh';
+        } else {
+          currentLang = 'en';
+        }
+        localStorage.setItem('u-nai_lang', currentLang);
+      }
+      window.__INITIAL_LANG__ = currentLang;
+      (function checkBody() {
+        if (document.body) {
+          document.body.classList.add('i18n-loading');
+          setTimeout(function() {
+            if (document.body && document.body.classList.contains('i18n-loading')) {
+              document.body.classList.remove('i18n-loading');
+            }
+          }, 5000);
+        } else {
+          requestAnimationFrame(checkBody);
+        }
+      })();
+    })();
+  </script>
+</head>
+<body>
+  <!-- Navbar — same style as vai_chat -->
+  <nav class="navbar navbar-expand-lg fixed-top vai-chat-navbar">
+    <div class="container-fluid px-3 d-flex align-items-center justify-content-between">
+      <a class="navbar-brand d-flex align-items-center" href="#" id="navBrandLink">
+        <img src="/static/vai.png" alt="vAI" style="height: 24px;">
+      </a>
+      <!-- Mobile: App Switcher, Menu Toggle (visible on mobile only) -->
+      <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+        <li class="nav-item dropdown" id="mobileAppSwitcherVai">
+          <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+            <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+            <div class="app-switcher-grid">
+              <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                <span class="app-switcher-label">vAI</span>
+              </a>
+              <a href="/" class="app-switcher-item" data-app="vwork">
+                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                <span class="app-switcher-label">vWork</span>
+              </a>
+              <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                <span class="app-switcher-label">vMarket</span>
+              </a>
+              <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                <span class="app-switcher-label">vOffice</span>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item" id="useAiBtnMobile">
+          <a class="nav-link" href="/login?product=vai" title="登錄">
+            <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <button class="navbar-toggler" type="button" id="vaiMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+            <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+          </button>
+        </li>
+      </ul>
+      <!-- Desktop: Full nav pill (hidden on mobile) -->
+      <div class="d-none d-lg-flex align-items-center gap-2">
+        <a class="btn btn-sm btn-outline-secondary" href="/login?product=vai" id="useAiBtn" data-i18n="nav.useAI" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">使用 AI</a>
+        <div class="vai-nav-pill">
+          <div class="dropdown">
+            <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" title="Applications">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+            </a>
+            <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+              <div class="app-switcher-grid">
+                <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                  <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                  <span class="app-switcher-label">vAI</span>
+                </a>
+                <a href="/" class="app-switcher-item" data-app="vwork">
+                  <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                  <span class="app-switcher-label">vWork</span>
+                </a>
+                <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                  <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                  <span class="app-switcher-label">vMarket</span>
+                </a>
+                <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                  <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                  <span class="app-switcher-label">vOffice</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="supportDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem;">
+              <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="/help" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+              <li><a class="dropdown-item" href="/contact?product=vai" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+            </ul>
+          </div>
+          <div class="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem;">
+              <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+              <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+              <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+            </ul>
+          </div>
+          <a class="nav-link" href="/login?product=vai" id="loginLink" style="padding: 0.25rem 0.5rem;">
+            <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+          </a>
+          <div class="dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+              <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+              <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li id="publicAICoinsDisplay" style="display: none;">
+                <a class="dropdown-item" href="/vai-vcoins">
+                  <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                  <span class="fw-bold" id="publicAICoinsBalance">0</span>
+                </a>
+              </li>
+              <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+              <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+              <li><a class="dropdown-item" href="/vai-billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Sidebar Overlay for mobile -->
+  <div class="sidebar-overlay" id="vaiSidebarOverlay"></div>
+
+  <!-- vAI Sidebar Menu for mobile -->
+  <div class="sidebar" id="vaiSidebar">
+    <nav class="sidebar-nav">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/help">
+            <i class="bi bi-question-circle"></i> <span data-i18n="nav.supportCenter">支援中心</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contact">
+            <i class="bi bi-headset"></i> <span data-i18n="nav.contact">聯絡客服</span>
+          </a>
+        </li>
+        <li class="nav-item nav-group">
+          <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vaiLanguageSubmenu" aria-expanded="false">
+            <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse" id="vaiLanguageSubmenu">
+            <ul class="nav flex-column submenu">
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" data-lang="en">English</a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item nav-group" id="vaiUserDropdownItem" style="display: none;">
+          <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#vaiUserSubmenu" aria-expanded="false">
+            <img id="vaiUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+            <i class="bi bi-person-circle" id="vaiUserIcon"></i> <span id="vaiUserName" data-i18n="nav.user">用戶</span>
+            <i class="bi bi-chevron-down ms-auto"></i>
+          </a>
+          <div class="collapse" id="vaiUserSubmenu">
+            <ul class="nav flex-column submenu">
+              <li class="nav-item">
+                <a class="nav-link" href="/personal-data">
+                  <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/vai-billing">
+                  <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" id="vaiLogoutBtn">
+                  <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+        <li class="nav-item" id="vaiLoginItem">
+          <a class="nav-link" href="/login?product=vai">
+            <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">登錄</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Welcome Mode — centered landing with inline input -->
+  <div class="vai-page" id="vaiWelcomePage">
+    <div class="vai-welcome-wrapper">
+      <div class="vai-welcome" id="vaiWelcome">
+        <div class="vai-erp-badge" data-i18n="vai.hero.badge">vAI 人工智慧助手</div>
+        <h1>
+          <span data-i18n="vai.hero.titleBefore2">與 vWork ERP 深度結合的</span><br>
+          <span class="vai-gradient-text" data-i18n="vai.hero.titleHighlight2">AI 智慧工作夥伴</span>
+        </h1>
+        <p class="subtitle" data-i18n="vai.hero.subtitle2">vAI 直接連接你的 vWork ERP 系統 — 即時查詢訂單、分析銷售、管理客戶、追蹤庫存。不只是聊天 AI，而是真正理解你業務數據的智能助手。</p>
+
+        <!-- AI Chat Demo Animation -->
+        <div class="vai-chat-demo-wrapper" style="margin: 2rem auto;">
+          <div class="card border-0" style="background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-radius: 1.25rem; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 8px 40px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.03);">
+            <div class="card-body p-3 position-relative">
+              <div id="vaiChatDemo" class="ai-assistant-chat-demo" style="min-height: 180px; max-height: 220px; justify-content: flex-start;">
+                <!-- Messages will be generated by JavaScript -->
+              </div>
+              <div class="ai-assistant-chat-overlay"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick action suggestions — ERP-oriented -->
+        <div class="vai-quick-actions">
+          <button class="vai-quick-btn" onclick="vaiQuickSend(this.textContent)" data-i18n="vai.demo.q1erp"><i class="bi bi-receipt me-1"></i>查詢最新訂單</button>
+          <button class="vai-quick-btn" onclick="vaiQuickSend(this.textContent)" data-i18n="vai.demo.q2erp"><i class="bi bi-graph-up me-1"></i>分析本月銷售</button>
+          <button class="vai-quick-btn" onclick="vaiQuickSend(this.textContent)" data-i18n="vai.demo.q3erp"><i class="bi bi-people me-1"></i>客戶消費排行</button>
+          <button class="vai-quick-btn" onclick="vaiQuickSend(this.textContent)" data-i18n="vai.demo.q4erp"><i class="bi bi-box-seam me-1"></i>庫存預警</button>
+        </div>
+
+        <!-- Inline input -->
+        <div class="vai-welcome-input">
+          <form id="vaiWelcomeForm" onsubmit="return handleDemoSend(event)">
+            <textarea class="form-control" id="vaiDemoInput" rows="3" data-i18n-placeholder="vai.demo.inputPlaceholderErp" placeholder="問 AI 任何關於你業務的問題..." style="resize: none;"></textarea>
+            <button type="submit" class="btn btn-send">
+              <i class="bi bi-send"></i>
+            </button>
+          </form>
+        </div>
+
+        <!-- CTA for login -->
+        <div class="mt-4 d-flex justify-content-center gap-2 flex-wrap" id="welcomeLoginCTA">
+          <a href="/login?product=vai" class="vai-btn-primary" data-i18n="vai.hero.cta">
+            <i class="bi bi-chat-dots"></i> 開始使用 vAI
+          </a>
+          <a href="#vworkIntegration" class="vai-btn-secondary" data-i18n="vai.hero.learnMore">
+            <i class="bi bi-arrow-down-circle"></i> 了解更多
+          </a>
+        </div>
+
+        <!-- vCoin pricing note -->
+        <div class="vai-vcoin-note mt-4">
+          <i class="bi bi-info-circle me-1"></i>
+          <span data-i18n="vai.vcoinNote">每天 5 次免費查詢，AI 功能以 vCoin 按量計費。</span>
+          <a href="#" class="vai-vcoin-link ms-1" data-bs-toggle="modal" data-bs-target="#vcoinModal" data-i18n="vai.vcoinLearnMore">了解 vCoin</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section: vWork Deep Integration -->
+    <section class="vai-section" id="vworkIntegration">
+      <div class="container" style="max-width: 960px;">
+        <div class="text-center mb-4">
+          <div class="vai-section-badge" data-i18n="vai.integration.badge">vWork ERP + AI</div>
+          <h2 class="vai-section-title" data-i18n="vai.integration.title">與 vWork 深度結合，數據即時互通</h2>
+          <p class="vai-section-subtitle" data-i18n="vai.integration.subtitle">vAI 不只是聊天機器人。它直接連接你的 vWork 企業資料，讓 AI 真正理解你的業務，幫你做出更好的決策。</p>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-4 col-6">
+            <div class="vai-integration-card">
+              <div class="vai-integration-icon"><i class="bi bi-receipt-cutoff"></i></div>
+              <h6 data-i18n="vai.integration.orders.title">訂單管理</h6>
+              <p data-i18n="vai.integration.orders.desc">即時查詢訂單狀態、自動生成報表，AI 分析銷售趨勢與異常。</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-6">
+            <div class="vai-integration-card">
+              <div class="vai-integration-icon"><i class="bi bi-people-fill"></i></div>
+              <h6 data-i18n="vai.integration.crm.title">客戶 CRM</h6>
+              <p data-i18n="vai.integration.crm.desc">分析客戶消費行為、自動分群、智能推薦跟進策略。</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-6">
+            <div class="vai-integration-card">
+              <div class="vai-integration-icon"><i class="bi bi-box-seam-fill"></i></div>
+              <h6 data-i18n="vai.integration.inventory.title">庫存追蹤</h6>
+              <p data-i18n="vai.integration.inventory.desc">庫存不足提醒、進銷存分析、智能補貨建議。</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-6">
+            <div class="vai-integration-card">
+              <div class="vai-integration-icon"><i class="bi bi-graph-up-arrow"></i></div>
+              <h6 data-i18n="vai.integration.analytics.title">智能報表</h6>
+              <p data-i18n="vai.integration.analytics.desc">自然語言生成銷售報表、財務分析、業績對比。</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-6">
+            <div class="vai-integration-card">
+              <div class="vai-integration-icon"><i class="bi bi-cash-stack"></i></div>
+              <h6 data-i18n="vai.integration.pos.title">POS 收銀</h6>
+              <p data-i18n="vai.integration.pos.desc">交易數據即時同步、每日結算分析、異常交易預警。</p>
+            </div>
+          </div>
+          <div class="col-md-4 col-6">
+            <div class="vai-integration-card">
+              <div class="vai-integration-icon"><i class="bi bi-calendar-check-fill"></i></div>
+              <h6 data-i18n="vai.integration.service.title">服務預約</h6>
+              <p data-i18n="vai.integration.service.desc">預約管理、員工排班建議、服務效率分析。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: AI + ERP Workflow Scenarios -->
+    <section class="vai-section vai-section-alt">
+      <div class="container" style="max-width: 960px;">
+        <div class="text-center mb-4">
+          <div class="vai-section-badge" data-i18n="vai.workflow.badge">AI 工作流</div>
+          <h2 class="vai-section-title" data-i18n="vai.workflow.title">一句話，完成過去數小時的工作</h2>
+          <p class="vai-section-subtitle" data-i18n="vai.workflow.subtitle">vAI 能直接操作 vWork 系統數據，從查詢到生成報表，全程自動化。</p>
+        </div>
+        <div class="vai-workflow-list">
+          <div class="vai-workflow-item">
+            <div class="vai-workflow-num">1</div>
+            <div class="vai-workflow-content">
+              <div class="vai-workflow-ask" data-i18n="vai.workflow.s1.ask">"本月業績和上月比怎麼樣？"</div>
+              <div class="vai-workflow-answer" data-i18n="vai.workflow.s1.answer">vAI 自動讀取 vWork 訂單數據，計算月對月增長率，分析各渠道貢獻，並生成可視化圖表。</div>
+            </div>
+          </div>
+          <div class="vai-workflow-item">
+            <div class="vai-workflow-num">2</div>
+            <div class="vai-workflow-content">
+              <div class="vai-workflow-ask" data-i18n="vai.workflow.s2.ask">"哪些庫存快沒了？幫我建採購單"</div>
+              <div class="vai-workflow-answer" data-i18n="vai.workflow.s2.answer">vAI 掃描庫存低於安全量的品項，列出清單，並可直接在 vWork 中生成採購訂單。</div>
+            </div>
+          </div>
+          <div class="vai-workflow-item">
+            <div class="vai-workflow-num">3</div>
+            <div class="vai-workflow-content">
+              <div class="vai-workflow-ask" data-i18n="vai.workflow.s3.ask">"幫我生成這季度的客戶分析報告"</div>
+              <div class="vai-workflow-answer" data-i18n="vai.workflow.s3.answer">vAI 讀取 CRM 資料，分析客戶消費頻次、客單價、流失風險，自動生成 PPT 或 PDF 報告。</div>
+            </div>
+          </div>
+          <div class="vai-workflow-item">
+            <div class="vai-workflow-num">4</div>
+            <div class="vai-workflow-content">
+              <div class="vai-workflow-ask" data-i18n="vai.workflow.s4.ask">"今天 POS 有異常交易嗎？"</div>
+              <div class="vai-workflow-answer" data-i18n="vai.workflow.s4.answer">vAI 分析當日所有 POS 交易，標記退款頻率異常、大額折扣等可疑操作，保護你的營收。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section: AI Tools -->
+    <section class="vai-section">
+      <div class="container" style="max-width: 960px;">
+        <div class="text-center mb-4">
+          <div class="vai-section-badge" data-i18n="vai.tools.badge">AI 全能工具</div>
+          <h2 class="vai-section-title" data-i18n="vai.tools.title">不只對話，還能創作</h2>
+          <p class="vai-section-subtitle" data-i18n="vai.tools.subtitle">vAI 整合四大 AI 工具，從智能對話到內容創作，全方位提升工作效率。</p>
+        </div>
+        <div class="row g-3">
+          <div class="col-md-3 col-6">
+            <div class="vai-tool-card">
+              <div class="vai-tool-icon"><i class="bi bi-chat-dots-fill"></i></div>
+              <h6 data-i18n="vai.tools.chat.title">AI 對話</h6>
+              <p data-i18n="vai.tools.chat.desc">智能問答、數據查詢、工作建議，連接 vWork 即時資料。</p>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="vai-tool-card">
+              <div class="vai-tool-icon"><i class="bi bi-palette-fill"></i></div>
+              <h6 data-i18n="vai.tools.sketch.title">AI 圖片</h6>
+              <p data-i18n="vai.tools.sketch.desc">產品圖生成、行銷素材設計、草圖轉精美插畫。</p>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="vai-tool-card">
+              <div class="vai-tool-icon"><i class="bi bi-camera-video-fill"></i></div>
+              <h6 data-i18n="vai.tools.video.title">AI 影片</h6>
+              <p data-i18n="vai.tools.video.desc">產品推廣影片、分鏡編輯、一鍵合成專業短影片。</p>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="vai-tool-card">
+              <div class="vai-tool-icon"><i class="bi bi-file-earmark-richtext-fill"></i></div>
+              <h6 data-i18n="vai.tools.docs.title">AI 文件</h6>
+              <p data-i18n="vai.tools.docs.desc">自動生成 Word、Excel、PPT、PDF 專業文件。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer inside welcome page so it scrolls into view -->
+    <div class="vai-footer-wrapper" id="vaiFooter">
+      <footer class="site-footer-light" style="padding: 2rem 0;">
+        <div class="container-fluid px-3">
+          <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+              <div class="d-flex align-items-center mb-3">
+                <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                  <img src="/static/vlogo.png" alt="V-sys Logo" style="height: auto; max-height: 24px; display: block;">
+                </a>
+              </div>
+              <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+              <div class="mt-3">
+                <a href="#" id="vworkFooterWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
+                <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-md-6">
+              <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+              <ul class="list-unstyled">
+                <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
+                <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
+                <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
+                <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
+              </ul>
+            </div>
+          <div class="col-lg-2 col-md-6">
+            <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+            <ul class="list-unstyled">
+              <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.home">首頁</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-2 col-md-6">
+            <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+            <ul class="list-unstyled">
+              <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+              <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+              <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+              <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <h6 class="mb-3" data-i18n="footer.contact">聯繫我們</h6>
+            <ul class="list-unstyled text-muted">
+              <li class="mb-2"><i class="bi bi-envelope me-2"></i><a href="mailto:info@vsysai.com" class="text-muted text-decoration-none">info@vsysai.com</a></li>
+              <li class="mb-2"><i class="bi bi-geo-alt me-2"></i><span data-i18n="footer.location">香港</span></li>
+            </ul>
+          </div>
+        </div>
+        <hr class="my-4">
+        <div class="text-center text-muted">
+          <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 V-sys Limited. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+  </div>
+
+  <!-- vCoin Modal -->
+  <div class="modal fade" id="vcoinModal" tabindex="-1" aria-labelledby="vcoinModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content vcoin-modal-content">
+        <div class="modal-header vcoin-modal-header">
+          <h5 class="modal-title" id="vcoinModalLabel">
+            <svg class="vcoin-icon me-2" width="28" height="28" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/>
+              <path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/>
+            </svg>
+            <span data-i18n="vai.vcoinModal.title">vCoin</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body vcoin-modal-body">
+          <!-- What is vCoin -->
+          <div class="vcoin-intro mb-4">
+            <h6 class="fw-semibold mb-2" data-i18n="vai.vcoinModal.whatIsTitle">vCoin 是什麼？</h6>
+            <p class="text-muted mb-0" data-i18n="vai.vcoinModal.whatIsDesc">vCoin 是 V-sys 的 AI 使用代幣。每天有 5 次免費查詢額度，超出後使用 AI 功能會消耗 vCoin。</p>
+          </div>
+
+          <!-- Usage info -->
+          <div class="vcoin-usage mb-4">
+            <h6 class="fw-semibold mb-3" data-i18n="vai.vcoinModal.usageTitle">消耗說明</h6>
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="vcoin-usage-card">
+                  <div class="vcoin-usage-icon"><i class="bi bi-chat-dots text-primary"></i></div>
+                  <div class="vcoin-usage-label" data-i18n="vai.vcoinModal.simpleQuery">簡單查詢</div>
+                  <div class="vcoin-usage-cost"><span class="badge bg-success">1 coin</span></div>
+                  <div class="vcoin-usage-desc text-muted small" data-i18n="vai.vcoinModal.simpleQueryDesc">基本問答、資料查詢</div>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="vcoin-usage-card">
+                  <div class="vcoin-usage-icon"><i class="bi bi-file-earmark-text text-success"></i></div>
+                  <div class="vcoin-usage-label" data-i18n="vai.vcoinModal.contentGen">內容生成</div>
+                  <div class="vcoin-usage-cost"><span class="badge bg-warning text-dark">5 coins</span></div>
+                  <div class="vcoin-usage-desc text-muted small" data-i18n="vai.vcoinModal.contentGenDesc">文件生成、郵件撰寫</div>
+                </div>
+              </div>
+            </div>
+            <div class="alert alert-info mt-3 mb-0 small">
+              <i class="bi bi-lightbulb me-1"></i>
+              <span data-i18n="vai.vcoinModal.dailyFreeTip">每天有 5 次免費查詢（交談及圖片生成），每日重置。不包含影片和文件生成。</span>
+            </div>
+          </div>
+
+          <!-- Purchase plans -->
+          <div class="vcoin-plans">
+            <h6 class="fw-semibold mb-3" data-i18n="vai.vcoinModal.buyTitle">購買 vCoin</h6>
+            <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card text-center">
+                  <div class="badge bg-secondary mb-2" data-i18n="vai.vcoinModal.planSmall">Small</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>100</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$20</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card text-center">
+                  <div class="badge bg-info mb-2" data-i18n="vai.vcoinModal.planMedium">Medium</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>300</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$50</div>
+                  <div class="badge bg-success mt-1" data-i18n="vai.vcoinModal.save17">省 17%</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card vcoin-plan-card--popular text-center">
+                  <div class="badge bg-primary mb-2" data-i18n="vai.vcoinModal.popular">最熱門</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>700</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$100</div>
+                  <div class="badge bg-success mt-1" data-i18n="vai.vcoinModal.save30">省 30%</div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="vcoin-plan-card text-center">
+                  <div class="badge bg-warning text-dark mb-2" data-i18n="vai.vcoinModal.planMega">Mega</div>
+                  <div class="vcoin-plan-amount">
+                    <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                    <strong>1,600</strong>
+                  </div>
+                  <div class="text-muted small mb-2">vCoin</div>
+                  <div class="vcoin-plan-price fw-bold">$200</div>
+                  <div class="badge bg-success mt-1" data-i18n="vai.vcoinModal.save38">省 38%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer vcoin-modal-footer">
+          <a href="/login?product=vai" class="btn btn-primary" data-i18n="vai.vcoinModal.loginToBuy">登錄購買</a>
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="vai.vcoinModal.close">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro Modal -->
+  <div class="modal fade" id="vaiIntroModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content" style="border-radius: 20px; border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12);">
+        <div class="modal-body text-center" style="padding: 2.5rem 2rem 2rem; background: linear-gradient(180deg, #fafafa 0%, #fff 100%);">
+          <div style="width: 56px; height: 56px; background: #f3f4f6; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+            <i class="bi bi-stars" style="font-size: 1.5rem; color: #374151;"></i>
+          </div>
+          <h5 style="font-weight: 800; color: #111827; margin-bottom: 0.75rem;" data-i18n="vai.intro.title">歡迎使用 vAI</h5>
+          <p style="color: #6b7280; font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem;" data-i18n="vai.intro.desc">vAI 是 V-sys 的核心 AI 助手，能協助你進行數據分析、文件處理、智能對話與工作自動化。登入後即可開始體驗。</p>
+          <a href="/login?product=vai" class="vai-btn-primary" style="width: 100%; justify-content: center;" data-i18n="vai.intro.loginBtn">
+            <i class="bi bi-box-arrow-in-right"></i> 登入開始使用
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/i18n.js"></script>
+  <script src="/static/js/sso.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script>
+    (function() {
+      // Footer, product & brand links are managed by App.updateAppSwitcherLinks() in app.js
+
+      // Language switcher (desktop dropdowns)
+      document.querySelectorAll('[data-lang]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          const lang = this.getAttribute('data-lang');
+          if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+            I18n.switchLanguage(lang);
+          }
+        });
+      });
+
+      // === Mobile Sidebar Toggle ===
+      var vaiMobileMenuToggle = document.getElementById('vaiMobileMenuToggle');
+      var vaiSidebar = document.getElementById('vaiSidebar');
+      var vaiSidebarOverlay = document.getElementById('vaiSidebarOverlay');
+
+      function toggleVaiSidebar() {
+        if (vaiSidebar) {
+          var isOpen = vaiSidebar.classList.contains('show');
+          if (isOpen) {
+            vaiSidebar.classList.remove('show');
+            // Wait for slide-out transition before hiding
+            setTimeout(function() { vaiSidebar.style.display = 'none'; }, 300);
+          } else {
+            vaiSidebar.style.display = 'block';
+            // Force reflow so transition triggers
+            vaiSidebar.offsetHeight;
+            vaiSidebar.classList.add('show');
+          }
+        }
+        if (vaiSidebarOverlay) vaiSidebarOverlay.classList.toggle('show');
+      }
+
+      function closeVaiSidebar() {
+        if (vaiSidebar) {
+          vaiSidebar.classList.remove('show');
+          setTimeout(function() { vaiSidebar.style.display = 'none'; }, 300);
+        }
+        if (vaiSidebarOverlay) vaiSidebarOverlay.classList.remove('show');
+      }
+
+      if (vaiMobileMenuToggle) {
+        vaiMobileMenuToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          toggleVaiSidebar();
+        });
+      }
+
+      if (vaiSidebarOverlay) {
+        vaiSidebarOverlay.addEventListener('click', closeVaiSidebar);
+      }
+
+      // Close sidebar when clicking on nav-links (except collapse toggles)
+      var vaiNavLinks = document.querySelectorAll('#vaiSidebar .nav-link:not(.nav-group-toggle)');
+      vaiNavLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          if (!this.hasAttribute('data-lang')) {
+            closeVaiSidebar();
+          }
+        });
+      });
+
+      // Sidebar language links
+      var vaiLangLinks = document.querySelectorAll('#vaiLanguageSubmenu .nav-link[data-lang]');
+      vaiLangLinks.forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          var lang = this.getAttribute('data-lang');
+          if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+            I18n.switchLanguage(lang);
+          }
+          closeVaiSidebar();
+        });
+      });
+
+      // Sidebar logout button
+      var vaiLogoutBtn = document.getElementById('vaiLogoutBtn');
+      if (vaiLogoutBtn) {
+        vaiLogoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (typeof App !== 'undefined' && App.logout) {
+            App.logout();
+          } else {
+            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+              .finally(function() {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('tenant_subdomain');
+                window.location.replace(window.location.pathname + '?logged_out=1');
+              });
+          }
+        });
+      }
+
+      // === Intro Popup Logic ===
+      var introModal = new bootstrap.Modal(document.getElementById('vaiIntroModal'));
+
+      function showIntroPopup() {
+        // Re-apply i18n to modal content in case language changed
+        if (typeof I18n !== 'undefined' && I18n.applyTranslations) {
+          I18n.applyTranslations();
+        }
+        introModal.show();
+      }
+
+      // Quick action buttons → popup
+      window.vaiQuickSend = function() {
+        showIntroPopup();
+      };
+
+      // Form submit (send button) → popup
+      window.handleDemoSend = function(e) {
+        e.preventDefault();
+        showIntroPopup();
+        return false;
+      };
+
+      // Enter key in textarea → popup
+      var welcomeInput = document.getElementById('vaiDemoInput');
+      if (welcomeInput) {
+        welcomeInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            showIntroPopup();
+          }
+        });
+      }
+
+      // === Auth state check ===
+      async function loadPublicAICoinsBalance() {
+        try {
+          const headers = { 'Accept': 'application/json' };
+          const token = localStorage.getItem('auth_token');
+          if (!token || token === 'temp_token') return;
+          headers['Authorization'] = 'Bearer ' + token;
+          const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+          if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+          const resp = await fetch('/api/v1/ai-coins/balance', { headers });
+          if (!resp.ok) return;
+          const data = await resp.json();
+          const balance = data.balance || 0;
+          const aiCoinsDisplay = document.getElementById('publicAICoinsDisplay');
+          const aiCoinsBalance = document.getElementById('publicAICoinsBalance');
+          const aiCoinsDivider = document.getElementById('publicAICoinsDivider');
+          if (aiCoinsDisplay && aiCoinsBalance) {
+            aiCoinsBalance.textContent = balance;
+            aiCoinsDisplay.style.display = 'block';
+            if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
+          }
+        } catch (e) { console.error('載入 vCoin 餘額失敗:', e); }
+      }
+
+      async function checkAuthAndUpdateNav() {
+        const userDropdownNav = document.getElementById('userDropdown');
+        const userNameSpan = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginLink = document.getElementById('loginLink');
+        const loginCTA = document.getElementById('welcomeLoginCTA');
+        // Sidebar elements
+        const vaiUserDropdownItem = document.getElementById('vaiUserDropdownItem');
+        const vaiLoginItem = document.getElementById('vaiLoginItem');
+
+        async function fetchCurrentUserSilently() {
+          try {
+            const headers = { 'Accept': 'application/json' };
+            const token = localStorage.getItem('auth_token');
+            if (token && token !== 'temp_token') {
+              headers['Authorization'] = 'Bearer ' + token;
+            } else {
+              return null;
+            }
+            const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+            if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+            const resp = await fetch('/api/v1/user/me', { headers });
+            if (!resp.ok) return null;
+            const user = await resp.json();
+            try { if (user) localStorage.setItem('user', JSON.stringify(user)); } catch (_e) {}
+            return user;
+          } catch (_e) { return null; }
+        }
+
+        const user = await fetchCurrentUserSilently();
+        let finalUser = user;
+        if (!finalUser) {
+          // If we had a token but the API rejected it (401 = SSO global logout or token expired),
+          // clear stale localStorage to prevent showing old user data.
+          const hadToken = localStorage.getItem('auth_token');
+          if (hadToken) {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('tenant_subdomain');
+          }
+        }
+        const isLoggedIn = !!(finalUser && finalUser.name);
+
+        // Update app-switcher links based on login state
+        if (typeof App !== 'undefined' && typeof App.updateAppSwitcherLinks === 'function') {
+            App.updateAppSwitcherLinks(isLoggedIn);
+        }
+
+        if (isLoggedIn) {
+          // Desktop navbar
+          if (userDropdownNav) userDropdownNav.style.display = '';
+          if (loginLink) loginLink.style.display = 'none';
+          if (loginCTA) loginCTA.style.display = 'none';
+          if (userNameSpan && finalUser.name) userNameSpan.textContent = finalUser.name;
+          loadPublicAICoinsBalance();
+
+          // "使用 AI" → "前往 AI" (desktop + mobile)
+          var useAiBtn = document.getElementById('useAiBtn');
+          if (useAiBtn) { useAiBtn.href = '/vai-chat'; useAiBtn.textContent = '前往 AI'; }
+          var useAiBtnMobile = document.getElementById('useAiBtnMobile');
+          if (useAiBtnMobile) {
+            var mLink = useAiBtnMobile.querySelector('a');
+            if (mLink) {
+              mLink.href = '/vai-chat';
+              mLink.title = '前往 AI';
+              var mIcon = mLink.querySelector('i');
+              if (mIcon) { mIcon.className = 'bi bi-stars'; }
+            }
+          }
+
+          // Sidebar
+          if (vaiUserDropdownItem) vaiUserDropdownItem.style.display = 'block';
+          if (vaiLoginItem) vaiLoginItem.style.display = 'none';
+          var vaiUserName = document.getElementById('vaiUserName');
+          if (vaiUserName && finalUser.name) {
+            vaiUserName.textContent = finalUser.name;
+            vaiUserName.removeAttribute('data-i18n');
+          }
+
+          // Desktop avatar
+          const avatarImg = document.getElementById('publicUserAvatar');
+          const avatarIcon = document.getElementById('publicUserIcon');
+          if (avatarImg) {
+            let url = (finalUser && finalUser.profile_pic) ? String(finalUser.profile_pic) : '';
+            if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+            if (url) {
+              avatarImg.src = url;
+              avatarImg.style.display = 'inline-block';
+              if (avatarIcon) avatarIcon.style.display = 'none';
+            }
+          }
+
+          // Sidebar avatar
+          var vaiAvatarImg = document.getElementById('vaiUserAvatar');
+          var vaiAvatarIcon = document.getElementById('vaiUserIcon');
+          if (vaiAvatarImg) {
+            let url = (finalUser && finalUser.profile_pic) ? String(finalUser.profile_pic) : '';
+            if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+            if (url) {
+              vaiAvatarImg.src = url;
+              vaiAvatarImg.style.display = 'inline-block';
+              if (vaiAvatarIcon) vaiAvatarIcon.style.display = 'none';
+            }
+          }
+
+          if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+            logoutBtn.setAttribute('data-bound', 'true');
+            logoutBtn.addEventListener('click', function(e) {
+              e.preventDefault();
+              if (typeof App !== 'undefined' && App.logout) {
+                App.logout();
+              } else {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tenant_subdomain');
+                    window.location.replace(window.location.pathname + '?logged_out=1');
+                  });
+              }
+            });
+          }
+        } else {
+          // Desktop navbar
+          if (userDropdownNav) userDropdownNav.style.display = 'none';
+          if (loginLink) loginLink.style.display = '';
+          if (loginCTA) loginCTA.style.display = '';
+          // Sidebar
+          if (vaiUserDropdownItem) vaiUserDropdownItem.style.display = 'none';
+          if (vaiLoginItem) vaiLoginItem.style.display = 'block';
+        }
+      }
+
+      checkAuthAndUpdateNav();
+
+      // Cross-tab logout detection
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'auth_token' && !e.newValue) {
+          fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+            .finally(function() { checkAuthAndUpdateNav(); });
+        } else if (e.key === null) {
+          fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+            .finally(function() { checkAuthAndUpdateNav(); });
+        } else if (e.key === 'auth_token') {
+          checkAuthAndUpdateNav();
+        }
+      });
+    })();
+  </script>
+
+  <!-- vAI Chat Demo Typing Animation -->
+  <script>
+    (function() {
+      var chatContainer = document.getElementById('vaiChatDemo');
+      if (!chatContainer) return;
+
+      // Conversation content (with i18n support) — ERP-themed demos
+      function getConversations() {
+        if (typeof I18n === 'undefined' || !I18n._ready) {
+          return [
+            {
+              user: '查詢本週的訂單狀況',
+              ai: '本週共有 42 筆訂單，總金額 $128,500。較上週增長 8%，其中線上訂單佔 65%。有 3 筆待處理退貨。'
+            },
+            {
+              user: '哪些庫存快要不足了？',
+              ai: '目前有 5 項商品低於安全庫存：A4影印紙（剩 12 箱）、碳粉匣（剩 3 個）、保護貼（剩 8 片）等。建議立即建立採購單，我可以幫你自動生成。'
+            }
+          ];
+        }
+        return [
+          {
+            user: I18n.t('vai.chatDemo.0.user') || '查詢本週的訂單狀況',
+            ai: I18n.t('vai.chatDemo.0.ai') || '本週共有 42 筆訂單，總金額 $128,500。較上週增長 8%，其中線上訂單佔 65%。有 3 筆待處理退貨。'
+          },
+          {
+            user: I18n.t('vai.chatDemo.1.user') || '哪些庫存快要不足了？',
+            ai: I18n.t('vai.chatDemo.1.ai') || '目前有 5 項商品低於安全庫存：A4影印紙（剩 12 箱）、碳粉匣（剩 3 個）、保護貼（剩 8 片）等。建議立即建立採購單，我可以幫你自動生成。'
+          }
+        ];
+      }
+
+      var conversations = getConversations();
+      var currentConversationIndex = 0;
+      var isTyping = false;
+      var animationTimer = null;
+
+      function typeText(element, text, speed, callback) {
+        var index = 0;
+        element.textContent = '';
+        isTyping = true;
+
+        function type() {
+          if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            animationTimer = setTimeout(type, speed || 30);
+          } else {
+            isTyping = false;
+            if (callback) callback();
+          }
+        }
+        type();
+      }
+
+      function createMessage(isUser, content, showTyping) {
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'd-flex ' + (isUser ? 'justify-content-end' : 'justify-content-start') + ' message-item';
+
+        var avatarHtml = '';
+        var bubbleClass = isUser ? 'user' : 'ai';
+
+        if (!isUser) {
+          avatarHtml = '<div class="avatar-circle me-2"><i class="bi bi-robot"></i></div>';
+        }
+
+        var contentHtml = showTyping
+          ? '<div class="typing-indicator"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>'
+          : '<div style="white-space: pre-wrap; word-wrap: break-word;">' + content + '</div>';
+
+        messageDiv.innerHTML =
+          avatarHtml +
+          '<div class="message-bubble ' + bubbleClass + ' position-relative" style="max-width: 70%;">' +
+            contentHtml +
+          '</div>' +
+          (isUser ? '<div class="avatar-circle ms-2"><i class="bi bi-person"></i></div>' : '');
+
+        return messageDiv;
+      }
+
+      function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      function clearChat() {
+        while (chatContainer.firstChild) {
+          chatContainer.removeChild(chatContainer.firstChild);
+        }
+      }
+
+      function showConversation(index) {
+        conversations = getConversations();
+
+        if (index >= conversations.length) {
+          // All conversations done, wait and restart loop
+          animationTimer = setTimeout(function() {
+            currentConversationIndex = 0;
+            clearChat();
+            showConversation(0);
+          }, 3000);
+          return;
+        }
+
+        var conversation = conversations[index];
+
+        // Show user message
+        var userMessage = createMessage(true, conversation.user);
+        chatContainer.appendChild(userMessage);
+        scrollToBottom();
+
+        // Type user message
+        var userBubble = userMessage.querySelector('.message-bubble div');
+        userBubble.textContent = '';
+        typeText(userBubble, conversation.user, 30, function() {
+          animationTimer = setTimeout(function() {
+            // Show AI thinking indicator
+            var thinkingMessage = createMessage(false, '', true);
+            chatContainer.appendChild(thinkingMessage);
+            scrollToBottom();
+
+            animationTimer = setTimeout(function() {
+              // Remove thinking, show AI reply
+              thinkingMessage.remove();
+
+              var aiMessage = createMessage(false, conversation.ai);
+              chatContainer.appendChild(aiMessage);
+              scrollToBottom();
+
+              var aiBubble = aiMessage.querySelector('.message-bubble div');
+              aiBubble.textContent = '';
+              typeText(aiBubble, conversation.ai, 20, function() {
+                animationTimer = setTimeout(function() {
+                  currentConversationIndex++;
+                  showConversation(currentConversationIndex);
+                }, 1500);
+              });
+            }, 1200);
+          }, 500);
+        });
+      }
+
+      // Start animation after page loads with a small delay
+      function startAnimation() {
+        animationTimer = setTimeout(function() {
+          showConversation(0);
+        }, 800);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', startAnimation, { once: true });
+      } else {
+        startAnimation();
+      }
+    })();
+  </script>
+</body>
+</html>

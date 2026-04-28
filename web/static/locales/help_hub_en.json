@@ -1,0 +1,76 @@
+{
+    "nav": {
+        "home": "Home",
+        "about": "About",
+        "features": "Features",
+        "pricing": "Pricing",
+        "supportCenter": "Support Center",
+        "supportInfo": "Support Info",
+        "login": "Login",
+        "contact": "Contact Us",
+        "tryFree": "Try Free",
+        "goToSystem": "Go to System",
+        "accountSettings": "Account Settings",
+        "billing": "Subscription",
+        "logout": "Logout",
+        "user": "User",
+        "language": "Language",
+        "help": "Help"
+    },
+    "helpPage": {
+        "title": "Support Center",
+        "needMoreHelp": "Need More Help?",
+        "needMoreHelpDesc": "If you encounter any issues or need further assistance, please:",
+        "needMoreHelpItem2": "Go to the Contact Us page to submit your question"
+    },
+    "helpHub": {
+        "subtitle": "Please select the product support documentation you need",
+        "vai": {
+            "desc": "AI Assistant Platform - Smart Conversations / Data Analysis / Automation",
+            "tags": {
+                "chat": "Smart Chat",
+                "analysis": "Data Analysis",
+                "automation": "Automation"
+            }
+        },
+        "vwork": {
+            "desc": "Full-featured AI Business Management System - ERP / CMS / POS",
+            "tags": {
+                "product": "Product Management",
+                "order": "Order Management",
+                "pos": "POS Checkout",
+                "customer": "Customer Management",
+                "more": "More..."
+            }
+        },
+        "vmarket": {
+            "desc": "Online Marketplace Platform",
+            "tags": {
+                "browse": "Browse Products",
+                "purchase": "Purchase Flow",
+                "seller": "Seller Onboarding"
+            }
+        },
+        "voffice": {
+            "desc": "Online Document Editing & Collaboration Platform",
+            "tags": {
+                "doc": "Document Editing",
+                "sheet": "Spreadsheets",
+                "slide": "Presentations"
+            }
+        }
+    },
+    "footer": {
+        "description": "Using technology to help humanity, making work and life simpler and more efficient. We believe technology can help everyone improve efficiency and optimize their lives.",
+        "products": "Products",
+        "info": "Information",
+        "support": "Support",
+        "documentation": "Support Center",
+        "contactSupport": "Contact Us",
+        "salesPartnerJoin": "Sales Partner",
+        "contactUs": "Contact Us",
+        "location": "Hong Kong",
+        "hours": "Monday to Friday 9:00 - 18:00",
+        "copyright": "© 2025 V-sys Limited. All rights reserved."
+    }
+}

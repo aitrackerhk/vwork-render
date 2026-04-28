@@ -1,0 +1,19 @@
+{
+  "name": "accounting_demo",
+  "title": "會計報表與財務分析",
+  "version": 1,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/accounting" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": ".stats-card.success", "text": { "zh": "查看收入概況", "zh-CN": "查看收入概况", "en": "View revenue overview" } },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": ".stats-card.danger", "text": { "zh": "監控支出狀況", "zh-CN": "监控支出状况", "en": "Monitor expenses" } },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#netProfitCard", "text": { "zh": "即時淨利潤分析", "zh-CN": "即时净利润分析", "en": "Real-time net profit" } },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#accountingChart", "text": { "zh": "財務趨勢圖表", "zh-CN": "财务趋势图表", "en": "Financial trend chart" } },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "done" }
+  ]
+}

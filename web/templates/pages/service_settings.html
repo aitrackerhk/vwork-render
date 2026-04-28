@@ -1,0 +1,211 @@
+{{define "pages/service_settings"}}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 col-lg-8">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h4 class="mb-3"><i class="bi bi-gear me-2"></i>服務設定</h4>
+          <form id="serviceSettingsForm" class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">三步友善預約</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="friendlyBookingSwitch" style="width: 3em; height: 1.5em;">
+                <label class="form-check-label" for="friendlyBookingSwitch">啟用三步友善預約介面</label>
+              </div>
+              <div class="form-text">
+                <strong>啟用時：</strong>新增預約頁面會使用類似網站預約元件的三步驟引導介面（選擇服務 → 選擇時間 → 確認資料），並支援選擇客戶。<br>
+                <strong>停用時：</strong>使用傳統表單方式新增預約。
+              </div>
+            </div>
+            <div class="col-12 mt-4">
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-check-lg me-1"></i>儲存設定
+              </button>
+            </div>
+          </form>
+          <div class="alert alert-success mt-3" id="serviceSettingsSuccess" style="display:none;">
+            <i class="bi bi-check-circle me-1"></i>已更新設定
+          </div>
+          <div class="alert alert-danger mt-3" id="serviceSettingsError" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- 預約介面預覽 -->
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3"><i class="bi bi-eye me-2"></i>介面預覽</h5>
+          
+          <!-- 傳統模式預覽 -->
+          <div id="previewTraditional">
+            <div class="border rounded p-3 bg-light">
+              <div class="d-flex align-items-center mb-2">
+                <span class="badge bg-secondary me-2">傳統模式</span>
+                <span class="text-muted small">標準表單填寫</span>
+              </div>
+              <div class="row g-2">
+                <div class="col-6">
+                  <div class="bg-white border rounded p-2 small">
+                    <span class="text-muted">客戶</span>
+                    <div class="text-truncate">下拉選擇...</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="bg-white border rounded p-2 small">
+                    <span class="text-muted">服務</span>
+                    <div class="text-truncate">下拉選擇...</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="bg-white border rounded p-2 small">
+                    <span class="text-muted">開始時間</span>
+                    <div class="text-truncate">日期時間選擇...</div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="bg-white border rounded p-2 small">
+                    <span class="text-muted">結束時間</span>
+                    <div class="text-truncate">日期時間選擇...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 友善預約模式預覽 -->
+          <div id="previewFriendly" style="display:none;">
+            <div class="border rounded p-3 bg-light">
+              <div class="d-flex align-items-center mb-3">
+                <span class="badge bg-primary me-2">三步友善預約</span>
+                <span class="text-muted small">引導式預約流程</span>
+              </div>
+              <!-- 步驟指示器 -->
+              <div class="d-flex justify-content-center mb-3">
+                <div class="d-flex align-items-center small">
+                  <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;">1</div>
+                  <span class="ms-1 me-3 fw-medium">選擇服務</span>
+                  <div class="border-top" style="width: 24px;"></div>
+                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center ms-3" style="width: 24px; height: 24px;">2</div>
+                  <span class="ms-1 me-3 text-muted">選擇時間</span>
+                  <div class="border-top" style="width: 24px;"></div>
+                  <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center ms-3" style="width: 24px; height: 24px;">3</div>
+                  <span class="ms-1 text-muted">確認資料</span>
+                </div>
+              </div>
+              <div class="row g-2">
+                <div class="col-4">
+                  <div class="bg-white border border-primary rounded p-2 text-center small">
+                    <i class="bi bi-scissors d-block text-primary"></i>
+                    基礎服務
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="bg-white border rounded p-2 text-center small">
+                    <i class="bi bi-star d-block text-muted"></i>
+                    進階服務
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="bg-white border rounded p-2 text-center small">
+                    <i class="bi bi-gem d-block text-muted"></i>
+                    VIP 服務
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 側邊提示 -->
+    <div class="col-12 col-lg-4">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="mb-3"><i class="bi bi-lightbulb me-2 text-warning"></i>使用提示</h6>
+          <ul class="small mb-0">
+            <li class="mb-2">三步友善預約介面更適合面對客戶的場景，讓預約過程更直覺。</li>
+            <li class="mb-2">傳統表單模式適合快速輸入，適合熟練的操作人員。</li>
+            <li class="mb-2">兩種模式都支援選擇客戶、服務員、房間、設備等關聯資料。</li>
+            <li>變更設定後，新開的預約頁面會立即套用新介面。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function initServiceSettings() {
+    const friendlySwitch = document.getElementById('friendlyBookingSwitch');
+    const form = document.getElementById('serviceSettingsForm');
+    const okEl = document.getElementById('serviceSettingsSuccess');
+    const errEl = document.getElementById('serviceSettingsError');
+    const previewTraditional = document.getElementById('previewTraditional');
+    const previewFriendly = document.getElementById('previewFriendly');
+
+    function updatePreview() {
+      if (friendlySwitch.checked) {
+        previewTraditional.style.display = 'none';
+        previewFriendly.style.display = '';
+      } else {
+        previewTraditional.style.display = '';
+        previewFriendly.style.display = 'none';
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        const resp = await App.apiRequest('/api/v1/tenant/service-settings');
+        const data = resp.data || resp;
+        friendlySwitch.checked = !!data.friendly_booking;
+        updatePreview();
+      } catch (e) {
+        if (errEl) {
+          errEl.textContent = e?.message || '載入設定失敗';
+          errEl.style.display = '';
+        }
+      }
+    }
+
+    if (friendlySwitch) {
+      friendlySwitch.addEventListener('change', updatePreview);
+    }
+
+    if (form) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (okEl) okEl.style.display = 'none';
+        if (errEl) errEl.style.display = 'none';
+        try {
+          await App.apiRequest('/api/v1/tenant/service-settings', {
+            method: 'PUT',
+            body: JSON.stringify({
+              friendly_booking: !!friendlySwitch?.checked
+            })
+          });
+          if (okEl) okEl.style.display = '';
+        } catch (e) {
+          if (errEl) {
+            errEl.textContent = e?.message || '儲存設定失敗';
+            errEl.style.display = '';
+          }
+        }
+      });
+    }
+
+    loadSettings();
+  }
+
+  function waitForAppAndInit() {
+    if (window.App && typeof window.App.apiRequest === 'function') {
+      initServiceSettings();
+      return;
+    }
+    setTimeout(waitForAppAndInit, 50);
+  }
+
+  document.addEventListener('DOMContentLoaded', waitForAppAndInit);
+})();
+</script>
+{{end}}

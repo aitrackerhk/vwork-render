@@ -1,0 +1,58 @@
+{{define "pages/vmarket_services"}}
+<section class="container">
+  <div class="vmarket-hero vmarket-hero-services">
+    <div class="vmarket-pill mb-3"><i class="bi bi-tools"></i> <span data-i18n="vmarket.nav.services">服務</span></div>
+    <h1 class="display-6 fw-semibold mb-3" data-i18n="vmarket.services.heroTitle">探索所有服務</h1>
+    <p class="lead text-muted mb-0" data-i18n="vmarket.services.heroSubtitle">瀏覽各公司在 VMarket 上架的專業服務</p>
+  </div>
+</section>
+
+<section class="container mt-4">
+  <div class="row g-4">
+    <aside class="col-12 col-lg-2">
+      {{template "partials/vmarket_category_sidebar" .}}
+    </aside>
+    <div class="col-12 col-lg-10">
+      {{if .Services}}
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="vmarket-section-title fs-5 mb-0">
+          <span data-i18n="vmarket.serviceList.title">所有服務</span>
+          <span class="badge bg-secondary rounded-pill ms-2">{{len .Services}}</span>
+        </h2>
+      </div>
+      <div class="row g-3">
+        {{range .Services}}
+        <div class="col-6 col-md-4 col-xl-3">
+          <a class="vmarket-featured-card vmarket-featured-service" href="{{.ServiceURL}}">
+            <div class="vmarket-featured-img">
+              <div class="vmarket-featured-img-placeholder vmarket-featured-img-service"><i class="bi bi-tools"></i></div>
+            </div>
+            <div class="vmarket-featured-body">
+              <div class="vmarket-featured-name">{{.Name}}</div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                {{if gt .Price 0.0}}
+                  <span class="vmarket-featured-price">${{printf "%.2f" .Price}}</span>
+                {{end}}
+                {{if gt .Duration 0}}
+                  <span class="vmarket-featured-duration"><i class="bi bi-clock"></i> {{.Duration}} min</span>
+                {{end}}
+              </div>
+              <div class="vmarket-featured-company">
+                {{if .CompanyLogo}}<img src="{{.CompanyLogo}}" alt="" class="vmarket-featured-company-logo">{{end}}
+                <span>{{.CompanyName}}</span>
+              </div>
+            </div>
+          </a>
+        </div>
+        {{end}}
+      </div>
+      {{else}}
+      <div class="vmarket-empty vmarket-empty-tall">
+        <i class="bi bi-tools fs-1 d-block mb-3"></i>
+        <h5 class="fw-semibold" data-i18n="vmarket.serviceList.empty">目前沒有上架服務</h5>
+      </div>
+      {{end}}
+    </div>
+  </div>
+</section>
+{{end}}

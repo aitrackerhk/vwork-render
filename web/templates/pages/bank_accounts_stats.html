@@ -1,0 +1,271 @@
+{{ define "pages/bank_accounts_stats" }}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stats-card.danger {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stats-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .stats-card.warning {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    }
+    
+    .account-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .account-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .account-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .account-subtitle {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+    
+    .stat-label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .stat-value {
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .stat-value.positive {
+        color: #28a745;
+    }
+    
+    .stat-value.negative {
+        color: #dc3545;
+    }
+    
+    .badge-default {
+        background-color: #6c757d;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>銀行賬戶統計</h2>
+    <a href="/bank-accounts" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline">返回銀行賬戶管理</span>
+    </a>
+</div>
+
+<div id="loadingIndicator" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">載入中...</span>
+    </div>
+    <p class="mt-2 text-muted">正在載入統計數據...</p>
+</div>
+
+<div id="statsContainer" style="display: none;">
+    <!-- 總計統計 -->
+    <div class="row mb-4" id="totalStats">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small">總收入</div>
+                        <div class="h4 mb-0" id="totalIncome">$0.00</div>
+                    </div>
+                    <i class="bi bi-arrow-down-circle fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card danger">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small">總支出</div>
+                        <div class="h4 mb-0" id="totalExpense">$0.00</div>
+                    </div>
+                    <i class="bi bi-arrow-up-circle fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card success">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small">淨額</div>
+                        <div class="h4 mb-0" id="totalNet">$0.00</div>
+                    </div>
+                    <i class="bi bi-calculator fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card info">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small">總交易數</div>
+                        <div class="h4 mb-0" id="totalTransactions">0</div>
+                    </div>
+                    <i class="bi bi-list-check fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 各賬戶統計 -->
+    <div id="accountsStats"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    if (!App.checkAuth()) return;
+    
+    try {
+        const response = await App.apiRequest('/bank-accounts/stats');
+        const stats = response.data || [];
+        
+        // 計算總計
+        let totalIncome = 0;
+        let totalExpense = 0;
+        let totalTransactions = 0;
+        
+        stats.forEach(stat => {
+            totalIncome += parseFloat(stat.total_income || 0);
+            totalExpense += parseFloat(stat.total_expense || 0);
+            totalTransactions += parseInt(stat.total_transactions || 0);
+        });
+        
+        const totalNet = totalIncome - totalExpense;
+        
+        // 更新總計顯示
+        document.getElementById('totalIncome').textContent = formatCurrency(totalIncome);
+        document.getElementById('totalExpense').textContent = formatCurrency(totalExpense);
+        document.getElementById('totalNet').textContent = formatCurrency(totalNet);
+        document.getElementById('totalNet').className = 'h4 mb-0 ' + (totalNet >= 0 ? 'text-success' : 'text-danger');
+        document.getElementById('totalTransactions').textContent = totalTransactions.toLocaleString();
+        
+        // 渲染各賬戶統計
+        const container = document.getElementById('accountsStats');
+        if (stats.length === 0) {
+            container.innerHTML = '<div class="alert alert-info">暫無銀行賬戶統計數據</div>';
+        } else {
+            container.innerHTML = stats.map(stat => {
+                const netAmount = parseFloat(stat.net_amount || 0);
+                const netClass = netAmount >= 0 ? 'positive' : 'negative';
+                
+                return `
+                    <div class="account-card">
+                        <div class="account-header">
+                            <div>
+                                <div class="account-title">
+                                    ${escapeHtml(stat.account_name)}
+                                    ${stat.is_default ? '<span class="badge-default ms-2">默認</span>' : ''}
+                                </div>
+                                <div class="account-subtitle">
+                                    ${escapeHtml(stat.bank_name)} - ${escapeHtml(stat.account_number)} (${stat.currency})
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="stat-item">
+                                    <span class="stat-label">總收入：</span>
+                                    <span class="stat-value positive">${formatCurrency(stat.total_income)}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">收入筆數：</span>
+                                    <span class="stat-value">${stat.income_count}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-item">
+                                    <span class="stat-label">總支出：</span>
+                                    <span class="stat-value negative">${formatCurrency(stat.total_expense)}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">支出筆數：</span>
+                                    <span class="stat-value">${stat.expense_count}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-item mt-2 pt-2" style="border-top: 2px solid #dee2e6;">
+                            <span class="stat-label"><strong>淨額：</strong></span>
+                            <span class="stat-value ${netClass}"><strong>${formatCurrency(netAmount)}</strong></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">總交易數：</span>
+                            <span class="stat-value">${stat.total_transactions}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 隱藏載入指示器，顯示內容
+        document.getElementById('loadingIndicator').style.display = 'none';
+        document.getElementById('statsContainer').style.display = 'block';
+        
+    } catch (error) {
+        console.error('載入統計數據失敗:', error);
+        document.getElementById('loadingIndicator').innerHTML = 
+            '<div class="alert alert-danger">載入統計數據失敗: ' + error.message + '</div>';
+    }
+});
+
+function formatCurrency(amount) {
+    return '$' + parseFloat(amount).toLocaleString('zh-TW', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{{ end }}
+

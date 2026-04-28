@@ -1,0 +1,1380 @@
+{{define "pages/page_editor"}}
+{{if .GoogleMapsAPIKey}}<meta name="google-maps-api-key" content="{{.GoogleMapsAPIKey}}">{{end}}
+<!-- Theme CSS Variables for editor preview -->
+<style>
+  :root {
+    {{.ThemeCSS | safeCSS}}
+  }
+
+  /* Base text color for editor preview — without this, text inherits
+     the browser default (black) and becomes unreadable on dark themes. */
+  .components-container {
+    color: var(--theme-text, #333333);
+  }
+  /* Headings follow theme */
+  .components-container h1,
+  .components-container h2,
+  .components-container h3,
+  .components-container h4,
+  .components-container h5,
+  .components-container h6 {
+    color: var(--theme-heading-color, #333333);
+  }
+  /* Form labels follow theme text */
+  .components-container .form-label,
+  .components-container label {
+    color: var(--theme-text, #333333);
+  }
+  /* Navbar brand & nav-link follow theme nav text */
+  .components-container .navbar-brand {
+    color: var(--theme-nav-text, #333333) !important;
+  }
+  .components-container .nav-link {
+    color: var(--theme-nav-text, #333333) !important;
+  }
+  /* Header component: all links inherit header's color */
+  .components-container header a {
+    color: inherit !important;
+  }
+  /* Table striped rows */
+  .components-container .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: var(--theme-surface, rgba(0,0,0,0.05));
+  }
+
+  /* Theme-aware overrides scoped to editor preview area */
+  .components-container .card {
+    background-color: var(--theme-card-bg, #ffffff);
+    border-color: var(--theme-card-border, #dee2e6);
+    box-shadow: var(--theme-card-shadow, 0 0.125rem 0.25rem rgba(0,0,0,0.075));
+  }
+  .components-container .card .card-title {
+    color: var(--theme-heading-color, #333333);
+  }
+  .components-container .card .text-muted {
+    color: var(--theme-text-muted, #6c757d) !important;
+  }
+  .components-container .bg-light {
+    background-color: var(--theme-surface, #f8f9fa) !important;
+  }
+  .components-container .text-muted {
+    color: var(--theme-text-muted, #6c757d) !important;
+  }
+  .components-container .btn-primary {
+    background-color: var(--theme-btn-primary-bg, #007bff);
+    border-color: var(--theme-btn-primary-bg, #007bff);
+    color: var(--theme-btn-primary-text, #ffffff);
+  }
+  .components-container .btn-primary:hover {
+    background-color: var(--theme-btn-primary-hover, #0056b3);
+    border-color: var(--theme-btn-primary-hover, #0056b3);
+  }
+  .components-container .text-primary {
+    color: var(--theme-primary, #007bff) !important;
+  }
+  /* Generic link color — exclude header/nav so their inline styles win */
+  .components-container a:not(header a):not(nav a):not(.navbar a) {
+    color: var(--theme-primary, #007bff);
+  }
+  .components-container a:not(header a):not(nav a):not(.navbar a):hover {
+    color: var(--theme-primary-hover, #0056b3);
+  }
+  /* Prevent Bootstrap .navbar default bg from overriding header/nav inline styles */
+  .components-container .navbar {
+    background-color: transparent !important;
+  }
+  .components-container .navbar-toggler {
+    border-color: var(--theme-nav-border, #dee2e6);
+  }
+  .components-container .navbar-toggler-icon {
+    filter: var(--theme-toggler-filter, none);
+  }
+  /* Additional Bootstrap overrides for editor preview */
+  .components-container .bg-white {
+    background-color: var(--theme-card-bg, #ffffff) !important;
+  }
+  .components-container .btn-light {
+    background-color: var(--theme-surface, #f8f9fa);
+    border-color: var(--theme-card-border, #dee2e6);
+    color: var(--theme-text, #333333);
+  }
+  .components-container .btn-light:hover {
+    background-color: var(--theme-surface-hover, #e9ecef);
+    border-color: var(--theme-card-border, #dee2e6);
+    color: var(--theme-text, #333333);
+  }
+  .components-container .btn-outline-secondary {
+    color: var(--theme-text-muted, #6c757d);
+    border-color: var(--theme-text-muted, #6c757d);
+  }
+  .components-container .btn-outline-secondary:hover {
+    background-color: var(--theme-text-muted, #6c757d);
+    border-color: var(--theme-text-muted, #6c757d);
+    color: var(--theme-card-bg, #ffffff);
+  }
+  .components-container .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+  .components-container .btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #ffffff;
+  }
+  .components-container .btn-success {
+    background-color: #198754;
+    border-color: #198754;
+  }
+  .components-container .badge.bg-success {
+    background-color: #198754 !important;
+  }
+  .components-container .badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+  }
+  .components-container .badge.bg-secondary {
+    background-color: var(--theme-text-muted, #6c757d) !important;
+  }
+  .components-container .nav-tabs .nav-link {
+    color: var(--theme-text-muted, #6c757d);
+  }
+  .components-container .nav-tabs .nav-link.active {
+    color: var(--theme-primary, #007bff);
+    background-color: var(--theme-card-bg, #ffffff);
+    border-color: var(--theme-card-border, #dee2e6) var(--theme-card-border, #dee2e6) var(--theme-card-bg, #ffffff);
+  }
+  .components-container .input-group-text {
+    background-color: var(--theme-surface, #f8f9fa);
+    color: var(--theme-text, #333333);
+    border-color: var(--theme-card-border, #dee2e6);
+  }
+  .components-container .form-control,
+  .components-container .form-select {
+    background-color: var(--theme-card-bg, #ffffff);
+    color: var(--theme-text, #333333);
+    border-color: var(--theme-card-border, #dee2e6);
+  }
+  .components-container .list-group-item {
+    background-color: var(--theme-card-bg, #ffffff);
+    border-color: var(--theme-card-border, #dee2e6);
+    color: var(--theme-text, #333333);
+  }
+  .components-container .table {
+    color: var(--theme-text, #333333);
+  }
+  .components-container .modal-content {
+    background-color: var(--theme-card-bg, #ffffff);
+    color: var(--theme-text, #333333);
+  }
+</style>
+<!-- Expose theme variables to JS -->
+<script>
+  window.__THEME_ID = "{{.ThemeID}}";
+</script>
+<!-- 左下角側邊欄切換按鈕 -->
+<button type="button" class="page-editor-sidebar-toggle" id="pageEditorSidebarToggle" onclick="togglePageEditorSidebar()" title="顯示菜單" data-i18n-title="pages.pageEditor.showMenu" >
+    <i class="bi bi-list"></i>
+</button>
+
+<!-- 屏幕限制提示（移到最外层，不受父元素 position 影响） -->
+<div id="screenLimitAlert" class="d-none position-fixed top-0 start-0">
+  <div class="alert alert-warning text-center m-0">
+    <h4 class="alert-heading" data-i18n="pages.pageEditor.deviceLimitTitle">裝置限制</h4>
+    <p class="mb-0" data-i18n="pages.pageEditor.deviceLimitDesc">頁面編輯器需要至少 1000px 寬度的螢幕才能使用。</p>
+    <hr>
+    <a href="/dashboard" class="btn btn-primary" data-i18n="pages.pageEditor.backToDashboard">返回儀表板</a>
+  </div>
+</div>
+
+<div class="container-fluid p-0" id="pageEditorPage" data-page-id="{{if .ID}}{{.ID}}{{else}}{{end}}">
+  <!-- Loading -->
+  <div id="pageEditorLoading" class="d-flex align-items-center justify-content-center" style="position: fixed; inset: 0; background: rgba(255,255,255,0.85); z-index: 1100;">
+      <div class="text-center">
+      <div class="spinner-border text-primary mb-3" role="status"></div>
+      <div class="text-muted small" data-i18n="pages.pageEditor.loading">載入中...</div>
+    </div>
+  </div>
+
+  <!-- 頂部工具欄 -->
+  <div class="bg-white border-bottom shadow-sm sticky-top" id="pebar" style="z-index: 1000;">
+    <div class="d-flex justify-content-between align-items-center px-4 py-3" style="position: relative;">
+      <div class="d-flex align-items-center gap-3">
+        <a class="btn btn-outline-secondary btn-sm" href="/pages">
+          <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="pages.pageEditor.back">返回</span>
+        </a>
+        <div class="dropdown" id="pageSelectorDropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="pageEditorTitle" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 150px;">
+            {{if .ID}}<span data-i18n="pages.pageEditor.editPage">編輯頁面</span>{{else}}<span data-i18n="pages.pageEditor.newPage">新增頁面</span>{{end}}
+          </button>
+          <ul class="dropdown-menu" id="pageSelectorMenu" aria-labelledby="pageEditorTitle" style="max-height: 400px; overflow-y: auto;">
+            <li><a class="dropdown-item" href="#" id="addNewPageOption"><i class="bi bi-plus-circle"></i> <span data-i18n="pages.pageEditor.addPage">加頁面</span></a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li id="pageListContainer"><div class="text-center text-muted py-2"><small data-i18n="common.loading">載入中...</small></div></li>
+          </ul>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" id="undoBtn" title="上一步 (Ctrl+Z)" data-i18n-title="pages.pageEditor.undo" disabled>
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" id="redoBtn" title="下一步 (Ctrl+Y)" data-i18n-title="pages.pageEditor.redo" disabled>
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+        <div id="previewUrlContainer" style="display: none;">
+          <div class="d-flex align-items-center gap-2">
+            <small class="text-muted" style="padding: 4px 12px; background-color: #f8f9fa; border-radius: 4px; border: 1px solid #dee2e6; min-width: 300px; text-align: center;">
+              <i class="bi bi-link-45deg"></i> 
+              <span id="previewUrl">/page/</span>
+            </small>
+            <a class="btn btn-outline-primary btn-sm" id="previewUrlOpenBtn" target="_blank" title="在新視窗開啟" data-i18n-title="pages.pageEditor.openInNewWindow">
+              <i class="bi bi-box-arrow-up-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+       <div class="d-flex gap-2 align-items-center">
+         <div class="d-flex gap-2 align-items-center me-3">
+           <button class="btn btn-outline-secondary btn-sm" id="desktopViewBtn" title="桌面視圖" data-i18n-title="pages.pageEditor.desktopView">
+             <i class="bi bi-laptop"></i>
+           </button>
+           <button class="btn btn-outline-secondary btn-sm" id="mobileViewBtn" title="手機視圖" data-i18n-title="pages.pageEditor.mobileView">
+             <i class="bi bi-phone"></i>
+           </button>
+         </div>
+        <button class="btn btn-outline-secondary btn-sm" id="pageSettingsBtn" onclick="PageEditor.showPageSettings()">
+          <i class="bi bi-gear"></i> <span data-i18n="pages.pageEditor.pageSettings">頁面設定</span>
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" id="previewBtn">
+          <i class="bi bi-eye"></i> <span data-i18n="pages.pageEditor.preview">預覽</span>
+        </button>
+         <button class="btn btn-primary btn-sm" id="saveBtn">
+           <i class="bi bi-save"></i> <span data-i18n="pages.pageEditor.save">保存</span>
+         </button>
+       </div>
+    </div>
+  </div>
+
+  <div class="d-flex" style="height: calc(100vh - 128px); position: relative;">
+    <!-- 左側工具欄 -->
+    <div class="editor-sidebar">
+      <button type="button" class="sidebar-icon-btn active" id="componentLibraryIcon" title="元件庫" data-i18n-title="pages.pageEditor.componentLibrary" data-panel="componentLibrary">
+        <i class="bi bi-grid-3x3-gap"></i>
+      </button>
+      <button type="button" class="sidebar-icon-btn" id="blockLibraryIcon" title="區塊庫" data-i18n-title="pages.pageEditor.blockLibrary" data-panel="blockLibrary">
+        <i class="bi bi-box"></i>
+      </button>
+      <button type="button" class="sidebar-icon-btn" id="styleSettingsIcon" title="樣式設定" data-i18n-title="pages.pageEditor.styleSettings" onclick="PageEditor.showStyleSettings()">
+        <i class="bi bi-palette"></i>
+      </button>
+      <button type="button" class="sidebar-icon-btn" id="pageSettingsIcon" title="頁面設定" data-i18n-title="pages.pageEditor.pageSettings" onclick="PageEditor.showPageSettings()">
+        <i class="bi bi-gear"></i>
+      </button>
+      <!-- 可以在這裡添加更多圖標 -->
+    </div>
+
+    <!-- 元件庫面板 -->
+    <div class="component-library-panel" id="componentLibraryPanel" style="display: none;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0 fw-bold" data-i18n="pages.pageEditor.componentLibrary">元件庫</h6>
+        <button type="button" class="btn-close" id="closeComponentLibrary" aria-label="關閉" data-i18n-title="pages.pageEditor.close" title="關閉"></button>
+      </div>
+      <div id="addComponentAfterPrompt" class="alert alert-info mb-3" style="display: none;">
+        <small id="addComponentAfterText"></small>
+      </div>
+      <div class="component-library-grid" id="componentLibrary">
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="header">
+          <i class="bi bi-window"></i> <span data-i18n="pages.pageEditor.components.header">頁首</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="nav">
+          <i class="bi bi-list"></i> <span data-i18n="pages.pageEditor.components.nav">導航欄</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="hero">
+          <i class="bi bi-image"></i> <span data-i18n="pages.pageEditor.components.hero">Hero 橫幅</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="banner-slider">
+          <i class="bi bi-images"></i> <span data-i18n="pages.pageEditor.components.bannerSlider">Banner Slider</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="text">
+          <i class="bi bi-text-paragraph"></i> <span data-i18n="pages.pageEditor.components.text">文字區塊</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="image">
+          <i class="bi bi-image"></i> <span data-i18n="pages.pageEditor.components.image">圖片</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="button">
+          <i class="bi bi-cursor"></i> <span data-i18n="pages.pageEditor.components.button">按鈕</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="section">
+          <i class="bi bi-layout-three-columns"></i> <span data-i18n="pages.pageEditor.components.section">區塊容器</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="heading">
+          <i class="bi bi-type-h1"></i> <span data-i18n="pages.pageEditor.components.heading">標題</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="product-list" data-ecommerce-only="true">
+          <i class="bi bi-grid"></i> <span data-i18n="pages.pageEditor.components.productList">產品列表</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="service-list" data-ecommerce-only="true">
+          <i class="bi bi-tools"></i> <span data-i18n="pages.pageEditor.components.serviceList">服務列表</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="footer">
+          <i class="bi bi-layout-text-window-reverse"></i> <span data-i18n="pages.pageEditor.components.footer">頁尾</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="order-list" data-ecommerce-only="true">
+          <i class="bi bi-list-check"></i> <span data-i18n="pages.pageEditor.components.orderList">訂單列表</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="blog-list">
+          <i class="bi bi-journal-text"></i> <span data-i18n="pages.pageEditor.components.blogList">博客列表</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="contact-form">
+          <i class="bi bi-envelope"></i> <span data-i18n="pages.pageEditor.components.contactForm">聯絡表單</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="service-booking">
+          <i class="bi bi-calendar-check"></i> <span data-i18n="pages.pageEditor.components.serviceBooking">服務預約</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="dining-menu" data-dining-only="true">
+          <i class="bi bi-journal-text"></i> <span data-i18n="pages.pageEditor.components.diningMenu">菜單</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="dining-table-reservation" data-dining-only="true">
+          <i class="bi bi-calendar2-check"></i> <span data-i18n="pages.pageEditor.components.diningReservation">預約餐桌</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="login-register">
+          <i class="bi bi-person-plus"></i> <span data-i18n="pages.pageEditor.components.loginRegister">登入與註冊</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="cart" data-ecommerce-only="true">
+          <i class="bi bi-cart"></i> <span data-i18n="pages.pageEditor.components.cart">購物車</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="checkout" data-ecommerce-only="true">
+          <i class="bi bi-credit-card"></i> <span data-i18n="pages.pageEditor.components.checkout">結帳表格</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="user-area">
+          <i class="bi bi-person-circle"></i> <span data-i18n="pages.pageEditor.components.userArea">用戶區域</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="list">
+          <i class="bi bi-list-ul"></i> <span data-i18n="pages.pageEditor.components.verticalMenu">垂直選單</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="product-detail" data-ecommerce-only="true">
+          <i class="bi bi-box-seam"></i> <span data-i18n="pages.pageEditor.components.productDetail">產品詳細資料</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="google-map">
+          <i class="bi bi-geo-alt"></i> <span data-i18n="pages.pageEditor.components.googleMap">Google 地圖</span>
+        </button>
+        <button class="btn btn-outline-primary btn-sm component-add-btn" data-type="custom-html">
+          <i class="bi bi-code-slash"></i> <span data-i18n="pages.pageEditor.components.customHtml">Custom HTML</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 區塊庫面板 -->
+    <div class="component-library-panel" id="blockLibraryPanel" style="display: none;">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0 fw-bold" data-i18n="pages.pageEditor.blockLibrary">區塊庫</h6>
+        <button type="button" class="btn-close" id="closeBlockLibrary" aria-label="關閉" data-i18n-title="pages.pageEditor.close" title="關閉"></button>
+      </div>
+      <div class="d-grid gap-2" id="blockLibrary">
+        <!-- 區塊列表將在這裡動態加載 -->
+        <div class="text-center text-muted py-3">
+          <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+          <small data-i18n="common.loading">載入中...</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中間：編輯區域 -->
+    <div class="flex-grow-1 editor-view-area" style="overflow-y: auto; overflow-x: hidden; position: relative; height: calc(100vh - 141px); background-color: var(--theme-bg, #ffffff);">
+      <!-- 元件編輯區域 -->
+      <div id="componentsContainer" class="components-container" style="max-width: 1000px; margin: 0 auto; background-color: var(--theme-bg, #ffffff);">
+        <div class="text-center text-muted py-5" id="emptyState">
+          <i class="bi bi-layout-wtf d-block mb-3" style="font-size: 3rem; opacity: 0.3;"></i>
+          <p data-i18n="pages.pageEditor.emptyStateHint">點擊左上角元件庫圖標或 +元件 按鈕添加元件到頁面</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右側：屬性面板 -->
+    <div class="bg-light border-start properties-panel" style="width: 350px; overflow-y: auto;" id="propertiesPanel">
+      <div class="p-3" style="padding-bottom: 100px;">
+        <h6 class="mb-3 fw-bold" data-i18n="pages.pageEditor.componentProperties">元件屬性</h6>
+        <div id="propertiesContent" class="text-muted has-form">
+          <div class="text-center py-5">
+            <i class="bi bi-cursor fs-1 d-block mb-3"></i>
+            <p data-i18n="pages.pageEditor.selectComponentToEdit">選擇元件以編輯屬性</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 保存為區塊 Modal -->
+<div class="modal fade" id="saveBlockModal" tabindex="-1" aria-labelledby="saveBlockModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saveBlockModalLabel" data-i18n="pages.pageEditor.saveAsBlock">保存為區塊</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="blockName" class="form-label" data-i18n="pages.pageEditor.blockName">區塊名稱</label>
+          <input type="text" class="form-control" id="blockName" placeholder="輸入區塊名稱" data-i18n-placeholder="pages.pageEditor.blockNamePlaceholder" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" id="saveBlockBtn" data-i18n="common.save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 保存成功 Modal -->
+<div class="modal fade" id="saveSuccessModal" tabindex="-1" aria-labelledby="saveSuccessModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="saveSuccessModalLabel">
+          <i class="bi bi-check-circle text-success"></i> <span data-i18n="pages.pageEditor.saveSuccess">保存成功</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3" data-i18n="pages.pageEditor.pageSaved">頁面已成功保存！</p>
+        <div class="mb-3">
+          <label class="form-label fw-bold" data-i18n="pages.pageEditor.previewLink">預覽連結：</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="saveSuccessPreviewUrl" readonly>
+            <button class="btn btn-outline-secondary" type="button" id="copyPreviewUrlBtn" title="複製連結" data-i18n-title="pages.pageEditor.copyLink">
+              <i class="bi bi-clipboard"></i>
+            </button>
+            <a class="btn btn-primary" id="openPreviewUrlBtn" target="_blank" title="在新視窗開啟" data-i18n-title="pages.pageEditor.openInNewWindow">
+              <i class="bi bi-box-arrow-up-right"></i> <span data-i18n="pages.pageEditor.viewResult">查看效果</span>
+            </a>
+          </div>
+        </div>
+        <div class="alert alert-info mb-0">
+          <small>
+            <i class="bi bi-info-circle"></i> 
+            <span id="saveSuccessStatusInfo" data-i18n="pages.pageEditor.draftOnlyHint">頁面狀態為「草稿」，只有您可以看到。如需公開訪問，請在「頁面設定」中將狀態改為「已發布」。</span>
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.close">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 頁面設定 Modal -->
+<div class="modal fade" id="pageSettingsModal" tabindex="-1" aria-labelledby="pageSettingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="pageSettingsModalLabel" data-i18n="pages.pageEditor.pageSettings">頁面設定</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label"><span data-i18n="pages.pageEditor.pageName">頁面名稱</span> <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="modalPageName" placeholder="例如：關於我們" data-i18n-placeholder="pages.pageEditor.pageNamePlaceholder" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label"><span data-i18n="pages.pageEditor.pageSlug">網址路徑</span> <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="modalPageSlug" placeholder="例如：about-us" data-i18n-placeholder="pages.pageEditor.pageSlugPlaceholder" required>
+            <small class="text-muted" data-i18n="pages.pageEditor.slugHint">輸入頁面名稱後會自動生成，也可手動修改</small>
+          </div>
+          <div class="col-12">
+            <label class="form-label" data-i18n="fields.status">狀態</label>
+            <select class="form-select" id="modalPageStatus">
+              <option value="draft" data-i18n="common.draft">草稿</option>
+              <option value="published" data-i18n="pages.pageEditor.published">已發布</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" onclick="PageEditor.savePageSettings()" data-i18n="pages.pageEditor.saveSettings">保存設定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 樣式設定 Modal -->
+<div class="modal fade" id="styleSettingsModal" tabindex="-1" aria-labelledby="styleSettingsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="styleSettingsModalLabel" data-i18n="pages.pageEditor.styleSettings">樣式設定</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <h6 class="mb-3" data-i18n="pages.pageEditor.textSettings">文字設定</h6>
+            <div class="mb-3">
+              <label class="form-label" data-i18n="pages.pageEditor.defaultTitleColor">標題文字預設顏色</label>
+              <input type="color" class="form-control form-control-color" id="styleDefaultTitleColor" value="#212529">
+              <small class="text-muted" data-i18n="pages.pageEditor.defaultTitleColorHint">影響所有元件的標題文字顏色</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" data-i18n="pages.pageEditor.defaultContentColor">內容文字預設顏色</label>
+              <input type="color" class="form-control form-control-color" id="styleDefaultContentColor" value="#212529">
+              <small class="text-muted" data-i18n="pages.pageEditor.defaultContentColorHint">影響所有元件的內容文字顏色</small>
+            </div>
+          </div>
+          <div class="col-12">
+            <hr>
+            <h6 class="mb-3" data-i18n="pages.pageEditor.containerWidthSettings">容器寬度設定</h6>
+            <div class="mb-3">
+              <label class="form-label" data-i18n="pages.pageEditor.containerWidth">容器寬度</label>
+              <select class="form-select" id="styleContainerWidth" onchange="PageEditor.toggleStyleContainerWidthInput();">
+                <option value="1200" data-i18n="pages.pageEditor.containerWidth1200">1200px (預設)</option>
+                <option value="full" data-i18n="pages.pageEditor.containerWidthFull">全寬</option>
+                <option value="custom" data-i18n="pages.pageEditor.containerWidthCustom">自訂</option>
+              </select>
+            </div>
+            <div class="mb-3" id="styleCustomWidthContainer" style="display: none;">
+              <label class="form-label" data-i18n="pages.pageEditor.customWidthPx">自訂寬度 (px)</label>
+              <input type="number" class="form-control" id="styleCustomWidth" min="100" max="2000" value="1200" placeholder="例如: 1200" data-i18n-placeholder="pages.pageEditor.customWidthPlaceholder">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" onclick="PageEditor.saveStyleSettings()" data-i18n="pages.pageEditor.saveSettings">保存設定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 編輯區塊名稱 Modal -->
+<div class="modal fade" id="editBlockNameModal" tabindex="-1" aria-labelledby="editBlockNameModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editBlockNameModalLabel" data-i18n="pages.pageEditor.editBlockName">編輯區塊名稱</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.pageEditor.blockName">區塊名稱</label>
+          <input type="text" class="form-control" id="editBlockNameInput" placeholder="輸入區塊名稱" data-i18n-placeholder="pages.pageEditor.blockNamePlaceholder" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" id="saveBlockNameBtn" data-i18n="common.save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.components-container {
+  min-height: 400px;
+  border-bottom: 2px solid #dee2e6;
+  padding: 20px;
+  position: relative;
+}
+
+#propertiesContent {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+#propertiesContent.has-form {
+  text-align: left;
+}
+
+#propertiesContent > div.text-center {
+  text-align: center;
+}
+
+#pebar .btn.active {
+  background-color: #0d6efd;
+  color: white;
+  border-color: #0d6efd;
+}
+
+#pebar #previewUrlContainer {
+  padding: 4px 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.component-item {
+  position: relative;
+  border: 2px dashed transparent;
+  padding: 0px;
+  margin-bottom: 0px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  cursor: grab;
+}
+
+/* column 之間的間距，防止換行（只針對區塊容器） */
+.components-container:not(.mobile-preview) .multi-col .row > * + * {
+  margin-left: 10px;
+}
+
+.components-container:not(.mobile-preview) .multi-col .row > .col-12.col-md-6 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.components-container:not(.mobile-preview) .multi-col .row > .col-12.col-md-4 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.components-container:not(.mobile-preview) .multi-col .row > .col-12.col-md-3 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* 使用 calc 調整 column 寬度以補償 margin，防止換行（只針對區塊容器） */
+/* 桌面模式下的列宽设置 */
+.components-container:not(.mobile-preview) .multi-col .row > .col-12.col-md-6 {
+  width: calc(50% - 5px) !important;
+  max-width: calc(50% - 5px) !important;
+  flex: 0 0 calc(50% - 5px) !important;
+}
+
+.components-container:not(.mobile-preview) .multi-col .row > .col-12.col-md-4 {
+  width: calc(33.333333% - 6.67px) !important;
+  max-width: calc(33.333333% - 6.67px) !important;
+  flex: 0 0 calc(33.333333% - 6.67px) !important;
+}
+
+.components-container:not(.mobile-preview) .multi-col .row > .col-12.col-md-3 {
+  width: calc(25% - 7.5px) !important;
+  max-width: calc(25% - 7.5px) !important;
+  flex: 0 0 calc(25% - 7.5px) !important;
+}
+
+/* product-list 的列宽设置，确保不会换行 */
+.components-container .row > .col-md-6:not(.col-12) {
+  width: calc(50% - 5px) !important;
+  max-width: calc(50% - 5px) !important;
+  flex: 0 0 calc(50% - 5px) !important;
+}
+
+.components-container .row > .col-md-4:not(.col-12) {
+  width: calc(33.333333% - 6.67px) !important;
+  max-width: calc(33.333333% - 6.67px) !important;
+  flex: 0 0 calc(33.333333% - 6.67px) !important;
+}
+
+.components-container .row > .col-md-3:not(.col-12) {
+  width: calc(25% - 7.5px) !important;
+  max-width: calc(25% - 7.5px) !important;
+  flex: 0 0 calc(25% - 7.5px) !important;
+}
+
+/* 在 mobile mode 中，确保 col-12 正常工作 */
+.components-container.mobile-preview .col-12 {
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* 在 mobile mode 中，覆盖所有 col-md-* 的宽度设置 */
+.components-container.mobile-preview .row > .col-12.col-md-6,
+.components-container.mobile-preview .row > .col-12.col-md-4,
+.components-container.mobile-preview .row > .col-12.col-md-3 {
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: 0 0 100% !important;
+}
+
+.component-item.small-component:hover,
+.component-item.small-component.selected {
+  min-height: 50px;
+}
+
+.component-item:active {
+  cursor: grabbing;
+}
+
+.component-item:hover {
+  border-color: #0d6efd;
+}
+
+.component-item.selected {
+  border-color: #0d6efd;
+}
+
+.component-item.linked-block {
+  border-left: 3px solid #0dcaf0;
+}
+
+.component-item.linked-block.selected {
+  border-color: #0d6efd;
+  border-left: 3px solid #0dcaf0;
+}
+
+.component-item.linked-block .component-preview .badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 5;
+  font-size: 0.7rem;
+}
+
+.component-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.component-item.drag-over {
+  border-color: #0d6efd;
+  border-style: dashed;
+  background-color: #e7f1ff;
+  transform: scale(1.02);
+}
+
+.component-item {
+  position: relative;
+  min-height: 0;
+  transition: min-height 0.2s ease;
+  overflow: hidden; /* 隐藏 function bar 右边突出的部分 */
+}
+
+/* Nav bottom 需要保留可展開選單高度，避免在 editor preview 被裁切 */
+.component-item.nav-bottom-component {
+  overflow: visible;
+}
+
+/* 只有當元件高度小於 50px 時，hover 或 selected 才設置 min-height */
+.component-item:hover:not([style*="min-height"]),
+.component-item.selected:not([style*="min-height"]) {
+  min-height: 50px;
+}
+
+.component-item .component-actions {
+  position: absolute;
+  top: 3px;
+  right: 0;
+  display: flex;
+  gap: 5px;
+  padding: 6px;
+  padding-right: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  border-radius: 6px 0 0 6px;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateX(calc(100% - 12px));
+  opacity: 0.7;
+}
+
+/* 选中状态下默认显示完整功能按钮，但可以通过内联样式覆盖 */
+.component-item.selected .component-actions {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.component-item .component-actions button {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.component-item .component-actions button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.component-item .component-actions button.btn-outline-danger:hover {
+  background: rgba(220, 53, 69, 0.8);
+  border-color: #dc3545;
+}
+
+.component-item .component-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.drag-handle {
+  position: absolute;
+  left: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: move;
+  color: #6c757d;
+  display: none;
+}
+
+.component-item:hover .drag-handle,
+.component-item.selected .drag-handle {
+  display: block;
+}
+
+.component-label {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+/* column 內元件的功能按鈕 */
+.column-child-item {
+  position: relative;
+  margin-bottom: 0.5rem;
+  min-height: 0;
+  transition: min-height 0.2s ease;
+}
+
+/* 欄內元件 hover 時不設置 min-height */
+
+.column-child-actions {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  display: none;
+  z-index: 100;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.column-child-item:hover .column-child-actions {
+  display: block;
+}
+
+.column-child-actions .btn-xs {
+  padding: 2px 6px;
+  font-size: 10px;
+  line-height: 1.2;
+  color: #333 !important;
+}
+
+.column-child-actions .btn-xs i {
+  color: #333 !important;
+}
+
+.column-child-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.component-bottom-buttons {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 8px;
+  z-index: 50;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.component-item.selected .component-bottom-buttons {
+  display: flex !important;
+}
+
+.add-component-after-btn {
+  position: relative;
+  display: inline-block;
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.6rem;
+  line-height: 1.3;
+  flex: 0 0 auto;
+}
+
+.add-component-after-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: white !important;
+}
+
+.edit-component-btn {
+  position: relative;
+  display: inline-block;
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.6rem;
+  line-height: 1.3;
+  flex: 0 0 auto;
+}
+
+.edit-component-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: white !important;
+}
+
+.edit-component-btn:hover {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.75) !important;
+  color: white !important;
+}
+
+.section-column-content {
+  position: relative;
+}
+
+.section-column-add-btn {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  display: block;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: white !important;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  line-height: 1.2;
+}
+
+.section-column-content:hover .section-column-add-btn,
+.section-column-content:focus-within .section-column-add-btn {
+  display: block !important;
+  opacity: 1;
+}
+
+/* 确保 section-column-add-btn 始终可见 */
+.section-column-add-btn {
+  display: block !important;
+  opacity: 1 !important;
+}
+
+.add-component-after-btn.active {
+  display: block !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border-color: rgba(0, 0, 0, 0.8) !important;
+  color: white !important;
+}
+
+.add-component-after-btn:hover {
+  background-color: rgba(0, 0, 0, 0.75) !important;
+  border-color: rgba(0, 0, 0, 0.75) !important;
+  color: white !important;
+}
+
+.component-preview {
+  position: relative;
+}
+
+/* 左側工具欄 */
+.editor-sidebar {
+  width: 56px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+  gap: 8px;
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.editor-sidebar.fixed {
+  position: fixed;
+  left: 0;
+  top: var(--pebar-height, 73px); /* 動態獲取 pebar 的高度 */
+  height: calc(100vh - var(--pebar-height, 73px));
+  z-index: 999;
+}
+
+/* 移除 transition，避免闪烁 */
+/* 使用 padding-left 代替 margin-left，避免影响内部容器的居中 */
+.editor-sidebar.fixed ~ .editor-view-area {
+  padding-left: 56px;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* 屬性面板 */
+.properties-panel {
+  flex-shrink: 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.properties-panel.fixed {
+  position: fixed;
+  right: 0;
+  top: var(--pebar-height, 73px);
+  height: calc(100vh - var(--pebar-height, 73px));
+  z-index: 999;
+}
+
+/* 当 propertiesPanel fixed 时，使用 padding-right 代替 margin-right，避免影响内部容器的居中 */
+.editor-view-area.properties-panel-fixed {
+  padding-right: 350px;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.sidebar-icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background-color: transparent;
+  color: #495057;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1.2rem;
+}
+
+.sidebar-icon-btn:hover {
+  background-color: #e9ecef;
+  color: #0d6efd;
+}
+
+.sidebar-icon-btn.active {
+  background-color: #0d6efd;
+  color: white;
+}
+
+/* 元件庫面板 */
+.component-library-panel {
+  position: fixed;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 420px;
+  max-height: calc(100vh - var(--pebar-height, 73px));
+  overflow-y: auto;
+  padding: 20px;
+  z-index: 998;
+  border: 1px solid #dee2e6;
+}
+
+.component-library-panel .component-library-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.component-library-panel .component-library-grid .component-add-btn {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.8rem;
+}
+
+/* 确保 navbar 不会遮挡功能按钮 */
+.component-item .navbar {
+  position: relative;
+  z-index: 1;
+}
+
+.component-item .component-actions {
+  z-index: 100 !important;
+}
+
+.component-item .component-label {
+  z-index: 10;
+}
+
+/* 移动预览模式：强制使用移动设备的响应式样式 */
+/* Bootstrap 的响应式是基于视口宽度的，所以我们需要强制覆盖 */
+
+/* 1. 覆盖所有列类 - 强制为全宽（移动设备行为） */
+.components-container.mobile-preview [class*="col-md"],
+.components-container.mobile-preview [class*="col-lg"],
+.components-container.mobile-preview [class*="col-xl"],
+.components-container.mobile-preview [class*="col-xxl"] {
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* 2. 覆盖 sm 断点的列类（可选，如果需要也强制全宽） */
+.components-container.mobile-preview [class*="col-sm"]:not([class*="col-12"]) {
+  flex: 0 0 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* 3. 覆盖 navbar 的响应式行为 - 强制显示 toggler，隐藏菜单 */
+.components-container.mobile-preview .navbar-expand-md,
+.components-container.mobile-preview .navbar-expand-lg,
+.components-container.mobile-preview .navbar-expand-xl,
+.components-container.mobile-preview .navbar-expand-xxl {
+  flex-wrap: wrap !important;
+}
+
+.components-container.mobile-preview .navbar-expand-md .navbar-toggler,
+.components-container.mobile-preview .navbar-expand-lg .navbar-toggler,
+.components-container.mobile-preview .navbar-expand-xl .navbar-toggler,
+.components-container.mobile-preview .navbar-expand-xxl .navbar-toggler {
+  display: block !important;
+}
+
+.components-container.mobile-preview .navbar-expand-md .navbar-collapse,
+.components-container.mobile-preview .navbar-expand-lg .navbar-collapse,
+.components-container.mobile-preview .navbar-expand-xl .navbar-collapse,
+.components-container.mobile-preview .navbar-expand-xxl .navbar-collapse {
+  display: none !important;
+  flex-basis: 100% !important;
+  flex-grow: 1 !important;
+  align-items: center !important;
+}
+
+.components-container.mobile-preview .navbar-expand-md .navbar-collapse.show,
+.components-container.mobile-preview .navbar-expand-lg .navbar-collapse.show,
+.components-container.mobile-preview .navbar-expand-xl .navbar-collapse.show,
+.components-container.mobile-preview .navbar-expand-xxl .navbar-collapse.show {
+  display: block !important;
+}
+
+.components-container.mobile-preview .navbar-expand-md .navbar-nav,
+.components-container.mobile-preview .navbar-expand-lg .navbar-nav,
+.components-container.mobile-preview .navbar-expand-xl .navbar-nav,
+.components-container.mobile-preview .navbar-expand-xxl .navbar-nav {
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+/* Nav bottom layout: 在 mobile 時隱藏 flex-row 的水平排列，變為垂直 */
+.components-container.mobile-preview .nav-bottom-menu .navbar-nav {
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+}
+
+/* 4. 覆盖 display 工具类 */
+/* 注意：使用空格前缀 " d-md-" 避免误匹配 mb-md-0、pb-md-0 等 class */
+.components-container.mobile-preview .d-md-flex,
+.components-container.mobile-preview .d-md-block,
+.components-container.mobile-preview .d-md-inline,
+.components-container.mobile-preview .d-md-inline-block,
+.components-container.mobile-preview .d-md-inline-flex,
+.components-container.mobile-preview .d-md-grid,
+.components-container.mobile-preview .d-md-table,
+.components-container.mobile-preview .d-lg-flex,
+.components-container.mobile-preview .d-lg-block,
+.components-container.mobile-preview .d-lg-inline,
+.components-container.mobile-preview .d-lg-inline-block,
+.components-container.mobile-preview .d-lg-inline-flex,
+.components-container.mobile-preview .d-lg-grid,
+.components-container.mobile-preview .d-lg-table,
+.components-container.mobile-preview .d-xl-flex,
+.components-container.mobile-preview .d-xl-block,
+.components-container.mobile-preview .d-xl-inline,
+.components-container.mobile-preview .d-xl-inline-block,
+.components-container.mobile-preview .d-xl-inline-flex,
+.components-container.mobile-preview .d-xl-grid,
+.components-container.mobile-preview .d-xl-table,
+.components-container.mobile-preview .d-xxl-flex,
+.components-container.mobile-preview .d-xxl-block,
+.components-container.mobile-preview .d-xxl-inline,
+.components-container.mobile-preview .d-xxl-inline-block,
+.components-container.mobile-preview .d-xxl-inline-flex,
+.components-container.mobile-preview .d-xxl-grid,
+.components-container.mobile-preview .d-xxl-table {
+  display: none !important;
+}
+
+/* 5. 覆盖 flex 方向工具类 */
+.components-container.mobile-preview [class*="flex-md-"],
+.components-container.mobile-preview [class*="flex-lg-"],
+.components-container.mobile-preview [class*="flex-xl-"],
+.components-container.mobile-preview [class*="flex-xxl-"] {
+  flex-direction: column !important;
+}
+
+/* 6. 覆盖 text 对齐工具类 */
+.components-container.mobile-preview [class*="text-md-"],
+.components-container.mobile-preview [class*="text-lg-"],
+.components-container.mobile-preview [class*="text-xl-"],
+.components-container.mobile-preview [class*="text-xxl-"] {
+  text-align: left !important;
+}
+
+/* 7. 覆盖 justify-content 工具类 */
+.components-container.mobile-preview [class*="justify-content-md-"],
+.components-container.mobile-preview [class*="justify-content-lg-"],
+.components-container.mobile-preview [class*="justify-content-xl-"],
+.components-container.mobile-preview [class*="justify-content-xxl-"] {
+    justify-content: flex-start !important;
+  }
+
+/* 在 page editor 中隐藏 CMS 布局的 footer，但不隐藏组件中的 footer */
+.cms-footer {
+  display: none !important;
+}
+
+/* block-delete-btn hover 样式 */
+.block-delete-btn:hover {
+  background-color: #6c757d !important;
+  border-color: #6c757d !important;
+}
+
+/* block-delete-btn icon 保持红色，不随 hover 改变 */
+.block-delete-btn i {
+  color: #dc3545 !important;
+}
+
+.block-delete-btn:hover i {
+  color: #dc3545 !important;
+}
+
+/* screenLimitAlert 響應式樣式 - 使用 inset: 0 確保完全覆蓋視口 */
+#screenLimitAlert {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(255, 255, 255, 0.98);
+  z-index: 9999;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#screenLimitAlert .alert {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  width: calc(100vw - 2rem);
+  max-width: 500px;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  margin: 0;
+}
+
+/* 移動端優化 - 確保內容完全在屏幕內 */
+@media (max-width: 480px) {
+  #screenLimitAlert {
+    padding: 0.5rem !important;
+  }
+  
+  #screenLimitAlert .alert {
+    width: calc(100vw - 1rem) !important;
+    max-width: calc(100vw - 1rem) !important;
+    max-height: calc(100vh - 1rem) !important;
+    padding: 1rem !important;
+  }
+  
+  #screenLimitAlert .alert-heading {
+    font-size: 1.1rem;
+  }
+  
+  #screenLimitAlert .alert p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  #screenLimitAlert {
+    padding: 1rem !important;
+  }
+  
+  #screenLimitAlert .alert {
+    width: calc(100vw - 2rem) !important;
+    max-width: calc(100vw - 2rem) !important;
+    max-height: calc(100vh - 2rem) !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 999px) {
+  #screenLimitAlert .alert {
+    max-width: 500px !important;
+  }
+}
+</style>
+
+<script src="/static/js/page-editor.js"></script>
+<script>
+  // 檢查並隱藏模組相關元件
+  async function hideModuleComponents() {
+    try {
+      if (typeof App === 'undefined' || typeof App.apiRequest !== 'function') {
+        setTimeout(hideModuleComponents, 500);
+        return;
+      }
+
+      const response = await App.apiRequest('/api/v1/tenant-modules');
+      const enabledModules = response.data.filter(m => m.is_enabled).map(m => m.module_code);
+      
+      // 檢查是否有 orders 或 products 模塊（電商相關）
+      const hasEcommerce = enabledModules.includes('orders') || enabledModules.includes('products');
+      // 檢查是否有 dining/food_and_beverage 模塊（餐飲相關）
+      const hasDining = enabledModules.includes('dining') || enabledModules.includes('food_and_beverage');
+      
+      // 如果沒有電商模塊，隱藏電商相關元件
+      if (!hasEcommerce) {
+        document.querySelectorAll('[data-ecommerce-only="true"]').forEach(btn => {
+          btn.style.display = 'none';
+        });
+      } else {
+        document.querySelectorAll('[data-ecommerce-only="true"]').forEach(btn => {
+          btn.style.display = '';
+        });
+      }
+
+      // 如果沒有餐飲模塊，隱藏餐飲相關元件
+      if (!hasDining) {
+        document.querySelectorAll('[data-dining-only="true"]').forEach(btn => {
+          btn.style.display = 'none';
+        });
+      } else {
+        document.querySelectorAll('[data-dining-only="true"]').forEach(btn => {
+          btn.style.display = '';
+        });
+      }
+    } catch (error) {
+      console.error('檢查模組失敗:', error);
+      // 如果出錯，顯示所有元件（默認行為）
+      document.querySelectorAll('[data-ecommerce-only="true"]').forEach(btn => {
+        btn.style.display = '';
+      });
+      document.querySelectorAll('[data-dining-only="true"]').forEach(btn => {
+        btn.style.display = '';
+      });
+    }
+  }
+
+  // Run module check after a short delay (works for both full-page and SPA)
+  setTimeout(hideModuleComponents, 500);
+</script>
+{{end}}

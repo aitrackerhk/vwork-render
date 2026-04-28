@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="enterpriseCustom.metaTitle">企業客製化方案 - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vsys.css">
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+
+        :root {
+            --ec-ink: #102a43;
+            --ec-muted: #486581;
+            --ec-bg: #f4f8fb;
+            --ec-accent: #0f766e;
+            --ec-accent-dark: #0b5a54;
+            --ec-card: #ffffff;
+            --ec-line: #d9e2ec;
+        }
+
+        body {
+            background: radial-gradient(1200px 400px at 50% -120px, rgba(15, 118, 110, 0.16), transparent), var(--ec-bg);
+            color: var(--ec-ink);
+        }
+
+        .ec-page {
+            padding-top: calc(var(--topnav-height, 56px) + 28px);
+            padding-bottom: 56px;
+        }
+
+        .ec-hero {
+            background: linear-gradient(145deg, #ffffff 0%, #ecfdf8 60%, #e8f1ff 100%);
+            border: 1px solid var(--ec-line);
+            border-radius: 28px;
+            padding: 44px 36px;
+            box-shadow: 0 18px 40px rgba(16, 42, 67, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ec-hero::after {
+            content: "";
+            position: absolute;
+            right: -80px;
+            top: -80px;
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            background: rgba(15, 118, 110, 0.14);
+            pointer-events: none;
+        }
+
+        .ec-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.12);
+            color: var(--ec-accent-dark);
+            font-weight: 700;
+            font-size: 0.86rem;
+            padding: 8px 14px;
+            margin-bottom: 16px;
+        }
+
+        .ec-title {
+            font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 14px;
+        }
+
+        .ec-subtitle {
+            color: var(--ec-muted);
+            font-size: 1.04rem;
+            margin-bottom: 20px;
+        }
+
+        .ec-points {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .ec-points li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: var(--ec-muted);
+        }
+
+        .ec-points i {
+            color: var(--ec-accent);
+            margin-top: 2px;
+        }
+
+        .ec-btn-row {
+            margin-top: 22px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .ec-btn-primary {
+            border: 1px solid var(--ec-accent);
+            background: var(--ec-accent);
+            color: #fff;
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .ec-btn-primary:hover {
+            background: var(--ec-accent-dark);
+            border-color: var(--ec-accent-dark);
+            color: #fff;
+        }
+
+        .ec-btn-secondary {
+            border: 1px solid var(--ec-line);
+            background: #fff;
+            color: var(--ec-ink);
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .ec-section {
+            margin-top: 34px;
+        }
+
+        .ec-section h2 {
+            font-size: clamp(1.35rem, 2.3vw, 2rem);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .ec-section p.ec-lead {
+            color: var(--ec-muted);
+            margin-bottom: 18px;
+        }
+
+        .ec-card {
+            background: var(--ec-card);
+            border: 1px solid var(--ec-line);
+            border-radius: 18px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 10px 26px rgba(16, 42, 67, 0.06);
+        }
+
+        .ec-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: rgba(15, 118, 110, 0.12);
+            color: var(--ec-accent);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .ec-card h3 {
+            font-size: 1.06rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .ec-card p {
+            color: var(--ec-muted);
+            margin-bottom: 0;
+        }
+
+        .ec-step {
+            position: relative;
+            padding-left: 52px;
+            margin-bottom: 18px;
+        }
+
+        .ec-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .ec-step-index {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--ec-accent);
+            color: #fff;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ec-step h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .ec-step p {
+            color: var(--ec-muted);
+            margin-bottom: 0;
+        }
+
+        .ec-cta-band {
+            margin-top: 32px;
+            border-radius: 24px;
+            padding: 26px;
+            background: linear-gradient(120deg, #0f766e 0%, #134e4a 100%);
+            color: #eafff7;
+        }
+
+        .ec-cta-band h3 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .ec-cta-band p {
+            margin-bottom: 12px;
+            color: rgba(234, 255, 247, 0.9);
+        }
+
+        .ec-cta-band .ec-btn-primary {
+            background: #fff;
+            color: #0f766e;
+            border-color: #fff;
+        }
+
+        @media (max-width: 991px) {
+            .ec-hero {
+                padding: 28px 20px;
+            }
+            .ec-page {
+                padding-top: calc(var(--topnav-height, 56px) + 18px);
+            }
+        }
+    </style>
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+
+            let currentLang = 'zh';
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) {
+                    localStorage.setItem('u-nai_lang', currentLang);
+                }
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+                    currentLang = 'zh-CN';
+                } else if (browserLang.startsWith('zh')) {
+                    currentLang = 'zh';
+                } else {
+                    currentLang = 'en';
+                }
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+
+            window.__INITIAL_LANG__ = currentLang;
+
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body data-whatsapp-phone="{{.WhatsAppPhone}}">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar" >
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
+                <img src="/static/vlogo.png" alt="V-sys" style="height: auto; max-height: 15px; display: block;">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#enterpriseNavbar" aria-controls="enterpriseNavbar" aria-expanded="false" aria-label="Toggle navigation" style="border: none; outline: none; box-shadow: none;">
+                <i class="bi bi-list" style="font-size: 1.8rem; color: #adb5bd;"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="enterpriseNavbar">
+                <ul class="navbar-nav me-auto align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link" href="/" data-i18n="nav.home">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/#about" data-i18n="nav.about">關於</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/enterprise-custom" data-i18n="nav.enterpriseCustom">企業客製化方案</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡客服</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item dropdown me-lg-2">
+                        <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                            <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-sm btn-outline-secondary" href="/login" data-i18n="nav.login" style="padding: 0.58rem 0.88rem; border-radius: 100px; border-color: #dee2e6;">登錄</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="ec-page">
+        <div class="container">
+            <section class="ec-hero">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-7">
+                        <span class="ec-badge"><i class="bi bi-stars"></i><span data-i18n="enterpriseCustom.heroBadge">Enterprise Custom Solution</span></span>
+                        <h1 class="ec-title" data-i18n="enterpriseCustom.heroTitle">企業客製化方案</h1>
+                        <p class="ec-subtitle" data-i18n="enterpriseCustom.heroSubtitle">我們為中大型企業度身規劃系統方案，從流程診斷、模組開發、第三方整合到上線支援，一次完成。</p>
+                        <ul class="ec-points">
+                            <li><i class="bi bi-check-circle-fill"></i><span data-i18n="enterpriseCustom.heroPoint1">客製化業務流程與前後台體驗</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i><span data-i18n="enterpriseCustom.heroPoint2">支援 ERP / POS / CRM / 物流 API 串接</span></li>
+                            <li><i class="bi bi-check-circle-fill"></i><span data-i18n="enterpriseCustom.heroPoint3">專屬顧問與交付經理全程跟進</span></li>
+                        </ul>
+                        <div class="ec-btn-row">
+                            <a class="ec-btn-primary js-wa-link" href="https://wa.me/{{.WhatsAppPhone}}" target="_blank" rel="noopener noreferrer">
+                                <i class="bi bi-whatsapp me-1"></i><span data-i18n="enterpriseCustom.heroPrimaryCta">WhatsApp 諮詢方案</span>
+                            </a>
+                            <a class="ec-btn-secondary" href="/contact" data-i18n="enterpriseCustom.heroSecondaryCta">先填聯絡表單</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="ec-card">
+                            <div class="ec-icon"><i class="bi bi-clipboard2-check"></i></div>
+                            <h3 data-i18n="enterpriseCustom.quickPanelTitle">不做制式方案，先做需求對齊</h3>
+                            <p data-i18n="enterpriseCustom.quickPanelDesc">此頁不提供固定計劃選項。先由顧問與你確認目標、預算與時程，再提供可落地的實施建議。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ec-section" id="feature-section">
+                <h2 data-i18n="enterpriseCustom.featureTitle">方案核心特色</h2>
+                <p class="ec-lead" data-i18n="enterpriseCustom.featureSubtitle">參考成熟企業專案流程，聚焦可擴展、可維運、可整合。</p>
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ec-card">
+                            <div class="ec-icon"><i class="bi bi-layout-text-window-reverse"></i></div>
+                            <h3 data-i18n="enterpriseCustom.features.custom.title">客製化功能與設計</h3>
+                            <p data-i18n="enterpriseCustom.features.custom.desc">按企業實際流程設計欄位、權限、表單與操作介面，避免使用無法擴充的拼裝式方案。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ec-card">
+                            <div class="ec-icon"><i class="bi bi-diagram-3"></i></div>
+                            <h3 data-i18n="enterpriseCustom.features.integration.title">第三方 API 串接</h3>
+                            <p data-i18n="enterpriseCustom.features.integration.desc">整合既有 ERP、CRM、POS、倉儲或物流系統，讓資料同步與跨團隊協作更穩定。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ec-card">
+                            <div class="ec-icon"><i class="bi bi-bank"></i></div>
+                            <h3 data-i18n="enterpriseCustom.features.funding.title">政府資助配套建議</h3>
+                            <p data-i18n="enterpriseCustom.features.funding.desc">可按企業情況提供常見資助方向建議與項目規劃，提升申請與落地效率。</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="ec-card">
+                            <div class="ec-icon"><i class="bi bi-headset"></i></div>
+                            <h3 data-i18n="enterpriseCustom.features.support.title">專屬售後支援</h3>
+                            <p data-i18n="enterpriseCustom.features.support.desc">專人管理進度、回應需求變更與風險，協助團隊在交付後持續優化。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ec-section">
+                <div class="row g-3">
+                    <div class="col-lg-6">
+                        <div class="ec-card">
+                            <h2 data-i18n="enterpriseCustom.processTitle">專案推進流程</h2>
+                            <p class="ec-lead" data-i18n="enterpriseCustom.processSubtitle">以目標和里程碑為導向，確保交付可控。</p>
+                            <div class="ec-step">
+                                <span class="ec-step-index">1</span>
+                                <h4 data-i18n="enterpriseCustom.steps.discovery.title">需求訪談</h4>
+                                <p data-i18n="enterpriseCustom.steps.discovery.desc">了解現況流程、痛點、關鍵 KPI 與系統限制。</p>
+                            </div>
+                            <div class="ec-step">
+                                <span class="ec-step-index">2</span>
+                                <h4 data-i18n="enterpriseCustom.steps.solution.title">方案設計</h4>
+                                <p data-i18n="enterpriseCustom.steps.solution.desc">輸出實作範圍、技術架構、預估時程與交付節點。</p>
+                            </div>
+                            <div class="ec-step">
+                                <span class="ec-step-index">3</span>
+                                <h4 data-i18n="enterpriseCustom.steps.build.title">開發與驗證</h4>
+                                <p data-i18n="enterpriseCustom.steps.build.desc">分階段開發與測試，逐步驗收，確保品質與可維護性。</p>
+                            </div>
+                            <div class="ec-step">
+                                <span class="ec-step-index">4</span>
+                                <h4 data-i18n="enterpriseCustom.steps.launch.title">上線與營運支援</h4>
+                                <p data-i18n="enterpriseCustom.steps.launch.desc">提供上線陪跑、團隊培訓與後續優化建議。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="ec-card h-100">
+                            <h2 data-i18n="enterpriseCustom.integrationTitle">常見整合場景</h2>
+                            <p class="ec-lead" data-i18n="enterpriseCustom.integrationSubtitle">按你的現有系統基礎，設計低風險接軌路徑。</p>
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <div class="ec-card">
+                                        <div class="ec-icon"><i class="bi bi-box-seam"></i></div>
+                                        <h3 data-i18n="enterpriseCustom.integrations.erp.title">ERP / SAP</h3>
+                                        <p data-i18n="enterpriseCustom.integrations.erp.desc">同步訂單、庫存、財務與主檔資料。</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="ec-card">
+                                        <div class="ec-icon"><i class="bi bi-people"></i></div>
+                                        <h3 data-i18n="enterpriseCustom.integrations.crm.title">CRM</h3>
+                                        <p data-i18n="enterpriseCustom.integrations.crm.desc">整合會員資料、分群與再行銷流程。</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="ec-card">
+                                        <div class="ec-icon"><i class="bi bi-shop"></i></div>
+                                        <h3 data-i18n="enterpriseCustom.integrations.pos.title">POS</h3>
+                                        <p data-i18n="enterpriseCustom.integrations.pos.desc">打通線上線下交易與門市操作數據。</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="ec-card">
+                                        <div class="ec-icon"><i class="bi bi-truck"></i></div>
+                                        <h3 data-i18n="enterpriseCustom.integrations.logistics.title">物流與倉儲</h3>
+                                        <p data-i18n="enterpriseCustom.integrations.logistics.desc">支援派送節點、回傳簽收與狀態追蹤。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ec-section">
+                <div class="ec-cta-band">
+                    <h3 data-i18n="enterpriseCustom.finalTitle">沒有固定價格表，因為每間企業都不一樣</h3>
+                    <p data-i18n="enterpriseCustom.finalSubtitle">直接 WhatsApp 聯絡我們，先確認目標與限制，再提供最適合的客製化建議。</p>
+                    <a class="ec-btn-primary js-wa-link" href="https://wa.me/{{.WhatsAppPhone}}" target="_blank" rel="noopener noreferrer">
+                        <i class="bi bi-whatsapp me-1"></i><span data-i18n="enterpriseCustom.finalCta">立即 WhatsApp 諮詢</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof I18n !== 'undefined') {
+                I18n.init();
+            }
+
+            document.querySelectorAll('[data-lang]').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                });
+            });
+
+            var phone = document.body.getAttribute('data-whatsapp-phone') || '{{.WhatsAppPhone}}';
+            var prefill = 'I want to ask about the enterprise custom solution.';
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                prefill = I18n.t('enterpriseCustom.whatsappPrefill') || prefill;
+            }
+            var waHref = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(prefill);
+            document.querySelectorAll('.js-wa-link').forEach(function(link) {
+                link.setAttribute('href', waHref);
+            });
+        });
+    </script>
+</body>
+</html>

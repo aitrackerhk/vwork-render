@@ -1,0 +1,358 @@
+{{define "layouts/topnav.html"}}
+<!-- Top Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 cms-navbar">
+    <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+        {{if .UseKioskNav}}
+        <span class="navbar-brand d-flex align-items-end" id="topnavBrandLink" style="align-items: flex-end; cursor: default;">
+            <img src="/static/logo3.png" alt="vWork" class="topnav-logo topnav-logo-full">
+            <img src="/static/vworkiconblue.png" alt="vWork" class="topnav-logo topnav-logo-icon">
+        </span>
+        {{else}}
+        <div class="d-flex align-items-center gap-2">
+            <a class="navbar-brand d-flex align-items-end" id="topnavBrandLink" href="/dashboard" style="align-items: flex-end;">
+                <img src="/static/logo3.png" alt="vWork" class="topnav-logo topnav-logo-full">
+                <img src="/static/vworkiconblue.png" alt="vWork" class="topnav-logo topnav-logo-icon">
+            </a>
+            <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" id="tenantSwitchBtn" type="button" data-bs-toggle="modal" data-bs-target="#tenantSwitchModal" style="display:none;">
+                <i class="bi bi-buildings"></i>
+                <span id="tenantSwitchName">企業</span>
+                <i class="bi bi-chevron-down"></i>
+            </button>
+        </div>
+        {{end}}
+        <script>
+          // 如果是公開頁面（/help 或 /contact），將 logo 鏈接改為首頁，並隱藏需要登錄的元素
+          (function() {
+            const path = window.location.pathname;
+            const isPublicPage = path === '/help' || path === '/contact' || (path.startsWith && path.startsWith('/help/')) || path === '/';
+            const isVaiPage = path.indexOf('/vai-') === 0;
+            const isVofficePage = path.indexOf('/voffice-') === 0;
+            // vmarket-settings and vmarket-join-recommendation are vWork CMS pages, not vMarket frontend pages
+            const vmarketCmsPages = ['/vmarket-settings', '/vmarket-join-recommendation'];
+            const isVmarketPage = path.indexOf('/vmarket-') === 0 && !vmarketCmsPages.some(function(p) { return path === p || path.indexOf(p + '/') === 0; });
+            
+            // vAI pages: brand → /vai-chat, logo → vai logo, hide CMS-specific nav items
+            if (isVaiPage) {
+              document.body.classList.add('vai-page');
+              const brandLink = document.getElementById('topnavBrandLink');
+              if (brandLink) brandLink.href = '/vai-chat';
+              const logos = brandLink && brandLink.querySelectorAll('.topnav-logo');
+              if (logos) logos.forEach(function(logo) { logo.src = '/static/vai.png'; logo.alt = 'vAI'; });
+              // Hide CMS notifications, messages, sidebar toggle, global search on Vai pages
+              // Use function + DOMContentLoaded to handle elements that may not exist yet
+              var vaiHideIds = [
+                'nav-notifications-topbar', 'nav-notifications-topbar-mobile',
+                'nav-messages-topbar', 'nav-messages-topbar-mobile',
+                'cmsGlobalSearch'
+              ];
+              function hideVaiElements() {
+                vaiHideIds.forEach(function(id) {
+                  var el = document.getElementById(id);
+                  if (el) {
+                    el.style.display = 'none';
+                    // Also hide the parent <li> so it doesn't occupy space (gap) in the mobile nav
+                    if (el.parentElement && el.parentElement.tagName === 'LI') {
+                      el.parentElement.style.display = 'none';
+                    }
+                  }
+                });
+              }
+              hideVaiElements(); // hide what's already in DOM
+              document.addEventListener('DOMContentLoaded', hideVaiElements); // hide rest after DOM ready
+              // Show Vai search box
+              function showVaiSearch() {
+                var vaiSearch = document.getElementById('vaiGlobalSearch');
+                if (vaiSearch) vaiSearch.style.display = 'block';
+              }
+              showVaiSearch();
+              document.addEventListener('DOMContentLoaded', showVaiSearch);
+            }
+
+            // vMarket pages: brand → /vmarket-search, logo → vmarket logo, hide CMS-specific nav items
+            if (isVmarketPage) {
+              const brandLink = document.getElementById('topnavBrandLink');
+              if (brandLink) brandLink.href = '/vmarket-search';
+              const logoFull = brandLink && brandLink.querySelector('.topnav-logo-full');
+              if (logoFull) { logoFull.src = '/static/vmarketlogo.png'; logoFull.alt = 'vMarket'; }
+              const logoIcon = brandLink && brandLink.querySelector('.topnav-logo-icon');
+              if (logoIcon) { logoIcon.src = '/static/vmarketiconyellow.png'; logoIcon.alt = 'vMarket'; }
+              // Hide CMS notifications, messages, sidebar toggle, global search on vMarket pages
+              var vmarketHideIds = [
+                'nav-notifications-topbar', 'nav-notifications-topbar-mobile',
+                'nav-messages-topbar', 'nav-messages-topbar-mobile',
+                'cmsGlobalSearch', 'tenantSwitchBtn'
+              ];
+              function hideVmarketElements() {
+                vmarketHideIds.forEach(function(id) {
+                  var el = document.getElementById(id);
+                  if (el) {
+                    el.style.display = 'none';
+                    // Also hide the parent <li> so it doesn't occupy space (gap) in the mobile nav
+                    if (el.parentElement && el.parentElement.tagName === 'LI') {
+                      el.parentElement.style.display = 'none';
+                    }
+                  }
+                });
+              }
+              hideVmarketElements();
+              document.addEventListener('DOMContentLoaded', hideVmarketElements);
+            }
+
+            // Sales partner tenant: override logo link to partner landing page
+            if (!isVaiPage && !isVofficePage && !isVmarketPage && !isPublicPage && window.salesPartnerCode) {
+              const brandLink = document.getElementById('topnavBrandLink');
+              if (brandLink) {
+                brandLink.href = '/' + window.salesPartnerCode.toLowerCase();
+              }
+            }
+            
+            if (isPublicPage) {
+              const brandLink = document.getElementById('topnavBrandLink');
+              if (brandLink) {
+                brandLink.href = '/';
+              }
+              
+              // 移除 CMS navbar class，讓公開頁面使用滾動陰影效果
+              const navbar = document.querySelector('.navbar');
+              if (navbar) {
+                navbar.classList.remove('cms-navbar');
+              }
+              
+              // 隱藏需要登錄的移動端元素
+              const mobileNotifications = document.getElementById('nav-notifications-topbar-mobile');
+              const mobileMessages = document.getElementById('nav-messages-topbar-mobile');
+              const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+              if (mobileNotifications) {
+                mobileNotifications.style.display = 'none';
+                if (mobileNotifications.parentElement && mobileNotifications.parentElement.tagName === 'LI') mobileNotifications.parentElement.style.display = 'none';
+              }
+              if (mobileMessages) {
+                mobileMessages.style.display = 'none';
+                if (mobileMessages.parentElement && mobileMessages.parentElement.tagName === 'LI') mobileMessages.parentElement.style.display = 'none';
+              }
+              if (mobileMenuToggle) {
+                mobileMenuToggle.style.display = 'none';
+                if (mobileMenuToggle.parentElement && mobileMenuToggle.parentElement.tagName === 'LI') mobileMenuToggle.parentElement.style.display = 'none';
+              }
+              
+              // 隱藏需要登錄的桌面端元素
+              const desktopNav = document.querySelector('.navbar-nav.ms-auto.align-items-center.d-none.d-lg-flex');
+              if (desktopNav) {
+                // 不隱藏整個 nav，只隱藏通知、消息和用戶頭像部分
+                // desktopNav.style.display = 'none';
+                
+                // Hide notifications
+                const notif = document.getElementById('nav-notifications-topbar');
+                if (notif && notif.parentElement) notif.parentElement.style.display = 'none';
+                
+                // Hide messages
+                const msg = document.getElementById('nav-messages-topbar');
+                if (msg && msg.parentElement) msg.parentElement.style.display = 'none';
+                
+                // Hide user dropdown (but keep app switcher, support, language)
+                const userDropdown = document.getElementById('userDropdown');
+                if (userDropdown && userDropdown.parentElement) userDropdown.parentElement.style.display = 'none';
+              }
+            }
+          })();
+        </script>
+        <style>
+          /* Badge positioning: -5px for mobile, -1px for desktop (991px+) */
+          @media (min-width: 991px) {
+            #unreadNotificationBadgeMobile,
+            #unreadMsgBadgeMobile,
+            #unreadNotificationBadge,
+            #unreadMsgBadge {
+              right: -1px !important;
+            }
+          }
+        </style>
+        <!-- Mobile: App Switcher, Notifications, Messages, Menu Toggle (always visible, on the right) -->
+        <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+            <li class="nav-item dropdown" id="mobileAppSwitcher">
+                <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                    <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                    <div class="app-switcher-grid">
+                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                            <span class="app-switcher-label">vAI</span>
+                        </a>
+                        <a href="/" class="app-switcher-item" data-app="vwork">
+                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                            <span class="app-switcher-label">vWork</span>
+                        </a>
+                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                            <span class="app-switcher-label">vMarket</span>
+                        </a>
+                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                            <span class="app-switcher-label">vOffice</span>
+                        </a>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link position-relative" href="/notifications" id="nav-notifications-topbar-mobile">
+                    <i class="bi bi-exclamation-square" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    <span class="badge bg-danger position-absolute" id="unreadNotificationBadgeMobile" style="display: none; font-size: 0.7rem; padding: 0.2em 0.4em; top: 5px; right: -5px;">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link position-relative" href="/messages" id="nav-messages-topbar-mobile">
+                    <i class="bi bi-chat-dots" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    <span class="badge bg-danger position-absolute" id="unreadMsgBadgeMobile" style="display: none; font-size: 0.7rem; padding: 0.2em 0.4em; top: 5px; right: -5px;">0</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <button class="navbar-toggler" type="button" id="mobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                    <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                </button>
+            </li>
+        </ul>
+ 
+        <div class="collapse navbar-collapse" id="navbarNav">
+            {{if not .UseKioskNav}}
+            <!-- CMS Global Search -->
+            <div class="me-3 flex-grow-1 d-none d-lg-block" style="max-width: 520px; margin-left: 20px;">
+                <div id="cmsGlobalSearch" class="cms-global-search" style="position: relative;">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input id="cmsGlobalSearchInput" type="text" class="form-control" placeholder="搜尋或指令..." data-i18n-placeholder="cms.globalSearch.placeholder" autocomplete="off">
+                    </div>
+                    <div id="cmsGlobalSearchDropdown" class="list-group shadow-sm"
+                         style="position: absolute; top: 100%; left: 0; right: 0; z-index: 2000; display: none; max-height: 60vh; overflow: auto; border-radius: 12px; margin-top: 6px;">
+                        <a href="/cms-search" class="list-group-item list-group-item-action text-end cms-global-search-link" data-i18n="cms.globalSearch.pageLink">進入搜尋頁</a>
+                    </div>
+                </div>
+                <!-- vAI Search (shown on /vai-* pages, cmsGlobalSearch is hidden) -->
+                <div id="vaiGlobalSearch" class="cms-global-search" style="display: none; position: relative;">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input id="vaiSearchInput" type="text" class="form-control" placeholder="搜尋對話訊息..." data-i18n-placeholder="vai.search.placeholder" autocomplete="off">
+                    </div>
+                    <div id="vaiSearchDropdown" class="vai-search-dropdown shadow-sm" style="display: none;">
+                        <div id="vaiSearchResults"></div>
+                    </div>
+                </div>
+            </div>
+            <ul class="navbar-nav ms-auto align-items-center d-none d-lg-flex">
+                <li class="nav-item">
+                    <a class="nav-link position-relative" href="/notifications" id="nav-notifications-topbar" style="margin-right: 10px;">
+                        <i class="bi bi-exclamation-square" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                        <span class="badge bg-danger position-absolute" id="unreadNotificationBadge" style="display: none; font-size: 0.7rem; padding: 0.2em 0.4em; top: 5px; right: -5px;">0</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link position-relative" href="/messages" id="nav-messages-topbar" style="margin-right: 10px;">
+                        <i class="bi bi-chat-dots" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                        <span class="badge bg-danger position-absolute" id="unreadMsgBadge" style="display: none; font-size: 0.7rem; padding: 0.2em 0.4em; top: 5px; right: -5px;">0</span>
+                    </a>
+                </li>
+                <!-- Desktop only: contact, language, user dropdown -->
+                <li class="nav-item d-none d-lg-block">
+                    <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                        <div class="dropdown" style="position: relative;">
+                            <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                <i class="bi bi-grid-3x3-gap-fill"></i>
+                            </a>
+                            <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                <div class="app-switcher-grid">
+                                    <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                        <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                        <span class="app-switcher-label">vAI</span>
+                                    </a>
+                                    <a href="/" class="app-switcher-item" data-app="vwork">
+                                        <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                        <span class="app-switcher-label">vWork</span>
+                                    </a>
+                                    <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                        <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                        <span class="app-switcher-label">vMarket</span>
+                                    </a>
+                                    <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                        <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                        <span class="app-switcher-label">vOffice</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown" style="position: relative;">
+                            <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdownCms" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdownCms">
+                                <li><a class="dropdown-item" href="/help/{{with navPrefix (index . "PageName")}}{{.}}{{else}}vwork{{end}}" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                <li><a class="dropdown-item" href="/contact?product={{with navPrefix (index . "PageName")}}{{.}}{{else}}vwork{{end}}" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                            </ul>
+                        </div>
+                        <div class="dropdown" style="position: relative;" id="languageDropdownContainer">
+                            <a class="nav-link dropdown-toggle" href="#" id="langDropdownCms" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                        <i class="bi bi-globe2" style="font-size: 1.2rem;"></i> <span data-i18n="nav.language">語言</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdownCms">
+                        <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                    </ul>
+                        </div>
+                        <div class="dropdown" style="position: relative;">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem;">
+                                <img id="topbarUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                                <i class="bi bi-person-circle" id="topbarUserIcon"></i> <span id="userName" data-i18n="nav.user">用戶</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li id="userAICoinsDisplay" style="display: none;">
+                                    <a class="dropdown-item" href="{{with navPrefix (index . "PageName")}}/{{.}}-vcoins{{else}}/vcoins{{end}}">
+                                        <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                                        <span class="fw-bold" id="userAICoinsBalance">0</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" id="aiCoinsDivider" style="display: none;"></li>
+                                <li><a class="dropdown-item" href="{{with navPrefix (index . "PageName")}}/{{.}}-personal-data{{else}}/personal-data{{end}}"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                <li><a class="dropdown-item" href="{{with navPrefix (index . "PageName")}}/{{.}}-billing{{else}}/billing{{end}}"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            {{else}}
+            <ul class="navbar-nav ms-auto align-items-center d-none d-lg-flex">
+                <li class="nav-item">
+                    <button class="btn btn-outline-primary btn-sm ms-2" id="returnToSystemBtn">
+                        <i class="bi bi-shield-lock"></i> 返回系統
+                    </button>
+                </li>
+            </ul>
+            {{end}}
+        </div>
+    </div>
+</nav>
+
+<!-- Tenant Switch Modal -->
+<div class="modal fade" id="tenantSwitchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="tenantSwitch.title">選擇企業</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-muted mb-2" data-i18n="tenantSwitch.selectHint">請選擇要進入的企業</div>
+                <div id="tenantSwitchList" class="list-group"></div>
+                <div class="text-danger small mt-2" id="tenantSwitchError" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" id="tenantSwitchAddTenant" data-i18n="tenantSwitch.addTenant">新增租戶</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="tenantSwitch.cancel">取消</button>
+                <button type="button" class="btn btn-primary" id="tenantSwitchConfirm" data-i18n="tenantSwitch.confirm">確認</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+

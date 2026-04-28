@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="helpVai.hub.title">支援中心 - vAI - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <link rel="icon" type="image/png" href="/static/vaiicon.png">
+    <link rel="apple-touch-icon" href="/static/vaiicon.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vsys.css">
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title] { visibility: hidden; }
+        @media (min-width: 992px) {
+            #mobileSidebar,
+            #sidebarOverlay {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            let currentLang = 'zh';
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) localStorage.setItem('u-nai_lang', currentLang);
+            } else if (savedLang) { currentLang = savedLang; }
+            else {
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) currentLang = 'zh-CN';
+                else if (browserLang.startsWith('zh')) currentLang = 'zh';
+                else currentLang = 'en';
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            window.__INITIAL_LANG__ = currentLang;
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() { if (document.body && document.body.classList.contains('i18n-loading')) document.body.classList.remove('i18n-loading'); }, 5000);
+                } else { requestAnimationFrame(checkBody); }
+            })();
+        })();
+    </script>
+</head>
+<body>
+    <!-- V-sys Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar" >
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
+                <img src="/static/vlogo.png" alt="V-sys" style="height: auto; max-height: 15px; display: block;">
+            </a>
+            <!-- Mobile: App Switcher, Menu Toggle -->
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcherHelpVai">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                <span class="app-switcher-label">vAI</span>
+                            </a>
+                            <a href="/" class="app-switcher-item" data-app="vwork">
+                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                <span class="app-switcher-label">vWork</span>
+                            </a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                <span class="app-switcher-label">vMarket</span>
+                            </a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                <span class="app-switcher-label">vOffice</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="mobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                        <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                    </button>
+                </li>
+            </ul>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about" id="navAboutLink" data-i18n="nav.about">關於</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                                </a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                            <span class="app-switcher-label">vAI</span>
+                                        </a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork">
+                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                            <span class="app-switcher-label">vWork</span>
+                                        </a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                            <span class="app-switcher-label">vMarket</span>
+                                        </a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                            <span class="app-switcher-label">vOffice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help/vai" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=vai" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                </ul>
+                            </div>
+                            <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+                            </a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                                    <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                    <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay d-lg-none" id="sidebarOverlay"></div>
+    <div class="sidebar d-lg-none" id="mobileSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="/" id="sidebarHomeLink"><i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="#about" id="sidebarAboutLink"><i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact"><i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span></a></li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#mobileLanguageSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="mobileLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-3 py-4" style="min-height: calc(100vh - 200px); padding-top: 80px !important;">
+    {{ if not .Category }}
+    <!-- Overview: category card grid -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h3 mb-3"><i class="bi bi-robot me-2 text-primary"></i><span data-i18n="helpVai.hub.title">vAI 支援中心</span></h1>
+                    <p class="text-muted mb-0" data-i18n="helpVai.hub.description">vAI 是 V-sys 旗下的人工智慧助手平台，提供智能對話、AI 圖片生成、AI 影片製作、AI 文件生成等功能，助您高效完成各種工作。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Features -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h5 mb-3"><i class="bi bi-grid me-2"></i><span data-i18n="helpVai.hub.coreFeatures">核心功能</span></h2>
+            <div class="row g-3">
+                <!-- vAI Chat -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/chat" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-chat-dots fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.chat.title">vAI 交談</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.chat.item1">建立對話</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.chat.item2">上傳檔案分析</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.chat.item3">搜尋對話記錄</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.chat.item4">管理對話列表</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- vAI Sketch -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/sketch" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-brush fs-2 text-success me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.sketch.title">vAI 圖片</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.sketch.item1">AI 圖片生成</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.sketch.item2">繪圖工具使用</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.sketch.item3">插入與編輯圖片</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.sketch.item4">管理草圖</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- vAI Video -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/video" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-camera-video fs-2 text-danger me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.video.title">vAI 影片</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.video.item1">AI 影片生成</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.video.item2">分鏡管理</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.video.item3">影片合併與下載</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.video.item4">影片延伸</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- vAI Docs -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/docs" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-file-earmark-text fs-2 text-warning me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.docs.title">vAI 文件</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.docs.item1">AI 文件生成</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.docs.item2">支援 Word / Excel / PPT / PDF</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVai.hub.docs.item3">下載與管理文件</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Topics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h5 mb-3"><i class="bi bi-book me-2"></i><span data-i18n="helpVai.hub.otherTopics">其他主題</span></h2>
+            <div class="row g-3">
+                <!-- Getting Started -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/getting-started" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-rocket-takeoff fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.gettingStarted.title">快速入門</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- vCoins -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/vcoins" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-coin fs-2 text-warning me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.vcoins.title">vCoin 虛擬代幣</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Account & Billing -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/account" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-person-circle fs-2 text-info me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.account.title">帳戶與訂閱</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- FAQ -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vai/faq" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-question-circle fs-2 text-secondary me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVai.hub.faq.title">常見問題</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Support -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-headset me-2"></i><span data-i18n="helpVai.hub.support.title">需要更多幫助？</span></h5>
+                    <p class="card-text" data-i18n="helpVai.hub.support.description">如果您遇到問題或需要進一步的協助，請：</p>
+                    <ul>
+                        <li><span data-i18n="helpVai.hub.support.item1pre">前往 </span><a href="/contact?product=vai" class="text-decoration-none" data-i18n="helpVai.hub.support.contactLink">聯絡客服</a><span data-i18n="helpVai.hub.support.item1post"> 頁面提交問題</span></li>
+                        <li data-i18n="helpVai.hub.support.item2">在 vAI 交談中直接詢問 AI 助手獲取即時幫助</li>
+                    </ul>
+                    <p class="text-muted small mt-3 mb-0"><i class="bi bi-info-circle me-1"></i><span data-i18n="helpVai.hub.support.footer">我們會持續更新功能與文檔，為您提供更好的使用體驗。</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ else }}
+    <!-- Category detail page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/help" data-i18n="helpVai.breadcrumb.supportCenter">支援中心</a></li>
+                    <li class="breadcrumb-item"><a href="/help/vai">vAI</a></li>
+                    <li class="breadcrumb-item active">{{ .CategoryTitle }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    {{ if eq .Category "getting-started" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-rocket-takeoff me-2 text-primary"></i><span data-i18n="helpVai.gettingStarted.title">快速入門指南</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.gettingStarted.intro">歡迎使用 vAI！以下指南將幫助您快速了解 vAI 的核心功能，開始您的 AI 工作之旅。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.gettingStarted.whatIsVai">什麼是 vAI？</h6>
+                    <p data-i18n="helpVai.gettingStarted.whatIsVaiDesc">vAI 是 V-sys 旗下的人工智慧助手平台，整合了智能對話、AI 圖片生成、AI 影片製作和 AI 文件生成四大核心功能。無論您是需要數據分析、創意設計還是文件處理，vAI 都能為您提供高效的解決方案。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.gettingStarted.registerLogin">註冊與登入</h6>
+                    <ol>
+                        <li data-i18n="helpVai.gettingStarted.registerStep1">前往 vAI 首頁，點擊右上角 <strong>登錄</strong> 按鈕</li>
+                        <li data-i18n="helpVai.gettingStarted.registerStep2">如果您還沒有帳戶，可以點擊 <strong>註冊</strong> 創建新帳戶</li>
+                        <li data-i18n="helpVai.gettingStarted.registerStep3">填寫電子郵件、密碼等基本資料完成註冊</li>
+                        <li data-i18n="helpVai.gettingStarted.registerStep4">登入後即可開始使用 vAI 的所有功能</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.gettingStarted.learnInterface">認識介面</h6>
+                    <p data-i18n="helpVai.gettingStarted.learnInterfaceDesc">登入後，您會看到以下導航區域：</p>
+                    <div class="feature-highlight">
+                        <ul class="mb-0">
+                            <li class="mb-2"><i class="bi bi-chat-dots text-primary me-2"></i><strong data-i18n="helpVai.gettingStarted.navChat">交談</strong> — <span data-i18n="helpVai.gettingStarted.navChatDesc">與 AI 進行智能對話，提問、分析數據、生成內容</span></li>
+                            <li class="mb-2"><i class="bi bi-brush text-success me-2"></i><strong data-i18n="helpVai.gettingStarted.navSketch">圖片</strong> — <span data-i18n="helpVai.gettingStarted.navSketchDesc">使用 AI 生成圖片，或使用內建繪圖工具創作</span></li>
+                            <li class="mb-2"><i class="bi bi-camera-video text-danger me-2"></i><strong data-i18n="helpVai.gettingStarted.navVideo">影片</strong> — <span data-i18n="helpVai.gettingStarted.navVideoDesc">使用 AI 生成短影片，支援分鏡編輯和合併</span></li>
+                            <li class="mb-2"><i class="bi bi-file-earmark-text text-warning me-2"></i><strong data-i18n="helpVai.gettingStarted.navDocs">文件</strong> — <span data-i18n="helpVai.gettingStarted.navDocsDesc">使用 AI 自動生成 Word、Excel、PPT、PDF 文件</span></li>
+                        </ul>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.gettingStarted.dailyFree">每日免費額度</h6>
+                    <p data-i18n="helpVai.gettingStarted.dailyFreeDesc">每個帳戶每天享有 <strong>5 次免費查詢</strong>，可用於交談及圖片生成。影片和文件生成不包含在免費額度內。超出免費額度後，AI 功能將以 <strong>vCoin</strong> 計費。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.gettingStarted.nextSteps">下一步</h6>
+                    <ul>
+                        <li data-i18n="helpVai.gettingStarted.nextStep1">試試在 <strong>交談</strong> 中向 AI 提問</li>
+                        <li data-i18n="helpVai.gettingStarted.nextStep2">前往 <strong>圖片</strong> 使用 AI 生成一張圖片</li>
+                        <li><span data-i18n="helpVai.gettingStarted.nextStep3pre">了解 </span><a href="/help/vai/vcoins" data-i18n="helpVai.gettingStarted.nextStep3link">vCoin 計費方式</a></li>
+                    </ul>
+
+                    {{ else if eq .Category "chat" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-chat-dots me-2 text-primary"></i><span data-i18n="helpVai.chat.title">vAI 交談</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.chat.intro">vAI 交談是您與 AI 助手互動的核心功能，支援智能對話、檔案分析、數據查詢等。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.chat.startNew">開始新對話</h6>
+                    <ol>
+                        <li data-i18n="helpVai.chat.startStep1">進入 <strong>交談</strong> 頁面</li>
+                        <li data-i18n="helpVai.chat.startStep2">點擊左側對話列表上方的 <strong>新對話</strong> 按鈕</li>
+                        <li data-i18n="helpVai.chat.startStep3">在底部輸入框中輸入您的問題或指令</li>
+                        <li data-i18n="helpVai.chat.startStep4">按 Enter 鍵或點擊發送按鈕提交</li>
+                        <li data-i18n="helpVai.chat.startStep5">AI 會在幾秒內回覆您的訊息</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.chat.uploadFile">上傳檔案分析</h6>
+                    <p data-i18n="helpVai.chat.uploadFileDesc">您可以上傳檔案讓 AI 進行分析：</p>
+                    <ol>
+                        <li data-i18n="helpVai.chat.uploadStep1">點擊輸入框旁的 <strong>附件按鈕</strong>（迴紋針圖示）</li>
+                        <li data-i18n="helpVai.chat.uploadStep2">選擇要上傳的檔案</li>
+                        <li data-i18n="helpVai.chat.uploadStep3">輸入您希望 AI 針對檔案進行的分析或操作</li>
+                        <li data-i18n="helpVai.chat.uploadStep4">發送訊息，AI 會讀取檔案內容並回覆分析結果</li>
+                    </ol>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i><strong data-i18n="helpVai.chat.supportedFormats">支援的檔案格式：</strong><span data-i18n="helpVai.chat.supportedFormatsDesc">Excel (.xls, .xlsx)、Word (.doc, .docx)、PowerPoint (.ppt, .pptx)、PDF (.pdf)、文字檔 (.txt)、圖片 (.jpg, .jpeg, .png)</span>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.chat.manageList">管理對話列表</h6>
+                    <ul>
+                        <li data-i18n="helpVai.chat.manageSwitch"><strong>切換對話</strong>：點擊左側對話列表中的任意對話即可切換</li>
+                        <li data-i18n="helpVai.chat.manageRename"><strong>重命名對話</strong>：將滑鼠移到對話標題上，點擊出現的編輯圖示</li>
+                        <li data-i18n="helpVai.chat.manageDelete"><strong>刪除對話</strong>：將滑鼠移到對話標題上，點擊出現的刪除圖示</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.chat.search">搜尋對話記錄</h6>
+                    <ol>
+                        <li data-i18n="helpVai.chat.searchStep1">點擊頂部導航欄的 <strong>搜尋圖示</strong></li>
+                        <li data-i18n="helpVai.chat.searchStep2">輸入關鍵字，系統會搜尋所有對話的標題和訊息內容</li>
+                        <li data-i18n="helpVai.chat.searchStep3">點擊搜尋結果即可跳轉到對應的對話和訊息，匹配文字會以高亮顯示</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.chat.tips">使用提示</h6>
+                    <div class="feature-highlight">
+                        <ul class="mb-0">
+                            <li class="mb-2" data-i18n="helpVai.chat.tip1">提問時盡量具體明確，例如：「幫我分析這份 Excel 中各月的銷售趨勢」</li>
+                            <li class="mb-2" data-i18n="helpVai.chat.tip2">您可以在對話中要求 AI 生成圖片、影片或文件，AI 會自動跳轉至對應功能</li>
+                            <li class="mb-2" data-i18n="helpVai.chat.tip3">每次簡單查詢消耗 <strong>1 vCoin</strong>，每日有 5 次免費額度</li>
+                        </ul>
+                    </div>
+
+                    {{ else if eq .Category "sketch" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-brush me-2 text-success"></i><span data-i18n="helpVai.sketch.title">vAI 圖片</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.sketch.intro">vAI 圖片提供 AI 圖片生成和內建繪圖工具，讓您輕鬆創建各種視覺素材。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.sketch.aiGenerate">AI 圖片生成</h6>
+                    <ol>
+                        <li data-i18n="helpVai.sketch.genStep1">進入 <strong>圖片</strong> 頁面</li>
+                        <li data-i18n="helpVai.sketch.genStep2">在底部的 <strong>AI 生成列</strong> 中輸入圖片描述（Prompt）</li>
+                        <li data-i18n="helpVai.sketch.genStep3">例如：「一隻在咖啡店裡看書的貓，水彩風格」</li>
+                        <li data-i18n="helpVai.sketch.genStep4">點擊生成按鈕，等待 AI 生成圖片</li>
+                        <li data-i18n="helpVai.sketch.genStep5">生成完成後，圖片會顯示在畫布上</li>
+                    </ol>
+                    <p class="text-muted small"><i class="bi bi-coin me-1"></i><span data-i18n="helpVai.sketch.genCost">每次圖片生成消耗 <strong>3 vCoin</strong></span></p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.sketch.drawTools">繪圖工具</h6>
+                    <p data-i18n="helpVai.sketch.drawToolsDesc">vAI 圖片內建完整的繪圖工具，位於畫布上方的工具列：</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th data-i18n="helpVai.sketch.toolCol">工具</th><th data-i18n="helpVai.sketch.shortcutCol">快捷鍵</th><th data-i18n="helpVai.sketch.descCol">說明</th></tr></thead>
+                            <tbody>
+                                <tr><td><i class="bi bi-cursor me-1"></i><span data-i18n="helpVai.sketch.toolSelect">選取</span></td><td>V</td><td data-i18n="helpVai.sketch.toolSelectDesc">選取並移動畫布上的物件</td></tr>
+                                <tr><td><i class="bi bi-pencil me-1"></i><span data-i18n="helpVai.sketch.toolPen">畫筆</span></td><td>P</td><td data-i18n="helpVai.sketch.toolPenDesc">自由手繪</td></tr>
+                                <tr><td><i class="bi bi-square me-1"></i><span data-i18n="helpVai.sketch.toolRect">矩形</span></td><td>R</td><td data-i18n="helpVai.sketch.toolRectDesc">繪製矩形形狀</td></tr>
+                                <tr><td><i class="bi bi-circle me-1"></i><span data-i18n="helpVai.sketch.toolEllipse">橢圓</span></td><td>E</td><td data-i18n="helpVai.sketch.toolEllipseDesc">繪製橢圓形狀</td></tr>
+                                <tr><td><i class="bi bi-slash-lg me-1"></i><span data-i18n="helpVai.sketch.toolLine">直線</span></td><td>L</td><td data-i18n="helpVai.sketch.toolLineDesc">繪製直線</td></tr>
+                                <tr><td><i class="bi bi-fonts me-1"></i><span data-i18n="helpVai.sketch.toolText">文字</span></td><td>T</td><td data-i18n="helpVai.sketch.toolTextDesc">在畫布上添加文字</td></tr>
+                                <tr><td><i class="bi bi-eraser me-1"></i><span data-i18n="helpVai.sketch.toolEraser">橡皮擦</span></td><td>X</td><td data-i18n="helpVai.sketch.toolEraserDesc">擦除畫布上的內容</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.sketch.colorSettings">顏色與線條設定</h6>
+                    <ul>
+                        <li data-i18n="helpVai.sketch.strokeColor"><strong>筆色（Stroke Color）</strong>：設定線條或邊框顏色</li>
+                        <li data-i18n="helpVai.sketch.fillColor"><strong>填色（Fill Color）</strong>：設定形狀的填充顏色</li>
+                        <li data-i18n="helpVai.sketch.strokeWidth"><strong>線條粗細</strong>：調整筆觸或邊框的粗細</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.sketch.canvasRatio">畫布比例</h6>
+                    <p data-i18n="helpVai.sketch.canvasRatioDesc">支援多種畫布比例以適應不同用途：</p>
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><span class="badge bg-secondary" data-i18n="helpVai.sketch.ratioFree">自由</span></li>
+                        <li class="list-inline-item"><span class="badge bg-secondary">1:1</span></li>
+                        <li class="list-inline-item"><span class="badge bg-secondary">4:3</span></li>
+                        <li class="list-inline-item"><span class="badge bg-secondary">3:4</span></li>
+                        <li class="list-inline-item"><span class="badge bg-secondary">16:9</span></li>
+                        <li class="list-inline-item"><span class="badge bg-secondary">9:16</span></li>
+                        <li class="list-inline-item"><span class="badge bg-secondary">3:2</span></li>
+                        <li class="list-inline-item"><span class="badge bg-secondary">2:3</span></li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.sketch.insertImage">插入圖片</h6>
+                    <ol>
+                        <li data-i18n="helpVai.sketch.insertStep1">點擊工具列上的 <strong>插入圖片</strong> 按鈕</li>
+                        <li><span data-i18n="helpVai.sketch.insertStep2">在彈出的圖片選擇器中，您可以：</span>
+                            <ul>
+                                <li data-i18n="helpVai.sketch.insertFrom"><strong>從產品圖片選取</strong>：搜尋您系統中的產品圖片</li>
+                                <li data-i18n="helpVai.sketch.insertUpload"><strong>上傳圖片</strong>：拖放或選擇本地圖片檔案上傳</li>
+                            </ul>
+                        </li>
+                        <li data-i18n="helpVai.sketch.insertStep3">選擇後圖片會插入到畫布中，可自由調整大小和位置</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.sketch.objectProps">物件屬性面板</h6>
+                    <p data-i18n="helpVai.sketch.objectPropsDesc">選中畫布上的物件後，右側會顯示屬性面板，您可以調整：</p>
+                    <ul>
+                        <li data-i18n="helpVai.sketch.propPosition">位置（X, Y 座標）和尺寸（寬、高）</li>
+                        <li data-i18n="helpVai.sketch.propColor">顏色和透明度</li>
+                        <li data-i18n="helpVai.sketch.propLayer">圖層順序（上移、下移、置頂、置底）</li>
+                        <li data-i18n="helpVai.sketch.propBgRemove">去背景功能（針對圖片物件）</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.sketch.manageSketch">管理草圖</h6>
+                    <ul>
+                        <li data-i18n="helpVai.sketch.manageSave"><strong>儲存草圖</strong>：點擊工具列上的儲存按鈕</li>
+                        <li data-i18n="helpVai.sketch.manageMySketch"><strong>我的草圖</strong>：在左側側邊欄中查看所有已儲存的草圖</li>
+                        <li data-i18n="helpVai.sketch.manageChatGen"><strong>對話生成</strong>：在左側側邊欄中查看從 vAI 交談中生成的圖片</li>
+                        <li data-i18n="helpVai.sketch.manageDelete"><strong>刪除草圖</strong>：點擊工具列上的刪除按鈕</li>
+                    </ul>
+
+                    {{ else if eq .Category "video" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-camera-video me-2 text-danger"></i><span data-i18n="helpVai.video.title">vAI 影片</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.video.intro">vAI 影片提供分鏡式的 AI 影片製作工具，讓您輕鬆創建短影片。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.video.createProject">建立影片專案</h6>
+                    <ol>
+                        <li data-i18n="helpVai.video.createStep1">進入 <strong>影片</strong> 頁面</li>
+                        <li data-i18n="helpVai.video.createStep2">點擊左側側邊欄中的 <strong>新專案</strong> 按鈕</li>
+                        <li data-i18n="helpVai.video.createStep3">輸入專案標題</li>
+                        <li data-i18n="helpVai.video.createStep4">選擇影片比例：<span class="badge bg-secondary">16:9</span>（橫式）、<span class="badge bg-secondary">9:16</span>（直式）或 <span class="badge bg-secondary">1:1</span>（正方形）</li>
+                        <li data-i18n="helpVai.video.createStep5">選擇每個分鏡的時長：5 秒、6 秒、7 秒或 8 秒</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.video.sceneEdit">分鏡編輯</h6>
+                    <p data-i18n="helpVai.video.sceneEditDesc">每個影片專案由多個 <strong>分鏡</strong> 組成，每個分鏡可以獨立生成：</p>
+                    <ol>
+                        <li><strong data-i18n="helpVai.video.sceneRefImg">添加參考圖片</strong><span data-i18n="helpVai.video.sceneRefImgDesc">（選填）：您可以為分鏡提供一張參考圖片，AI 會參考該圖片來生成影片。圖片來源可以是：</span>
+                            <ul>
+                                <li data-i18n="helpVai.video.sceneRefProduct">產品圖片（搜尋您系統中的產品）</li>
+                                <li data-i18n="helpVai.video.sceneRefSketch">草圖（從 vAI 圖片中已儲存的草圖）</li>
+                                <li data-i18n="helpVai.video.sceneRefUpload">上傳圖片（從電腦上傳）</li>
+                            </ul>
+                        </li>
+                        <li data-i18n="helpVai.video.scenePrompt"><strong>輸入影片描述</strong>：用文字描述您想要的影片內容，例如：「產品從左側緩緩進入畫面，背景是柔和的漸層色」</li>
+                        <li data-i18n="helpVai.video.sceneGenerate">點擊 <strong>生成</strong> 按鈕，AI 會開始生成影片片段</li>
+                    </ol>
+                    <p class="text-muted small"><i class="bi bi-coin me-1"></i><span data-i18n="helpVai.video.sceneCost">每次影片生成消耗 <strong>30 vCoin</strong>（每 5 秒為單位）</span></p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.video.manageScene">管理分鏡</h6>
+                    <ul>
+                        <li data-i18n="helpVai.video.sceneAdd"><strong>新增分鏡</strong>：點擊分鏡條末端的 <strong>+</strong> 按鈕</li>
+                        <li data-i18n="helpVai.video.sceneSwitch"><strong>切換分鏡</strong>：在底部分鏡條中點擊不同的分鏡縮圖</li>
+                        <li data-i18n="helpVai.video.sceneDelete"><strong>刪除分鏡</strong>：在分鏡編輯區域中點擊刪除按鈕</li>
+                        <li data-i18n="helpVai.video.sceneRegenerate"><strong>重新生成</strong>：對已生成的分鏡點擊重新生成按鈕</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.video.extend">影片延伸</h6>
+                    <p data-i18n="helpVai.video.extendDesc">如果生成的影片片段太短，您可以使用 <strong>延伸影片</strong> 功能：</p>
+                    <ol>
+                        <li data-i18n="helpVai.video.extendStep1">在已生成的分鏡上點擊 <strong>延伸影片</strong> 按鈕</li>
+                        <li data-i18n="helpVai.video.extendStep2">AI 會在現有影片基礎上延伸約 7 秒</li>
+                    </ol>
+                    <p class="text-muted small"><i class="bi bi-coin me-1"></i><span data-i18n="helpVai.video.extendCost">每次影片延伸消耗 <strong>30 vCoin</strong></span></p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.video.mergeDownload">合併與下載</h6>
+                    <ol>
+                        <li data-i18n="helpVai.video.mergeStep1">當所有分鏡都生成完成後，點擊 <strong>合併影片</strong> 按鈕</li>
+                        <li data-i18n="helpVai.video.mergeStep2">系統會將所有分鏡合併成一段完整的影片</li>
+                        <li data-i18n="helpVai.video.mergeStep3">合併完成後，您可以 <strong>預覽</strong> 和 <strong>下載</strong> 完整影片</li>
+                    </ol>
+
+                    {{ else if eq .Category "docs" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-file-earmark-text me-2 text-warning"></i><span data-i18n="helpVai.docs.title">vAI 文件</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.docs.intro">vAI 文件讓您可以用 AI 自動生成各種格式的專業文件。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.docs.formats">支援的文件格式</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6 col-md-3"><div class="feature-highlight text-center"><i class="bi bi-file-earmark-word fs-3 text-primary"></i><br><strong>Word</strong><br><small class="text-muted">.docx</small></div></div>
+                        <div class="col-6 col-md-3"><div class="feature-highlight text-center"><i class="bi bi-file-earmark-excel fs-3 text-success"></i><br><strong>Excel</strong><br><small class="text-muted">.xlsx</small></div></div>
+                        <div class="col-6 col-md-3"><div class="feature-highlight text-center"><i class="bi bi-file-earmark-ppt fs-3 text-danger"></i><br><strong>PowerPoint</strong><br><small class="text-muted">.pptx</small></div></div>
+                        <div class="col-6 col-md-3"><div class="feature-highlight text-center"><i class="bi bi-file-earmark-pdf fs-3 text-danger"></i><br><strong>PDF</strong><br><small class="text-muted">.pdf</small></div></div>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.docs.generate">生成新文件</h6>
+                    <ol>
+                        <li data-i18n="helpVai.docs.genStep1">進入 <strong>文件</strong> 頁面</li>
+                        <li data-i18n="helpVai.docs.genStep2">點擊 <strong>新文件</strong> 按鈕</li>
+                        <li data-i18n="helpVai.docs.genStep3">選擇文件類型（Word / Excel / PPT / PDF）</li>
+                        <li data-i18n="helpVai.docs.genStep4">輸入文件標題（選填）</li>
+                        <li><span data-i18n="helpVai.docs.genStep5">輸入描述（Prompt），詳細描述您想要生成的文件內容，例如：</span>
+                            <ul>
+                                <li data-i18n="helpVai.docs.genExampleWord">Word：「撰寫一份公司年度工作總結報告，包含業績回顧、團隊成長和未來展望」</li>
+                                <li data-i18n="helpVai.docs.genExampleExcel">Excel：「建立一份月度財務報表模板，包含收入、支出、利潤三個分頁」</li>
+                                <li data-i18n="helpVai.docs.genExamplePPT">PPT：「製作一份產品發布會簡報，包含產品介紹、功能亮點和定價方案」</li>
+                                <li data-i18n="helpVai.docs.genExamplePDF">PDF：「生成一份員工手冊，包含公司文化、規章制度和福利待遇」</li>
+                            </ul>
+                        </li>
+                        <li data-i18n="helpVai.docs.genStep6">點擊 <strong>生成</strong>，等待 AI 處理</li>
+                    </ol>
+                    <p class="text-muted small"><i class="bi bi-coin me-1"></i><span data-i18n="helpVai.docs.genCost">文件生成消耗 <strong>5+ vCoin</strong>（每 15 頁 5 vCoin，最低 5 vCoin）</span></p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.docs.viewDownload">查看與下載文件</h6>
+                    <ul>
+                        <li data-i18n="helpVai.docs.viewItem1">生成完成後，文件會顯示在左側 <strong>我的文件</strong> 列表中</li>
+                        <li data-i18n="helpVai.docs.viewItem2">點擊文件可查看詳情：文件標題、類型、狀態、生成日期、原始描述等</li>
+                        <li data-i18n="helpVai.docs.viewItem3">點擊 <strong>下載</strong> 按鈕將文件下載到您的電腦</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.docs.fromChat">對話中生成文件</h6>
+                    <p data-i18n="helpVai.docs.fromChatDesc">您也可以在 <strong>vAI 交談</strong> 中直接要求 AI 生成文件。生成的文件會出現在文件頁面的 <strong>對話生成</strong> 分頁中。</p>
+
+                    {{ else if eq .Category "vcoins" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-coin me-2 text-warning"></i><span data-i18n="helpVai.vcoins.title">vCoin 虛擬代幣</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.vcoins.intro">vCoin 是 vAI 平台的虛擬代幣，用於支付 AI 功能的使用費用。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.vcoins.whatIs">什麼是 vCoin？</h6>
+                    <p data-i18n="helpVai.vcoins.whatIsDesc">vCoin 是 vAI 的消費計量單位。不同的 AI 操作會消耗不同數量的 vCoin，讓您可以按需使用。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.vcoins.sources">vCoin 來源</h6>
+                    <ul>
+                        <li data-i18n="helpVai.vcoins.sourceDaily"><strong>每日免費額度</strong>：每個帳戶每天享有 5 次免費查詢</li>
+                        <li data-i18n="helpVai.vcoins.sourceMonthly"><strong>月配額</strong>：訂閱方案（vSuite / vSuite Pro）包含每月 vCoin 配額，每月自動重置</li>
+                        <li data-i18n="helpVai.vcoins.sourcePurchase"><strong>購買 vCoin</strong>：額外購買 vCoin 充值，購買的 vCoin 不會過期</li>
+                        <li data-i18n="helpVai.vcoins.sourceGift"><strong>贈送</strong>：活動或推廣期間可能獲得贈送的 vCoin</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.vcoins.rates">消耗費率</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered vai-cost-table">
+                            <thead class="table-light"><tr><th data-i18n="helpVai.vcoins.rateColOp">操作類型</th><th data-i18n="helpVai.vcoins.rateColCost">消耗</th><th data-i18n="helpVai.vcoins.rateColDesc">說明</th></tr></thead>
+                            <tbody>
+                                <tr><td><i class="bi bi-chat-dots me-2 text-primary"></i><span data-i18n="helpVai.vcoins.rateSimpleQuery">簡單查詢</span></td><td><strong>1</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateSimpleQueryDesc">基本問答、資料查詢</td></tr>
+                                <tr><td><i class="bi bi-image me-2 text-success"></i><span data-i18n="helpVai.vcoins.rateImageGen">圖片生成</span></td><td><strong>3</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateImageGenDesc">AI 圖片生成</td></tr>
+                                <tr><td><i class="bi bi-brush me-2 text-success"></i><span data-i18n="helpVai.vcoins.rateSketchGen">草圖生成</span></td><td><strong>3</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateSketchGenDesc">AI 草圖生成</td></tr>
+                                <tr><td><i class="bi bi-file-earmark-text me-2 text-warning"></i><span data-i18n="helpVai.vcoins.rateDocGen">文件生成</span></td><td><strong>5+</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateDocGenDesc">每 15 頁 5 vCoin，最低 5 vCoin</td></tr>
+                                <tr><td><i class="bi bi-camera-video me-2 text-danger"></i><span data-i18n="helpVai.vcoins.rateVideoGen">影片生成</span></td><td><strong>20</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateVideoGenDesc">AI 影片生成（每 5 秒為單位）</td></tr>
+                                <tr><td><i class="bi bi-camera-video me-2 text-danger"></i><span data-i18n="helpVai.vcoins.rateVideoExtend">影片延伸</span></td><td><strong>20</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateVideoExtendDesc">AI 影片延伸（每 5 秒為單位）</td></tr>
+                                <tr><td><i class="bi bi-textarea-t me-2 text-info"></i><span data-i18n="helpVai.vcoins.rateOcr">OCR 文字辨識</span></td><td><strong>1</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateOcrDesc">圖片文字辨識</td></tr>
+                                <tr><td><i class="bi bi-mic me-2 text-info"></i><span data-i18n="helpVai.vcoins.rateStt">語音轉文字</span></td><td><strong>1</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateSttDesc">語音轉文字</td></tr>
+                                <tr><td><i class="bi bi-diagram-3 me-2 text-info"></i><span data-i18n="helpVai.vcoins.rateFieldMatch">欄位匹配</span></td><td><strong>1</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateFieldMatchDesc">AI 自動匹配欄位</td></tr>
+                                <tr><td><i class="bi bi-lightbulb me-2 text-info"></i><span data-i18n="helpVai.vcoins.rateAiSuggest">AI 建議/分析</span></td><td><strong>1</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateAiSuggestDesc">AI 智能建議與分析</td></tr>
+                                <tr><td><i class="bi bi-search me-2 text-primary"></i><span data-i18n="helpVai.vcoins.rateLeadAnalyze">Lead Finder AI 分析</span></td><td><strong>1</strong> vCoin</td><td data-i18n="helpVai.vcoins.rateLeadAnalyzeDesc">AI 分析公司資料並產生搜尋關鍵字</td></tr>
+                                <tr><td><i class="bi bi-globe me-2 text-primary"></i><span data-i18n="helpVai.vcoins.rateLeadSearch">Lead Finder 搜尋</span></td><td><strong>1</strong> vCoin / 50 筆</td><td data-i18n="helpVai.vcoins.rateLeadSearchDesc">每 50 筆搜尋結果 1 vCoin，無條件進位</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.vcoins.purchase">購買 vCoin</h6>
+                    <p data-i18n="helpVai.vcoins.purchaseDesc">您可以在 <strong>vCoin</strong> 頁面購買額外的 vCoin：</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th data-i18n="helpVai.vcoins.planCol">方案</th><th data-i18n="helpVai.vcoins.amountCol">vCoin 數量</th><th data-i18n="helpVai.vcoins.priceCol">價格 (USD)</th><th data-i18n="helpVai.vcoins.noteCol">備註</th></tr></thead>
+                            <tbody>
+                                <tr><td>Small</td><td>100</td><td>$20</td><td>—</td></tr>
+                                <tr><td>Medium</td><td>300</td><td>$50</td><td data-i18n="helpVai.vcoins.saveMedium">省 17%</td></tr>
+                                <tr class="table-warning"><td><strong>Large</strong></td><td><strong>700</strong></td><td><strong>$100</strong></td><td><strong data-i18n="helpVai.vcoins.saveLarge">最受歡迎，省 30%</strong></td></tr>
+                                <tr><td>Mega</td><td>1,600</td><td>$200</td><td data-i18n="helpVai.vcoins.saveMega">省 38%</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.vcoins.balance">查看餘額與交易記錄</h6>
+                    <p data-i18n="helpVai.vcoins.balanceDesc">前往 <strong>vCoin</strong> 頁面，您可以查看：</p>
+                    <ul>
+                        <li data-i18n="helpVai.vcoins.balanceTotal"><strong>總可用餘額</strong>：當前可用的 vCoin 總數</li>
+                        <li data-i18n="helpVai.vcoins.balanceMonthly"><strong>月配額餘額</strong>：訂閱方案的月配額剩餘量及重置日期</li>
+                        <li data-i18n="helpVai.vcoins.balanceDaily"><strong>每日免費額度</strong>：當日剩餘的免費查詢次數</li>
+                        <li data-i18n="helpVai.vcoins.balancePurchased"><strong>已購買餘額</strong>：購買的 vCoin 存量</li>
+                        <li data-i18n="helpVai.vcoins.balanceHistory"><strong>交易記錄</strong>：所有 vCoin 的使用和充值記錄，支援按類型篩選</li>
+                    </ul>
+
+                    {{ else if eq .Category "account" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-person-circle me-2 text-info"></i><span data-i18n="helpVai.account.title">帳戶與訂閱</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.account.intro">管理您的 vAI 帳戶設定和訂閱方案。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.account.settings">帳戶設定</h6>
+                    <p data-i18n="helpVai.account.settingsDesc">點擊右上角的用戶頭像，選擇 <strong>帳戶設置</strong>，您可以：</p>
+                    <ul>
+                        <li data-i18n="helpVai.account.settingsItem1">修改個人資料（姓名、電子郵件、電話等）</li>
+                        <li data-i18n="helpVai.account.settingsItem2">更改密碼</li>
+                        <li data-i18n="helpVai.account.settingsItem3">上傳或修改頭像</li>
+                        <li data-i18n="helpVai.account.settingsItem4">設定語言偏好</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.account.plans">訂閱方案</h6>
+                    <p data-i18n="helpVai.account.plansDesc">vAI 提供以下訂閱方案：</p>
+                    <div class="table-responsive">
+                        <table style="display: none !important;" class="d-none"  class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th data-i18n="helpVai.account.planCol">方案</th><th data-i18n="helpVai.account.monthlyCol">月付</th><th data-i18n="helpVai.account.yearlyCol">年付</th><th data-i18n="helpVai.account.vcoinCol">月 vCoin 配額</th><th data-i18n="helpVai.account.featuresCol">主要特色</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>vSuite</strong></td><td>$380/<span data-i18n="helpVai.account.month">月</span></td><td>$250/<span data-i18n="helpVai.account.month">月</span><br><small class="text-muted" data-i18n="helpVai.account.vsuiteSave">年付 $3,000，省 $1,560</small></td><td>1,000</td><td data-i18n="helpVai.account.vsuiteFeatures">所有功能、無限記錄、無廣告、vOffice AI 智慧辦公</td></tr>
+                                <tr><td><strong>vSuite Pro</strong></td><td>$680/<span data-i18n="helpVai.account.month">月</span></td><td>$500/<span data-i18n="helpVai.account.month">月</span><br><small class="text-muted" data-i18n="helpVai.account.vsuiteProSave">年付 $6,000，省 $2,160</small></td><td>2,000</td><td data-i18n="helpVai.account.vsuiteProFeatures">所有 vSuite 功能 + 企業支援服務、資料遺失防護、安全控管</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p data-i18n="helpVai.account.plansNote">訂閱方案包含的 vCoin 月配額會在每月自動重置。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.account.manageSubscription">管理訂閱</h6>
+                    <ol>
+                        <li data-i18n="helpVai.account.manageStep1">點擊右上角的用戶頭像，選擇 <strong>訂閱</strong></li>
+                        <li data-i18n="helpVai.account.manageStep2">查看當前訂閱方案和到期日期</li>
+                        <li data-i18n="helpVai.account.manageStep3">升級或降級訂閱方案</li>
+                        <li data-i18n="helpVai.account.manageStep4">管理付款方式</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.account.logout">登出</h6>
+                    <p data-i18n="helpVai.account.logoutDesc">點擊右上角的用戶頭像，選擇 <strong>登出</strong> 即可安全登出帳戶。系統支援跨分頁同步登出，在任一分頁登出後，其他分頁也會自動登出。</p>
+
+                    {{ else if eq .Category "faq" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-question-circle me-2 text-secondary"></i><span data-i18n="helpVai.faq.title">常見問題</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVai.faq.intro">以下是 vAI 用戶最常詢問的問題。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVai.faq.q1">vAI 是免費的嗎？</h6>
+                    <p data-i18n="helpVai.faq.a1">vAI 提供每天 5 次免費查詢額度。超出免費額度後，需使用 vCoin 支付。您可以訂閱 vSuite 方案獲取每月 vCoin 配額，或單獨購買 vCoin。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.faq.q2">vCoin 會過期嗎？</h6>
+                    <p data-i18n="helpVai.faq.a2"><strong>購買的 vCoin 不會過期</strong>，可以一直使用。訂閱方案的月配額則會在每月重置，未使用的月配額不會累積到下個月。每日免費額度會在每天重置。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.faq.q3">支援哪些檔案格式上傳？</h6>
+                    <p data-i18n="helpVai.faq.a3desc">vAI 交談支援以下檔案格式上傳分析：</p>
+                    <ul>
+                        <li data-i18n="helpVai.faq.a3docs"><strong>文件</strong>：.xls, .xlsx, .doc, .docx, .ppt, .pptx, .pdf, .txt</li>
+                        <li data-i18n="helpVai.faq.a3images"><strong>圖片</strong>：.jpg, .jpeg, .png</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.faq.q4">AI 生成的圖片/影片/文件品質不滿意怎麼辦？</h6>
+                    <p data-i18n="helpVai.faq.a4desc">您可以：</p>
+                    <ul>
+                        <li data-i18n="helpVai.faq.a4item1">嘗試 <strong>修改描述（Prompt）</strong>，提供更具體的細節和要求</li>
+                        <li data-i18n="helpVai.faq.a4item2">使用 <strong>重新生成</strong> 功能</li>
+                        <li data-i18n="helpVai.faq.a4item3">對於圖片，您可以使用內建繪圖工具進一步編輯</li>
+                        <li data-i18n="helpVai.faq.a4item4">對於影片，您可以使用 <strong>延伸影片</strong> 功能增加長度</li>
+                    </ul>
+                    <p class="text-muted small" data-i18n="helpVai.faq.a4note">注意：重新生成會再次消耗 vCoin。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.faq.q5">如何從 vAI 交談中生成圖片或影片？</h6>
+                    <p data-i18n="helpVai.faq.a5desc">在 vAI 交談中，您可以直接使用自然語言請求 AI 生成圖片或影片。例如：</p>
+                    <ul>
+                        <li data-i18n="helpVai.faq.a5ex1">「幫我生成一張產品推廣圖片」</li>
+                        <li data-i18n="helpVai.faq.a5ex2">「幫我生成一段產品推廣影片」</li>
+                        <li data-i18n="helpVai.faq.a5ex3">「幫我生成一份公司發展簡報」</li>
+                    </ul>
+                    <p data-i18n="helpVai.faq.a5note">AI 會自動調用對應的功能，生成的結果可以在圖片/影片/文件頁面的 <strong>對話生成</strong> 分頁中找到。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.faq.q6">我可以在多個裝置上使用 vAI 嗎？</h6>
+                    <p data-i18n="helpVai.faq.a6">可以。vAI 是基於網頁的應用，您可以在任何裝置的瀏覽器中登入使用。您的對話記錄、草圖、影片專案和文件都會同步保存在雲端。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.faq.q7">vAI 和 vWork 有什麼關係？</h6>
+                    <p data-i18n="helpVai.faq.a7">vAI 和 vWork 都是 V-sys 的產品。vAI 是獨立的 AI 助手平台，而 vWork 是企業管理系統（ERP/CMS/POS）。兩者使用同一個帳戶體系，您可以在 vAI 中查詢和分析 vWork 中的業務數據（如訂單、客戶、銷售等）。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVai.faq.q8">遇到其他問題怎麼辦？</h6>
+                    <p data-i18n="helpVai.faq.a8desc">如果您的問題未在以上列出，歡迎透過以下方式聯繫我們：</p>
+                    <ul>
+                        <li><a href="/contact?product=vai" data-i18n="helpVai.faq.a8contact">聯絡客服</a><span data-i18n="helpVai.faq.a8contactPost"> 提交問題</span></li>
+                        <li><span data-i18n="helpVai.faq.a8email">發送電子郵件至 </span><a href="mailto:info@vsysai.com">info@vsysai.com</a></li>
+                    </ul>
+
+                    {{ else }}
+                    <!-- Unknown category fallback -->
+                    <h1 class="h3 mb-4"><i class="bi bi-exclamation-circle me-2 text-muted"></i><span data-i18n="helpVai.notFound.title">找不到此分類</span></h1>
+                    <p class="text-muted" data-i18n="helpVai.notFound.desc">抱歉，找不到您請求的幫助分類。請返回 <a href="/help/vai">vAI 支援中心</a> 瀏覽所有分類。</p>
+
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Support (detail view) -->
+    <div class="row mt-4 mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-headset me-2"></i><span data-i18n="helpVai.detail.support.title">需要更多幫助？</span></h5>
+                    <p class="mb-2"><span data-i18n="helpVai.detail.support.desc">如果以上內容未能解答您的問題，歡迎 </span><a href="/contact?product=vai" data-i18n="helpVai.detail.support.link">聯絡客服</a>。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ end }}
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer-light">
+        <div class="container-fluid px-4">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="V-sys Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" id="footerProductVWork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" id="footerInfoHome" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/" id="footerInfoAbout" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
+                        <li class="mb-2"><a href="/sales-partner" class="text-muted text-decoration-none" data-i18n="footer.salesPartnerJoin">銷售商加盟</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contactUs">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none">info@vsysai.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span data-i18n="footer.location">香港</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span data-i18n="footer.hours">週一至週五 9:00 - 18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof I18n !== 'undefined') I18n.init();
+
+            // Nav, footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+
+            // Mobile sidebar
+            var toggle = document.getElementById('mobileMenuToggle');
+            var sidebar = document.getElementById('mobileSidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            function closeSidebar() { if (sidebar) sidebar.classList.remove('show'); if (overlay) overlay.classList.remove('show'); }
+            if (toggle) toggle.addEventListener('click', function(e) { e.preventDefault(); if (sidebar) sidebar.classList.toggle('show'); if (overlay) overlay.classList.toggle('show'); });
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar on nav link click
+            document.querySelectorAll('#mobileSidebar .nav-link:not(.nav-group-toggle)').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (!this.hasAttribute('data-lang')) closeSidebar();
+                });
+            });
+
+            // Language
+            document.querySelectorAll('[data-lang]').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) I18n.switchLanguage(this.getAttribute('data-lang'));
+                    closeSidebar();
+                });
+            });
+
+            // Auth status
+            checkAuthAndUpdateNav();
+        });
+
+        async function checkAuthAndUpdateNav() {
+            const loginLink = document.getElementById('loginLink');
+            const userDropdownNav = document.getElementById('userDropdown');
+            const userNameSpan = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            async function fetchUser() {
+                try {
+                    const headers = { 'Accept': 'application/json' };
+                    const token = localStorage.getItem('auth_token');
+                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                    const sub = localStorage.getItem('tenant_subdomain');
+                    if (sub) headers['X-Tenant-Subdomain'] = sub;
+                    const resp = await fetch('/api/v1/user/me', { headers });
+                    if (!resp.ok) return null;
+                    return await resp.json();
+                } catch (_) { return null; }
+            }
+
+            const user = await fetchUser();
+            const isLoggedIn = !!(user && user.name);
+
+            if (isLoggedIn) {
+                if (loginLink) loginLink.style.display = 'none';
+                if (userDropdownNav) userDropdownNav.style.display = '';
+                if (userNameSpan) userNameSpan.textContent = user.name;
+
+                const avatarImg = document.getElementById('publicUserAvatar');
+                const avatarIcon = document.getElementById('publicUserIcon');
+                if (avatarImg) {
+                    let url = (user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            if (avatarIcon) avatarIcon.style.display = '';
+                        };
+                    }
+                }
+
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                              .finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace(window.location.pathname + '?logged_out=1');
+                              });
+                        }
+                    });
+                }
+            } else {
+                if (loginLink) loginLink.style.display = '';
+                if (userDropdownNav) userDropdownNav.style.display = 'none';
+            }
+        }
+    </script>
+    <!-- Cross-tab logout detection -->
+    <script>
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'auth_token' && !e.newValue) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === null) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === 'auth_token') {
+                checkAuthAndUpdateNav();
+            }
+        });
+    </script>
+    <!-- Navbar scroll shadow -->
+    <script>
+        (function() {
+            var navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            function handleScroll() { if (window.scrollY > 60) navbar.classList.add('scrolled'); else navbar.classList.remove('scrolled'); }
+            handleScroll();
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
+    </script>
+    <!-- Help category card styles -->
+    <style>
+        .help-category-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+        }
+        .help-category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .card-body h6.fw-bold {
+            border-left: 3px solid #0d6efd;
+            padding-left: 0.75rem;
+        }
+        .vai-cost-table th, .vai-cost-table td {
+            vertical-align: middle;
+        }
+        .feature-highlight {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+
+</body>
+</html>

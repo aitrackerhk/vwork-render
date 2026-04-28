@@ -1,0 +1,181 @@
+{{ define "pages/inventory_settings" }}
+<style>
+    .settings-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .setting-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+    
+    .setting-title {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .setting-description {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    .form-check.form-switch .form-check-input {
+        width: 3rem;
+        height: 1.5rem;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-gear"></i> <span data-i18n="inventorySettings.title">出入庫設定</span></h2>
+        <a href="/inventory-processing" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="inventorySettings.backToProcessing">返回出入庫處理</span>
+        </a>
+    </div>
+
+    <form id="settingsForm">
+        <!-- 無需出入庫設定 -->
+        <div class="settings-card">
+            <h5 class="mb-3"><i class="bi bi-check2-circle"></i> <span data-i18n="inventorySettings.noNeedSection.title">無需出入庫設定</span></h5>
+            <p class="text-muted mb-3">
+                <strong data-i18n="inventorySettings.noNeedSection.on">開啟</strong>：<span data-i18n="inventorySettings.noNeedSection.descOn">出入庫記錄自動完成並即時更新庫存，無需在出入庫處理頁面操作</span><br>
+                <strong data-i18n="inventorySettings.noNeedSection.off">關閉</strong>：<span data-i18n="inventorySettings.noNeedSection.descOff">需到出入庫處理頁面掃碼或點擊完成，才會更新庫存</span>
+            </p>
+
+            <div class="setting-item">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="setting-title" data-i18n="inventorySettings.noNeedSection.settingTitle">無需出入庫處理</div>
+                        <div class="setting-description" data-i18n="inventorySettings.noNeedSection.settingDesc">自動完成出入庫並計算庫存</div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input" type="checkbox" id="autoCompleteIfNoNeed" name="auto_complete_if_no_need">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 續件掃碼設定 -->
+        <div class="settings-card">
+            <h5 class="mb-3"><i class="bi bi-list-check"></i> <span data-i18n="inventorySettings.scanSection.title">續件掃碼設定</span></h5>
+            <p class="text-muted mb-3">
+                <strong data-i18n="inventorySettings.scanSection.off">關閉</strong>：<span data-i18n="inventorySettings.scanSection.descOff">掃描單號 QR Code 後自動完成出入庫（更新庫存）</span><br>
+                <strong data-i18n="inventorySettings.scanSection.on">開啟</strong>：<span data-i18n="inventorySettings.scanSection.descOn">掃描單號後，需再逐一掃描每個產品條碼才能完成</span>
+            </p>
+            
+            <div class="setting-item">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="setting-title" data-i18n="inventorySettings.scanSection.outboundTitle">出庫續件掃碼</div>
+                        <div class="setting-description" data-i18n="inventorySettings.scanSection.outboundDesc">開啟後，出庫時需要逐件掃描產品條碼確認</div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input" type="checkbox" id="requiresItemByItemOutbound" name="requires_item_by_item_outbound">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="setting-title" data-i18n="inventorySettings.scanSection.inboundTitle">入庫續件掃碼</div>
+                        <div class="setting-description" data-i18n="inventorySettings.scanSection.inboundDesc">開啟後，入庫時需要逐件掃描產品條碼確認</div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input" type="checkbox" id="requiresItemByItemInbound" name="requires_item_by_item_inbound">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 儲存按鈕 -->
+        <div class="d-flex justify-content-end gap-2 mb-4">
+            <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="inventorySettings.reset">重置</span>
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg"></i> <span data-i18n="inventorySettings.save">儲存設定</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let originalSettings = null;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+        await loadSettings();
+    });
+
+    async function loadSettings() {
+        try {
+            const loadingText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventorySettings.loading') : '載入設定中...';
+            App.showLoading(loadingText);
+            const settings = await App.apiRequest('/inventory-settings');
+            App.hideLoading();
+            
+            originalSettings = settings;
+            populateForm(settings);
+        } catch (error) {
+            App.hideLoading();
+            const failText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventorySettings.loadFailed') : '載入設定失敗：';
+            App.showAlert(failText + error.message, 'danger');
+        }
+    }
+
+    function populateForm(settings) {
+        document.getElementById('autoCompleteIfNoNeed').checked = settings.auto_complete_if_no_need !== false;
+        document.getElementById('requiresItemByItemOutbound').checked = settings.requires_item_by_item_outbound || false;
+        document.getElementById('requiresItemByItemInbound').checked = settings.requires_item_by_item_inbound || false;
+    }
+
+    function resetForm() {
+        if (originalSettings) {
+            populateForm(originalSettings);
+        }
+    }
+
+    document.getElementById('settingsForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const data = {
+            auto_complete_if_no_need: document.getElementById('autoCompleteIfNoNeed').checked,
+            requires_item_by_item_outbound: document.getElementById('requiresItemByItemOutbound').checked,
+            requires_item_by_item_inbound: document.getElementById('requiresItemByItemInbound').checked
+        };
+        
+        try {
+            const savingText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventorySettings.saving') : '儲存中...';
+            App.showLoading(savingText);
+            await App.apiRequest('/inventory-settings', {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            });
+            App.hideLoading();
+            
+            originalSettings = data;
+            const savedText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventorySettings.saved') : '設定已儲存';
+            App.showAlert(savedText, 'success');
+        } catch (error) {
+            App.hideLoading();
+            const failText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventorySettings.saveFailed') : '儲存失敗：';
+            App.showAlert(failText + error.message, 'danger');
+        }
+    });
+</script>
+{{ end }}

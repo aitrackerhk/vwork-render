@@ -1,0 +1,186 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 620" width="1440" height="620">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="50%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#f472b6;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#818cf8;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#c084fc;stop-opacity:0.2"/>
+    </linearGradient>
+    <linearGradient id="shopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="shop2Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#34d399"/>
+      <stop offset="100%" style="stop-color:#10b981"/>
+    </linearGradient>
+    <linearGradient id="shop3Grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa"/>
+      <stop offset="100%" style="stop-color:#3b82f6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background gradient -->
+  <rect width="1440" height="620" fill="url(#bgGrad)"/>
+
+  <!-- Decorative waves -->
+  <path d="M0,520 Q180,460 360,490 T720,470 T1080,500 T1440,460 L1440,620 L0,620Z" fill="url(#wave1)"/>
+  <path d="M0,560 Q200,510 400,540 T800,520 T1200,550 T1440,510 L1440,620 L0,620Z" fill="url(#wave2)"/>
+
+  <!-- Large floating circles (decorative blobs) -->
+  <circle cx="120" cy="100" r="80" fill="#fbbf24" opacity="0.15"/>
+  <circle cx="1350" cy="140" r="100" fill="#34d399" opacity="0.12"/>
+  <circle cx="700" cy="80" r="50" fill="#f472b6" opacity="0.18"/>
+  <circle cx="1100" cy="500" r="65" fill="#fbbf24" opacity="0.1"/>
+  <circle cx="200" cy="480" r="45" fill="#60a5fa" opacity="0.12"/>
+
+  <!-- Small sparkle dots -->
+  <circle cx="300" cy="150" r="4" fill="#fff" opacity="0.6"/>
+  <circle cx="500" cy="100" r="3" fill="#fff" opacity="0.5"/>
+  <circle cx="900" cy="120" r="5" fill="#fff" opacity="0.55"/>
+  <circle cx="1200" cy="180" r="3.5" fill="#fff" opacity="0.5"/>
+  <circle cx="150" cy="300" r="3" fill="#fff" opacity="0.45"/>
+  <circle cx="1300" cy="350" r="4" fill="#fff" opacity="0.5"/>
+  <circle cx="650" cy="500" r="3" fill="#fff" opacity="0.4"/>
+  <circle cx="1050" cy="250" r="3.5" fill="#fff" opacity="0.5"/>
+  <circle cx="400" cy="420" r="2.5" fill="#fff" opacity="0.45"/>
+
+  <!-- Left side: Shop/storefront illustration -->
+  <g transform="translate(100, 240)">
+    <!-- Shop building 1 (yellow) -->
+    <rect x="0" y="60" width="120" height="140" rx="12" fill="url(#shopGrad)" opacity="0.9"/>
+    <!-- Awning -->
+    <path d="M-8,60 L128,60 L120,85 L8,85 Z" fill="#f59e0b" opacity="0.7"/>
+    <path d="M-8,60 Q20,80 48,60 Q76,80 104,60 Q128,80 128,60" fill="none" stroke="#fff" stroke-width="2" opacity="0.5"/>
+    <!-- Window -->
+    <rect x="20" y="100" width="36" height="36" rx="6" fill="#fff" opacity="0.85"/>
+    <rect x="66" y="100" width="36" height="36" rx="6" fill="#fff" opacity="0.85"/>
+    <!-- Door -->
+    <rect x="38" y="150" width="44" height="50" rx="6" fill="#fff" opacity="0.9"/>
+    <circle cx="72" cy="178" r="3" fill="#f59e0b"/>
+    <!-- Signboard -->
+    <rect x="30" y="40" width="60" height="18" rx="9" fill="#fff" opacity="0.9"/>
+    <circle cx="48" cy="49" r="4" fill="#f59e0b"/>
+    <rect x="58" y="46" width="22" height="6" rx="3" fill="#f59e0b" opacity="0.5"/>
+  </g>
+
+  <!-- Shop building 2 (green) -->
+  <g transform="translate(250, 260)">
+    <rect x="0" y="50" width="110" height="120" rx="12" fill="url(#shop2Grad)" opacity="0.85"/>
+    <path d="M-6,50 L116,50 L110,72 L6,72 Z" fill="#10b981" opacity="0.6"/>
+    <rect x="15" y="85" width="80" height="35" rx="6" fill="#fff" opacity="0.85"/>
+    <!-- Products on shelf -->
+    <rect x="22" y="90" width="14" height="22" rx="4" fill="#fbbf24" opacity="0.7"/>
+    <rect x="40" y="95" width="14" height="17" rx="4" fill="#f472b6" opacity="0.7"/>
+    <rect x="58" y="88" width="14" height="24" rx="4" fill="#60a5fa" opacity="0.7"/>
+    <rect x="76" y="92" width="14" height="20" rx="4" fill="#a78bfa" opacity="0.7"/>
+    <rect x="32" y="130" width="46" height="40" rx="6" fill="#fff" opacity="0.9"/>
+    <circle cx="65" cy="152" r="3" fill="#10b981"/>
+    <rect x="28" y="30" width="54" height="18" rx="9" fill="#fff" opacity="0.9"/>
+    <circle cx="42" cy="39" r="3.5" fill="#10b981"/>
+    <rect x="50" y="36" width="22" height="6" rx="3" fill="#10b981" opacity="0.5"/>
+  </g>
+
+  <!-- Right side: People shopping illustration -->
+  <!-- Person 1 (walking with bag) -->
+  <g transform="translate(1080, 280)">
+    <!-- Body -->
+    <circle cx="30" cy="20" r="18" fill="#fbbf24" opacity="0.9"/>
+    <rect x="15" y="38" width="30" height="55" rx="12" fill="#fbbf24" opacity="0.8"/>
+    <!-- Face details -->
+    <circle cx="24" cy="17" r="2.5" fill="#fff"/>
+    <circle cx="36" cy="17" r="2.5" fill="#fff"/>
+    <path d="M24,27 Q30,33 36,27" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <!-- Shopping bag -->
+    <rect x="48" y="50" width="24" height="28" rx="5" fill="#ec4899" opacity="0.85"/>
+    <path d="M52,50 Q60,40 68,50" fill="none" stroke="#ec4899" stroke-width="2.5"/>
+    <!-- Star on bag -->
+    <polygon points="60,58 62,64 68,64 63,68 65,74 60,70 55,74 57,68 52,64 58,64" fill="#fff" opacity="0.8" transform="scale(0.6) translate(40, 30)"/>
+  </g>
+
+  <!-- Person 2 (browsing) -->
+  <g transform="translate(1220, 300)">
+    <circle cx="25" cy="18" r="16" fill="#60a5fa" opacity="0.9"/>
+    <rect x="12" y="34" width="26" height="48" rx="10" fill="#60a5fa" opacity="0.75"/>
+    <circle cx="20" cy="15" r="2" fill="#fff"/>
+    <circle cx="30" cy="15" r="2" fill="#fff"/>
+    <path d="M20,24 Q25,29 30,24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+    <!-- Phone in hand -->
+    <rect x="40" y="42" width="14" height="22" rx="3" fill="#1e293b" opacity="0.7"/>
+    <rect x="42" y="45" width="10" height="14" rx="1.5" fill="#818cf8" opacity="0.6"/>
+  </g>
+
+  <!-- Shopping cart icon (center-right) -->
+  <g transform="translate(1000, 420)" opacity="0.25">
+    <path d="M10,5 L20,5 L25,35 L55,35 L60,15 L28,15" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="32" cy="45" r="5" fill="#fff"/>
+    <circle cx="52" cy="45" r="5" fill="#fff"/>
+  </g>
+
+  <!-- Floating product cards -->
+  <!-- Card 1 (top right) -->
+  <g transform="translate(1150, 100)">
+    <rect x="0" y="0" width="100" height="80" rx="14" fill="#fff" opacity="0.15"/>
+    <rect x="10" y="10" width="80" height="35" rx="8" fill="#fff" opacity="0.1"/>
+    <rect x="10" y="52" width="50" height="8" rx="4" fill="#fff" opacity="0.15"/>
+    <rect x="10" y="64" width="30" height="6" rx="3" fill="#fff" opacity="0.1"/>
+  </g>
+
+  <!-- Card 2 (left floating) -->
+  <g transform="translate(60, 100)">
+    <rect x="0" y="0" width="90" height="70" rx="12" fill="#fff" opacity="0.12"/>
+    <rect x="10" y="10" width="70" height="30" rx="7" fill="#fff" opacity="0.08"/>
+    <rect x="10" y="46" width="40" height="7" rx="3.5" fill="#fff" opacity="0.12"/>
+    <rect x="10" y="57" width="25" height="5" rx="2.5" fill="#fff" opacity="0.08"/>
+  </g>
+
+  <!-- Service icons floating -->
+  <!-- Wrench icon -->
+  <g transform="translate(380, 130)" opacity="0.3">
+    <circle cx="20" cy="20" r="20" fill="#fff" opacity="0.2"/>
+    <path d="M14,26 L26,14 M24,12 L28,16 L26,18 L22,14 Z" fill="#fff" stroke="#fff" stroke-width="1.5"/>
+  </g>
+
+  <!-- Package icon -->
+  <g transform="translate(1000, 140)" opacity="0.25">
+    <rect x="5" y="10" width="30" height="25" rx="4" fill="none" stroke="#fff" stroke-width="2"/>
+    <path d="M5,18 L35,18 M20,10 L20,35" fill="none" stroke="#fff" stroke-width="1.5"/>
+    <path d="M10,10 L20,3 L30,10" fill="none" stroke="#fff" stroke-width="2"/>
+  </g>
+
+  <!-- Location pin -->
+  <g transform="translate(850, 420)" opacity="0.2">
+    <path d="M15,5 C8,5 3,10 3,17 C3,27 15,38 15,38 C15,38 27,27 27,17 C27,10 22,5 15,5Z" fill="#fff"/>
+    <circle cx="15" cy="16" r="5" fill="#8b5cf6" opacity="0.5"/>
+  </g>
+
+  <!-- Connecting dots/lines -->
+  <g opacity="0.1">
+    <line x1="350" y1="300" x2="500" y2="250" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+    <line x1="900" y1="280" x2="1050" y2="320" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+    <line x1="600" y1="450" x2="780" y2="400" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+  </g>
+
+  <!-- Ground/floor area -->
+  <rect x="80" y="440" width="320" height="8" rx="4" fill="#fff" opacity="0.08"/>
+  <rect x="1050" y="420" width="240" height="6" rx="3" fill="#fff" opacity="0.06"/>
+
+  <!-- Small decorative shapes -->
+  <rect x="500" y="200" width="16" height="16" rx="4" fill="#fbbf24" opacity="0.2" transform="rotate(15, 508, 208)"/>
+  <rect x="820" y="160" width="12" height="12" rx="3" fill="#34d399" opacity="0.2" transform="rotate(30, 826, 166)"/>
+  <polygon points="680,440 686,452 698,452 688,460 692,472 680,464 668,472 672,460 662,452 674,452" fill="#fbbf24" opacity="0.15"/>
+  <polygon points="440,100 444,108 452,108 446,114 448,122 440,116 432,122 434,114 428,108 436,108" fill="#fff" opacity="0.25"/>
+  <polygon points="1320,430 1323,436 1330,436 1325,440 1327,446 1320,442 1313,446 1315,440 1310,436 1317,436" fill="#fff" opacity="0.2"/>
+
+  <!-- Triangle confetti -->
+  <polygon points="560,130 570,115 580,130" fill="#f472b6" opacity="0.15" transform="rotate(20, 570, 122)"/>
+  <polygon points="1250,220 1258,208 1266,220" fill="#fbbf24" opacity="0.12" transform="rotate(-10, 1258, 214)"/>
+  <polygon points="180,420 188,408 196,420" fill="#34d399" opacity="0.15" transform="rotate(15, 188, 414)"/>
+</svg>

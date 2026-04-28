@@ -1,0 +1,823 @@
+{{define "pages/ad_position_detail"}}
+<div class="container-fluid py-4">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-2">
+          <li class="breadcrumb-item"><a href="/ad-positions" data-i18n="pages.adPositions.title">廣告位置管理</a></li>
+          <li class="breadcrumb-item active" id="positionName" data-i18n="common.loading">載入中...</li>
+        </ol>
+      </nav>
+      <h4 class="mb-0" id="pageTitle"><i class="bi bi-display me-2"></i><span data-i18n="pages.carouselSettings.pageTitle">廣告位置詳情</span></h4>
+    </div>
+    <div id="headerActions">
+      <!-- 動態按鈕區域 -->
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3" id="adPositionTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="ads-tab" data-bs-toggle="tab" data-bs-target="#ads-content" type="button" role="tab">
+        <i class="bi bi-collection-play me-1"></i>
+        <span data-i18n="pages.ads.title">廣告管理</span>
+        <span class="badge bg-secondary ms-1" id="adCountBadge">0</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings-content" type="button" role="tab">
+        <i class="bi bi-gear me-1"></i>
+        <span data-i18n="pages.carouselSettings.title">輪播設定</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="preview-tab" data-bs-toggle="tab" data-bs-target="#preview-content" type="button" role="tab">
+        <i class="bi bi-eye me-1"></i>
+        <span data-i18n="pages.carouselSettings.preview">預覽</span>
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  <div class="tab-content" id="adPositionTabsContent">
+    
+    <!-- 廣告管理 Tab -->
+    <div class="tab-pane fade show active" id="ads-content" role="tabpanel">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0" data-i18n="pages.ads.list">廣告列表</h5>
+          <button class="btn btn-primary btn-sm" onclick="showCreateAdModal()">
+            <i class="bi bi-plus-lg me-1"></i><span data-i18n="pages.ads.create">新增廣告</span>
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- 過濾 -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <select class="form-select form-select-sm" id="mediaTypeFilter">
+                <option value="" data-i18n="pages.ads.filterType">全部類型</option>
+                <option value="image" data-i18n="pages.ads.image">圖片</option>
+                <option value="video" data-i18n="pages.ads.video">影片</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select form-select-sm" id="statusFilter">
+                <option value="" data-i18n="pages.ads.filterStatus">全部狀態</option>
+                <option value="true" data-i18n="pages.ads.active">啟用</option>
+                <option value="false" data-i18n="pages.ads.inactive">停用</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="搜索廣告名稱..." data-i18n-placeholder="pages.ads.searchPlaceholder">
+            </div>
+          </div>
+
+          <!-- 廣告列表 -->
+          <div class="row" id="adsList">
+            <div class="col-12 text-center text-muted py-5" data-i18n="common.loading">載入中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 輪播設定 Tab -->
+    <div class="tab-pane fade" id="settings-content" role="tabpanel">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0" data-i18n="pages.carouselSettings.playbackSettings">播放設定</h5>
+            </div>
+            <div class="card-body">
+              <div class="mb-3">
+                <label class="form-label" data-i18n="pages.carouselSettings.slideInterval">圖片輪播秒數</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="slideInterval" value="5" min="1" max="300">
+                  <span class="input-group-text" data-i18n="pages.carouselSettings.slideIntervalUnit">秒</span>
+                </div>
+                <small class="text-muted" data-i18n="pages.adPositions.slideIntervalHint">每張圖片顯示的時間，影片會播放完整長度</small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" data-i18n="pages.carouselSettings.transitionDuration">轉場時間</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="transitionDuration" value="500" min="0" max="5000" step="100">
+                  <span class="input-group-text" data-i18n="pages.carouselSettings.transitionUnit">毫秒</span>
+                </div>
+              </div>
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="autoUpdate" checked>
+                <label class="form-check-label" for="autoUpdate" data-i18n="pages.carouselSettings.autoUpdate">自動更新</label>
+                <small class="d-block text-muted" data-i18n="pages.carouselSettings.autoUpdateHint">輪播播放器會定期檢查更新並下載新內容</small>
+              </div>
+              <div class="mb-3" id="updateIntervalGroup">
+                <label class="form-label" data-i18n="pages.carouselSettings.updateInterval">更新檢查間隔</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="updateInterval" value="3600" min="60" max="86400">
+                  <span class="input-group-text" data-i18n="pages.carouselSettings.updateIntervalUnit">秒</span>
+                </div>
+                <small class="text-muted" data-i18n="pages.carouselSettings.updateIntervalHint">建議值: 3600 (1小時)</small>
+              </div>
+              <button class="btn btn-primary" onclick="saveSettings()">
+                <i class="bi bi-check-lg me-1"></i><span data-i18n="pages.carouselSettings.saveSettings">保存設定</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5 class="mb-0" data-i18n="pages.carouselSettings.downloadTitle">下載輪播</h5>
+            </div>
+            <div class="card-body">
+              <p class="text-muted" data-i18n="pages.carouselSettings.downloadDesc">生成包含所有廣告媒體和播放器的 ZIP 壓縮包，可在離線環境使用。</p>
+              
+              <div class="alert alert-info">
+                <h6 class="alert-heading"><i class="bi bi-info-circle me-1"></i><span data-i18n="pages.carouselSettings.zipContents">ZIP 包含內容</span></h6>
+                <ul class="mb-0 small">
+                  <li><strong>media/</strong> - <span data-i18n="pages.carouselSettings.zipMedia">所有圖片和影片文件</span></li>
+                  <li><strong>manifest.json</strong> - <span data-i18n="pages.carouselSettings.zipManifest">輪播配置文件</span></li>
+                  <li><strong>carousel-player.exe</strong> - <span data-i18n="pages.carouselSettings.zipPlayer">輪播播放器程式</span></li>
+                  <li><strong>啟動輪播.bat</strong> - <span data-i18n="pages.carouselSettings.zipLauncher">快速啟動腳本</span></li>
+                </ul>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-6">
+                  <h6 data-i18n="pages.carouselSettings.adCount">廣告數量</h6>
+                  <p class="fs-3 mb-0" id="settingsAdCount">-</p>
+                </div>
+                <div class="col-6">
+                  <h6 data-i18n="pages.carouselSettings.version">版本號</h6>
+                  <p class="mb-0">
+                    <span class="badge bg-primary fs-6" id="currentVersion">v1</span>
+                  </p>
+                </div>
+              </div>
+
+              <button class="btn btn-success btn-lg w-100" onclick="downloadCarousel()">
+                <i class="bi bi-download me-2"></i><span data-i18n="pages.carouselSettings.downloadZip">下載輪播 ZIP</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 預覽 Tab -->
+    <div class="tab-pane fade" id="preview-content" role="tabpanel">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0" data-i18n="pages.carouselSettings.previewTitle">輪播預覽</h5>
+          <div>
+            <button class="btn btn-outline-secondary btn-sm" onclick="refreshPreview()">
+              <i class="bi bi-arrow-clockwise"></i> <span data-i18n="pages.carouselSettings.refresh">刷新</span>
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="ad-preview-shell" id="previewShell">
+            <div id="previewStage" class="ad-preview-stage">
+              <div class="ad-preview-placeholder">
+                <div class="text-center">
+                  <i class="bi bi-collection-play fs-1 d-block mb-2"></i>
+                  <span data-i18n="common.loading">載入中...</span>
+                </div>
+              </div>
+            </div>
+            <div class="ad-preview-controls" id="previewControls">
+              <button type="button" id="previewPrev">&lt;</button>
+              <button type="button" id="previewExit" data-i18n="common.exit">離開</button>
+              <button type="button" id="previewNext">&gt;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 創建/編輯廣告 Modal -->
+<div class="modal fade" id="adModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="adModalTitle" data-i18n="pages.ads.create">新增廣告</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="adId">
+        <div class="mb-3">
+          <label class="form-label"><span data-i18n="pages.ads.name">廣告名稱</span> <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="adName" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.ads.mediaType">媒體類型</label>
+          <select class="form-select" id="adMediaType">
+            <option value="image" data-i18n="pages.ads.image">圖片</option>
+            <option value="video" data-i18n="pages.ads.video">影片</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label"><span data-i18n="pages.ads.mediaFile">媒體文件</span> <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="adMediaURL" placeholder="媒體 URL" data-i18n-placeholder="pages.ads.mediaURL" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="document.getElementById('adMediaFile').click()">
+              <i class="bi bi-upload"></i> <span data-i18n="pages.ads.upload">上傳</span>
+            </button>
+          </div>
+          <input type="file" id="adMediaFile" class="d-none" accept="image/*,video/*" onchange="uploadAdMedia(this)">
+          <input type="hidden" id="adMediaPath">
+          <div class="alert alert-info mt-2 py-2 small">
+            <i class="bi bi-info-circle me-1"></i>
+            <span data-i18n="pages.ads.resolutionHint">建議解析度：請上傳 1920x1080 或更高解析度的圖片/影片，播放時會自動全寬顯示並保持比例。</span>
+          </div>
+        </div>
+        <div class="mb-3" id="mediaPreview" style="display:none;">
+          <label class="form-label" data-i18n="pages.ads.preview">預覽</label>
+          <div id="mediaPreviewContainer"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.duration">顯示時長 (秒)</label>
+            <input type="number" class="form-control" id="adDuration" value="5" min="1">
+            <small class="text-muted" data-i18n="pages.ads.durationHint">圖片使用此時長，影片會自動檢測</small>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.sortOrder">排序</label>
+            <input type="number" class="form-control" id="adSortOrder" value="0" min="0">
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.startDate">開始日期</label>
+            <input type="datetime-local" class="form-control" id="adStartDate">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label" data-i18n="pages.ads.endDate">結束日期</label>
+            <input type="datetime-local" class="form-control" id="adEndDate">
+          </div>
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" id="adIsActive" checked>
+          <label class="form-check-label" for="adIsActive" data-i18n="pages.ads.isActive">啟用廣告</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" onclick="saveAd()" data-i18n="common.save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.ad-preview-shell {
+  position: relative;
+  background: #000;
+  height: 400px;
+  overflow: hidden;
+  cursor: none;
+}
+.ad-preview-shell.show-cursor {
+  cursor: default;
+}
+.ad-preview-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.ad-preview-item {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+.ad-preview-item.active {
+  display: flex;
+}
+.ad-preview-item img,
+.ad-preview-item video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.ad-preview-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+.ad-preview-controls.visible {
+  opacity: 1;
+}
+.ad-preview-controls button {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  min-width: 44px;
+}
+.ad-preview-controls button:hover {
+  background: #007bff;
+  color: #fff;
+}
+#previewExit:hover {
+  background: #ff4444 !important;
+  color: #fff;
+}
+.ad-preview-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+</style>
+
+<script>
+function wdT(key, fallback) { return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback; }
+const adPositionId = '{{.AdPositionID}}';
+let adModal;
+let adPosition = null;
+let settings = null;
+let ads = [];
+let previewState = {
+  items: [],
+  currentIndex: 0,
+  timer: null
+};
+let previewHideTimer = null;
+
+document.addEventListener('DOMContentLoaded', async function() {
+  adModal = new bootstrap.Modal(document.getElementById('adModal'));
+  
+  // Wait for i18n to be ready before loading data, so wdT() returns correct translations
+  if (window.I18n && I18n.whenReady) {
+    await I18n.whenReady();
+    if (I18n.updatePage) I18n.updatePage();
+  }
+
+  // 載入數據 (i18n is now ready, wdT() will return correct translations)
+  loadData();
+
+  // 過濾事件
+  document.getElementById('mediaTypeFilter').addEventListener('change', loadAds);
+  document.getElementById('statusFilter').addEventListener('change', loadAds);
+  document.getElementById('searchInput').addEventListener('input', debounce(loadAds, 300));
+
+  // 自動更新開關
+  document.getElementById('autoUpdate').addEventListener('change', function() {
+    document.getElementById('updateIntervalGroup').style.display = this.checked ? 'block' : 'none';
+  });
+
+  // Tab 切換時刷新預覽
+  document.getElementById('preview-tab').addEventListener('shown.bs.tab', function() {
+    renderPreview();
+  });
+  document.getElementById('preview-tab').addEventListener('hidden.bs.tab', function() {
+    stopPreviewPlayback();
+  });
+
+  initPreviewControls();
+});
+
+async function loadData() {
+  try {
+    // 載入廣告位置
+    const posResp = await App.apiRequest(`/api/v1/ad-positions/${adPositionId}`);
+    adPosition = posResp;
+    document.getElementById('positionName').textContent = adPosition.name;
+    document.getElementById('pageTitle').textContent = adPosition.name;
+    
+    // 載入廣告
+    await loadAds();
+    
+    // 載入輪播設定
+    await loadSettings();
+
+    // Re-apply translations after all dynamic content is rendered
+    if (window.I18n && I18n.updatePage) I18n.updatePage();
+  } catch (error) {
+    console.error('載入資料失敗:', error);
+    App.showError(wdT('pages.carouselSettings.loadFailed', '載入資料失敗'));
+  }
+}
+
+async function loadAds() {
+  const mediaType = document.getElementById('mediaTypeFilter').value;
+  const isActive = document.getElementById('statusFilter').value;
+  const search = document.getElementById('searchInput').value;
+
+  try {
+    const params = new URLSearchParams({ ad_position_id: adPositionId });
+    if (mediaType) params.append('media_type', mediaType);
+    if (isActive) params.append('is_active', isActive);
+    if (search) params.append('search', search);
+    
+    const resp = await App.apiRequest(`/api/v1/ads?${params}`);
+    ads = resp.data || [];
+    
+    document.getElementById('adCountBadge').textContent = ads.length;
+    document.getElementById('settingsAdCount').textContent = ads.length;
+    
+    renderAds();
+  } catch (error) {
+    console.error('載入廣告失敗:', error);
+    App.showError(wdT('pages.ads.loadFailed', '載入廣告失敗'));
+  }
+}
+
+async function loadSettings() {
+  try {
+    const resp = await App.apiRequest(`/api/v1/carousel/${adPositionId}/settings`);
+    settings = resp;
+    
+    document.getElementById('slideInterval').value = settings.slide_interval || 5;
+    document.getElementById('transitionDuration').value = settings.transition_duration || 500;
+    document.getElementById('autoUpdate').checked = settings.auto_update !== false;
+    document.getElementById('updateInterval').value = settings.update_interval || 3600;
+    document.getElementById('currentVersion').textContent = 'v' + (settings.version || 1);
+    
+    document.getElementById('updateIntervalGroup').style.display = 
+      document.getElementById('autoUpdate').checked ? 'block' : 'none';
+  } catch (error) {
+    console.error('載入設定失敗:', error);
+  }
+}
+
+function renderAds() {
+  const container = document.getElementById('adsList');
+  if (!ads.length) {
+    container.innerHTML = `
+      <div class="col-12 text-center text-muted py-5">
+        <i class="bi bi-collection-play fs-1 d-block mb-2"></i>
+        <p>${wdT('pages.ads.noData', '暫無廣告，點擊「新增廣告」開始添加')}</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = ads.map(ad => `
+    <div class="col-md-4 col-lg-3 mb-4">
+      <div class="card h-100 ${ad.is_active ? '' : 'opacity-50'}">
+        <div class="position-relative" style="height: 160px; background: #1a1a2e;">
+          ${ad.media_type === 'video' 
+            ? `<video src="${escapeHtml(ad.media_url)}" class="w-100 h-100" style="object-fit: cover;" muted></video>
+               <span class="position-absolute top-0 start-0 m-2 badge bg-primary"><i class="bi bi-play-fill"></i> ${wdT('pages.ads.video', '影片')}</span>`
+            : `<img src="${escapeHtml(ad.media_url)}" class="w-100 h-100" style="object-fit: cover;" alt="${escapeHtml(ad.name)}">`
+          }
+          <span class="position-absolute top-0 end-0 m-2 badge ${ad.is_active ? 'bg-success' : 'bg-secondary'}">
+            ${ad.is_active ? wdT('pages.ads.active', '啟用') : wdT('pages.ads.inactive', '停用')}
+          </span>
+        </div>
+        <div class="card-body py-2">
+          <h6 class="card-title text-truncate mb-1">${escapeHtml(ad.name)}</h6>
+          <p class="card-text small text-muted mb-0">
+            <i class="bi bi-clock me-1"></i>${ad.duration}${wdT('pages.adPositions.seconds', '秒')}
+            <span class="ms-2"><i class="bi bi-sort-numeric-down"></i>${ad.sort_order}</span>
+          </p>
+        </div>
+        <div class="card-footer bg-transparent py-2">
+          <div class="btn-group btn-group-sm w-100">
+            <button class="btn btn-outline-primary" onclick="editAd('${ad.id}')" title="${wdT('common.edit', '編輯')}">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-outline-${ad.is_active ? 'warning' : 'success'}" onclick="toggleAdStatus('${ad.id}', ${!ad.is_active})" title="${ad.is_active ? wdT('pages.ads.inactive', '停用') : wdT('pages.ads.active', '啟用')}">
+              <i class="bi bi-${ad.is_active ? 'pause' : 'play'}"></i>
+            </button>
+            <button class="btn btn-outline-danger" onclick="deleteAd('${ad.id}')" title="${wdT('common.delete', '刪除')}">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderPreview() {
+  const stage = document.getElementById('previewStage');
+  const activeAds = ads.filter(a => a.is_active);
+  stopPreviewPlayback();
+  previewState.items = activeAds;
+  previewState.currentIndex = 0;
+
+  if (!activeAds.length) {
+    stage.innerHTML = `
+      <div class="ad-preview-placeholder">
+        <div class="text-center">
+          <i class="bi bi-collection-play fs-1 d-block mb-2"></i>
+          <span>${wdT('pages.carouselSettings.noActiveAds', '暫無啟用的廣告')}</span>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  stage.innerHTML = activeAds.map((ad, i) => `
+    <div class="ad-preview-item ${i === 0 ? 'active' : ''}" data-index="${i}">
+      ${ad.media_type === 'video'
+        ? `<video src="${escapeHtml(ad.media_url)}" muted playsinline></video>`
+        : `<img src="${escapeHtml(ad.media_url)}" alt="${escapeHtml(ad.name)}">`
+      }
+    </div>
+  `).join('');
+
+  startPreviewPlayback();
+}
+
+function refreshPreview() {
+  renderPreview();
+  App.showSuccess(wdT('pages.carouselSettings.refreshSuccess', '預覽已刷新'));
+}
+
+function initPreviewControls() {
+  const shell = document.getElementById('previewShell');
+  const controls = document.getElementById('previewControls');
+  const prevBtn = document.getElementById('previewPrev');
+  const nextBtn = document.getElementById('previewNext');
+  const exitBtn = document.getElementById('previewExit');
+
+  shell.addEventListener('mousemove', function() {
+    shell.classList.add('show-cursor');
+    controls.classList.add('visible');
+    if (previewHideTimer) clearTimeout(previewHideTimer);
+    previewHideTimer = setTimeout(function() {
+      controls.classList.remove('visible');
+      shell.classList.remove('show-cursor');
+    }, 3000);
+  });
+
+  prevBtn.addEventListener('click', function() {
+    goToPreviewItem(-1);
+  });
+  nextBtn.addEventListener('click', function() {
+    goToPreviewItem(1);
+  });
+  exitBtn.addEventListener('click', function() {
+    stopPreviewPlayback();
+    const adsTab = document.getElementById('ads-tab');
+    if (adsTab) {
+      bootstrap.Tab.getOrCreateInstance(adsTab).show();
+    }
+  });
+}
+
+function stopPreviewPlayback() {
+  if (previewState.timer) {
+    clearTimeout(previewState.timer);
+    previewState.timer = null;
+  }
+  const activeItem = document.querySelector('.ad-preview-item.active');
+  if (activeItem) {
+    const video = activeItem.querySelector('video');
+    if (video) {
+      video.pause();
+    }
+  }
+}
+
+function goToPreviewItem(direction) {
+  if (!previewState.items.length) return;
+  stopPreviewPlayback();
+  const items = document.querySelectorAll('.ad-preview-item');
+  if (!items.length) return;
+
+  items[previewState.currentIndex].classList.remove('active');
+  previewState.currentIndex = (previewState.currentIndex + direction + previewState.items.length) % previewState.items.length;
+  items[previewState.currentIndex].classList.add('active');
+
+  startPreviewPlayback();
+}
+
+function startPreviewPlayback() {
+  if (!previewState.items.length) return;
+  const items = document.querySelectorAll('.ad-preview-item');
+  const current = previewState.items[previewState.currentIndex];
+  const currentEl = items[previewState.currentIndex];
+
+  if (current.media_type === 'video') {
+    const video = currentEl.querySelector('video');
+    if (video) {
+      video.currentTime = 0;
+      video.onended = function() {
+        goToPreviewItem(1);
+      };
+      video.play().catch(() => {
+        previewState.timer = setTimeout(function() {
+          goToPreviewItem(1);
+        }, (current.duration > 0 ? current.duration : (settings?.slide_interval || 5)) * 1000);
+      });
+    }
+  } else {
+    const duration = (current.duration > 0 ? current.duration : (settings?.slide_interval || 5)) * 1000;
+    previewState.timer = setTimeout(function() {
+      goToPreviewItem(1);
+    }, duration);
+  }
+}
+
+function showCreateAdModal() {
+  document.getElementById('adId').value = '';
+  document.getElementById('adName').value = '';
+  document.getElementById('adMediaType').value = 'image';
+  document.getElementById('adMediaURL').value = '';
+  document.getElementById('adMediaPath').value = '';
+  document.getElementById('adDuration').value = adPosition ? adPosition.slide_interval : 5;
+  document.getElementById('adSortOrder').value = ads.length;
+  document.getElementById('adStartDate').value = '';
+  document.getElementById('adEndDate').value = '';
+  document.getElementById('adIsActive').checked = true;
+  document.getElementById('mediaPreview').style.display = 'none';
+  document.getElementById('adModalTitle').textContent = wdT('pages.ads.create', '新增廣告');
+  adModal.show();
+}
+
+function editAd(id) {
+  const ad = ads.find(a => a.id === id);
+  if (!ad) return;
+
+  document.getElementById('adId').value = ad.id;
+  document.getElementById('adName').value = ad.name;
+  document.getElementById('adMediaType').value = ad.media_type;
+  document.getElementById('adMediaURL').value = ad.media_url;
+  document.getElementById('adMediaPath').value = ad.media_path || '';
+  document.getElementById('adDuration').value = ad.duration;
+  document.getElementById('adSortOrder').value = ad.sort_order;
+  document.getElementById('adStartDate').value = ad.start_date ? ad.start_date.substring(0, 16) : '';
+  document.getElementById('adEndDate').value = ad.end_date ? ad.end_date.substring(0, 16) : '';
+  document.getElementById('adIsActive').checked = ad.is_active;
+  
+  showMediaPreview(ad.media_url, ad.media_type);
+  
+  document.getElementById('adModalTitle').textContent = wdT('pages.ads.edit', '編輯廣告');
+  adModal.show();
+}
+
+async function uploadAdMedia(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const resp = await App.apiRequest('/api/v1/ads/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    document.getElementById('adMediaURL').value = resp.url;
+    document.getElementById('adMediaPath').value = resp.path || '';
+    document.getElementById('adMediaType').value = resp.media_type;
+    showMediaPreview(resp.url, resp.media_type);
+    App.showSuccess(wdT('pages.ads.uploadSuccess', '上傳成功'));
+  } catch (error) {
+    console.error('上傳失敗:', error);
+    App.showError(error.message || wdT('pages.ads.uploadFailed', '上傳失敗'));
+  }
+  
+  input.value = '';
+}
+
+function showMediaPreview(url, mediaType) {
+  const container = document.getElementById('mediaPreviewContainer');
+  const preview = document.getElementById('mediaPreview');
+  
+  if (mediaType === 'video') {
+    container.innerHTML = `<video src="${escapeHtml(url)}" class="img-fluid" style="max-height: 200px;" controls></video>`;
+  } else {
+    container.innerHTML = `<img src="${escapeHtml(url)}" class="img-fluid" style="max-height: 200px;">`;
+  }
+  preview.style.display = 'block';
+}
+
+async function saveAd() {
+  const id = document.getElementById('adId').value;
+  const data = {
+    ad_position_id: adPositionId,
+    name: document.getElementById('adName').value,
+    media_type: document.getElementById('adMediaType').value,
+    media_url: document.getElementById('adMediaURL').value,
+    media_path: document.getElementById('adMediaPath').value,
+    duration: parseInt(document.getElementById('adDuration').value) || 5,
+    sort_order: parseInt(document.getElementById('adSortOrder').value) || 0,
+    is_active: document.getElementById('adIsActive').checked
+  };
+
+  const startDate = document.getElementById('adStartDate').value;
+  const endDate = document.getElementById('adEndDate').value;
+  if (startDate) data.start_date = new Date(startDate).toISOString();
+  if (endDate) data.end_date = new Date(endDate).toISOString();
+
+  if (!data.name || !data.media_url) {
+    App.showError(wdT('pages.ads.fillRequired', '請填寫名稱並上傳媒體文件'));
+    return;
+  }
+
+  try {
+    if (id) {
+      await App.apiRequest(`/api/v1/ads/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data)
+      });
+    } else {
+      await App.apiRequest('/api/v1/ads', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+    }
+    adModal.hide();
+    App.showSuccess(wdT('pages.ads.saveSuccess', '保存成功'));
+    loadAds();
+  } catch (error) {
+    console.error('保存廣告失敗:', error);
+    App.showError(error.message || wdT('pages.ads.saveFailed', '保存失敗'));
+  }
+}
+
+async function toggleAdStatus(id, isActive) {
+  try {
+    await App.apiRequest(`/api/v1/ads/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ is_active: isActive })
+    });
+    App.showSuccess(isActive ? wdT('pages.ads.toggleEnabled', '已啟用') : wdT('pages.ads.toggleDisabled', '已停用'));
+    loadAds();
+  } catch (error) {
+    console.error('更新狀態失敗:', error);
+    App.showError(wdT('pages.ads.toggleFailed', '更新失敗'));
+  }
+}
+
+async function deleteAd(id) {
+  if (!confirm(wdT('pages.ads.confirmDelete', '確定要刪除此廣告嗎？'))) return;
+
+  try {
+    await App.apiRequest(`/api/v1/ads/${id}`, { method: 'DELETE' });
+    App.showSuccess(wdT('pages.ads.deleteSuccess', '刪除成功'));
+    loadAds();
+  } catch (error) {
+    console.error('刪除廣告失敗:', error);
+    App.showError(wdT('pages.ads.deleteFailed', '刪除失敗'));
+  }
+}
+
+async function saveSettings() {
+  const data = {
+    slide_interval: parseInt(document.getElementById('slideInterval').value) || 5,
+    transition_duration: parseInt(document.getElementById('transitionDuration').value) || 500,
+    auto_update: document.getElementById('autoUpdate').checked,
+    update_interval: parseInt(document.getElementById('updateInterval').value) || 3600
+  };
+
+  try {
+    const resp = await App.apiRequest(`/api/v1/carousel/${adPositionId}/settings`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+    settings = resp;
+    App.showSuccess(wdT('pages.carouselSettings.saveSuccess', '設定已保存'));
+  } catch (error) {
+    console.error('保存設定失敗:', error);
+    App.showError(wdT('pages.carouselSettings.saveFailed', '保存失敗'));
+  }
+}
+
+function downloadCarousel() {
+  if (!ads.length) {
+    App.showAlert(wdT('pages.carouselSettings.noAdsToDownload', '請先添加廣告'), 'warning');
+    return;
+  }
+  window.location.href = `/api/v1/carousel/${adPositionId}/download`;
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+{{end}}

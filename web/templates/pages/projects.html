@@ -1,0 +1,261 @@
+{{define "pages/projects"}}
+<div class="container-fluid" id="projectsPage">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="mb-1"><i class="bi bi-kanban"></i> <span data-i18n="projectsPage.title">項目</span></h3>
+      <div class="text-muted small" data-i18n="projectsPage.subtitle">更直覺的項目管理：搜尋、篩選、進度一眼看懂</div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary" type="button" onclick="ProjectsUI.openLatestDraft()">
+        <i class="bi bi-file-earmark"></i> <span class="d-none d-md-inline" data-i18n="common.draft">草稿</span>
+      </button>
+      <a class="btn btn-primary" href="/projects/new">
+        <i class="bi bi-plus-lg"></i> <span class="d-none d-md-inline" data-i18n="projectsPage.addProject">新增項目</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-6">
+          <label class="form-label small text-muted" data-i18n="common.search">搜尋</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" id="projectsSearch" placeholder="搜尋項目編號/名稱..." data-i18n-placeholder="projectsPage.searchPlaceholder">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small text-muted" data-i18n="fields.status">狀態</label>
+          <select class="form-select" id="projectsStatus">
+            <option value="" data-i18n="common.all">全部</option>
+            <option value="active" data-i18n="projects.status.active">進行中</option>
+            <option value="on_hold" data-i18n="projects.status.on_hold">暫停</option>
+            <option value="completed" data-i18n="projects.status.completed">已完成</option>
+            <option value="cancelled" data-i18n="projects.status.cancelled">已取消</option>
+          </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+          <button class="btn btn-outline-primary w-100" type="button" onclick="ProjectsUI.applyFilters()">
+            <span data-i18n="common.apply">套用</span>
+          </button>
+          <button class="btn btn-outline-secondary w-100" type="button" onclick="ProjectsUI.resetFilters()">
+            <span data-i18n="common.clear">清除</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="projectsList" class="row g-3">
+    <div class="col-12 text-center p-5 text-muted">
+      <div class="spinner-border"></div>
+      <div class="mt-2" data-i18n="common.loading">載入中...</div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-4" id="projectsPager" style="display:none;">
+    <div class="text-muted small" id="projectsPagerInfo"></div>
+    <div class="btn-group btn-group-sm">
+      <button class="btn btn-outline-secondary" type="button" onclick="ProjectsUI.prevPage()"><span data-i18n="common.prevPage">上一頁</span></button>
+      <button class="btn btn-outline-secondary" type="button" onclick="ProjectsUI.nextPage()"><span data-i18n="common.nextPage">下一頁</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ProjectsUI = (() => {
+  let page = 1;
+  const limit = 12;
+  let lastTotal = 0;
+
+  function statusBadge(status) {
+    const map = {
+      active: ['active', 'success'],
+      on_hold: ['on_hold', 'warning'],
+      completed: ['completed', 'primary'],
+      cancelled: ['cancelled', 'secondary'],
+    };
+    const [key, cls] = map[status] || [status || 'unknown', 'secondary'];
+    const label = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(`projects.status.${key}`) : (key || '—');
+    return `<span class="badge bg-${cls}">${label}</span>`;
+  }
+
+  function pct(done, total) {
+    if (!total || total <= 0) return 0;
+    return Math.round((done / total) * 100);
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  async function load() {
+    const list = document.getElementById('projectsList');
+    const q = document.getElementById('projectsSearch')?.value || '';
+    const status = document.getElementById('projectsStatus')?.value || '';
+
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (q) params.set('search', q);
+    if (status) params.set('status', status);
+
+    try {
+      const res = await App.apiRequest(`/projects?${params.toString()}`);
+      const data = res.data || [];
+      lastTotal = res.total || 0;
+
+      if (!data.length) {
+        list.innerHTML = `
+          <div class="col-12 text-center p-5 text-muted">
+            <i class="bi bi-folder2-open fs-1"></i>
+            <div class="mt-2">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('projectsPage.noProjects') : '暫無項目'}</div>
+          </div>
+        `;
+      } else {
+        list.innerHTML = data.map(p => {
+          const done = Number(p.tasks_done || 0);
+          const total = Number(p.tasks_total || 0);
+          const progress = pct(done, total);
+          const owner = (p.owner && p.owner.name) ? p.owner.name : ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.unassigned') : '未指定');
+          const code = p.code ? `<span class="text-muted small">${escapeHtml(p.code)}</span>` : `<span class="text-muted small">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('projectsPage.noCode') : '未設定編號'}</span>`;
+          const dateRange = `${p.start_date || '—'} ~ ${p.end_date || '—'}`;
+          const budget = (p.budget != null) ? Number(p.budget).toLocaleString() : '0';
+          let cover = p.cover_url ? String(p.cover_url) : '';
+          if (cover && !cover.startsWith('http') && !cover.startsWith('/')) cover = '/' + cover;
+          const coverHtml = cover ? `
+            <div style="height: 140px; overflow: hidden; border-radius: 12px; background:#f1f5f9;">
+              <img src="${escapeHtml(cover)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
+            </div>
+          ` : `
+            <div style="height: 140px; border-radius: 12px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); display:flex; align-items:center; justify-content:center; color:#94a3b8;">
+              <i class="bi bi-image fs-2"></i>
+            </div>
+          `;
+          const typeName = p.project_type_name ? String(p.project_type_name) : '';
+          const typeColor = p.project_type_color ? String(p.project_type_color) : '#64748b';
+          const typeBadge = typeName ? `<span class="badge" style="background:${escapeHtml(typeColor)}; color:white;">${escapeHtml(typeName)}</span>` : '';
+
+          return `
+            <div class="col-12 col-md-6 col-xl-4">
+              <div class="card shadow-sm border-0 h-100">
+                ${coverHtml}
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                      <div class="fw-semibold d-flex gap-2 align-items-center">${escapeHtml(p.name)} ${typeBadge}</div>
+                      ${code}
+                    </div>
+                    ${statusBadge(p.status)}
+                  </div>
+
+                  <div class="small text-muted mb-2">
+                    <div><i class="bi bi-person"></i> ${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('projectsPage.owner') : '負責人'}：${escapeHtml(owner)}</div>
+                    <div><i class="bi bi-calendar3"></i> ${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('projectsPage.dateRange') : '日期'}：${escapeHtml(dateRange)}</div>
+                    <div><i class="bi bi-cash-coin"></i> ${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('projectsPage.budget') : '預算'}：$${escapeHtml(budget)}</div>
+                  </div>
+
+                  <div class="mb-2">
+                    <div class="d-flex justify-content-between small text-muted">
+                      <span>${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('projectsPage.taskProgress') : '任務進度'}</span>
+                      <span>${done}/${total}（${progress}%）</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div class="progress-bar bg-primary" role="progressbar" style="width: ${progress}%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="d-flex gap-2 mt-3">
+                    <a class="btn btn-sm btn-outline-primary" href="/projects/${p.id}/edit">
+                      <i class="bi bi-pencil"></i> ${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.edit') : '編輯'}
+                    </a>
+                    <button class="btn btn-sm btn-outline-danger" type="button" onclick="ProjectsUI.deleteProject('${p.id}')">
+                      <i class="bi bi-trash"></i> ${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.delete') : '刪除'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const pager = document.getElementById('projectsPager');
+      const info = document.getElementById('projectsPagerInfo');
+      if (pager && info) {
+        const start = (page - 1) * limit + 1;
+        const end = Math.min(page * limit, lastTotal);
+        pager.style.display = lastTotal > limit ? '' : 'none';
+        info.textContent = lastTotal ? (
+          (typeof I18n !== 'undefined' && I18n.t)
+            ? I18n.t('projectsPage.pagerInfo').replace('{start}', String(start)).replace('{end}', String(end)).replace('{total}', String(lastTotal))
+            : `顯示 ${start}-${end} / 共 ${lastTotal} 筆`
+        ) : '';
+      }
+    } catch (e) {
+      console.error(e);
+      list.innerHTML = `
+        <div class="col-12 text-center p-5 text-danger">
+          <i class="bi bi-exclamation-triangle fs-1"></i>
+          <div class="mt-2">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.loadError') : '載入失敗'}</div>
+        </div>
+      `;
+    }
+  }
+
+  async function deleteProject(id) {
+    if (!confirm((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('projectsPage.confirmDelete') : '確定要刪除此項目？（任務也會一起刪除）')) return;
+    try {
+      await App.apiRequest(`/projects/${id}`, { method: 'DELETE' });
+      App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.deleteSuccess') : '已刪除', 'success');
+      await load();
+    } catch (e) {
+      console.error(e);
+      App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.deleteError') : '刪除失敗', 'danger');
+    }
+  }
+
+  function applyFilters() { page = 1; load(); }
+  function resetFilters() {
+    const s = document.getElementById('projectsSearch'); if (s) s.value = '';
+    const st = document.getElementById('projectsStatus'); if (st) st.value = '';
+    page = 1; load();
+  }
+  function prevPage() { if (page > 1) { page--; load(); } }
+  function nextPage() { if (page * limit < lastTotal) { page++; load(); } }
+  function reload() { load(); }
+
+  function openLatestDraft() {
+    try {
+      if (!window.draftManager) {
+        App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.draftNotLoaded') : '草稿功能未載入', 'warning');
+        return;
+      }
+      const drafts = draftManager.getDraftsForPage('projects') || [];
+      if (!drafts.length) {
+        App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.noDrafts') : '暫無草稿', 'info');
+        return;
+      }
+      const latest = drafts[0];
+      const draftUrl = `/projects/new?draft_id=${encodeURIComponent(latest.id)}`;
+      if (typeof Router !== 'undefined' && Router.go) { Router.go(draftUrl); } else { window.location.href = draftUrl; }
+    } catch (e) {
+      console.error(e);
+      App.showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.openDraftFailed') : '打開草稿失敗', 'danger');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const s = document.getElementById('projectsSearch');
+    if (s) s.addEventListener('keydown', (e) => { if (e.key === 'Enter') applyFilters(); });
+    if (typeof I18n !== 'undefined' && I18n.whenReady) {
+      await I18n.whenReady(5000);
+    }
+    load();
+  });
+
+  return { applyFilters, resetFilters, prevPage, nextPage, reload, deleteProject, openLatestDraft };
+})();
+</script>
+{{end}}
+
+

@@ -1,0 +1,1805 @@
+{
+  "nav": {
+    "home": "首页",
+    "features": "功能",
+    "supportCenter": "支援中心",
+    "supportInfo": "支援信息",
+    "login": "登录",
+    "contact": "联络客服",
+    "accountSettings": "账户设置",
+    "billing": "订阅",
+    "logout": "登出",
+    "user": "用户",
+    "language": "语言",
+    "about": "关于我们"
+  },
+  "footer": {
+    "description": "V-sys 以科技帮助人类，让工作和生活更简单高效。我们相信科技能够帮助每个人提升效率，优化生活。",
+    "products": "产品",
+    "productList": {
+      "vai": "vAI",
+      "vwork": "vWork",
+      "vmarket": "vMarket",
+      "voffice": "vOffice"
+    },
+    "info": "资讯",
+    "home": "首页",
+    "support": "支援信息",
+    "documentation": "支援中心",
+    "contactSupport": "联络客服",
+    "contact": "联系我们",
+    "contactUs": "联系我们",
+    "hours": "周一至周五 9:00 - 18:00",
+    "salesPartnerJoin": "销售商加盟",
+    "location": "香港",
+    "copyright": "© 2025 V-sys Limited. All rights reserved."
+  },
+  "vai": {
+    "nav": {
+      "features": "功能",
+      "demo": "体验",
+      "login": "登录",
+      "chat": "交谈",
+      "sketch": "草图",
+      "video": "影片",
+      "docs": "文件",
+      "apps": "发现"
+    },
+    "hero": {
+      "badge": "vAI 人工智能助手",
+      "title": "你的 AI 工作伙伴",
+      "subtitle": "让人工智能帮助你完成各种工作，从数据分析到内容创作。",
+      "primaryCta": "立即体验",
+      "secondaryCta": "了解更多",
+      "titleBefore": "你的智能",
+      "titleHighlight": "AI 工作伙伴",
+      "cta": "开始使用 vAI",
+      "learnMore": "了解更多",
+      "titleBefore2": "用 AI 就能完成工作的",
+      "titleHighlight2": "全能 AI 工作伙伴",
+      "subtitle2": "从对话问答、数据分析、图片视频创作，到订单管理、客户分析、库存追踪 — 不需要复杂的系统，用 AI 就能搞定你的日常工作。"
+    },
+    "demo": {
+      "greeting": "你好！我是 vAI，你的智能助手。有什么我可以帮助你的吗？",
+      "inputPlaceholder": "试试问我一个问题...",
+      "q1": "你可以做什么？",
+      "q2": "帮我分析数据",
+      "q3": "如何提升工作效率？",
+      "q1erp": "查询最新订单",
+      "q2erp": "分析本月销售",
+      "q3erp": "客户消费排行",
+      "q4erp": "库存预警",
+      "inputPlaceholderErp": "问 AI 任何关于你业务的问题..."
+    },
+    "chatDemo": {
+      "0": {
+        "user": "查询本周的订单状况",
+        "ai": "本周共有 42 笔订单，总金额 $128,500。较上周增长 8%，其中线上订单占 65%。有 3 笔待处理退货。"
+      },
+      "1": {
+        "user": "哪些库存快要不足了？",
+        "ai": "目前有 5 项商品低于安全库存：A4复印纸（剩 12 箱）、碳粉盒（剩 3 个）、保护膜（剩 8 片）等。建议立即建立采购单，我可以帮你自动生成。"
+      }
+    },
+    "vcoinNote": "每天 5 次免费查询，AI 功能以 vCoin 按量计费。",
+    "vcoinLearnMore": "了解 vCoin",
+    "vcoinModal": {
+      "title": "vCoin",
+      "whatIsTitle": "vCoin 是什么？",
+      "whatIsDesc": "vCoin 是 V-sys 的 AI 使用代币。每天有 5 次免费查询额度，超出后使用 AI 功能会消耗 vCoin。",
+      "usageTitle": "消耗说明",
+      "simpleQuery": "简单查询（1 vCoin）",
+      "simpleQueryDesc": "基本问答、资料查询",
+      "imageGen": "图片生成（3 vCoin）",
+      "imageGenDesc": "AI 图片生成",
+      "sketchGen": "草图生成（3 vCoin）",
+      "sketchGenDesc": "AI 草图生成",
+      "docGen": "文件生成（5+ vCoin）",
+      "docGenDesc": "每 15 页 5 vCoin，最低 5 vCoin",
+      "videoGen": "视频生成（30 vCoin）",
+      "videoGenDesc": "AI 视频生成（每 5 秒为单位）",
+      "videoExtend": "视频延伸（30 vCoin）",
+      "videoExtendDesc": "AI 视频延伸（每 5 秒为单位）",
+      "ocr": "OCR 文字识别（1 vCoin）",
+      "ocrDesc": "图片文字识别",
+      "stt": "语音转文字（1 vCoin）",
+      "sttDesc": "语音转文字",
+      "matchFields": "栏位匹配（1 vCoin）",
+      "matchFieldsDesc": "AI 自动匹配栏位",
+      "aiSuggestion": "AI 建议（1 vCoin）",
+      "aiSuggestionDesc": "AI 智能建议与分析",
+      "contentGen": "内容生成",
+      "contentGenDesc": "文件生成、邮件撰写",
+      "dailyFreeTip": "每天有 5 次免费查询（交谈及图片生成），每日重置。不包含视频和文件生成。",
+      "buyTitle": "购买 vCoin",
+      "planSmall": "Small",
+      "planMedium": "Medium",
+      "popular": "最热门",
+      "planMega": "Mega",
+      "save17": "省 17%",
+      "save30": "省 30%",
+      "save38": "省 38%",
+      "loginToBuy": "登录购买",
+      "close": "关闭"
+    },
+    "intro": {
+      "title": "欢迎使用 vAI",
+      "desc": "vAI 是 V-sys 的核心 AI 助手，能协助你进行数据分析、文件处理、智能对话与工作自动化。登录后即可开始体验。",
+      "loginBtn": "登录开始使用"
+    },
+    "features": {
+      "title": "为你的工作注入 AI 超能力",
+      "subtitle": "vAI 整合多种 AI 能力，让工作更聪明、更快速。",
+      "items": {
+        "1": { "title": "智能对话", "desc": "自然语言对话，快速获取答案与建议。" },
+        "2": { "title": "数据分析", "desc": "协助分析业务数据，生成报表与洞察。" },
+        "3": { "title": "文件处理", "desc": "自动整理、分类和摘要文件内容。" },
+        "4": { "title": "工作自动化", "desc": "自动化日常操作，提升工作效率。" }
+      }
+    },
+    "integration": {
+      "badge": "vWork ERP + AI",
+      "title": "与 vWork 深度结合，数据即时互通",
+      "subtitle": "vAI 不只是聊天机器人。它直接连接你的 vWork 企业资料，让 AI 真正理解你的业务，帮你做出更好的决策。",
+      "orders": {
+        "title": "订单管理",
+        "desc": "即时查询订单状态、自动生成报表，AI 分析销售趋势与异常。"
+      },
+      "crm": {
+        "title": "客户 CRM",
+        "desc": "分析客户消费行为、自动分群、智能推荐跟进策略。"
+      },
+      "inventory": {
+        "title": "库存追踪",
+        "desc": "库存不足提醒、进销存分析、智能补货建议。"
+      },
+      "analytics": {
+        "title": "智能报表",
+        "desc": "自然语言生成销售报表、财务分析、业绩对比。"
+      },
+      "pos": {
+        "title": "POS 收银",
+        "desc": "交易数据即时同步、每日结算分析、异常交易预警。"
+      },
+      "service": {
+        "title": "服务预约",
+        "desc": "预约管理、员工排班建议、服务效率分析。"
+      }
+    },
+    "workflow": {
+      "badge": "AI 工作流",
+      "title": "一句话，完成过去数小时的工作",
+      "subtitle": "vAI 能直接处理你的业务数据，从查询到生成报表，全程自动化。",
+      "s1": {
+        "ask": "\"本月业绩和上月比怎么样？\"",
+        "answer": "vAI 自动读取订单数据，计算月对月增长率，分析各渠道贡献，并生成可视化图表。"
+      },
+      "s2": {
+        "ask": "\"哪些库存快没了？帮我建采购单\"",
+        "answer": "vAI 扫描库存低于安全量的品项，列出清单，并可直接生成采购订单。"
+      },
+      "s3": {
+        "ask": "\"帮我生成这季度的客户分析报告\"",
+        "answer": "vAI 读取 CRM 资料，分析客户消费频次、客单价、流失风险，自动生成 PPT 或 PDF 报告。"
+      },
+      "s4": {
+        "ask": "\"今天 POS 有异常交易吗？\"",
+        "answer": "vAI 分析当日所有 POS 交易，标记退款频率异常、大额折扣等可疑操作，保护你的营收。"
+      }
+    },
+    "tools": {
+      "badge": "AI 全能工具",
+      "title": "不只对话，还能创作",
+      "subtitle": "vAI 整合四大 AI 工具，从智能对话到内容创作，全方位提升工作效率。",
+      "chat": {
+        "title": "AI 对话",
+        "desc": "智能问答、数据查询、工作建议，即时分析你的业务资料。"
+      },
+      "sketch": {
+        "title": "AI 图片",
+        "desc": "产品图生成、营销素材设计、草图转精美插画。"
+      },
+      "video": {
+        "title": "AI 视频",
+        "desc": "产品推广视频、分镜编辑、一键合成专业短视频。"
+      },
+      "docs": {
+        "title": "AI 文件",
+        "desc": "自动生成 Word、Excel、PPT、PDF 专业文件。"
+      }
+    },
+    "sidebar": {
+      "chat": "交谈",
+      "sketch": "草图",
+      "video": "影片",
+      "docs": "文件",
+      "mySketches": "我的草图",
+      "chatGeneration": "对话生成",
+      "myProjects": "我的项目",
+      "myDocs": "我的文件"
+    },
+    "search": {
+      "placeholder": "搜索对话消息...",
+      "noResults": "没有找到结果",
+      "failed": "搜索失败"
+    },
+    "common": {
+      "close": "关闭",
+      "delete": "删除",
+      "rename": "重命名",
+      "conversationList": "对话列表",
+      "cancel": "取消",
+      "confirm": "确认",
+      "loading": "载入中...",
+      "loadFailed": "载入失败",
+      "loadMore": "加载更多",
+      "deleteFailed": "删除失败",
+      "saveFailed": "保存失败",
+      "unnamed": "未命名",
+      "download": "下载",
+      "upload": "上传",
+      "productImages": "产品图片",
+      "searchProducts": "搜索产品名称...",
+      "noProductImages": "找不到有图片的产品",
+      "noImages": "找不到图片",
+      "image": "图片",
+      "supportFormats": "支持 JPG, PNG, GIF, WebP",
+      "dropzoneText": "点击或拖拽图片到这里",
+      "unknownError": "未知错误",
+      "requestFailed": "请求失败",
+      "justNow": "刚刚",
+      "minutesAgo": " 分钟前",
+      "hoursAgo": " 小时前",
+      "daysAgo": " 天前",
+      "weeksAgo": " 周前",
+      "monthsAgo": " 个月前",
+      "insertImage": "插入图片",
+      "submitting": "提交中..."
+    },
+    "chat": {
+      "title": "vAI Chat",
+      "newConversation": "新对话",
+      "inputPlaceholder": "输入你的问题...",
+      "send": "发送",
+      "startConversation": "开始与 vAI 对话",
+      "llmConfigured": "LLM Endpoint 由系统管理员配置",
+      "uploadFile": "上传文件",
+      "inputMessage": "输入消息给 AI...",
+      "noConversations": "尚无对话",
+      "noConversationsHint": "点击「新对话」开始",
+      "conversation": "对话",
+      "renamePrompt": "请输入新的对话名称：",
+      "renameFailed": "重命名失败",
+      "deleteConfirm": "确定要删除此对话及所有消息吗？此操作无法恢复。",
+      "deleteFailed": "删除失败",
+      "loadingChat": "载入对话中...",
+      "aiThinking": "AI 正在思考...",
+      "startChat": "开始与 AI 助手对话",
+      "llmNotConfigured": "LLM Endpoint 未配置，请联系管理员",
+      "suggestionsLabel": "你可以试试问：",
+      "quickGenerateImage": "生成产品推广图片",
+      "quickGenerateVideo": "生成产品推广视频",
+      "quickGeneratePptx": "生成公司发展演示文稿",
+      "quickQueryOrders": "查询最新订单",
+      "newChat": "开始新对话",
+      "createFailed": "创建对话失败",
+      "analyzeAttachments": "请阅读并分析附件内容",
+      "aiNoResponse": "AI 未返回任何内容",
+      "navigating": "正在导航到页面...",
+      "openInVWork": "前往 vWork",
+      "copyPaymentLink": "复制链接",
+      "openPaymentLink": "打开",
+      "copied": "已复制！",
+      "imageGenerated": "已为你生成图片：",
+      "docGenerating": "正在生成 {label} 文件「{title}」，请稍候...",
+      "docGenerated": "你的 {label} 文件已生成，点击下方卡片下载。",
+      "videoGenerating": "正在为你生成视频，请稍候...",
+      "videoGenerated": "视频已生成，请查看下方播放器。",
+      "aiResponseFailed": "AI 回应失败，请稍后再试",
+      "sendFailed": "发送失败，请稍后再试",
+      "llmApiError": "LLM API 返回错误",
+      "llmParseFailed": "无法解析 LLM 回应，请检查 API 配置",
+      "deleteMessageConfirm": "确定要删除此消息吗？",
+      "messageDeleted": "消息已删除",
+      "deleteMessageTitle": "删除消息",
+      "unsupportedFormat": "不支持的文件格式：.{ext}",
+      "fileTooLarge": "文件「{name}」超过 20MB 大小限制",
+      "uploadFailed": "上传文件「{name}」失败：{error}",
+      "generationTimeout": "生成超时",
+      "generationFailed": "生成失败",
+      "generatingProgress": "生成中... ({seconds}s)",
+      "cannotExtractVideo": "无法提取视频",
+      "webSearch": "网络搜索",
+      "webSearchSources": "来源",
+      "voiceInput": "语音输入",
+      "voiceInputRecording": "录音中... 点击停止",
+      "voiceInputAttached": "语音录音已附加",
+      "voiceInputNotSupported": "此浏览器不支持语音输入",
+      "voiceInputPermissionDenied": "麦克风权限被拒绝",
+      "voiceInputNoSpeech": "未检测到语音",
+      "voiceInputFailed": "语音输入失败：{error}",
+      "downloadVideo": "下载视频",
+      "downloadDocument": "下载文件",
+      "document": "文件",
+      "video": "视频",
+      "recordDeleted": "相关记录已被删除",
+      "browserNoVideoSupport": "你的浏览器不支持视频播放。",
+      "aiVideo": "AI 视频",
+      "videoGeneratingStatus": "视频生成中...",
+      "docGeneratingStatus": "文件生成中..."
+    },
+    "sketch": {
+      "title": "vAI 草图",
+      "newSketch": "新草图",
+      "save": "保存",
+      "load": "加载",
+      "delete": "删除",
+      "generate": "AI 生成",
+      "generating": "生成中...",
+      "promptPlaceholder": "描述你想生成的图像... (例如：将草图转为精美插画)",
+      "tools": {
+        "select": "选取",
+        "pen": "画笔",
+        "rectangle": "矩形",
+        "ellipse": "椭圆",
+        "line": "线条",
+        "text": "文字",
+        "eraser": "橡皮擦",
+        "upload": "上传图片"
+      },
+      "actions": {
+        "undo": "撤销",
+        "redo": "重做",
+        "clear": "清除画布"
+      },
+      "savedSketches": "已保存草图",
+      "noSketches": "尚无已保存的草图",
+      "noSketchesHint": "点击「新草图」开始",
+      "untitled": "未命名草图",
+      "genHistory": "生成历史",
+      "noGenHistory": "尚无生成历史",
+      "addToCanvas": "加到画布",
+      "replaceCanvas": "替换画布",
+      "attachRef": "附加参考图片",
+      "removeAttachment": "移除附件",
+      "maxAttachments": "最多可附加 2 张参考图片",
+      "deleteGen": "删除",
+      "aiGenerateResult": "AI 生成结果",
+      "aiGenerating": "AI 正在生成图片...",
+      "aiGeneratingHint": "请稍候，通常需要 10-30 秒",
+      "enterPrompt": "请输入描述提示词",
+      "generationFailedRetry": "生成失败，请稍后再试",
+      "aiGenerationFailed": "AI 生成失败：",
+      "noAiResult": "AI 未返回图片结果",
+      "strokeColor": "笔色",
+      "fillColor": "填色",
+      "lineWidth": "粗细",
+      "ratio": "比例",
+      "ratioFree": "自由",
+      "insertImage": "插入图片",
+      "undoShortcut": "撤销 (Ctrl+Z)",
+      "redoShortcut": "重做 (Ctrl+Y)",
+      "clearCanvas": "清除画布",
+      "deleteSketch": "删除草图",
+      "saveSketch": "保存草图",
+      "textInputPlaceholder": "输入文字...",
+      "duplicate": "复制",
+      "sketchList": "草图列表",
+      "generateWithAI": "用 AI 生成",
+      "genHistoryBtn": "生成历史",
+      "deleteConfirm": "确定要删除此草图吗？",
+      "deleteConfirmPermanent": "确定要删除此草图吗？此操作无法恢复。",
+      "canvasEmpty": "画布为空，无内容可保存",
+      "canvasPlaceholder": "在此画布上绘图",
+      "sketchPrefix": "草图 ",
+      "enterSketchName": "请输入草图名称：",
+      "saved": "草图已保存",
+      "saveFailedRetry": "保存失败，请稍后再试",
+      "loadSketchFailed": "载入草图失败",
+      "unsavedNew": "当前草图尚未保存，确定要创建新草图吗？",
+      "noChatGenerations": "尚无对话生成的图片",
+      "noChatGenerationsHint": "在 vAi Chat 中生成的图片会显示在这里",
+      "deleteGenerationConfirm": "确定要删除此生成记录吗？",
+      "loadProductImageFailed": "载入产品图片失败",
+      "props": {
+        "title": "属性",
+        "position": "位置",
+        "width": "宽",
+        "height": "高",
+        "strokeColor": "笔色",
+        "fillColor": "填色",
+        "lineWidth": "线宽",
+        "color": "颜色",
+        "fontSize": "字体大小",
+        "textContent": "文字内容",
+        "opacity": "透明度",
+        "replaceImage": "替换图片",
+        "removeBackground": "去背景",
+        "removingBackground": "处理中...",
+        "backgroundRemoved": "背景已移除",
+        "removeBackgroundFailed": "去背景失败",
+        "layerOrder": "图层顺序",
+        "bringToFront": "移到最前",
+        "sendToBack": "移到最后",
+        "duplicate": "复制",
+        "delete": "删除",
+        "endpoint": "终点",
+        "types": {
+          "pen": "笔迹",
+          "eraser": "橡皮擦",
+          "rect": "矩形",
+          "ellipse": "圆形",
+          "line": "直线",
+          "text": "文字",
+          "image": "图片"
+        }
+      }
+    },
+    "video": {
+      "addShot": "新增分镜",
+      "noShots": "尚无分镜",
+      "addShotHint": "点击「新增分镜」开始",
+      "selectShot": "选择或新增一个分镜",
+      "aspectRatio": "比例",
+      "duration": "时长",
+      "emptyTitle": "开始制作视频",
+      "emptyDesc": "新增视频项目，新增分镜，使用 AI 逐段生成视频",
+      "addFirstShot": "新增第一个分镜",
+      "referenceImage": "参考图片 (选填)",
+      "selectImage": "选择图片",
+      "noRefImage": "无参考图片 (纯文字生成)",
+      "prompt": "视频描述",
+      "promptPlaceholder": "描述这个分镜的内容，例如：一只猫在阳光下伸懒腰，画面缓慢推进...",
+      "generate": "AI 生成视频",
+      "generating": "生成中...",
+      "download": "下载",
+      "regenerate": "生成与保存",
+      "deleteShot": "删除分镜",
+      "combineAll": "合并所有分镜",
+      "combinedResult": "合并视频结果",
+      "downloadCombined": "下载合并视频",
+      "selectRefImage": "选择参考图片",
+      "selectCharImage": "选择角色图片",
+      "clickToChangeImage": "点击更换图片",
+      "productImages": "产品图片",
+      "sketchImages": "草图",
+      "upload": "上传",
+      "searchProducts": "搜索产品名称...",
+      "loadingProducts": "载入产品图片...",
+      "loadingSketches": "载入草图...",
+      "dropzoneText": "点击或拖拽图片到这里",
+      "extendVideo": "延伸视频",
+      "extending": "延伸中...",
+      "extendPromptTitle": "输入延伸视频的描述",
+      "extendPromptBody": "输入延伸视频的描述 (Prompt)：\n\n延伸会在当前视频后增加约 7 秒",
+      "extendSuccess": "视频延伸完成！",
+      "extendFailed": "视频延伸失败：",
+      "extendTimeout": "延伸超时",
+      "newProject": "新增视频",
+      "noHistory": "尚无视频记录",
+      "createHint": "点击「新增视频」开始",
+      "selectProject": "选择或创建视频项目",
+      "createFirst": "创建第一个视频",
+      "loadHistoryFailed": "载入视频历史失败",
+      "noProjects": "尚无视频项目",
+      "noProjectsHint": "点击「新增项目」开始",
+      "shots": " 个分镜",
+      "completed": " 已完成",
+      "deleteProject": "删除项目",
+      "noChatVideos": "尚无对话生成的视频",
+      "noChatVideosHint": "在 vAi Chat 中生成的视频会显示在这里",
+      "videoFromChat": "来自对话的视频",
+      "unnamedProject": "未命名项目",
+      "projectPrefix": "视频项目 ",
+      "enterProjectName": "请输入项目名称：",
+      "projectCreated": "新项目已创建",
+      "createProjectFailed": "创建项目失败",
+      "deleteProjectConfirm": "确定要删除此视频项目吗？此操作无法恢复。",
+      "toolTitle": "vAI 视频工具",
+      "projectDeleted": "项目已删除",
+      "deleteProjectFailed": "删除项目失败",
+      "deleteChatVideoConfirm": "确定要删除此对话视频记录吗？（对话记录会显示「相关记录已被删除」）",
+      "videoRecordDeleted": "视频记录已删除",
+      "deleteVideoRecordFailed": "删除视频记录失败",
+      "noShotsInProject": "尚无分镜，请新增分镜开始",
+      "addShotTitle": "新增分镜",
+      "selectProjectFirst": "请先创建或选择项目",
+      "deleteShotConfirm": "确定要删除分镜 {num} 吗？",
+      "enterDescription": "请输入视频描述",
+      "generationFailed": "视频生成失败：",
+      "generationTimeout": "生成超时",
+      "generatingProgress": "生成中... ({seconds}s)",
+      "shotGenerated": "分镜 {num} 生成完成！",
+      "shotDoneNoVideo": "分镜 {num} 已生成，但无法提取视频",
+      "safetyFiltered": "视频因安全政策被过滤，请修改提示词后重试",
+      "cannotExtend": "此分镜无已生成的视频，无法延伸",
+      "cannotReadSourceVideo": "无法读取来源视频",
+      "cannotReadForExtend": "无法读取来源视频以进行延伸",
+      "preparingExtend": "准备延伸中...",
+      "extendingProgress": "延伸中... ({seconds}s)",
+      "waitingApi": "等待 API 回应...",
+      "generationFailedStatus": "生成失败",
+      "completedStatus": "已完成",
+      "aiGenerateBtn": "AI 生成视频",
+      "minShotsToCombine": "至少需要 2 个已完成的分镜才能合并",
+      "combineReady": "合并预览已就绪，{count} 个分镜将依序播放",
+      "noVideoToDownload": "此分镜无视频可下载",
+      "noCombinedToDownload": "无合并视频可下载",
+      "deleteRecord": "删除记录",
+      "historyLabel": "历史记录",
+      "unknownError": "未知错误",
+      "requestFailed": "请求失败",
+      "submitting": "提交中...",
+      "loadFailed": "载入失败",
+      "noProductImages": "没有找到有图片的产品",
+      "noSketchImages": "没有找到图片",
+      "imageFallbackTitle": "图片",
+      "timeJustNow": "刚才",
+      "timeMinutesAgo": "{n} 分钟前",
+      "timeHoursAgo": "{n} 小时前",
+      "timeDaysAgo": "{n} 天前",
+      "timeWeeksAgo": "{n} 周前",
+      "timeMonthsAgo": "{n} 个月前",
+
+      "prevShotContinuity": "承接上一分镜",
+      "prevShotHint": "已自动截取上一分镜最后画面作为参考",
+      "captureFrameFailed": "无法截取上一分镜的画面",
+      "prevShotPromptHint": "[承接上一分镜最后画面，请保持角色和场景连贯]",
+
+      "clickToUpload": "点击上传图片",
+      "chatWelcome": "Hi! 我是 vAi 影片助手",
+      "chatWelcomeDesc": "告诉我你想做什么视频，我会自动帮你规划分镜和故事。例如：",
+      "chatPlaceholder": "描述你想做的视频，AI 会自动帮你规划分镜...",
+      "chatSuggest1": "帮我做一个 30 秒的产品开箱视频",
+      "chatSuggest2": "制作一段社交短视频，介绍我们的新服务",
+      "chatSuggest3": "做一个品牌形象宣传片，有质感的画面",
+      "advancedEdit": "高级编辑",
+      "noStoryboardYet": "请先描述你的视频构想",
+      "storyboardTitle": "分镜脚本",
+      "startGenerating": "开始生成",
+      "regenerateStoryboard": "重新规划",
+      "generatingVideo": "视频生成中...",
+      "preparingProject": "创建项目中...",
+      "generatingShot": "生成分镜",
+      "shotComplete": "分镜",
+      "shotFailed": "分镜",
+      "allShotsComplete": "所有分镜已生成完成！",
+      "viewInEditor": "在编辑器中查看",
+      "combineVideo": "合并视频",
+      "batchFailed": "生成失败",
+      "generationResumed": "已恢复生成进度",
+      "pollingResumed": "正在继续追踪生成状态...",
+      "extendFailed": "视频延长失败，此分镜未生成",
+      "partialSuccess": "部分分镜已生成，{done} 个成功，{dropped} 个失败",
+      "generationSlow": "AI 生成时间较长，请耐心等待...",
+      "generationCancelled": "视频生成已取消",
+      "noDescriptionYet": "请先描述你的视频构想",
+      "capturingFrame": "捕获前一镜头画面",
+      "sendingToAI": "正在提交至 AI 生成..."
+    },
+    "docs": {
+      "newDoc": "新增文件",
+      "emptyTitle": "AI 文件生成",
+      "emptyDesc": "输入描述，让 AI 为你生成 Word、Excel、PowerPoint 或 PDF 文件",
+      "createFirst": "创建第一份文件",
+      "selectDoc": "请选择文件",
+      "selectDocHint": "从左侧列表选择文件，或创建新文件",
+      "createNew": "创建新文件",
+      "docType": "文件类型",
+      "title": "标题 (选填)",
+      "titlePlaceholder": "文件标题...",
+      "prompt": "描述",
+      "promptPlaceholder": "描述你想生成的文件...\n\n例如：\n- 创建一份产品营销提案\n- 生成员工薪资明细报表\n- 制作季度业绩报告演示文稿",
+      "generate": "生成文件",
+      "generating": "AI 正在生成文件，请稍候...",
+      "ready": "文件已生成",
+      "download": "下载文件",
+      "noDocuments": "尚无文件",
+      "noChatDocs": "尚无对话生成的文件",
+      "noChatDocsHint": "在 vAi Chat 中生成的文件会显示在这里",
+      "enterDescription": "请输入文件描述",
+      "generatingBtn": "生成中...",
+      "generateSuccess": "文件生成成功！",
+      "generateFailed": "文件生成失败",
+      "deleteConfirm": "确定要删除此文件吗？",
+      "deleted": "文件已删除",
+      "deleteFailed": "删除失败",
+      "generationFailed": "生成失败",
+      "myDocs": "我的文件",
+      "chatGeneration": "对话生成",
+      "statusCompleted": "已完成",
+      "statusGenerating": "生成中",
+      "statusPending": "等待中",
+      "statusFailed": "失败"
+    },
+    "apps": {
+      "title": "AI 发现",
+      "subtitle": "探索 130+ 个 AI 应用场景，一键开始对话",
+      "searchPlaceholder": "搜索应用...",
+      "noResults": "找不到符合的应用",
+      "tryOther": "请尝试其他关键字",
+      "categoryAll": "全部",
+      "cat": {
+        "vwork": "vWork 专属",
+        "writing": "写作助手",
+        "business": "商业工具",
+        "development": "程序开发",
+        "education": "教育学习",
+        "marketing": "营销推广",
+        "lifestyle": "日常生活",
+        "support": "客服支援",
+        "hr": "人力资源",
+        "design": "创意设计",
+        "legal": "法律合规",
+        "analytics": "数据分析",
+        "translation": "翻译语言"
+      },
+      "app": {
+        "vwOrderMgmt": {
+          "name": "订单管理助手",
+          "desc": "AI 协助管理和查询 vWork 订单",
+          "prompt": "你是 vWork 订单管理 AI 助手。请帮我处理以下订单相关需求：[创建新订单/查询订单状态/批量更新订单/订单异常处理]。订单信息如下：[订单详情]。请提供操作建议和具体步骤。"
+        },
+        "vwInventory": {
+          "name": "库存查询助手",
+          "desc": "AI 协助查询和管理 vWork 库存",
+          "prompt": "你是 vWork 库存管理 AI 助手。请帮我处理以下库存需求：[查询库存量/库存预警分析/补货建议/库存盘点规划]。商品信息：[商品名称或类别]，仓库：[仓库名称]。请提供详细的库存分析和建议。"
+        },
+        "vwCustomerMgmt": {
+          "name": "客户管理助手",
+          "desc": "AI 协助管理 vWork 客户资料",
+          "prompt": "你是 vWork 客户管理 AI 助手。请帮我处理以下客户相关需求：[新增客户/客户分群分析/客户跟进提醒/客户价值评估]。客户信息：[客户详情]。请提供操作建议和客户经营策略。"
+        },
+        "vwInvoice": {
+          "name": "发票处理助手",
+          "desc": "AI 协助生成和管理 vWork 发票",
+          "prompt": "你是 vWork 发票处理 AI 助手。请帮我处理以下发票需求：[生成发票/发票查询/对账/逾期应收款追踪]。相关信息：[发票/订单详情]。请提供处理建议和模板。"
+        },
+        "vwReport": {
+          "name": "报表生成助手",
+          "desc": "AI 协助生成 vWork 业务报表",
+          "prompt": "你是 vWork 报表分析 AI 助手。请帮我生成以下报表：[销售报表/营收分析/客户分析/库存报表/员工绩效]。时间范围：[时间段]，需包含的维度：[维度描述]。请提供报表结构和关键数据解读建议。"
+        },
+        "vwWorkflow": {
+          "name": "工作流自动化",
+          "desc": "AI 协助设计 vWork 自动化流程",
+          "prompt": "你是 vWork 工作流自动化 AI 助手。请帮我设计以下自动化流程：[订单自动分配/库存自动补货/客户自动跟进/自动通知]。业务场景：[场景描述]，触发条件：[条件描述]。请提供完整的工作流设计方案。"
+        },
+        "vwSchedule": {
+          "name": "排程管理助手",
+          "desc": "AI 协助安排 vWork 工作排程",
+          "prompt": "你是 vWork 排程管理 AI 助手。请帮我安排以下排程：[员工班表/项目时程/交货排程/会议安排]。人员：[人员列表]，时间限制：[限制条件]，优先级：[优先级描述]。请提供最优化的排程方案。"
+        },
+        "vwApproval": {
+          "name": "审批流程助手",
+          "desc": "AI 协助设计 vWork 审批流程",
+          "prompt": "你是 vWork 审批流程 AI 助手。请帮我设计以下审批流程：[采购审批/费用报销/请假审批/合同审批]。组织架构：[架构描述]，审批规则：[规则描述]。请提供完整的审批流程设计和权限配置建议。"
+        },
+        "vwNotification": {
+          "name": "通知设定助手",
+          "desc": "AI 协助设定 vWork 自动通知",
+          "prompt": "你是 vWork 通知设定 AI 助手。请帮我设定以下自动通知：[订单状态通知/库存预警/付款提醒/任务到期提醒]。通知对象：[对象描述]，通知渠道：[Email/APP 推送/短信]。请提供通知模板和触发条件设计。"
+        },
+        "vwDataImport": {
+          "name": "数据导入助手",
+          "desc": "AI 协助导入导出 vWork 数据",
+          "prompt": "你是 vWork 数据导入导出 AI 助手。请帮我处理以下数据需求：[导入客户资料/导入商品资料/导出报表/数据迁移]。数据格式：[CSV/Excel/JSON]，数据字段：[字段描述]。请提供数据映射建议和注意事项。"
+        },
+        "article": {
+          "name": "文章撰写",
+          "desc": "快速产出结构完整的文章",
+          "prompt": "请帮我撰写一篇关于 [主题] 的文章，包含引言、主要论点和结论。字数约 800-1000 字，语气专业且易读。"
+        },
+        "blog": {
+          "name": "博客文章",
+          "desc": "撰写吸引读者的博客文章",
+          "prompt": "请帮我撰写一篇关于 [主题] 的博客文章，需要引人入胜的标题、开头吸引读者，包含实用的观点与建议，结尾有行动呼吁。"
+        },
+        "adCopy": {
+          "name": "广告文案",
+          "desc": "撰写高转化率的广告文案",
+          "prompt": "请帮我撰写 [产品/服务] 的广告文案，目标受众为 [受众描述]，需要突出卖点，语气有说服力，包含行动呼吁。请提供 3 个版本。"
+        },
+        "productDesc": {
+          "name": "产品描述",
+          "desc": "撰写有吸引力的产品描述",
+          "prompt": "请帮我撰写 [产品名称] 的产品描述。产品特点：[列出特点]。需要突出产品优势、使用场景，语气专业且吸引人。"
+        },
+        "pressRelease": {
+          "name": "新闻稿",
+          "desc": "撰写专业的新闻稿",
+          "prompt": "请帮我撰写一篇新闻稿，主题为 [事件/产品发布]，公司名为 [公司名]，包含标题、导言、正文、公司背景和联系信息。"
+        },
+        "socialPost": {
+          "name": "社交帖文",
+          "desc": "撰写各平台的社交媒体帖文",
+          "prompt": "请帮我撰写关于 [主题] 的社交帖文，适用于 [平台：微博/微信/小红书/LinkedIn]，需要吸引互动、包含适当的表情符号和标签。请提供 3 个版本。"
+        },
+        "seoArticle": {
+          "name": "SEO 文章",
+          "desc": "撰写搜索引擎优化文章",
+          "prompt": "请帮我撰写一篇 SEO 友好的文章，目标关键字为 [关键字]，需包含自然的关键字分布、适当的标题结构（H1/H2/H3）、meta 描述和内部链接建议。"
+        },
+        "story": {
+          "name": "故事创作",
+          "desc": "创作引人入胜的故事",
+          "prompt": "请帮我创作一个关于 [主题/背景] 的短篇故事，风格为 [写实/奇幻/科幻/悬疑]，约 1000 字，需要有鲜明的角色、引人入胜的情节和意想不到的结局。"
+        },
+        "speech": {
+          "name": "演讲稿",
+          "desc": "撰写有感染力的演讲稿",
+          "prompt": "请帮我撰写一篇 [场合] 的演讲稿，主题为 [主题]，演讲时长约 [X] 分钟，语气 [正式/轻松]，需要有引人注目的开场、清晰的论述和有力的结尾。"
+        },
+        "newsletter": {
+          "name": "电子报",
+          "desc": "撰写吸引订阅者的电子报",
+          "prompt": "请帮我撰写一期电子报，主题为 [主题]，受众为 [受众类型]，需包含引人注目的标题、精简的内容摘要和明确的行动呼吁。"
+        },
+        "bizPlan": {
+          "name": "商业计划书",
+          "desc": "撰写完整的商业计划书",
+          "prompt": "请帮我撰写 [公司/项目] 的商业计划书大纲，包含执行摘要、市场分析、产品/服务描述、营销策略、财务预测和团队介绍。"
+        },
+        "swot": {
+          "name": "SWOT 分析",
+          "desc": "进行全面的 SWOT 分析",
+          "prompt": "请帮我对 [公司/产品/项目] 进行 SWOT 分析，详细分析其优势（Strengths）、劣势（Weaknesses）、机会（Opportunities）和威胁（Threats），并提出策略建议。"
+        },
+        "marketAnalysis": {
+          "name": "市场分析",
+          "desc": "进行深入的市场分析报告",
+          "prompt": "请帮我分析 [行业/市场] 的现状，包含市场规模、增长趋势、主要参与者、消费者行为、进入壁垒和未来展望。"
+        },
+        "meetingNotes": {
+          "name": "会议记录",
+          "desc": "整理专业的会议记录",
+          "prompt": "请帮我整理以下会议内容的会议记录：[会议内容]。需包含会议信息、出席人员、讨论要点、决议事项和待办事项。"
+        },
+        "proposal": {
+          "name": "提案书",
+          "desc": "撰写有说服力的提案书",
+          "prompt": "请帮我撰写 [项目/合作] 的提案书，客户为 [客户名称]，需包含背景分析、解决方案、实施计划、预期成效和报价概要。"
+        },
+        "financialReport": {
+          "name": "财务报告",
+          "desc": "生成财务分析报告",
+          "prompt": "请帮我撰写 [公司/项目] 的财务报告摘要，包含营收概况、成本分析、利润率、现金流状况和财务健康度评估。"
+        },
+        "investPitch": {
+          "name": "融资简报",
+          "desc": "制作投资人简报内容",
+          "prompt": "请帮我准备 [公司名] 的投资人简报内容，包含问题描述、解决方案、市场机会、商业模式、竞争优势、团队介绍和融资需求。"
+        },
+        "competitorAnalysis": {
+          "name": "竞品分析",
+          "desc": "进行详细的竞争对手分析",
+          "prompt": "请帮我分析 [产品/公司] 的主要竞争对手，比较各家的产品功能、定价策略、市场定位、优劣势和市场份额。"
+        },
+        "okr": {
+          "name": "OKR 设定",
+          "desc": "制定团队目标与关键成果",
+          "prompt": "请帮我制定 [部门/团队] 的季度 OKR，角色为 [角色描述]，需包含 3-5 个目标（Objectives）和每个目标的 3-4 个关键成果（Key Results）。"
+        },
+        "riskAssessment": {
+          "name": "风险评估",
+          "desc": "进行项目风险评估",
+          "prompt": "请帮我对 [项目/计划] 进行风险评估，识别潜在风险、评估影响程度和发生概率，并提出风险缓解策略和应急计划。"
+        },
+        "codeGen": {
+          "name": "代码生成",
+          "desc": "根据需求生成代码",
+          "prompt": "请帮我用 [编程语言] 写一个 [功能描述] 的程序，需求如下：[具体需求]。请包含注释说明和错误处理。"
+        },
+        "codeReview": {
+          "name": "代码审查",
+          "desc": "审查并改善代码质量",
+          "prompt": "请帮我审查以下代码，指出潜在问题、性能瓶颈、安全隐患和改善建议：\n\n[粘贴代码]"
+        },
+        "debugHelper": {
+          "name": "调试助手",
+          "desc": "协助排查程序错误",
+          "prompt": "我遇到以下程序错误，请帮我分析原因并提供解决方案：\n\n错误信息：[错误信息]\n代码：[相关代码]\n环境：[开发环境]"
+        },
+        "apiDoc": {
+          "name": "API 文档",
+          "desc": "生成 API 文档说明",
+          "prompt": "请帮我撰写以下 API 端点的文档：\n\n端点：[URL]\n方法：[GET/POST/PUT/DELETE]\n功能：[描述]\n\n需包含请求参数、响应格式、错误码和使用示例。"
+        },
+        "sqlQuery": {
+          "name": "SQL 查询",
+          "desc": "生成和优化 SQL 查询",
+          "prompt": "请帮我写一个 SQL 查询，数据库为 [MySQL/PostgreSQL/等]，需求如下：[查询需求]。数据表结构：[描述表结构]。请同时提供性能优化建议。"
+        },
+        "regex": {
+          "name": "正则表达式",
+          "desc": "生成和解释正则表达式",
+          "prompt": "请帮我写一个正则表达式，用于 [匹配需求描述]。请提供正则表达式、解释每个部分的含义，并给出测试示例。"
+        },
+        "architecture": {
+          "name": "系统架构",
+          "desc": "设计系统架构方案",
+          "prompt": "请帮我设计 [系统/应用] 的架构方案，需求：[需求描述]，预期用户量：[用户量]。请包含技术选型、系统组件、数据流程和扩展策略。"
+        },
+        "unitTest": {
+          "name": "单元测试",
+          "desc": "生成单元测试代码",
+          "prompt": "请帮我为以下代码撰写单元测试，使用 [测试框架]，需涵盖正常情况、边界条件和错误处理：\n\n[粘贴代码]"
+        },
+        "refactor": {
+          "name": "代码重构",
+          "desc": "重构并改善代码结构",
+          "prompt": "请帮我重构以下代码，改善可读性、性能和可维护性，并说明每处改动的原因：\n\n[粘贴代码]"
+        },
+        "techDoc": {
+          "name": "技术文档",
+          "desc": "撰写技术文档和说明",
+          "prompt": "请帮我撰写 [系统/功能] 的技术文档，包含系统概述、架构说明、安装指南、API 说明、常见问题和维护指南。"
+        },
+        "studyPlan": {
+          "name": "学习计划",
+          "desc": "制定个性化学习计划",
+          "prompt": "请帮我制定学习 [主题/技能] 的学习计划，我目前的水平是 [水平]，目标是 [目标]，每周可投入 [小时数] 小时。请安排 [周数] 周的学习计划。"
+        },
+        "examPrep": {
+          "name": "考试准备",
+          "desc": "协助考试复习和准备",
+          "prompt": "请帮我准备 [考试名称] 的复习计划，考试日期为 [日期]，需包含重点整理、常考题型、复习策略和时间安排。"
+        },
+        "thesisOutline": {
+          "name": "论文大纲",
+          "desc": "制定学术论文大纲",
+          "prompt": "请帮我制定一篇关于 [研究主题] 的论文大纲，学科为 [学科]，需包含研究背景、文献综述、研究方法、预期结果和结论。"
+        },
+        "langLearn": {
+          "name": "语言学习",
+          "desc": "协助外语学习和练习",
+          "prompt": "我正在学习 [语言]，目前水平为 [初级/中级/高级]。请帮我进行对话练习，主题为 [主题]，并在对话中纠正我的错误和提供改善建议。"
+        },
+        "explainer": {
+          "name": "概念解释",
+          "desc": "用简单的方式解释复杂概念",
+          "prompt": "请用简单易懂的方式解释 [概念/主题]，就像在对一个 [年龄/水平] 的人说明一样。请使用类比和例子来帮助理解。"
+        },
+        "readingNotes": {
+          "name": "读书笔记",
+          "desc": "整理书籍重点和心得",
+          "prompt": "请帮我整理《[书名]》的读书笔记，包含书籍概要、各章重点、关键观点、实用建议和个人反思问题。"
+        },
+        "courseDesign": {
+          "name": "课程设计",
+          "desc": "设计教学课程内容",
+          "prompt": "请帮我设计一门 [主题] 的课程，对象为 [学习者描述]，时长 [小时数]，需包含课程目标、大纲、教学活动、评估方式和参考资料。"
+        },
+        "quizGen": {
+          "name": "测验出题",
+          "desc": "自动生成测验题目",
+          "prompt": "请帮我针对 [主题/章节] 出 [数量] 题测验题，包含 [选择题/填空题/问答题]，难度为 [简单/中等/困难]，并附上答案和解析。"
+        },
+        "research": {
+          "name": "研究助手",
+          "desc": "协助学术研究和资料整理",
+          "prompt": "我正在研究 [研究主题]，请帮我：1. 整理相关的研究方向 2. 建议研究方法 3. 提出可能的研究假设 4. 建议数据收集方式。"
+        },
+        "flashcard": {
+          "name": "记忆卡片",
+          "desc": "生成学习用的记忆卡片",
+          "prompt": "请帮我为 [主题/科目] 制作 20 张记忆卡片（Flashcards），每张包含正面（问题/概念）和背面（答案/解释），适合 [学习目的] 使用。"
+        },
+        "marketingStrategy": {
+          "name": "营销策略",
+          "desc": "制定完整的营销策略",
+          "prompt": "请帮我制定 [产品/服务] 的营销策略，目标市场为 [市场描述]，预算为 [预算]，需包含目标设定、渠道选择、内容策略和 KPI 指标。"
+        },
+        "brandNaming": {
+          "name": "品牌命名",
+          "desc": "创意品牌名称构思",
+          "prompt": "请帮我为 [产品/服务描述] 构思品牌名称，品牌定位为 [定位描述]，目标客群为 [客群]。请提供 10 个候选名称，附上含义说明和域名建议。"
+        },
+        "slogan": {
+          "name": "标语口号",
+          "desc": "创作品牌标语和口号",
+          "prompt": "请帮 [品牌名称] 创作宣传标语，品牌价值为 [价值描述]，目标是 [目标]。请提供 10 个标语选项，附上适用场景说明。"
+        },
+        "emailMarketing": {
+          "name": "邮件营销",
+          "desc": "撰写营销电子邮件",
+          "prompt": "请帮我撰写 [目的：欢迎信/促销/复购/活动邀请] 的营销邮件，产品为 [产品]，受众为 [受众]。需包含吸引人的主题行、正文和行动呼吁。"
+        },
+        "socialStrategy": {
+          "name": "社交策略",
+          "desc": "制定社交媒体策略",
+          "prompt": "请帮我制定 [品牌/产品] 的社交媒体策略，平台为 [微博/微信/小红书/抖音]，目标为 [目标]。需包含内容日历、帖文类型、发文频率和互动策略。"
+        },
+        "kolCollab": {
+          "name": "KOL 合作",
+          "desc": "规划网红合作方案",
+          "prompt": "请帮我规划 [产品/品牌] 的 KOL 营销合作方案，预算为 [预算]，目标为 [目标]。需包含 KOL 筛选标准、合作模式、内容要求和效果评估方式。"
+        },
+        "promoPlanning": {
+          "name": "促销策划",
+          "desc": "策划促销活动方案",
+          "prompt": "请帮我策划 [品牌/产品] 的促销活动，时间为 [时间段]，目标为 [销售目标]。需包含活动主题、促销机制、推广渠道和预算分配。"
+        },
+        "persona": {
+          "name": "用户画像",
+          "desc": "建立目标用户画像",
+          "prompt": "请帮我建立 [产品/服务] 的用户画像（Persona），需包含人口统计数据、行为特征、痛点需求、消费习惯和媒体使用偏好。请建立 3 个不同的用户画像。"
+        },
+        "abTest": {
+          "name": "A/B 测试",
+          "desc": "设计 A/B 测试方案",
+          "prompt": "请帮我设计 [网站/App/邮件] 的 A/B 测试方案，测试目标为 [转化率/点击率/等]。需包含假设、变量设定、样本量计算、测试时长和分析方法。"
+        },
+        "adPlacement": {
+          "name": "广告投放",
+          "desc": "规划数字广告投放策略",
+          "prompt": "请帮我规划 [产品/服务] 的数字广告投放策略，预算为 [预算]，目标为 [目标]。需包含平台选择、受众定向、广告格式、出价策略和预期 ROAS。"
+        },
+        "travelPlan": {
+          "name": "旅游规划",
+          "desc": "规划完整的旅游行程",
+          "prompt": "请帮我规划 [目的地] 的旅游行程，天数为 [天数]，人数 [人数]，预算 [预算]，偏好 [类型：文化/美食/自然/冒险]。请安排每日行程、住宿和交通建议。"
+        },
+        "recipe": {
+          "name": "食谱推荐",
+          "desc": "根据食材推荐食谱",
+          "prompt": "我手边有这些食材：[列出食材]，请推荐 3 道可以制作的菜肴，包含完整的食谱：食材清单、步骤说明、烹饪时间和小技巧。"
+        },
+        "fitnessPlan": {
+          "name": "健身计划",
+          "desc": "制定个人健身计划",
+          "prompt": "请帮我制定健身计划，目标为 [减脂/增肌/维持]，目前体重 [体重]，每周可运动 [天数] 天，每次 [时长]，可用设备 [设备]。请安排每日训练菜单。"
+        },
+        "financePlanning": {
+          "name": "财务规划",
+          "desc": "个人财务规划建议",
+          "prompt": "请帮我进行个人财务规划，月收入约 [金额]，目标为 [目标：买房/退休/投资]。请建议预算分配、储蓄计划、投资方向和风险管理。"
+        },
+        "giftIdea": {
+          "name": "礼物建议",
+          "desc": "推荐合适的礼物选择",
+          "prompt": "请推荐适合 [对象：朋友/家人/同事] 的 [场合：生日/节日/纪念日] 礼物，预算为 [预算]，对方喜好为 [喜好描述]。请提供 10 个建议。"
+        },
+        "partyPlanning": {
+          "name": "派对策划",
+          "desc": "策划各类派对活动",
+          "prompt": "请帮我策划一场 [类型] 派对，人数约 [人数]，预算 [预算]，地点 [地点]。需包含主题、场地布置、活动安排、餐饮菜单和注意事项。"
+        },
+        "homeDecor": {
+          "name": "家居布置",
+          "desc": "提供家居装饰建议",
+          "prompt": "请帮我规划 [房间类型] 的家居布置，空间大小约 [平方米]，风格偏好 [风格]，预算 [预算]。请建议配色方案、家具选择和布置技巧。"
+        },
+        "petCare": {
+          "name": "宠物照护",
+          "desc": "提供宠物照护建议",
+          "prompt": "我养了一只 [宠物种类和品种]，年龄 [年龄]，请提供饲养建议，包含饮食、运动、清洁、健康检查和常见疾病预防。"
+        },
+        "timeManagement": {
+          "name": "时间管理",
+          "desc": "改善时间管理效率",
+          "prompt": "请帮我改善时间管理，我的主要挑战是 [挑战描述]，每日可用时间约 [小时]，需要完成 [任务列表]。请提供具体的时间管理方法和每日排程建议。"
+        },
+        "habitBuilding": {
+          "name": "习惯养成",
+          "desc": "建立良好习惯的计划",
+          "prompt": "我想养成 [习惯描述] 的习惯，请帮我制定 30 天养成计划，包含每日具体行动、进度追踪方法、可能的障碍和应对策略。"
+        },
+        "faqGen": {
+          "name": "FAQ 生成",
+          "desc": "生成常见问题及回答",
+          "prompt": "请帮我为 [产品/服务] 生成常见问题集（FAQ），涵盖产品使用、账户管理、支付方式、退换货政策等方面，每个类别 5 个问题，附上完整回答。"
+        },
+        "complaintReply": {
+          "name": "客诉回复",
+          "desc": "撰写专业的客诉回复",
+          "prompt": "请帮我回复以下客户投诉：[投诉内容]。回复需表达歉意、说明原因、提出解决方案，语气专业且有同理心。"
+        },
+        "refundProcess": {
+          "name": "退款流程",
+          "desc": "制定退款处理流程",
+          "prompt": "请帮我制定 [产品/服务] 的退款处理流程和模板，包含退款条件、申请步骤、处理时间、回复模板和例外情况处理。"
+        },
+        "productGuide": {
+          "name": "产品指南",
+          "desc": "撰写产品使用指南",
+          "prompt": "请帮我撰写 [产品名称] 的使用指南，包含开始使用、基本操作、高级功能、故障排除和常见问题。语气友善易懂。"
+        },
+        "serviceFlow": {
+          "name": "服务流程",
+          "desc": "设计客户服务流程",
+          "prompt": "请帮我设计 [服务类型] 的客户服务流程，包含各阶段的步骤、话术模板、升级机制和服务质量指标。"
+        },
+        "userGuide": {
+          "name": "用户手册",
+          "desc": "撰写完整的用户手册",
+          "prompt": "请帮我撰写 [系统/软件] 的用户手册，包含系统介绍、安装设置、功能说明、操作步骤（含截图描述）和 FAQ。"
+        },
+        "complaintAnalysis": {
+          "name": "客诉分析",
+          "desc": "分析客诉数据和趋势",
+          "prompt": "请帮我建立客户投诉分析框架，包含投诉分类体系、严重程度评级、趋势分析方法、根因分析模板和改善建议报告格式。"
+        },
+        "satisfactionSurvey": {
+          "name": "满意度调查",
+          "desc": "设计客户满意度调查",
+          "prompt": "请帮我设计 [产品/服务] 的客户满意度调查问卷，包含 [NPS/CSAT/CES] 指标、各维度的评分题、开放式问题和调查流程建议。"
+        },
+        "scriptTemplate": {
+          "name": "话术模板",
+          "desc": "制作客服话术模板",
+          "prompt": "请帮我制作 [场景：欢迎/咨询/投诉/跟踪] 的客服话术模板，需包含开场白、引导话术、解决方案说明和结束语。请提供正式和亲切两种版本。"
+        },
+        "knowledgeBase": {
+          "name": "知识库",
+          "desc": "建立客服知识库文章",
+          "prompt": "请帮我为 [产品/服务] 建立知识库文章，主题为 [主题]，需包含问题描述、解决步骤、注意事项和相关文章链接。格式需适合客服人员快速查阅。"
+        },
+        "jobDescription": {
+          "name": "职位描述",
+          "desc": "撰写吸引人才的职位描述",
+          "prompt": "请帮我撰写 [职位名称] 的职位描述，公司为 [公司描述]，需包含工作职责、资格要求、加分条件、薪资福利和公司文化介绍。"
+        },
+        "interviewQ": {
+          "name": "面试题目",
+          "desc": "设计面试问题库",
+          "prompt": "请帮我设计 [职位名称] 的面试问题，包含行为面试题、技术面试题、情境题和文化适配题，每类 5 题，附上评分标准和理想回答要点。"
+        },
+        "offerLetter": {
+          "name": "录取通知",
+          "desc": "撰写录取通知书模板",
+          "prompt": "请帮我撰写 [职位名称] 的录取通知书，包含职位信息、薪资福利、到职日期、试用期条件和需要回复的事项。语气专业且热情。"
+        },
+        "performanceReview": {
+          "name": "绩效评估",
+          "desc": "撰写绩效评估报告",
+          "prompt": "请帮我撰写员工绩效评估报告的模板，包含工作成果回顾、目标达成率、能力评估、改善建议和发展计划。"
+        },
+        "employeeHandbook": {
+          "name": "员工手册",
+          "desc": "撰写员工手册内容",
+          "prompt": "请帮我撰写公司员工手册的 [章节：考勤制度/请假规定/福利制度/行为准则] 章节，需符合 [地区] 的劳动法规。"
+        },
+        "trainingPlan": {
+          "name": "培训计划",
+          "desc": "设计员工培训计划",
+          "prompt": "请帮我设计 [新人入职/技能提升/管理培训] 的培训计划，对象为 [员工类型]，时长 [天数]。需包含课程大纲、培训方式、评估方法和后续跟进。"
+        },
+        "exitInterview": {
+          "name": "离职面谈",
+          "desc": "设计离职面谈问卷",
+          "prompt": "请帮我设计离职面谈的问题清单，涵盖离职原因、工作满意度、管理反馈、公司改善建议等方面，约 15-20 个问题，附上引导说明。"
+        },
+        "salaryReport": {
+          "name": "薪资报告",
+          "desc": "撰写薪资调查报告",
+          "prompt": "请帮我撰写 [职位/行业] 的薪资调查报告模板，包含市场薪资水平、薪资结构分析、福利比较和调薪建议。"
+        },
+        "teamBuilding": {
+          "name": "团队建设",
+          "desc": "策划团队建设活动",
+          "prompt": "请帮我策划团队建设活动，人数 [人数]，预算 [预算]，目标为 [增进沟通/提升合作/缓解压力]。请提供 5 个活动方案，包含流程、所需材料和预期效果。"
+        },
+        "companyCulture": {
+          "name": "企业文化",
+          "desc": "建立企业文化文件",
+          "prompt": "请帮我建立公司的企业文化文件，公司使命为 [使命]，价值观为 [价值观]。需包含文化宣言、核心价值说明、行为准则和文化实践案例。"
+        },
+        "logoConcept": {
+          "name": "Logo 概念",
+          "desc": "构思 Logo 设计概念",
+          "prompt": "请帮我构思 [品牌名称] 的 Logo 设计概念，品牌定位为 [定位]，目标客群为 [客群]。请提供 5 个概念方向，包含设计理念、色彩建议和风格参考。"
+        },
+        "colorScheme": {
+          "name": "配色方案",
+          "desc": "设计品牌配色方案",
+          "prompt": "请帮我设计 [品牌/项目] 的配色方案，品牌调性为 [调性]。需包含主色、辅色、强调色的 HEX 值，以及在不同场景（网页、印刷、社交）的应用建议。"
+        },
+        "uiCopy": {
+          "name": "界面文案",
+          "desc": "撰写 UI 界面文案",
+          "prompt": "请帮我撰写 [App/网站] 的 UI 文案，页面为 [页面描述]，需包含标题、按钮文字、提示信息、错误信息和空状态文案。语气 [正式/亲切/活泼]。"
+        },
+        "brandStory": {
+          "name": "品牌故事",
+          "desc": "撰写品牌故事",
+          "prompt": "请帮我撰写 [品牌名称] 的品牌故事，创立背景为 [背景]，核心价值为 [价值]。需要情感共鸣、真实感，适用于官网关于我们页面。"
+        },
+        "namingIdea": {
+          "name": "命名构思",
+          "desc": "产品或项目命名构思",
+          "prompt": "请帮我为 [产品/项目/功能] 命名，特色为 [特色描述]，目标用户为 [用户]。请提供 15 个名称建议，包含中英文，附上含义和选名理由。"
+        },
+        "taglineDesign": {
+          "name": "标语设计",
+          "desc": "设计产品标语文案",
+          "prompt": "请帮我为 [产品/活动] 设计标语，核心信息为 [信息]，目标为 [目标]。请提供 10 个标语，分为理性诉求和感性诉求两类，附上适用情境。"
+        },
+        "packagingCopy": {
+          "name": "包装文案",
+          "desc": "撰写产品包装文案",
+          "prompt": "请帮我撰写 [产品] 的包装文案，包含产品名称呈现、卖点标语、产品说明、使用方式和品牌故事短文。需符合 [风格] 风格。"
+        },
+        "spaceDesc": {
+          "name": "空间描述",
+          "desc": "撰写空间设计描述",
+          "prompt": "请帮我撰写 [空间类型：咖啡厅/办公室/展览] 的空间设计概念描述，风格为 [风格]，需包含设计理念、空间配置、材质选择和氛围营造。"
+        },
+        "styleGuide": {
+          "name": "风格指南",
+          "desc": "建立品牌风格指南",
+          "prompt": "请帮我建立 [品牌名称] 的品牌风格指南，包含品牌定位、视觉规范（色彩/字体/图像风格）、语气规范、应用示例和禁止事项。"
+        },
+        "creativeBrief": {
+          "name": "创意简报",
+          "desc": "撰写创意项目简报",
+          "prompt": "请帮我撰写 [项目/活动] 的创意简报，包含项目背景、目标、目标受众、核心信息、预算、时程和成功指标。"
+        },
+        "contractDraft": {
+          "name": "合同草案",
+          "desc": "起草基本合同文件",
+          "prompt": "请帮我起草 [合同类型：服务/合作/保密] 合同的基本框架，双方为 [甲方] 和 [乙方]，需包含基本条款、权利义务、付款条件和违约责任。（注意：此为参考模板，正式使用请咨询法律专业人士）"
+        },
+        "privacyPolicy": {
+          "name": "隐私政策",
+          "desc": "撰写隐私权政策",
+          "prompt": "请帮我撰写 [网站/App] 的隐私权政策，需涵盖数据收集、使用目的、数据保护、Cookie 政策、第三方共享和用户权利。需符合 [GDPR/个人信息保护法] 要求。"
+        },
+        "termsOfUse": {
+          "name": "使用条款",
+          "desc": "撰写服务使用条款",
+          "prompt": "请帮我撰写 [平台/服务] 的使用条款，包含服务描述、使用规范、知识产权、免责声明、账户管理和争议解决。"
+        },
+        "disclaimer": {
+          "name": "免责声明",
+          "desc": "撰写免责声明文件",
+          "prompt": "请帮我撰写 [网站/产品/服务] 的免责声明，涵盖信息准确性、使用风险、第三方链接、损害赔偿限制和适用法律。"
+        },
+        "nda": {
+          "name": "保密协议",
+          "desc": "起草保密协议模板",
+          "prompt": "请帮我起草保密协议（NDA）模板，类型为 [单向/双向]，保密期限为 [期限]，需包含定义、保密义务、排除条款和违约责任。"
+        },
+        "trademark": {
+          "name": "商标申请",
+          "desc": "协助商标申请准备",
+          "prompt": "请帮我准备 [品牌/商标名称] 的商标申请相关信息，包含商标分类建议、申请流程说明、所需文件清单和注意事项。"
+        },
+        "complianceCheck": {
+          "name": "合规检查",
+          "desc": "进行基本合规检查",
+          "prompt": "请帮我检查 [业务/产品] 在 [地区/行业] 的基本合规要求，包含必要的执照许可、行业法规、数据保护要求和申报义务。"
+        },
+        "legalOpinion": {
+          "name": "法律意见",
+          "desc": "提供基本法律问题分析",
+          "prompt": "请帮我分析以下法律问题：[问题描述]，涉及 [法律领域]。请提供基本的法律分析、可能的风险和建议的处理方向。（注意：此为一般性参考，正式问题请咨询执业律师）"
+        },
+        "riskDisclosure": {
+          "name": "风险揭示",
+          "desc": "撰写风险揭示文件",
+          "prompt": "请帮我撰写 [投资/产品/服务] 的风险揭示书，包含主要风险类型、风险程度说明、投资者/用户须知和风险管理建议。"
+        },
+        "authorization": {
+          "name": "授权书",
+          "desc": "撰写授权书模板",
+          "prompt": "请帮我撰写 [授权类型] 的授权书模板，授权人为 [甲方]，被授权人为 [乙方]，授权范围为 [范围]，需包含授权期限和限制条件。"
+        },
+        "dataInterpret": {
+          "name": "数据解读",
+          "desc": "解读和分析数据",
+          "prompt": "请帮我解读以下数据：[粘贴数据]。请分析数据中的关键发现、趋势、异常值，并提出可行的业务建议。"
+        },
+        "reportDesign": {
+          "name": "报表设计",
+          "desc": "设计数据报表结构",
+          "prompt": "请帮我设计 [业务目的] 的数据报表，需包含的指标有 [指标列表]，使用者为 [报表受众]。请建议报表结构、图表类型和数据呈现方式。"
+        },
+        "kpiSetting": {
+          "name": "KPI 设定",
+          "desc": "设定关键绩效指标",
+          "prompt": "请帮我设定 [部门/项目] 的 KPI 指标，业务目标为 [目标描述]。需包含每个 KPI 的定义、计算方式、目标值和衡量频率。"
+        },
+        "trendAnalysis": {
+          "name": "趋势分析",
+          "desc": "进行数据趋势分析",
+          "prompt": "请帮我分析以下时间序列数据的趋势：[数据描述]，时间范围为 [范围]。请识别趋势方向、季节性模式、转折点和未来预测。"
+        },
+        "userAnalysis": {
+          "name": "用户分析",
+          "desc": "进行用户行为分析",
+          "prompt": "请帮我设计 [产品/平台] 的用户分析框架，需包含用户分群方法、关键行为指标、漏斗分析、留存分析和用户生命周期分析。"
+        },
+        "salesAnalysis": {
+          "name": "销售分析",
+          "desc": "进行销售数据分析",
+          "prompt": "请帮我分析以下销售数据：[数据描述]。需包含整体趋势、产品表现、客户分析、地区比较和销售预测。"
+        },
+        "forecastModel": {
+          "name": "预测模型",
+          "desc": "设计数据预测模型",
+          "prompt": "请帮我设计 [预测目标] 的预测模型方案，可用数据有 [数据描述]。请建议适合的模型方法、所需数据、特征工程和模型评估指标。"
+        },
+        "dataCleaning": {
+          "name": "数据清理",
+          "desc": "设计数据清理流程",
+          "prompt": "请帮我设计 [数据来源] 的数据清理流程，数据问题包含 [问题描述]。需包含缺失值处理、异常值检测、格式标准化和质量验证步骤。"
+        },
+        "vizSuggestion": {
+          "name": "可视化建议",
+          "desc": "建议数据可视化方式",
+          "prompt": "我有以下数据需要可视化：[数据描述和目的]。请建议最适合的图表类型、工具选择、配色方案和版面配置，并说明选择原因。"
+        },
+        "abExperiment": {
+          "name": "实验设计",
+          "desc": "设计数据驱动的实验",
+          "prompt": "请帮我设计一个数据驱动的实验，目标是验证 [假设描述]。需包含实验设计、控制变量、样本量估算、统计检验方法和结果判读标准。"
+        },
+        "zhEnTranslate": {
+          "name": "中英翻译",
+          "desc": "中文和英文互译",
+          "prompt": "请将以下内容翻译成 [英文/中文]，保持原文的语气和风格，确保翻译自然流畅：\n\n[粘贴原文]"
+        },
+        "jaTranslate": {
+          "name": "日文翻译",
+          "desc": "中文和日文互译",
+          "prompt": "请将以下内容翻译成 [日文/中文]，注意敬语使用和日文表达习惯：\n\n[粘贴原文]"
+        },
+        "koTranslate": {
+          "name": "韩文翻译",
+          "desc": "中文和韩文互译",
+          "prompt": "请将以下内容翻译成 [韩文/中文]，注意敬语等级和韩文表达习惯：\n\n[粘贴原文]"
+        },
+        "multiTranslate": {
+          "name": "多语翻译",
+          "desc": "同时翻译成多种语言",
+          "prompt": "请将以下内容同时翻译成 [语言列表]，每种语言的翻译需要符合当地语言习惯：\n\n[粘贴原文]"
+        },
+        "localization": {
+          "name": "本地化",
+          "desc": "进行内容本地化调整",
+          "prompt": "请将以下内容进行 [目标市场] 的本地化处理，不只是翻译，还需调整文化引用、度量单位、日期格式和当地惯例：\n\n[粘贴原文]"
+        },
+        "subtitleTranslate": {
+          "name": "字幕翻译",
+          "desc": "翻译视频字幕",
+          "prompt": "请将以下字幕翻译成 [目标语言]，注意每行字数限制（建议不超过 [字数] 个字），保持时间轴的自然断句：\n\n[粘贴字幕]"
+        },
+        "bizTranslate": {
+          "name": "商务翻译",
+          "desc": "翻译商务文件",
+          "prompt": "请翻译以下商务文件为 [目标语言]，类型为 [合同/报告/演示/邮件]，需保持专业用语的准确性和正式语气：\n\n[粘贴原文]"
+        },
+        "techTranslate": {
+          "name": "技术翻译",
+          "desc": "翻译技术文件",
+          "prompt": "请翻译以下技术文件为 [目标语言]，领域为 [IT/医学/工程/科学]，需保持专业术语的准确性和一致性：\n\n[粘贴原文]"
+        },
+        "literaryTranslate": {
+          "name": "文学翻译",
+          "desc": "翻译文学作品",
+          "prompt": "请翻译以下文学作品为 [目标语言]，注意保留原文的修辞手法、情感色彩和文学风格，必要时可进行创意改编：\n\n[粘贴原文]"
+        },
+        "colloquialTranslate": {
+          "name": "口语翻译",
+          "desc": "翻译口语化内容",
+          "prompt": "请将以下口语化内容翻译成 [目标语言] 的口语表达，注意使用自然的日常用语而非书面语，保留原文的语气和情绪：\n\n[粘贴原文]"
+        }
+      }
+    }
+  },
+  "login": {
+    "signingInto": "你正在登录",
+    "loginTitle": "登录你的账号",
+    "registerTitle": "创建你的账号",
+    "email": "邮箱",
+    "password": "密码"
+  },
+  "billing": {
+    "title": "订阅",
+    "currentSubscription": "当前订阅",
+    "selectPlan": "选择计划",
+    "paymentHistoryTitle": "付款历史",
+    "checkoutSuccess": "订阅成功！您的订阅已激活。",
+    "checkoutCancel": "订阅已取消。您可以随时重新订阅。",
+    "paymentHistoryError": "载入付款历史失败",
+    "paymentHistory": {
+      "date": "日期",
+      "invoice": "发票号",
+      "amount": "金额",
+      "period": "期间",
+      "status": "状态",
+      "actions": "操作"
+    },
+    "trial": {
+      "title": "试用期",
+      "desc": "您目前正在使用免费试用版",
+      "quotaDesc": "您目前正在使用免费试用，以下为您的配额使用状况",
+      "daysLeft": "剩余天数",
+      "days": "天",
+      "expired": "试用期结束后，请选择订阅计划以继续使用服务",
+      "expiredWithDate": "试用期将于 {date} 结束，届时请选择订阅计划以继续使用服务",
+      "orderQuota": "vWork 订单配额",
+      "remainOrders": "还剩 {n} 张",
+      "quotaFull": "已达上限，7 天后需订阅"
+    },
+    "salesPartnerTrial": {
+      "title": "合作伙伴试用期",
+      "desc": "您正在使用由 {partner} 提供的试用服务",
+      "expiredWithDate": "试用期将于 {date} 结束，届时请联络您的合作伙伴以订阅服务"
+    },
+    "monthlyBilling": "月付",
+    "yearlyBilling": "年付",
+    "perMonth": "/月",
+    "perYear": "/年",
+    "billedYearly": "按年计费",
+    "yearlySaveTag": "省 34%",
+    "noDiscount": "没有优惠",
+    "vsuite": {
+      "name": "vSuite",
+      "monthlyPrice": "$380/月",
+      "yearlyPrice": "",
+      "yearlyTotal": "年付 $3,000",
+      "yearlySavings": "节省 $1,560/年",
+      "badge": "热门",
+      "features": {
+        "0": "所有功能",
+        "1": "无限记录",
+        "2": "无广告",
+        "3": "每月 1,000 vCoins",
+        "4": "vOffice - AI 智慧办公",
+        "4a": "文件、表格、简报编辑",
+        "4b": "PDF 检视、编辑与转换",
+        "4c": "离线桌面版（Windows/macOS/Linux）",
+        "4d": "AI 撰写、翻译、摘要、分析",
+        "5": "vMarket - 商品市集",
+        "6": "支援服务"
+      },
+      "button": "立即订阅"
+    },
+    "vsuite_pro": {
+      "name": "vSuite Pro",
+      "monthlyPrice": "$680/月",
+      "yearlyPrice": "$500/月",
+      "yearlyTotal": "年付 $6,000",
+      "yearlySavings": "节省 $2,160/年",
+      "badge": "最优惠",
+      "features": {
+        "0": "所有 vSuite 功能",
+        "1": "无广告",
+        "2": "每月 2,000 vCoins",
+        "3": "vOffice - AI 智慧办公",
+        "3a": "文件、表格、简报编辑",
+        "3b": "PDF 检视、编辑与转换",
+        "3c": "离线桌面版（Windows/macOS/Linux）",
+        "3d": "AI 撰写、翻译、摘要、分析",
+        "4": "vMarket - 商品市集",
+        "5": "企业支援服务",
+        "6": "数据遗失防护",
+        "7": "安全管控服务"
+      },
+      "button": "立即订阅"
+    },
+    "advanced": {
+      "badge": "进阶版",
+      "name": "进阶版方案"
+    },
+    "subscribed": "已订阅",
+    "nextRenewal": "下次续费",
+    "cancelAtPeriodEnd": "将在周期结束时取消",
+    "cancelSubscription": "取消订阅",
+    "noPlan": "您尚未订阅任何计划，请选择一个计划开始使用",
+    "noPaymentHistory": "暂无付款记录",
+    "loading": "载入中...",
+    "loadError": "载入订阅信息失败",
+    "processing": "正在处理订阅请求...",
+    "subscribeError": "订阅失败",
+    "cancelConfirm": "确定要取消订阅吗？订阅将在当前计费周期结束时取消。",
+    "cancelSuccess": "订阅已设置为在周期结束时取消",
+    "cancelError": "取消订阅失败"
+  },
+  "aiCoins": {
+    "title": "vCoin",
+    "balance": "当前余额",
+    "totalAvailable": "总可用",
+    "monthlyQuota": "月配额",
+    "dailyFree": "每日免费",
+    "purchased": "已购买余额",
+    "totalUsed": "累计使用",
+    "usageInfo": "消耗说明",
+    "operation": "操作类型",
+    "coinsPerUse": "每次消耗",
+    "description": "说明",
+    "simpleQuery": "简单查询",
+    "simpleQueryDesc": "基本问答、资料查询",
+    "imageGen": "图片生成",
+    "imageGenDesc": "AI 图片生成",
+    "sketchGen": "草图生成",
+    "sketchGenDesc": "AI 草图生成",
+    "docGen": "文件生成",
+    "docGenDesc": "每 15 页 5 vCoin，最低 5 vCoin（最终由资料决定）",
+    "videoGen": "视频生成",
+    "videoGenDesc": "AI 视频生成（每 5 秒为单位）",
+    "videoExtend": "视频延伸",
+    "videoExtendDesc": "AI 视频延伸（每 5 秒为单位）",
+    "ocr": "OCR 文字识别",
+    "ocrDesc": "图片文字识别",
+    "stt": "语音转文字",
+    "sttDesc": "语音转文字",
+    "matchFields": "栏位匹配",
+    "matchFieldsDesc": "AI 自动匹配栏位",
+    "aiSuggestion": "AI 建议/分析",
+    "aiSuggestionDesc": "AI 智能建议与分析",
+    "analysis": "数据分析",
+    "analysisDesc": "报表分析、趋势预测",
+    "generate": "内容生成",
+    "generateDesc": "文件生成、邮件撰写",
+    "export": "数据导出",
+    "exportDesc": "Excel/PDF 导出",
+    "automation": "自动化任务",
+    "automationDesc": "批量处理、自动化流程",
+    "dailyFreeTip": "每天有 5 次免费查询（交谈及图片生成），每日重置。不包含视频和文件生成。",
+    "buyCoins": "购买 vCoin",
+    "buy": "购买",
+    "popular": "最受欢迎",
+    "transactionHistory": "交易记录",
+    "allTypes": "全部类型",
+    "typeConsume": "使用",
+    "typePurchase": "购买",
+    "typeMonthlyReset": "月配额",
+    "typeBonus": "赠送",
+    "noTransactions": "暂无交易记录",
+    "resetsOn": "重置于",
+    "loadBalanceFailed": "载入余额失败",
+    "purchaseComingSoon": "购买功能即将推出",
+    "purchaseFailed": "购买失败",
+    "planSmall": "小包",
+    "planMedium": "中包",
+    "planMega": "超值包",
+    "save17": "省 17%",
+    "save30": "省 30%",
+    "save38": "省 38%"
+  },
+  "tenantSwitch": {
+    "title": "选择企业",
+    "selectHint": "请选择要进入的企业",
+    "addTenant": "新增租户",
+    "cancel": "取消",
+    "confirm": "确认",
+    "pleaseSelect": "请选择企业",
+    "switchFailed": "切换租户失败"
+  },
+  "login": {
+    "selectTenant": "选择租户",
+    "selectTenantHint": "请选择要进入的租户",
+    "selectTenantRequired": "请选择租户",
+    "noTenants": "没有可用租户"
+  },
+  "helpVai": {
+    "breadcrumb": {
+      "supportCenter": "支援中心"
+    },
+    "hub": {
+      "title": "vAI 支援中心",
+      "description": "vAI 是 V-sys 旗下的人工智能助手平台，提供智能对话、AI 图片生成、AI 视频制作、AI 文件生成等功能，助您高效完成各种工作。",
+      "coreFeatures": "核心功能",
+      "chat": { "title": "vAI 对话", "item1": "建立对话", "item2": "上传文件分析", "item3": "搜索对话记录", "item4": "管理对话列表" },
+      "sketch": { "title": "vAI 图片", "item1": "AI 图片生成", "item2": "绘图工具使用", "item3": "插入与编辑图片", "item4": "管理草图" },
+      "video": { "title": "vAI 视频", "item1": "AI 视频生成", "item2": "分镜管理", "item3": "视频合并与下载", "item4": "视频延伸" },
+      "docs": { "title": "vAI 文件", "item1": "AI 文件生成", "item2": "支持 Word / Excel / PPT / PDF", "item3": "下载与管理文件" },
+      "otherTopics": "其他主题",
+      "gettingStarted": { "title": "快速入门" },
+      "vcoins": { "title": "vCoin 虚拟代币" },
+      "account": { "title": "账户与订阅" },
+      "faq": { "title": "常见问题" },
+      "support": {
+        "title": "需要更多帮助？",
+        "description": "如果您遇到问题或需要进一步的协助，请：",
+        "item1pre": "前往 ",
+        "contactLink": "联络客服",
+        "item1post": " 页面提交问题",
+        "item2": "在 vAI 对话中直接询问 AI 助手获取即时帮助",
+        "footer": "我们会持续更新功能与文档，为您提供更好的使用体验。"
+      }
+    },
+    "gettingStarted": {
+      "title": "快速入门指南",
+      "intro": "欢迎使用 vAI！以下指南将帮助您快速了解 vAI 的核心功能，开始您的 AI 工作之旅。",
+      "whatIsVai": "什么是 vAI？",
+      "whatIsVaiDesc": "vAI 是 V-sys 旗下的人工智能助手平台，整合了智能对话、AI 图片生成、AI 视频制作和 AI 文件生成四大核心功能。无论您是需要数据分析、创意设计还是文件处理，vAI 都能为您提供高效的解决方案。",
+      "registerLogin": "注册与登录",
+      "registerStep1": "前往 vAI 首页，点击右上角 <strong>登录</strong> 按钮",
+      "registerStep2": "如果您还没有账户，可以点击 <strong>注册</strong> 创建新账户",
+      "registerStep3": "填写电子邮件、密码等基本资料完成注册",
+      "registerStep4": "登录后即可开始使用 vAI 的所有功能",
+      "learnInterface": "认识界面",
+      "learnInterfaceDesc": "登录后，您会看到以下导航区域：",
+      "navChat": "对话",
+      "navChatDesc": "与 AI 进行智能对话，提问、分析数据、生成内容",
+      "navSketch": "图片",
+      "navSketchDesc": "使用 AI 生成图片，或使用内置绘图工具创作",
+      "navVideo": "视频",
+      "navVideoDesc": "使用 AI 生成短视频，支持分镜编辑和合并",
+      "navDocs": "文件",
+      "navDocsDesc": "使用 AI 自动生成 Word、Excel、PPT、PDF 文件",
+      "dailyFree": "每日免费额度",
+      "dailyFreeDesc": "每个账户每天享有 <strong>5 次免费查询</strong>，可用于交谈及图片生成。视频和文件生成不包含在免费额度内。超出免费额度后，AI 功能将以 <strong>vCoin</strong> 计费。",
+      "nextSteps": "下一步",
+      "nextStep1": "试试在 <strong>对话</strong> 中向 AI 提问",
+      "nextStep2": "前往 <strong>图片</strong> 使用 AI 生成一张图片",
+      "nextStep3pre": "了解 ",
+      "nextStep3link": "vCoin 计费方式"
+    },
+    "chat": {
+      "title": "vAI 对话",
+      "intro": "vAI 对话是您与 AI 助手互动的核心功能，支持智能对话、文件分析、数据查询等。",
+      "startNew": "开始新对话",
+      "startStep1": "进入 <strong>对话</strong> 页面",
+      "startStep2": "点击左侧对话列表上方的 <strong>新对话</strong> 按钮",
+      "startStep3": "在底部输入框中输入您的问题或指令",
+      "startStep4": "按 Enter 键或点击发送按钮提交",
+      "startStep5": "AI 会在几秒内回复您的消息",
+      "uploadFile": "上传文件分析",
+      "uploadFileDesc": "您可以上传文件让 AI 进行分析：",
+      "uploadStep1": "点击输入框旁的 <strong>附件按钮</strong>（回形针图标）",
+      "uploadStep2": "选择要上传的文件",
+      "uploadStep3": "输入您希望 AI 针对文件进行的分析或操作",
+      "uploadStep4": "发送消息，AI 会读取文件内容并回复分析结果",
+      "supportedFormats": "支持的文件格式：",
+      "supportedFormatsDesc": "Excel (.xls, .xlsx)、Word (.doc, .docx)、PowerPoint (.ppt, .pptx)、PDF (.pdf)、文本文件 (.txt)、图片 (.jpg, .jpeg, .png)",
+      "manageList": "管理对话列表",
+      "manageSwitch": "<strong>切换对话</strong>：点击左侧对话列表中的任意对话即可切换",
+      "manageRename": "<strong>重命名对话</strong>：将鼠标移到对话标题上，点击出现的编辑图标",
+      "manageDelete": "<strong>删除对话</strong>：将鼠标移到对话标题上，点击出现的删除图标",
+      "search": "搜索对话记录",
+      "searchStep1": "点击顶部导航栏的 <strong>搜索图标</strong>",
+      "searchStep2": "输入关键字，系统会搜索所有对话的标题和消息内容",
+      "searchStep3": "点击搜索结果即可跳转到对应的对话和消息，匹配文字会以高亮显示",
+      "tips": "使用提示",
+      "tip1": "提问时尽量具体明确，例如：「帮我分析这份 Excel 中各月的销售趋势」",
+      "tip2": "您可以在对话中要求 AI 生成图片、视频或文件，AI 会自动跳转至对应功能",
+      "tip3": "每次简单查询消耗 <strong>1 vCoin</strong>，每日有 5 次免费额度"
+    },
+    "sketch": {
+      "title": "vAI 图片",
+      "intro": "vAI 图片提供 AI 图片生成和内置绘图工具，让您轻松创建各种视觉素材。",
+      "aiGenerate": "AI 图片生成",
+      "genStep1": "进入 <strong>图片</strong> 页面",
+      "genStep2": "在底部的 <strong>AI 生成栏</strong> 中输入图片描述（Prompt）",
+      "genStep3": "例如：「一只在咖啡店里看书的猫，水彩风格」",
+      "genStep4": "点击生成按钮，等待 AI 生成图片",
+      "genStep5": "生成完成后，图片会显示在画布上",
+      "genCost": "每次图片生成消耗 <strong>3 vCoin</strong>",
+      "drawTools": "绘图工具",
+      "drawToolsDesc": "vAI 图片内置完整的绘图工具，位于画布上方的工具栏：",
+      "toolCol": "工具",
+      "shortcutCol": "快捷键",
+      "descCol": "说明",
+      "toolSelect": "选取",
+      "toolSelectDesc": "选取并移动画布上的对象",
+      "toolPen": "画笔",
+      "toolPenDesc": "自由手绘",
+      "toolRect": "矩形",
+      "toolRectDesc": "绘制矩形形状",
+      "toolEllipse": "椭圆",
+      "toolEllipseDesc": "绘制椭圆形状",
+      "toolLine": "直线",
+      "toolLineDesc": "绘制直线",
+      "toolText": "文字",
+      "toolTextDesc": "在画布上添加文字",
+      "toolEraser": "橡皮擦",
+      "toolEraserDesc": "擦除画布上的内容",
+      "colorSettings": "颜色与线条设置",
+      "strokeColor": "<strong>笔色（Stroke Color）</strong>：设置线条或边框颜色",
+      "fillColor": "<strong>填色（Fill Color）</strong>：设置形状的填充颜色",
+      "strokeWidth": "<strong>线条粗细</strong>：调整笔触或边框的粗细",
+      "canvasRatio": "画布比例",
+      "canvasRatioDesc": "支持多种画布比例以适应不同用途：",
+      "ratioFree": "自由",
+      "insertImage": "插入图片",
+      "insertStep1": "点击工具栏上的 <strong>插入图片</strong> 按钮",
+      "insertStep2": "在弹出的图片选择器中，您可以：",
+      "insertFrom": "<strong>从产品图片选取</strong>：搜索您系统中的产品图片",
+      "insertUpload": "<strong>上传图片</strong>：拖放或选择本地图片文件上传",
+      "insertStep3": "选择后图片会插入到画布中，可自由调整大小和位置",
+      "objectProps": "对象属性面板",
+      "objectPropsDesc": "选中画布上的对象后，右侧会显示属性面板，您可以调整：",
+      "propPosition": "位置（X, Y 坐标）和尺寸（宽、高）",
+      "propColor": "颜色和透明度",
+      "propLayer": "图层顺序（上移、下移、置顶、置底）",
+      "propBgRemove": "去背景功能（针对图片对象）",
+      "manageSketch": "管理草图",
+      "manageSave": "<strong>保存草图</strong>：点击工具栏上的保存按钮",
+      "manageMySketch": "<strong>我的草图</strong>：在左侧侧边栏中查看所有已保存的草图",
+      "manageChatGen": "<strong>对话生成</strong>：在左侧侧边栏中查看从 vAI 对话中生成的图片",
+      "manageDelete": "<strong>删除草图</strong>：点击工具栏上的删除按钮"
+    },
+    "video": {
+      "title": "vAI 视频",
+      "intro": "vAI 视频提供分镜式的 AI 视频制作工具，让您轻松创建短视频。",
+      "createProject": "创建视频项目",
+      "createStep1": "进入 <strong>视频</strong> 页面",
+      "createStep2": "点击左侧侧边栏中的 <strong>新项目</strong> 按钮",
+      "createStep3": "输入项目标题",
+      "createStep4": "选择视频比例：16:9（横式）、9:16（竖式）或 1:1（正方形）",
+      "createStep5": "选择每个分镜的时长：5 秒、6 秒、7 秒或 8 秒",
+      "sceneEdit": "分镜编辑",
+      "sceneEditDesc": "每个视频项目由多个 <strong>分镜</strong> 组成，每个分镜可以独立生成：",
+      "sceneRefImg": "添加参考图片",
+      "sceneRefImgDesc": "（选填）：您可以为分镜提供一张参考图片，AI 会参考该图片来生成视频。图片来源可以是：",
+      "sceneRefProduct": "产品图片（搜索您系统中的产品）",
+      "sceneRefSketch": "草图（从 vAI 图片中已保存的草图）",
+      "sceneRefUpload": "上传图片（从电脑上传）",
+      "scenePrompt": "<strong>输入视频描述</strong>：用文字描述您想要的视频内容，例如：「产品从左侧缓缓进入画面，背景是柔和的渐变色」",
+      "sceneGenerate": "点击 <strong>生成</strong> 按钮，AI 会开始生成视频片段",
+      "sceneCost": "每次视频生成消耗 <strong>30 vCoin</strong>（每 5 秒为单位）",
+      "manageScene": "管理分镜",
+      "sceneAdd": "<strong>新增分镜</strong>：点击分镜条末端的 + 按钮",
+      "sceneSwitch": "<strong>切换分镜</strong>：在底部分镜条中点击不同的分镜缩图",
+      "sceneDelete": "<strong>删除分镜</strong>：在分镜编辑区域中点击删除按钮",
+      "sceneRegenerate": "<strong>重新生成</strong>：对已生成的分镜点击重新生成按钮",
+      "extend": "视频延伸",
+      "extendDesc": "如果生成的视频片段太短，您可以使用 <strong>延伸视频</strong> 功能：",
+      "extendStep1": "在已生成的分镜上点击 <strong>延伸视频</strong> 按钮",
+      "extendStep2": "AI 会在现有视频基础上延伸约 7 秒",
+      "extendCost": "每次视频延伸消耗 <strong>30 vCoin</strong>",
+      "mergeDownload": "合并与下载",
+      "mergeStep1": "当所有分镜都生成完成后，点击 <strong>合并视频</strong> 按钮",
+      "mergeStep2": "系统会将所有分镜合并成一段完整的视频",
+      "mergeStep3": "合并完成后，您可以 <strong>预览</strong> 和 <strong>下载</strong> 完整视频"
+    },
+    "docs": {
+      "title": "vAI 文件",
+      "intro": "vAI 文件让您可以用 AI 自动生成各种格式的专业文件。",
+      "formats": "支持的文件格式",
+      "generate": "生成新文件",
+      "genStep1": "进入 <strong>文件</strong> 页面",
+      "genStep2": "点击 <strong>新文件</strong> 按钮",
+      "genStep3": "选择文件类型（Word / Excel / PPT / PDF）",
+      "genStep4": "输入文件标题（选填）",
+      "genStep5": "输入描述（Prompt），详细描述您想要生成的文件内容，例如：",
+      "genExampleWord": "Word：「撰写一份公司年度工作总结报告，包含业绩回顾、团队成长和未来展望」",
+      "genExampleExcel": "Excel：「建立一份月度财务报表模板，包含收入、支出、利润三个分页」",
+      "genExamplePPT": "PPT：「制作一份产品发布会简报，包含产品介绍、功能亮点和定价方案」",
+      "genExamplePDF": "PDF：「生成一份员工手册，包含公司文化、规章制度和福利待遇」",
+      "genStep6": "点击 <strong>生成</strong>，等待 AI 处理",
+      "genCost": "文件生成消耗 <strong>5+ vCoin</strong>（每 15 页 5 vCoin，最低 5 vCoin）",
+      "viewDownload": "查看与下载文件",
+      "viewItem1": "生成完成后，文件会显示在左侧 <strong>我的文件</strong> 列表中",
+      "viewItem2": "点击文件可查看详情：文件标题、类型、状态、生成日期、原始描述等",
+      "viewItem3": "点击 <strong>下载</strong> 按钮将文件下载到您的电脑",
+      "fromChat": "对话中生成文件",
+      "fromChatDesc": "您也可以在 <strong>vAI 对话</strong> 中直接要求 AI 生成文件。生成的文件会出现在文件页面的 <strong>对话生成</strong> 标签中。"
+    },
+    "vcoins": {
+      "title": "vCoin 虚拟代币",
+      "intro": "vCoin 是 vAI 平台的虚拟代币，用于支付 AI 功能的使用费用。",
+      "whatIs": "什么是 vCoin？",
+      "whatIsDesc": "vCoin 是 vAI 的消费计量单位。不同的 AI 操作会消耗不同数量的 vCoin，让您可以按需使用。",
+      "sources": "vCoin 来源",
+      "sourceDaily": "<strong>每日免费额度</strong>：每个账户每天享有 5 次免费查询",
+      "sourceMonthly": "<strong>月配额</strong>：订阅方案（vSuite / vSuite Pro）包含每月 vCoin 配额，每月自动重置",
+      "sourcePurchase": "<strong>购买 vCoin</strong>：额外购买 vCoin 充值，购买的 vCoin 不会过期",
+      "sourceGift": "<strong>赠送</strong>：活动或推广期间可能获得赠送的 vCoin",
+      "rates": "消耗费率",
+      "rateColOp": "操作类型",
+      "rateColCost": "消耗",
+      "rateColDesc": "说明",
+      "rateSimpleQuery": "简单查询",
+      "rateSimpleQueryDesc": "基本问答、资料查询",
+      "rateImageGen": "图片生成",
+      "rateImageGenDesc": "AI 图片生成",
+      "rateSketchGen": "草图生成",
+      "rateSketchGenDesc": "AI 草图生成",
+      "rateDocGen": "文件生成",
+      "rateDocGenDesc": "每 15 页 5 vCoin，最低 5 vCoin",
+      "rateVideoGen": "视频生成",
+      "rateVideoGenDesc": "AI 视频生成（每 5 秒为单位）",
+      "rateVideoExtend": "视频延伸",
+      "rateVideoExtendDesc": "AI 视频延伸（每 5 秒为单位）",
+      "rateOcr": "OCR 文字识别",
+      "rateOcrDesc": "图片文字识别",
+      "rateStt": "语音转文字",
+      "rateSttDesc": "语音转文字",
+      "rateFieldMatch": "字段匹配",
+      "rateFieldMatchDesc": "AI 自动匹配字段",
+      "rateAiSuggest": "AI 建议/分析",
+      "rateAiSuggestDesc": "AI 智能建议与分析",
+      "rateLeadAnalyze": "Lead Finder AI 分析",
+      "rateLeadAnalyzeDesc": "AI 分析公司资料并生成搜索关键字",
+      "rateLeadSearch": "Lead Finder 搜索",
+      "rateLeadSearchDesc": "每 50 条搜索结果 1 vCoin，向上取整",
+      "purchase": "购买 vCoin",
+      "purchaseDesc": "您可以在 <strong>vCoin</strong> 页面购买额外的 vCoin：",
+      "planCol": "方案",
+      "amountCol": "vCoin 数量",
+      "priceCol": "价格 (USD)",
+      "noteCol": "备注",
+      "saveMedium": "省 17%",
+      "saveLarge": "最受欢迎，省 30%",
+      "saveMega": "省 38%",
+      "balance": "查看余额与交易记录",
+      "balanceDesc": "前往 <strong>vCoin</strong> 页面，您可以查看：",
+      "balanceTotal": "<strong>总可用余额</strong>：当前可用的 vCoin 总数",
+      "balanceMonthly": "<strong>月配额余额</strong>：订阅方案的月配额剩余量及重置日期",
+      "balanceDaily": "<strong>每日免费额度</strong>：当日剩余的免费查询次数",
+      "balancePurchased": "<strong>已购买余额</strong>：购买的 vCoin 存量",
+      "balanceHistory": "<strong>交易记录</strong>：所有 vCoin 的使用和充值记录，支持按类型筛选"
+    },
+    "account": {
+      "title": "账户与订阅",
+      "intro": "管理您的 vAI 账户设置和订阅方案。",
+      "settings": "账户设置",
+      "settingsDesc": "点击右上角的用户头像，选择 <strong>账户设置</strong>，您可以：",
+      "settingsItem1": "修改个人资料（姓名、电子邮件、电话等）",
+      "settingsItem2": "更改密码",
+      "settingsItem3": "上传或修改头像",
+      "settingsItem4": "设置语言偏好",
+      "plans": "订阅方案",
+      "plansDesc": "vAI 提供以下订阅方案：",
+      "planCol": "方案",
+      "monthlyCol": "月付",
+      "yearlyCol": "年付",
+      "vcoinCol": "月 vCoin 配额",
+      "featuresCol": "主要特色",
+      "month": "月",
+      "vsuiteSave": "年付 $3,000，省 $1,560",
+      "vsuiteFeatures": "所有功能、无限记录、无广告、vOffice AI 智慧办公",
+      "vsuiteProSave": "年付 $6,000，省 $2,160",
+      "vsuiteProFeatures": "所有 vSuite 功能 + 企业支援服务、数据丢失防护、安全控管",
+      "plansNote": "订阅方案包含的 vCoin 月配额会在每月自动重置。",
+      "manageSubscription": "管理订阅",
+      "manageStep1": "点击右上角的用户头像，选择 <strong>订阅</strong>",
+      "manageStep2": "查看当前订阅方案和到期日期",
+      "manageStep3": "升级或降级订阅方案",
+      "manageStep4": "管理付款方式",
+      "logout": "登出",
+      "logoutDesc": "点击右上角的用户头像，选择 <strong>登出</strong> 即可安全登出账户。系统支持跨标签页同步登出，在任一标签页登出后，其他标签页也会自动登出。"
+    },
+    "faq": {
+      "title": "常见问题",
+      "intro": "以下是 vAI 用户最常询问的问题。",
+      "q1": "vAI 是免费的吗？",
+      "a1": "vAI 提供每天 5 次免费查询额度。超出免费额度后，需使用 vCoin 支付。您可以订阅 vSuite 方案获取每月 vCoin 配额，或单独购买 vCoin。",
+      "q2": "vCoin 会过期吗？",
+      "a2": "<strong>购买的 vCoin 不会过期</strong>，可以一直使用。订阅方案的月配额则会在每月重置，未使用的月配额不会累积到下个月。每日免费额度会在每天重置。",
+      "q3": "支持哪些文件格式上传？",
+      "a3desc": "vAI 对话支持以下文件格式上传分析：",
+      "a3docs": "<strong>文件</strong>：.xls, .xlsx, .doc, .docx, .ppt, .pptx, .pdf, .txt",
+      "a3images": "<strong>图片</strong>：.jpg, .jpeg, .png",
+      "q4": "AI 生成的图片/视频/文件质量不满意怎么办？",
+      "a4desc": "您可以：",
+      "a4item1": "尝试 <strong>修改描述（Prompt）</strong>，提供更具体的细节和要求",
+      "a4item2": "使用 <strong>重新生成</strong> 功能",
+      "a4item3": "对于图片，您可以使用内置绘图工具进一步编辑",
+      "a4item4": "对于视频，您可以使用 <strong>延伸视频</strong> 功能增加长度",
+      "a4note": "注意：重新生成会再次消耗 vCoin。",
+      "q5": "如何从 vAI 对话中生成图片或视频？",
+      "a5desc": "在 vAI 对话中，您可以直接使用自然语言请求 AI 生成图片或视频。例如：",
+      "a5ex1": "「帮我生成一张产品推广图片」",
+      "a5ex2": "「帮我生成一段产品推广视频」",
+      "a5ex3": "「帮我生成一份公司发展简报」",
+      "a5note": "AI 会自动调用对应的功能，生成的结果可以在图片/视频/文件页面的 <strong>对话生成</strong> 标签中找到。",
+      "q6": "我可以在多个设备上使用 vAI 吗？",
+      "a6": "可以。vAI 是基于网页的应用，您可以在任何设备的浏览器中登录使用。您的对话记录、草图、视频项目和文件都会同步保存在云端。",
+      "q7": "vAI 和 vWork 有什么关系？",
+      "a7": "vAI 和 vWork 都是 V-sys 的产品。vAI 是独立的 AI 助手平台，而 vWork 是企业管理系统（ERP/CMS/POS）。两者使用同一个账户体系，您可以在 vAI 中查询和分析 vWork 中的业务数据（如订单、客户、销售等）。",
+      "q8": "遇到其他问题怎么办？",
+      "a8desc": "如果您的问题未在以上列出，欢迎通过以下方式联系我们：",
+      "a8contact": "联络客服",
+      "a8contactPost": " 提交问题",
+      "a8email": "发送电子邮件至 "
+    },
+    "notFound": {
+      "title": "找不到此分类",
+      "desc": "抱歉，找不到您请求的帮助分类。请返回 vAI 支援中心 浏览所有分类。"
+    },
+    "detail": {
+      "support": {
+        "title": "需要更多帮助？",
+        "desc": "如果以上内容未能解答您的问题，欢迎 ",
+        "link": "联络客服"
+      }
+    }
+  }
+}

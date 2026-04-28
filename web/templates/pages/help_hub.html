@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="helpPage.title">支援中心 - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <link rel="icon" type="image/png" href="/static/vicon.png">
+    <link rel="apple-touch-icon" href="/static/vlogo.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vsys.css">
+    <!-- i18n anti-flicker -->
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title] {
+            visibility: hidden;
+        }
+    </style>
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            let currentLang = 'zh';
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) localStorage.setItem('u-nai_lang', currentLang);
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) currentLang = 'zh-CN';
+                else if (browserLang.startsWith('zh')) currentLang = 'zh';
+                else currentLang = 'en';
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            window.__INITIAL_LANG__ = currentLang;
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body>
+    <!-- V-sys Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar" >
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
+                <img src="/static/vlogo.png" alt="V-sys" style="height: auto; max-height: 15px; display: block;">
+            </a>
+            <!-- Mobile: App Switcher, Menu Toggle -->
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcherHelpHub">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                <span class="app-switcher-label">vAI</span>
+                            </a>
+                            <a href="/" class="app-switcher-item" data-app="vwork">
+                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                <span class="app-switcher-label">vWork</span>
+                            </a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                <span class="app-switcher-label">vMarket</span>
+                            </a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                <span class="app-switcher-label">vOffice</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="helpHubMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                        <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                    </button>
+                </li>
+            </ul>
+            <!-- Desktop Menu -->
+            <div class="collapse navbar-collapse" id="helpHubNavbar">
+                <ul class="navbar-nav me-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about" id="navAboutLink" data-i18n="nav.about">關於</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a>
+                    </li>
+                </ul>
+                <!-- Right: theborderbox -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                                </a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                            <span class="app-switcher-label">vAI</span>
+                                        </a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork">
+                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                            <span class="app-switcher-label">vWork</span>
+                                        </a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                            <span class="app-switcher-label">vMarket</span>
+                                        </a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                            <span class="app-switcher-label">vOffice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=vwork" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                </ul>
+                            </div>
+                            <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+                            </a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                                    <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                    <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay d-lg-none" id="helpHubSidebarOverlay"></div>
+    
+    <!-- Sidebar for mobile -->
+    <div class="sidebar d-lg-none" id="helpHubSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/" id="sidebarHomeLink">
+                        <i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about" id="sidebarAboutLink">
+                        <i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">
+                        <i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#helpHubLanguageSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="helpHubLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-3 py-4" style="min-height: calc(100vh - 200px); padding-top: 80px !important;">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="h2 mb-3" style="margin-top: 1.5rem;"><i class="bi bi-question-circle me-2"></i><span data-i18n="helpPage.title">支援中心</span></h1>
+                <p class="text-muted" data-i18n="helpHub.subtitle">請選擇您需要查看的產品支援文檔</p>
+            </div>
+        </div>
+
+        <!-- Product Selection Cards -->
+        <div class="row g-4 justify-content-center mb-5">
+            <!-- vAI -->
+            <div class="col-md-6 col-lg-3">
+                <a href="/help/vai" class="text-decoration-none">
+                    <div class="card h-100 help-product-card">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <img src="/static/vai.png" alt="vAI" style="height: 30px;">
+                            </div>
+                            <p class="text-muted small mb-3" data-i18n="helpHub.vai.desc">人工智慧助手平台 - 智能對話 / 資料分析 / 自動化</p>
+                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vai.tags.chat">智能對話</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vai.tags.analysis">資料分析</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vai.tags.automation">自動化</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- vWork -->
+            <div class="col-md-6 col-lg-3">
+                <a href="/help/vwork" class="text-decoration-none">
+                    <div class="card h-100 help-product-card">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <img src="/static/logo3.png" alt="vWork" style="height: 30px;">
+                            </div>
+                            <p class="text-muted small mb-3" data-i18n="helpHub.vwork.desc">全功能 AI 企業管理系統 - ERP / CMS / POS</p>
+                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vwork.tags.product">商品管理</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vwork.tags.order">訂單管理</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vwork.tags.pos">POS 收銀</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vwork.tags.customer">客戶管理</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vwork.tags.more">更多...</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- vMarket -->
+            <div class="col-md-6 col-lg-3">
+                <a href="/help/vmarket" class="text-decoration-none">
+                    <div class="card h-100 help-product-card">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <img src="/static/vmarketlogo.png" alt="vMarket" style="height: 30px;">
+                            </div>
+                            <p class="text-muted small mb-3" data-i18n="helpHub.vmarket.desc">線上市集平台</p>
+                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vmarket.tags.browse">瀏覽商品</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vmarket.tags.purchase">購買流程</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.vmarket.tags.seller">商家入駐</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- vOffice -->
+            <div class="col-md-6 col-lg-3">
+                <a href="/help/voffice" class="text-decoration-none">
+                    <div class="card h-100 help-product-card">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3">
+                                <img src="/static/vofficelogo.png" alt="vOffice" style="height: 30px;">
+                            </div>
+                            <p class="text-muted small mb-3" data-i18n="helpHub.voffice.desc">線上文檔編輯協作平台</p>
+                            <div class="d-flex flex-wrap gap-1 justify-content-center">
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.voffice.tags.doc">文檔編輯</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.voffice.tags.sheet">試算表</span>
+                                <span class="badge bg-light text-dark" data-i18n="helpHub.voffice.tags.slide">簡報</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Need Help Section -->
+        <div class="row mb-4">
+            <div class="col-12 col-lg-8 mx-auto">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-headset me-2"></i><span data-i18n="helpPage.needMoreHelp">需要更多幫助？</span></h5>
+                        <p class="card-text"><span data-i18n="helpPage.needMoreHelpDesc">如果您遇到問題或需要進一步的協助，請：</span></p>
+                        <ul>
+                            <li><span data-i18n="helpPage.needMoreHelpItem2">前往 <a href="/contact" class="text-decoration-none">聯絡客服</a> 頁面提交問題</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer-light">
+        <div class="container-fluid px-4">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="V-sys Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" id="footerProductVWork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" id="footerInfoHome" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/" id="footerInfoAbout" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
+                        <li class="mb-2"><a href="/sales-partner" class="text-muted text-decoration-none" data-i18n="footer.salesPartnerJoin">銷售商加盟</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contactUs">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none">info@vsysai.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span data-i18n="footer.location">香港</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span data-i18n="footer.hours">週一至週五 9:00 - 18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+    <style>
+        .help-product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+        }
+        .help-product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        /* Hub page: sidebar is mobile-only */
+        @media (min-width: 992px) {
+            #helpHubSidebar,
+            #helpHubSidebarOverlay {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // i18n init
+            if (typeof I18n !== 'undefined') I18n.init();
+
+            // Nav, footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+
+            // Mobile sidebar toggle
+            const toggle = document.getElementById('helpHubMobileMenuToggle');
+            const sidebar = document.getElementById('helpHubSidebar');
+            const overlay = document.getElementById('helpHubSidebarOverlay');
+
+            function toggleSidebar() {
+                if (sidebar) sidebar.classList.toggle('show');
+                if (overlay) overlay.classList.toggle('show');
+            }
+            function closeSidebar() {
+                if (sidebar) sidebar.classList.remove('show');
+                if (overlay) overlay.classList.remove('show');
+            }
+
+            if (toggle) toggle.addEventListener('click', function(e) { e.preventDefault(); toggleSidebar(); });
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar on nav link click
+            document.querySelectorAll('#helpHubSidebar .nav-link:not(.nav-group-toggle)').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (!this.hasAttribute('data-lang')) closeSidebar();
+                });
+            });
+
+            // Language switching
+            document.querySelectorAll('[data-lang]').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) I18n.switchLanguage(lang);
+                    closeSidebar();
+                });
+            });
+
+            // Auth status
+            checkAuthAndUpdateNav();
+        });
+
+        async function checkAuthAndUpdateNav() {
+            const loginLink = document.getElementById('loginLink');
+            const userDropdownNav = document.getElementById('userDropdown');
+            const userNameSpan = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            async function fetchUser() {
+                try {
+                    const headers = { 'Accept': 'application/json' };
+                    const token = localStorage.getItem('auth_token');
+                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                    const sub = localStorage.getItem('tenant_subdomain');
+                    if (sub) headers['X-Tenant-Subdomain'] = sub;
+                    const resp = await fetch('/api/v1/user/me', { headers });
+                    if (!resp.ok) return null;
+                    return await resp.json();
+                } catch (_) { return null; }
+            }
+
+            const user = await fetchUser();
+            const isLoggedIn = !!(user && user.name);
+
+            if (isLoggedIn) {
+                if (loginLink) loginLink.style.display = 'none';
+                if (userDropdownNav) userDropdownNav.style.display = '';
+                if (userNameSpan) userNameSpan.textContent = user.name;
+
+                // Avatar
+                const avatarImg = document.getElementById('publicUserAvatar');
+                const avatarIcon = document.getElementById('publicUserIcon');
+                if (avatarImg) {
+                    let url = (user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            if (avatarIcon) avatarIcon.style.display = '';
+                        };
+                    }
+                }
+
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                              .finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace(window.location.pathname + '?logged_out=1');
+                              });
+                        }
+                    });
+                }
+            } else {
+                if (loginLink) loginLink.style.display = '';
+                if (userDropdownNav) userDropdownNav.style.display = 'none';
+            }
+        }
+    </script>
+    <!-- Cross-tab logout detection -->
+    <script>
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'auth_token' && !e.newValue) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === null) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === 'auth_token') {
+                checkAuthAndUpdateNav();
+            }
+        });
+    </script>
+    <!-- Navbar scroll shadow -->
+    <script>
+        (function() {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            function handleScroll() {
+                if (window.scrollY > 60) navbar.classList.add('scrolled');
+                else navbar.classList.remove('scrolled');
+            }
+            handleScroll();
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+{{ define "pages/inventory_count_detail" }}
+<div id="inventoryCountDetailContainer">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>庫存盤點詳情</h2>
+        <a href="/inventory-counts" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span>
+        </a>
+    </div>
+
+    <div id="alertContainer"></div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">盤點信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>盤點編號:</strong> <span id="countNumber"></span></p>
+                    <p><strong>盤點日期:</strong> <span id="countDate"></span></p>
+                    <p><strong>倉庫位置:</strong> <span id="warehouseLocation"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>狀態:</strong> <span id="countStatus"></span></p>
+                    <p><strong>創建時間:</strong> <span id="createdAt"></span></p>
+                    <p><strong>備註:</strong> <span id="notes"></span></p>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary" id="completeCountBtn" style="display: none;">
+                    <i class="bi bi-check-circle"></i> 完成盤點
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">盤點明細</h5>
+            <button class="btn btn-sm btn-primary" id="addItemBtn">
+                <i class="bi bi-plus-circle"></i> 添加產品
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>產品</th>
+                            <th>系統庫存</th>
+                            <th>盤點數量</th>
+                            <th>差異</th>
+                            <th>備註</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="countItemsTable">
+                        <tr>
+                            <td colspan="6" class="text-center">載入中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加產品模態框 -->
+    <div class="modal fade" id="addItemModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加產品</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addItemForm">
+                        <div class="mb-3">
+                            <label class="form-label">產品 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="productSelect" required>
+                                <option value="">請選擇產品</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">盤點數量 <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="countedQuantity" required step="1" min="0">
+                            <small class="text-muted">系統庫存: <span id="systemQuantityDisplay">-</span></span></small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">備註</label>
+                            <textarea class="form-control" id="itemNotes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="saveItemBtn">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const countId = '{{ .ID }}';
+    let countData = null;
+    let products = [];
+
+    async function loadCountData() {
+        try {
+            countData = await App.apiRequest(`/api/v1/inventory-counts/${countId}`);
+            renderCountInfo();
+            loadCountItems();
+            loadProducts();
+        } catch (error) {
+            App.showAlert('載入盤點數據失敗: ' + error.message, 'danger');
+        }
+    }
+
+    function renderCountInfo() {
+        document.getElementById('countNumber').textContent = countData.count_number || '-';
+        document.getElementById('countDate').textContent = countData.count_date ? new Date(countData.count_date).toLocaleDateString('zh-TW') : '-';
+        document.getElementById('warehouseLocation').textContent = countData.warehouse_location || '-';
+        document.getElementById('notes').textContent = countData.notes || '-';
+        document.getElementById('createdAt').textContent = countData.created_at ? new Date(countData.created_at).toLocaleString('zh-TW') : '-';
+        
+        const statusBadge = {
+            'draft': '<span class="badge bg-secondary">草稿</span>',
+            'in_progress': '<span class="badge bg-warning">進行中</span>',
+            'completed': '<span class="badge bg-success">已完成</span>',
+            'cancelled': '<span class="badge bg-danger">已取消</span>'
+        };
+        document.getElementById('countStatus').innerHTML = statusBadge[countData.status] || countData.status;
+        
+        if (countData.status === 'draft' || countData.status === 'in_progress') {
+            document.getElementById('completeCountBtn').style.display = 'inline-block';
+        }
+    }
+
+    async function loadCountItems() {
+        try {
+            const data = await App.apiRequest(`/api/v1/inventory-counts/${countId}`);
+            const items = data.count_items || [];
+            renderCountItems(items);
+        } catch (error) {
+            App.showAlert('載入盤點明細失敗: ' + error.message, 'danger');
+        }
+    }
+
+    function renderCountItems(items) {
+        const tbody = document.getElementById('countItemsTable');
+        if (items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">暫無盤點明細</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = items.map(item => {
+            const varianceClass = item.variance > 0 ? 'text-success' : item.variance < 0 ? 'text-danger' : '';
+            return `
+                <tr>
+                    <td>${item.product?.name || '-'}</td>
+                    <td>${item.system_quantity}</td>
+                    <td>${item.counted_quantity}</td>
+                    <td class="${varianceClass}">${item.variance > 0 ? '+' : ''}${item.variance}</td>
+                    <td>${item.notes || '-'}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteItem('${item.id}')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function loadProducts() {
+        try {
+            const data = await App.apiRequest('/api/v1/products?limit=1000');
+            products = data.data || [];
+            const select = document.getElementById('productSelect');
+            select.innerHTML = '<option value="">請選擇產品</option>';
+            products.forEach(product => {
+                select.innerHTML += `<option value="${product.id}" data-stock="${product.stock_quantity}">${product.name} (庫存: ${product.stock_quantity})</option>`;
+            });
+        } catch (error) {
+            console.error('載入產品失敗:', error);
+        }
+    }
+
+    document.getElementById('productSelect').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const stock = selectedOption.getAttribute('data-stock') || '0';
+        document.getElementById('systemQuantityDisplay').textContent = stock;
+    });
+
+    document.getElementById('addItemBtn').addEventListener('click', function() {
+        const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+        modal.show();
+    });
+
+    document.getElementById('saveItemBtn').addEventListener('click', async function() {
+        const form = document.getElementById('addItemForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const productId = document.getElementById('productSelect').value;
+        const countedQuantity = parseInt(document.getElementById('countedQuantity').value);
+        const notes = document.getElementById('itemNotes').value;
+
+        try {
+            await App.apiRequest(`/api/v1/inventory-counts/${countId}/items`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    product_id: productId,
+                    counted_quantity: countedQuantity,
+                    notes: notes
+                })
+            });
+            App.showAlert('添加成功', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
+            form.reset();
+            loadCountItems();
+        } catch (error) {
+            App.showAlert('添加失敗: ' + error.message, 'danger');
+        }
+    });
+
+    async function deleteItem(itemId) {
+        if (!confirm('確定要刪除此盤點明細嗎？')) return;
+        try {
+            await App.apiRequest(`/api/v1/inventory-count-items/${itemId}`, { method: 'DELETE' });
+            App.showAlert('刪除成功', 'success');
+            loadCountItems();
+        } catch (error) {
+            App.showAlert('刪除失敗: ' + error.message, 'danger');
+        }
+    }
+
+    document.getElementById('completeCountBtn').addEventListener('click', async function() {
+        if (!confirm('確定要完成此盤點嗎？完成後將自動更新產品庫存。')) return;
+        try {
+            await App.apiRequest(`/api/v1/inventory-counts/${countId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ status: 'completed' })
+            });
+            App.showAlert('盤點已完成，庫存已更新', 'success');
+            loadCountData();
+        } catch (error) {
+            App.showAlert('完成盤點失敗: ' + error.message, 'danger');
+        }
+    });
+
+    // 初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadCountData);
+    } else {
+        loadCountData();
+    }
+</script>
+{{ end }}
+

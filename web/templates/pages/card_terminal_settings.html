@@ -1,0 +1,269 @@
+{{define "pages/card_terminal_settings"}}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            
+            <!-- vWork Connector 狀態 -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plug me-2"></i>
+                        <span data-i18n="pages.cardTerminalSettings.connectorStatus">vWork Connector 狀態</span>
+                    </h5>
+                    <span class="badge" id="connectorStatusBadge">未連接</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label" data-i18n="pages.cardTerminalSettings.connectorPort">Connector 端口</label>
+                            <input type="number" class="form-control" id="connectorPort" value="9527" min="1" max="65535">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" class="btn btn-outline-primary" id="checkConnectorBtn">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                <span data-i18n="pages.cardTerminalSettings.checkConnection">檢查連接</span>
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/api/v1/downloads/connector" class="btn btn-outline-secondary">
+                                <i class="bi bi-download me-1"></i>
+                                <span data-i18n="pages.cardTerminalSettings.downloadConnector">下載 vWork Connector</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-text" data-i18n="pages.cardTerminalSettings.portHint">vWork Connector 程式監聽的端口</div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info small mt-3 mb-0" id="connectorHelpInfo">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <span data-i18n="pages.cardTerminalSettings.connectorHelp">vWork Connector 是一個本地程式，用於連接卡機等硬件設備。請先下載並安裝後再進行設定。</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 已配置的卡機列表（從 Connector 讀取） -->
+            <div class="card shadow-sm mb-4" id="configuredTerminalsCard">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-credit-card me-2"></i>
+                        <span data-i18n="pages.cardTerminalSettings.configuredTerminals">已配置的卡機</span>
+                    </h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="refreshTerminalsBtn">
+                        <i class="bi bi-arrow-repeat me-1"></i>
+                        <span data-i18n="common.refresh">刷新</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- 未連接提示 -->
+                    <div id="notConnectedHint" class="text-center py-4">
+                        <i class="bi bi-plug text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3 mb-0" data-i18n="pages.cardTerminalSettings.connectFirst">
+                            請先連接 vWork Connector 以查看卡機設定
+                        </p>
+                    </div>
+                    
+                    <!-- 無卡機提示 -->
+                    <div id="noTerminalsHint" class="text-center py-4" style="display: none;">
+                        <i class="bi bi-credit-card text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3 mb-2" data-i18n="pages.cardTerminalSettings.noTerminals">
+                            尚未配置任何卡機
+                        </p>
+                        <p class="text-muted small" data-i18n="pages.cardTerminalSettings.configInConnector">
+                            請在 vWork Connector 程式中新增卡機設定
+                        </p>
+                    </div>
+                    
+                    <!-- 卡機列表 -->
+                    <div class="table-responsive" id="terminalsTableWrapper" style="display: none;">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="pages.cardTerminalSettings.terminalName">名稱</th>
+                                    <th data-i18n="pages.cardTerminalSettings.terminalType">類型</th>
+                                    <th data-i18n="pages.cardTerminalSettings.connection">連接</th>
+                                    <th data-i18n="pages.cardTerminalSettings.status">狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody id="terminalsList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 使用說明 -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-question-circle me-2"></i>
+                        <span data-i18n="pages.cardTerminalSettings.setupGuide">設置指南</span>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li class="mb-2" data-i18n="pages.cardTerminalSettings.step1">下載並安裝 vWork Connector 程式</li>
+                        <li class="mb-2" data-i18n="pages.cardTerminalSettings.step2">確保卡機已連接到本地網絡，並獲取 IP 地址</li>
+                        <li class="mb-2" data-i18n="pages.cardTerminalSettings.step3New">在 vWork Connector 程式的設定視窗中新增卡機</li>
+                        <li class="mb-2" data-i18n="pages.cardTerminalSettings.step4New">在 Connector 中測試卡機連接</li>
+                        <li data-i18n="pages.cardTerminalSettings.step5">儲存設定後，即可在 POS 頁面使用刷卡收款</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/vwork-connector.js"></script>
+<script>
+(function() {
+    let isConnectorConnected = false;
+    
+    // 更新 Connector 狀態顯示
+    function updateConnectorStatus(status, error) {
+        const badge = document.getElementById('connectorStatusBadge');
+        
+        if (status === 'connected') {
+            badge.textContent = '已連接';
+            badge.className = 'badge bg-success';
+            isConnectorConnected = true;
+            // 連接後自動載入卡機列表
+            loadTerminalsFromConnector();
+        } else if (status === 'connecting') {
+            badge.textContent = '連接中...';
+            badge.className = 'badge bg-warning';
+            isConnectorConnected = false;
+        } else {
+            badge.textContent = error || '未連接';
+            badge.className = 'badge bg-secondary';
+            isConnectorConnected = false;
+            showNotConnectedState();
+        }
+    }
+    
+    // 顯示未連接狀態
+    function showNotConnectedState() {
+        document.getElementById('notConnectedHint').style.display = 'block';
+        document.getElementById('noTerminalsHint').style.display = 'none';
+        document.getElementById('terminalsTableWrapper').style.display = 'none';
+    }
+    
+    // 從 Connector 載入卡機列表
+    async function loadTerminalsFromConnector() {
+        if (!window.VWorkConnector || !isConnectorConnected) {
+            showNotConnectedState();
+            return;
+        }
+        
+        try {
+            const result = await window.VWorkConnector.getCardTerminals();
+            const terminals = result.terminals || [];
+            
+            document.getElementById('notConnectedHint').style.display = 'none';
+            
+            if (terminals.length === 0) {
+                document.getElementById('noTerminalsHint').style.display = 'block';
+                document.getElementById('terminalsTableWrapper').style.display = 'none';
+            } else {
+                document.getElementById('noTerminalsHint').style.display = 'none';
+                document.getElementById('terminalsTableWrapper').style.display = 'block';
+                renderTerminalsList(terminals);
+            }
+        } catch (e) {
+            console.warn('無法載入卡機列表:', e);
+            document.getElementById('notConnectedHint').style.display = 'none';
+            document.getElementById('noTerminalsHint').style.display = 'block';
+            document.getElementById('terminalsTableWrapper').style.display = 'none';
+        }
+    }
+    
+    // 渲染卡機列表
+    function renderTerminalsList(terminals) {
+        const tbody = document.getElementById('terminalsList');
+        tbody.innerHTML = '';
+        
+        terminals.forEach((terminal, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <strong>${escapeHtml(terminal.name || '未命名')}</strong>
+                </td>
+                <td>
+                    <span class="badge bg-primary">${escapeHtml(terminal.type?.toUpperCase() || 'N/A')}</span>
+                </td>
+                <td><code>${escapeHtml(terminal.ip || '')}:${terminal.port || ''}</code></td>
+                <td>
+                    <span class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>已配置
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    // 輔助：HTML escape
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+    }
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 載入 Connector 端口設置
+        const portInput = document.getElementById('connectorPort');
+        if (window.VWorkConnector) {
+            portInput.value = window.VWorkConnector.port;
+        }
+        
+        // 監聽端口變更
+        portInput.addEventListener('change', function() {
+            const port = parseInt(this.value, 10);
+            if (port > 0 && port < 65536 && window.VWorkConnector) {
+                window.VWorkConnector.setPort(port);
+            }
+        });
+        
+        // 監聽 Connector 狀態變化
+        if (window.VWorkConnector) {
+            window.VWorkConnector.on('statusChange', function(data) {
+                updateConnectorStatus(data.status, data.error);
+            });
+        }
+        
+        // 檢查連接按鈕
+        document.getElementById('checkConnectorBtn').addEventListener('click', async function() {
+            this.disabled = true;
+            updateConnectorStatus('connecting');
+            
+            try {
+                if (window.VWorkConnector) {
+                    await window.VWorkConnector.checkConnection();
+                }
+            } finally {
+                this.disabled = false;
+            }
+        });
+        
+        // 刷新卡機列表按鈕
+        document.getElementById('refreshTerminalsBtn').addEventListener('click', function() {
+            if (isConnectorConnected) {
+                loadTerminalsFromConnector();
+            } else {
+                if (typeof App !== 'undefined' && App.showWarning) {
+                    App.showWarning('請先連接 Connector');
+                }
+            }
+        });
+        
+        // 初始檢查 Connector
+        if (window.VWorkConnector) {
+            window.VWorkConnector.checkConnection();
+        }
+    });
+})();
+</script>
+{{end}}

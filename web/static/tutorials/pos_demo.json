@@ -1,0 +1,27 @@
+{
+  "name": "pos_demo",
+  "title": "POS 收銀台操作",
+  "version": 1,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/pos" },
+    { "action": "highlight", "selector": ".select2-selection", "text": { "zh": "選擇客戶", "zh-CN": "选择客户", "en": "Select customer" } },
+    { "action": "click", "selector": ".select2-selection" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "type", "selector": ".select2-search__field", "value": "Tony" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "click", "selector": ".select2-results__option--highlighted" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "waitFor", "selector": "#productsGrid .pos-product-card", "timeoutMs": 5000 },
+    { "action": "highlight", "selector": "#productsGrid .pos-product-card:first-child", "text": { "zh": "點擊商品加入購物車", "zh-CN": "点击商品加入购物车", "en": "Add item to cart" } },
+    { "action": "click", "selector": "#productsGrid .pos-product-card:first-child" },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "waitFor", "selector": "#cartItems .pos-cart-item", "timeoutMs": 5000 },
+    { "action": "highlight", "selector": "#cartItems .pos-cart-item:first-child .btn-group", "text": { "zh": "調整商品數量", "zh-CN": "调整商品数量", "en": "Adjust quantity" } },
+    { "action": "click", "selector": "#cartItems .pos-cart-item:first-child .bi-plus" },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "highlight", "selector": "#posCheckoutBtn", "text": { "zh": "確認訂單並結帳", "zh-CN": "确认订单并结账", "en": "Checkout" } },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "done" }
+  ]
+}

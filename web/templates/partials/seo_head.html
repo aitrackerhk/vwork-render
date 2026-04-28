@@ -1,0 +1,25 @@
+{{define "partials/seo_head"}}
+{{if .SEO}}
+  {{if .SEO.Description}}<meta name="description" content="{{.SEO.Description}}">{{end}}
+  {{if .SEO.Keywords}}<meta name="keywords" content="{{.SEO.Keywords}}">{{end}}
+  {{if .SEO.CanonicalURL}}<link rel="canonical" href="{{.SEO.CanonicalURL}}">{{end}}
+  {{if .SEO.Title}}<meta property="og:title" content="{{.SEO.Title}}">{{end}}
+  {{if .SEO.Description}}<meta property="og:description" content="{{.SEO.Description}}">{{end}}
+  {{if .SEO.CanonicalURL}}<meta property="og:url" content="{{.SEO.CanonicalURL}}">{{end}}
+  <meta property="og:type" content="{{if .SEO.Type}}{{.SEO.Type}}{{else}}website{{end}}">
+  {{if .SEO.ImageURL}}<meta property="og:image" content="{{.SEO.ImageURL}}">{{end}}
+  {{if .SEO.ArticlePublishedTime}}<meta property="article:published_time" content="{{.SEO.ArticlePublishedTime}}">{{end}}
+  {{if .SEO.ArticleAuthor}}<meta property="article:author" content="{{.SEO.ArticleAuthor}}">{{end}}
+  {{if .SEO.Locale}}<meta property="og:locale" content="{{.SEO.Locale}}">{{end}}
+  {{range .SEO.LocaleAlternates}}<meta property="og:locale:alternate" content="{{.}}">{{end}}
+  <meta name="twitter:card" content="summary_large_image">
+  {{if .SEO.Title}}<meta name="twitter:title" content="{{.SEO.Title}}">{{end}}
+  {{if .SEO.Description}}<meta name="twitter:description" content="{{.SEO.Description}}">{{end}}
+  {{if .SEO.ImageURL}}<meta name="twitter:image" content="{{.SEO.ImageURL}}">{{end}}
+  {{range .SEO.Hreflangs}}
+  <link rel="alternate" hreflang="{{.Lang}}" href="{{.URL}}">
+  {{end}}
+  {{if .SEO.XDefaultURL}}<link rel="alternate" hreflang="x-default" href="{{.SEO.XDefaultURL}}">{{end}}
+  {{if .SEO.JSONLD}}<script type="application/ld+json">{{.SEO.JSONLD}}</script>{{end}}
+{{end}}
+{{end}}

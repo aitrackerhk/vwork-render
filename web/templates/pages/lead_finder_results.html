@@ -1,0 +1,354 @@
+{{ define "pages/lead_finder_results" }}
+
+{{if not .HasLeadFinder}}
+<!-- Feature Gate Overlay: Lead Finder requires vSuite Pro+ -->
+<div id="featureGateOverlay" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:#fff;border-radius:1rem;max-width:480px;width:100%;padding:2.5rem 2rem;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+        <div style="font-size:3rem;margin-bottom:1rem;"><i class="bi bi-search-heart text-primary"></i></div>
+        <h4 style="font-weight:700;margin-bottom:0.5rem;">自動搵客 Lead Finder</h4>
+        <p style="color:#64748b;font-size:0.9375rem;margin-bottom:1.5rem;">此功能需要 <strong>{{.RequiredPlan}}</strong> 方案。<br>請升級您的訂閱以使用自動搵客功能。</p>
+        <a href="/billing" class="btn btn-primary btn-lg w-100" style="font-weight:600;">
+            <i class="bi bi-arrow-up-circle me-2"></i>升級方案
+        </a>
+        <div style="margin-top:1rem;">
+            <a href="/dashboard" style="color:#64748b;font-size:0.875rem;text-decoration:none;">
+                <i class="bi bi-arrow-left me-1"></i>返回主頁
+            </a>
+        </div>
+    </div>
+</div>
+{{end}}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0" data-i18n="leadFinder.resultsTitle">搵客結果</h3>
+  <div class="d-flex gap-2">
+    <a href="/lead-finder" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> <span data-i18n="leadFinder.backToFinder">返回搵客</span></a>
+    <button class="btn btn-outline-success" onclick="LeadResults.exportExcel()"><i class="bi bi-file-earmark-excel"></i> Excel</button>
+    <button class="btn btn-outline-danger" onclick="LeadResults.exportPDF()"><i class="bi bi-file-earmark-pdf"></i> PDF</button>
+  </div>
+</div>
+
+<!-- Search Info Summary -->
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="text-muted small" data-i18n="leadFinder.targetIndustry">目標行業</div>
+        <div class="fw-semibold" id="lrIndustry">-</div>
+      </div>
+      <div class="col-md-2">
+        <div class="text-muted small" data-i18n="leadFinder.regionCol">地區</div>
+        <div class="fw-semibold" id="lrRegion">-</div>
+      </div>
+      <div class="col-md-2">
+        <div class="text-muted small" data-i18n="leadFinder.resultCount">結果數</div>
+        <div class="fw-semibold" id="lrResultCount">-</div>
+      </div>
+      <div class="col-md-2">
+        <div class="text-muted small" data-i18n="leadFinder.statusCol">狀態</div>
+        <div id="lrStatus">-</div>
+      </div>
+      <div class="col-md-3">
+        <div class="text-muted small" data-i18n="leadFinder.searchDate">搜尋日期</div>
+        <div class="fw-semibold" id="lrDate">-</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter bar -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <div class="row g-2 align-items-center">
+      <div class="col-auto">
+        <label class="form-label mb-0 small text-muted" data-i18n="leadFinder.filterStatus">篩選狀態:</label>
+      </div>
+      <div class="col-auto">
+        <select class="form-select form-select-sm" id="lrFilterStatus" onchange="LeadResults.applyFilter()">
+          <option value="" data-i18n="common.all">全部</option>
+          <option value="new">新發現</option>
+          <option value="contacted">已聯繫</option>
+          <option value="converted">已轉客戶</option>
+          <option value="dismissed">已排除</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <label class="form-label mb-0 small text-muted" data-i18n="leadFinder.contactType">聯絡方式:</label>
+      </div>
+      <div class="col-auto">
+        <select class="form-select form-select-sm" id="lrFilterContact" onchange="LeadResults.applyFilter()">
+          <option value="" data-i18n="common.all">不限</option>
+          <option value="email" data-i18n="leadFinder.hasEmail">有電郵</option>
+          <option value="phone" data-i18n="leadFinder.hasPhone">有電話</option>
+          <option value="both" data-i18n="leadFinder.hasBoth">電郵+電話</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <div class="form-check form-check-inline mb-0">
+          <input class="form-check-input" type="checkbox" id="lrFilterHideDup" onchange="LeadResults.applyFilter()">
+          <label class="form-check-label small text-muted" for="lrFilterHideDup" data-i18n="leadFinder.hideDuplicates">隱藏重複</label>
+        </div>
+      </div>
+      <div class="col-auto ms-auto">
+        <span class="text-muted small" id="lrDupInfo"></span>
+        <span class="text-muted small ms-2" id="lrFilterInfo"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Results Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="text-muted small">
+          <tr>
+            <th style="width:40px;">#</th>
+            <th data-i18n="leadFinder.companyName">公司名稱</th>
+            <th style="width:150px;" data-i18n="fields.phone">電話</th>
+            <th style="width:200px;" data-i18n="fields.email">電郵</th>
+            <th data-i18n="leadFinder.description">描述</th>
+            <th style="width:80px;" class="text-center" data-i18n="leadFinder.relevance">相關度</th>
+            <th style="width:100px;" data-i18n="leadFinder.statusCol">狀態</th>
+            <th style="width:160px;"></th>
+          </tr>
+        </thead>
+        <tbody id="lrResultsTbody">
+          <tr class="text-muted"><td colspan="8" class="text-center py-3" data-i18n="common.loading">載入中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Notes Modal -->
+<div class="modal fade" id="notesModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" data-i18n="leadFinder.editNotes">備註</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="notesResultId">
+        <div class="mb-3">
+          <label class="form-label" data-i18n="leadFinder.statusCol">狀態</label>
+          <select class="form-select" id="notesStatus">
+            <option value="new">新發現</option>
+            <option value="contacted">已聯繫</option>
+            <option value="converted">已轉客戶</option>
+            <option value="dismissed">已排除</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="leadFinder.notes">備註</label>
+          <textarea class="form-control" id="notesText" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+        <button type="button" class="btn btn-primary" onclick="LeadResults.saveNotes()" data-i18n="common.save">儲存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LeadResults = (() => {
+  const qs = id => document.getElementById(id);
+  const t = (k, fb) => { if (typeof I18n === 'undefined' || !I18n.t) return fb; const v = I18n.t(k); return (v && v !== k) ? v : (fb || k); };
+  const searchId = '{{ .SearchID }}';
+  let allResults = [];
+  const statusMap = { 'new': '新發現', contacted: '已聯繫', converted: '已轉客戶', dismissed: '已排除' };
+  const statusClass = { 'new': 'info', contacted: 'warning', converted: 'success', dismissed: 'secondary' };
+
+  async function init() {
+    if (!App.checkAuth()) return;
+    await loadResults();
+  }
+
+  async function loadResults() {
+    const tbody = qs('lrResultsTbody');
+    try {
+      const res = await App.apiRequest(`/lead-finder/searches/${searchId}/results`);
+      const search = res.search || {};
+      allResults = res.results || [];
+
+      // Fill search summary
+      qs('lrIndustry').textContent = search.target_industry || '-';
+      qs('lrRegion').textContent = search.region || '-';
+      qs('lrResultCount').textContent = search.result_count || allResults.length;
+      const sMap = { pending: '等待中', searching: '搜尋中', completed: '已完成', failed: '失敗' };
+      const sClass = { pending: 'secondary', searching: 'primary', completed: 'success', failed: 'danger' };
+      qs('lrStatus').innerHTML = `<span class="badge bg-${sClass[search.status] || 'secondary'}">${sMap[search.status] || search.status}</span>`;
+      qs('lrDate').textContent = search.created_at ? new Date(search.created_at).toLocaleString('zh-HK') : '-';
+
+      renderResults(allResults);
+    } catch(e) {
+      console.error(e);
+      tbody.innerHTML = `<tr class="text-danger"><td colspan="8" class="text-center py-3">${t('common.loadError','載入失敗')}</td></tr>`;
+      App.showAlert(e.message || t('common.loadError','載入失敗'), 'danger');
+    }
+  }
+
+  function renderResults(results) {
+    const tbody = qs('lrResultsTbody');
+    if (!results.length) {
+      tbody.innerHTML = `<tr class="text-muted"><td colspan="8" class="text-center py-3">${t('common.noData','沒有結果')}</td></tr>`;
+      qs('lrFilterInfo').textContent = '';
+      qs('lrDupInfo').textContent = '';
+      return;
+    }
+    const dupResults = results.filter(r => r.extra_fields && r.extra_fields.is_duplicate);
+    qs('lrFilterInfo').textContent = `${t('common.showing','顯示')} ${results.length} ${t('common.items','項')}`;
+    qs('lrDupInfo').textContent = dupResults.length > 0 ? `⚠ ${dupResults.length} ${t('leadFinder.duplicatesFound','項重複')}` : '';
+    if (dupResults.length > 0) qs('lrDupInfo').classList.add('text-warning'); else qs('lrDupInfo').classList.remove('text-warning');
+
+    tbody.innerHTML = results.map((r, i) => {
+      const relevanceColor = r.relevance >= 70 ? 'success' : r.relevance >= 40 ? 'warning' : 'secondary';
+      const website = r.website ? `<a href="${r.website}" target="_blank" class="text-truncate d-inline-block" style="max-width:180px;" title="${r.website}">${new URL(r.website).hostname}</a>` : '-';
+      const isDup = r.extra_fields && r.extra_fields.is_duplicate;
+      const dupType = r.extra_fields ? r.extra_fields.duplicate_type : '';
+      const dupMatch = r.extra_fields ? (r.extra_fields.duplicate_match || '') : '';
+      const dupBadge = isDup
+        ? `<span class="badge bg-warning text-dark ms-1" title="${t('leadFinder.duplicateOf','重複來源')}: ${dupType === 'customer' ? t('leadFinder.existingCustomer','現有客戶') : t('leadFinder.existingLead','現有Lead')} (${escHtml(dupMatch)})"><i class="bi bi-exclamation-triangle"></i> ${t('leadFinder.duplicate','重複')}</span>`
+        : '';
+      const rowClass = isDup ? ' class="table-warning"' : '';
+      return `
+        <tr${rowClass}>
+          <td class="text-muted small">${i + 1}</td>
+          <td>
+            <div class="fw-semibold">${escHtml(r.company_name || '-')}${dupBadge}</div>
+            <div class="small text-muted text-truncate" style="max-width:200px;">${website}</div>
+          </td>
+          <td>
+            ${r.phone ? `<a href="tel:${r.phone}" class="text-decoration-none"><i class="bi bi-telephone"></i> ${escHtml(r.phone)}</a>` : '<span class="text-muted">-</span>'}
+          </td>
+          <td>
+            ${r.email ? `<a href="mailto:${r.email}" class="text-decoration-none"><i class="bi bi-envelope"></i> ${escHtml(r.email)}</a>` : '<span class="text-muted">-</span>'}
+          </td>
+          <td class="small text-truncate" style="max-width:250px;" title="${escHtml(r.description || '')}">${escHtml(r.description || '-')}</td>
+          <td class="text-center"><span class="badge bg-${relevanceColor}">${r.relevance}</span></td>
+          <td><span class="badge bg-${statusClass[r.status] || 'secondary'}">${statusMap[r.status] || r.status}</span></td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-primary" onclick="LeadResults.openNotes('${r.id}','${r.status}','${escHtml(r.notes || '')}')" title="${t('leadFinder.editNotes','備註')}"><i class="bi bi-pencil"></i></button>
+              ${r.status !== 'converted' ? `<button class="btn btn-outline-success" onclick="LeadResults.convert('${r.id}')" title="${t('leadFinder.convertToCustomer','轉為客戶')}"><i class="bi bi-person-plus"></i></button>` : ''}
+              ${r.status !== 'dismissed' ? `<button class="btn btn-outline-secondary" onclick="LeadResults.dismiss('${r.id}')" title="${t('leadFinder.dismiss','排除')}"><i class="bi bi-x-lg"></i></button>` : ''}
+              <button class="btn btn-outline-danger" onclick="LeadResults.deleteResult('${r.id}')" title="${t('leadFinder.delete','刪除')}"><i class="bi bi-trash"></i></button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  function applyFilter() {
+    const status = qs('lrFilterStatus').value;
+    const contact = qs('lrFilterContact').value;
+    const hideDup = qs('lrFilterHideDup').checked;
+    let filtered = allResults;
+    if (status) {
+      filtered = filtered.filter(r => r.status === status);
+    }
+    if (contact === 'email') {
+      filtered = filtered.filter(r => r.email);
+    } else if (contact === 'phone') {
+      filtered = filtered.filter(r => r.phone);
+    } else if (contact === 'both') {
+      filtered = filtered.filter(r => r.email && r.phone);
+    }
+    if (hideDup) {
+      filtered = filtered.filter(r => !(r.extra_fields && r.extra_fields.is_duplicate));
+    }
+    renderResults(filtered);
+  }
+
+  function openNotes(resultId, status, notes) {
+    qs('notesResultId').value = resultId;
+    qs('notesStatus').value = status;
+    qs('notesText').value = notes;
+    new bootstrap.Modal(qs('notesModal')).show();
+  }
+
+  async function saveNotes() {
+    const resultId = qs('notesResultId').value;
+    const status = qs('notesStatus').value;
+    const notes = qs('notesText').value.trim();
+    try {
+      await App.apiRequest(`/lead-finder/results/${resultId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status, notes }),
+      });
+      bootstrap.Modal.getInstance(qs('notesModal')).hide();
+      // Update local data
+      const idx = allResults.findIndex(r => r.id === resultId);
+      if (idx >= 0) { allResults[idx].status = status; allResults[idx].notes = notes; }
+      applyFilter();
+      App.showAlert(t('common.saved','已儲存'), 'success');
+    } catch(e) {
+      App.showAlert(e.message || t('common.saveFailed','儲存失敗'), 'danger');
+    }
+  }
+
+  async function convert(resultId) {
+    if (!confirm(t('leadFinder.confirmConvert','確定將此 Lead 轉為客戶？'))) return;
+    try {
+      const res = await App.apiRequest(`/lead-finder/results/${resultId}/convert`, { method: 'POST' });
+      App.showAlert(t('leadFinder.converted','已轉為客戶'), 'success');
+      const idx = allResults.findIndex(r => r.id === resultId);
+      if (idx >= 0) {
+        allResults[idx].status = 'converted';
+        allResults[idx].converted_to_customer_id = res.customer?.id;
+      }
+      applyFilter();
+    } catch(e) {
+      App.showAlert(e.message || t('leadFinder.convertFailed','轉換失敗'), 'danger');
+    }
+  }
+
+  async function dismiss(resultId) {
+    try {
+      await App.apiRequest(`/lead-finder/results/${resultId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: 'dismissed' }),
+      });
+      const idx = allResults.findIndex(r => r.id === resultId);
+      if (idx >= 0) allResults[idx].status = 'dismissed';
+      applyFilter();
+    } catch(e) {
+      App.showAlert(e.message || t('common.saveFailed','操作失敗'), 'danger');
+    }
+  }
+
+  async function deleteResult(resultId) {
+    if (!confirm(t('leadFinder.confirmDelete','確定要刪除此 Lead？'))) return;
+    try {
+      await App.apiRequest(`/lead-finder/results/${resultId}`, { method: 'DELETE' });
+      allResults = allResults.filter(r => r.id !== resultId);
+      applyFilter();
+      App.showAlert(t('leadFinder.deleted','已刪除'), 'success');
+    } catch(e) {
+      App.showAlert(e.message || t('leadFinder.deleteFailed','刪除失敗'), 'danger');
+    }
+  }
+
+  function exportExcel() {
+    window.open(`/api/v1/lead-finder/searches/${searchId}/export/excel`, '_blank');
+  }
+
+  function exportPDF() {
+    window.open(`/api/v1/lead-finder/searches/${searchId}/export/pdf`, '_blank');
+  }
+
+  function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  return { applyFilter, openNotes, saveNotes, convert, dismiss, deleteResult, exportExcel, exportPDF };
+})();
+</script>
+{{ end }}

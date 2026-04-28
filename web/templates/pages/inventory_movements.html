@@ -1,0 +1,568 @@
+{{ define "pages/inventory_movements" }}
+<style>
+    .report-period-selector {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .report-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-arrow-left-right"></i> <span data-i18n="inventoryMovements.title">出入貨記錄</span></h2>
+    </div>
+
+    <!-- 篩選器 -->
+    <div class="report-period-selector">
+        <div class="row align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="accounting.startDate">開始日期</label>
+                <input type="date" class="form-control" id="startDate">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="accounting.endDate">結束日期</label>
+                <input type="date" class="form-control" id="endDate">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold" data-i18n="fields.type">類型</label>
+                <select class="form-select" id="movementType">
+                    <option value="" data-i18n="common.all">全部</option>
+                    <option value="shipping" data-i18n="inventoryMovements.shipping">出貨</option>
+                    <option value="receiving" data-i18n="inventoryMovements.receiving">入貨</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold" data-i18n="fields.warehouse">倉庫</label>
+                <select class="form-select" id="warehouseFilter" style="width: 100%;">
+                    <option value="" data-i18n="common.all">全部</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold" data-i18n="inventoryMovements.productSku">產品/SKU</label>
+                <input type="text" class="form-control" id="productSearch" placeholder="輸入產品名稱或 SKU" data-i18n-placeholder="inventoryMovements.productSkuPlaceholder" onkeypress="if(event.key==='Enter') loadMovements()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">&nbsp;</label>
+                <button type="button" class="btn btn-primary w-100" onclick="loadMovements()">
+                    <i class="bi bi-search"></i> <span data-i18n="common.search">搜索</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 表格 -->
+    <div class="report-table">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th data-i18n="fields.date">日期</th>
+                        <th data-i18n="fields.type">類型</th>
+                        <th data-i18n="fields.warehouse">倉庫</th>
+                        <th data-i18n="fields.product">產品</th>
+                        <th data-i18n="fields.quantity">數量</th>
+                        <th data-i18n="inventoryMovements.sourceNumber">來源單號</th>
+                        <th data-i18n="fields.note">備註</th>
+                        <th data-i18n="fields.actions">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="movementsTable">
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4" data-i18n="common.loading">載入中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 分頁 -->
+    <nav aria-label="Pagination" class="mt-3">
+        <ul class="pagination justify-content-center" id="pagination">
+        </ul>
+    </nav>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qrCodeModal" tabindex="-1" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qrCodeModalLabel">
+                    <span id="qrCodeTypeLabel" class="badge"></span>
+                    <span data-i18n="inventoryMovements.qrCode">QR Code</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center" id="qrCodeModalBody">
+                <div class="qr-container mb-3 d-flex justify-content-center">
+                    <div id="qrCodeContainer" style="width: 200px; height: 200px;"></div>
+                </div>
+                <div class="info text-start" id="qrCodeInfo">
+                    <!-- 動態填充 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.close">關閉</button>
+                <button type="button" class="btn btn-primary" onclick="printQRCode()">
+                    <i class="bi bi-printer"></i> <span data-i18n="common.print">列印</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPage = 1;
+    let totalPages = 1;
+    let warehouses = [];
+    let products = [];
+    let currentMovements = []; // 存儲當前顯示的 movements
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // 載入倉庫和產品列表
+        try {
+            const [warehousesData, productsData] = await Promise.all([
+                App.apiRequest('/warehouses?limit=1000'),
+                App.apiRequest('/products?limit=1000')
+            ]);
+            warehouses = warehousesData.data || [];
+            products = productsData.data || [];
+
+            // 初始化倉庫選擇器
+            $('#warehouseFilter').select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryCounts.selectWarehouse') : '請選擇倉庫',
+                allowClear: true,
+                data: warehouses.map(w => ({ id: w.id, text: w.name })),
+                width: '100%'
+            });
+        } catch (error) {
+            console.error('Failed to load data:', error);
+        }
+
+        // 設置默認日期範圍（最近30天）
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+        document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+        document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+
+        // 載入記錄
+        await loadMovements();
+    });
+
+    async function loadMovements(page = 1) {
+        currentPage = page;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const movementType = document.getElementById('movementType').value;
+        const warehouseID = $('#warehouseFilter').val();
+
+        const params = new URLSearchParams({
+            page: page.toString(),
+            limit: '50'
+        });
+        if (startDate) params.append('start_date', startDate);
+        if (endDate) params.append('end_date', endDate);
+        if (movementType) params.append('type', movementType);
+        if (warehouseID) params.append('warehouse_id', warehouseID);
+
+        try {
+            App.showLoading((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.loading') : '載入中...');
+            const response = await App.apiRequest(`/inventory-movements?${params.toString()}`);
+            App.hideLoading();
+
+            const movements = response.data || [];
+            totalPages = Math.ceil((response.total || 0) / 50);
+
+            // 文字過濾（產品名稱或 SKU）
+            const keyword = (document.getElementById('productSearch').value || '').toLowerCase().trim();
+            const filteredMovements = keyword
+                ? movements.filter(m => {
+                    const product = products.find(p => p.id === m.product_id);
+                    const name = (product?.name || '').toLowerCase();
+                    const sku = (product?.sku || '').toLowerCase();
+                    return name.includes(keyword) || sku.includes(keyword);
+                })
+                : movements;
+
+            renderMovements(filteredMovements);
+            renderPagination();
+        } catch (error) {
+            App.hideLoading();
+            const failed = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.loadError') : '載入失敗';
+            App.showAlert(failed + ': ' + error.message, 'danger');
+        }
+    }
+
+    function renderMovements(movements) {
+        const tbody = document.getElementById('movementsTable');
+        if (!tbody) return;
+        
+        // 存儲當前顯示的 movements
+        currentMovements = movements;
+
+        if (movements.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.noData') : '暫無記錄') + '</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = movements.map(movement => {
+            const warehouse = warehouses.find(w => w.id === movement.warehouse_id);
+            const product = products.find(p => p.id === movement.product_id);
+            const typeBadge = movement.type === 'shipping' 
+                ? '<span class="badge bg-danger">' + ((typeof I18n !== "undefined" && I18n.t) ? I18n.t("inventoryMovements.shipping") : "出貨") + '</span>' 
+                : '<span class="badge bg-success">' + ((typeof I18n !== "undefined" && I18n.t) ? I18n.t("inventoryMovements.receiving") : "入貨") + '</span>';
+            
+            const referenceLink = movement.reference_type === 'order'
+                ? `<a href="/orders/${movement.reference_id}/edit" target="_blank">${movement.order_number || movement.reference_id}</a>`
+                : `<a href="/purchase-orders/${movement.reference_id}/edit" target="_blank">${movement.order_number || movement.reference_id}</a>`;
+
+            // 顯示產品屬性
+            let attributesDisplay = '';
+            if (movement.product_attributes) {
+                const attrs = Array.isArray(movement.product_attributes) ? movement.product_attributes : 
+                             (typeof movement.product_attributes === 'object' ? Object.entries(movement.product_attributes) : []);
+                if (attrs.length > 0) {
+                    const attrTexts = attrs.map(attr => {
+                        if (Array.isArray(attr)) {
+                            return `${attr[0]}: ${attr[1]}`;
+                        } else if (attr.attribute_id && attr.value) {
+                            return `${attr.attribute_id}: ${attr.value}`;
+                        } else if (attr.value) {
+                            return attr.value;
+                        }
+                        return '';
+                    }).filter(t => t);
+                    if (attrTexts.length > 0) {
+                        attributesDisplay = `<div class="small text-muted">${attrTexts.join(', ')}</div>`;
+                    }
+                }
+            }
+
+            return `
+                <tr>
+                    <td>${movement.date || ''}</td>
+                    <td>${typeBadge}</td>
+                    <td>${warehouse ? warehouse.name : movement.warehouse_id || ''}</td>
+                    <td>${product ? product.name : movement.product_id || ''}${attributesDisplay}</td>
+                    <td>${movement.quantity || 0}</td>
+                    <td>${referenceLink}</td>
+                    <td>${movement.notes || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="printMovementQRCode('${movement.id}', '${movement.type}', '${movement.reference_id}', ${movement.note_index || 0})" title="打印 QR Code">
+                            <i class="bi bi-qr-code"></i>
+                        </button>
+                        ${movement.type === 'shipping' 
+                            ? `<button class="btn btn-sm btn-outline-primary" onclick="createShipmentFromMovement('${movement.id}')" title="${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryMovements.createShipment') : '轉成配送'}">
+                                <i class="bi bi-truck"></i> <span class="d-none d-md-inline">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryMovements.createShipment') : '轉成配送'}</span>
+                               </button>`
+                            : ''
+                        }
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderPagination() {
+        const pagination = document.getElementById('pagination');
+        if (!pagination) return;
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let html = '';
+        if (currentPage > 1) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadMovements(${currentPage - 1}); return false;">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.prevPage') : '上一頁'}</a></li>`;
+        }
+        
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''}"><a class="page-link" href="#" onclick="loadMovements(${i}); return false;">${i}</a></li>`;
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            }
+        }
+        
+        if (currentPage < totalPages) {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadMovements(${currentPage + 1}); return false;">${(typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.nextPage') : '下一頁'}</a></li>`;
+        }
+
+        pagination.innerHTML = html;
+
+        // mobile：標記第一/最後可見 page-item，方便套左右圓角
+        try {
+            const items = Array.from(pagination.querySelectorAll('.page-item'))
+                .filter(li => {
+                    const style = window.getComputedStyle(li);
+                    return style && style.display !== 'none' && style.visibility !== 'hidden';
+                });
+            items.forEach(li => li.classList.remove('first-visible', 'last-visible'));
+            if (items.length > 0) {
+                items[0].classList.add('first-visible');
+                items[items.length - 1].classList.add('last-visible');
+            }
+        } catch (e) {}
+    }
+
+    async function createShipmentFromMovement(movementId) {
+        // 找到對應的 movement 數據
+        const movement = currentMovements.find(m => m.id === movementId);
+        if (!movement) {
+            App.showAlert('找不到出貨記錄', 'danger');
+            return;
+        }
+
+        const confirmText = (typeof I18n !== 'undefined' && I18n.t) 
+            ? I18n.t('inventoryMovements.confirmCreateShipment') 
+            : '確定要將此出貨記錄轉成配送單嗎？';
+        
+        if (!confirm(confirmText)) return;
+
+        // 獲取產品名稱
+        const product = products.find(p => p.id === movement.product_id);
+        const productName = product ? product.name : '';
+
+        try {
+            App.showLoading((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.processing') : '處理中...');
+            const response = await App.apiRequest(`/inventory-movements/${movementId}/create-shipment`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    order_id: movement.order_id || null,
+                    product_id: movement.product_id || null,
+                    product_name: productName,
+                    product_attributes: movement.product_attributes || null,
+                    quantity: movement.quantity || 1,
+                    warehouse_id: movement.warehouse_id || null
+                })
+            });
+            App.hideLoading();
+
+            if (response && response.id) {
+                const successText = (typeof I18n !== 'undefined' && I18n.t) 
+                    ? I18n.t('inventoryMovements.shipmentCreated') 
+                    : '配送單已建立';
+                App.showAlert(successText, 'success');
+                
+                // 跳轉到配送單編輯頁面
+                const shipUrl = `/shipments/${response.id}/edit`;
+                if (typeof Router !== 'undefined' && Router.go) { Router.go(shipUrl); } else { window.location.href = shipUrl; }
+            }
+        } catch (error) {
+            App.hideLoading();
+            const failed = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.operationFailed') : '操作失敗';
+            App.showAlert(failed + ': ' + error.message, 'danger');
+        }
+    }
+
+    function printMovementQRCode(movementId, type, referenceId, noteIndex) {
+        const movement = currentMovements.find(m => m.id === movementId);
+        if (!movement) {
+            App.showAlert('找不到記錄', 'danger');
+            return;
+        }
+
+        const qrCode = type === 'shipping' 
+            ? `SHIP-${referenceId}-${noteIndex}`
+            : `RECV-${referenceId}-${noteIndex}`;
+        
+        const warehouse = warehouses.find(w => w.id === movement.warehouse_id);
+        const product = products.find(p => p.id === movement.product_id);
+        
+        // 設置類型標籤
+        const typeLabel = document.getElementById('qrCodeTypeLabel');
+        if (type === 'shipping') {
+            typeLabel.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryMovements.shipping') : '出庫';
+            typeLabel.className = 'badge bg-danger';
+        } else {
+            typeLabel.textContent = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryMovements.receiving') : '入庫';
+            typeLabel.className = 'badge bg-success';
+        }
+        
+        // 填充資訊
+        const orderNumLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('fields.orderNumber') : '單號';
+        const dateLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('fields.date') : '日期';
+        const warehouseLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('fields.warehouse') : '倉庫';
+        const productLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('fields.product') : '產品';
+        const quantityLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('fields.quantity') : '數量';
+        
+        document.getElementById('qrCodeInfo').innerHTML = `
+            <div class="mb-2"><strong>${orderNumLabel}：</strong>${movement.order_number || '-'}</div>
+            <div class="mb-2"><strong>${dateLabel}：</strong>${movement.date || '-'}</div>
+            <div class="mb-2"><strong>${warehouseLabel}：</strong>${warehouse ? warehouse.name : '-'}</div>
+            <div class="mb-2"><strong>${productLabel}：</strong>${product ? product.name : '-'}</div>
+            <div class="mb-2"><strong>${quantityLabel}：</strong>${movement.quantity || 0}</div>
+            <div class="mb-2"><strong>QR Code：</strong><code>${qrCode}</code></div>
+        `;
+        
+        // 存儲當前 QR Code 資訊供列印使用
+        window.currentQRCodeData = {
+            qrCode,
+            type,
+            movement,
+            warehouse,
+            product
+        };
+        
+        // 先清空容器，再顯示 Modal
+        const modalEl = document.getElementById('qrCodeModal');
+        const container = document.getElementById('qrCodeContainer');
+        if (container) {
+            container.innerHTML = '';
+        }
+        
+        // 獲取或創建 Modal 實例
+        let modal = bootstrap.Modal.getInstance(modalEl);
+        if (!modal) {
+            modal = new bootstrap.Modal(modalEl);
+        }
+        
+        // 監聽 shown 事件來生成 QR Code
+        const onShown = function() {
+            generateQRCode(qrCode);
+            modalEl.removeEventListener('shown.bs.modal', onShown);
+        };
+        modalEl.addEventListener('shown.bs.modal', onShown);
+        
+        // 顯示 Modal
+        modal.show();
+    }
+    
+    function generateQRCode(qrCode) {
+        const container = document.getElementById('qrCodeContainer');
+        if (!container) {
+            console.error('qrCodeContainer not found');
+            return;
+        }
+        
+        // 清除之前的 QR Code
+        container.innerHTML = '';
+        
+        // 生成新的 QR Code
+        if (typeof QRCode !== 'undefined') {
+            // 嘗試使用 toCanvas API (node-qrcode)
+            if (typeof QRCode.toCanvas === 'function') {
+                const canvas = document.createElement('canvas');
+                canvas.id = 'qrCanvas';
+                container.appendChild(canvas);
+                QRCode.toCanvas(canvas, qrCode, { width: 200, margin: 2 }, function(error) {
+                    if (error) {
+                        console.error('QR Code 生成失敗:', error);
+                        container.innerHTML = '<p class="text-danger">QR Code 生成失敗</p>';
+                    } else {
+                        console.log('QR Code 生成成功:', qrCode);
+                    }
+                });
+            } else {
+                // 使用 qrcode.js 的 API (new QRCode)
+                try {
+                    new QRCode(container, {
+                        text: qrCode,
+                        width: 200,
+                        height: 200,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                    console.log('QR Code 生成成功:', qrCode);
+                } catch (e) {
+                    console.error('QR Code 生成失敗:', e);
+                    container.innerHTML = '<p class="text-danger">QR Code 生成失敗: ' + e.message + '</p>';
+                }
+            }
+        } else {
+            console.error('QRCode library not loaded');
+            container.innerHTML = '<p class="text-danger">QR Code 庫未載入</p>';
+        }
+    }
+    
+    function printQRCode() {
+        if (!window.currentQRCodeData) return;
+        
+        const { qrCode, type, movement, warehouse, product } = window.currentQRCodeData;
+        
+        // 嘗試獲取 canvas 或 img
+        let dataUrl = '';
+        const container = document.getElementById('qrCodeContainer');
+        const canvas = container.querySelector('canvas');
+        const img = container.querySelector('img');
+        
+        if (canvas) {
+            dataUrl = canvas.toDataURL('image/png');
+        } else if (img) {
+            dataUrl = img.src;
+        } else {
+            App.showAlert('QR Code 圖片未找到', 'warning');
+            return;
+        }
+        
+        const typeText = type === 'shipping' 
+            ? ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryMovements.shipping') : '出庫')
+            : ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('inventoryMovements.receiving') : '入庫');
+        const typeBgColor = type === 'shipping' ? '#dc3545' : '#28a745';
+        
+        const printWindow = window.open('', '_blank', 'width=400,height=550');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>QR Code - ${movement.order_number || qrCode}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+                    .qr-container { margin: 20px auto; }
+                    .qr-container img { max-width: 200px; }
+                    .info { margin-top: 15px; text-align: left; max-width: 280px; margin: 15px auto; }
+                    .info-row { margin: 5px 0; font-size: 14px; }
+                    .label { font-weight: bold; }
+                    .type-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; color: white; font-size: 12px; background: ${typeBgColor}; }
+                    @media print { body { padding: 10px; } .no-print { display: none; } }
+                </style>
+            </head>
+            <body>
+                <h3><span class="type-badge">${typeText}</span></h3>
+                <div class="qr-container"><img src="${dataUrl}" alt="QR Code"></div>
+                <div class="info">
+                    <div class="info-row"><span class="label">單號：</span>${movement.order_number || '-'}</div>
+                    <div class="info-row"><span class="label">日期：</span>${movement.date || '-'}</div>
+                    <div class="info-row"><span class="label">倉庫：</span>${warehouse ? warehouse.name : '-'}</div>
+                    <div class="info-row"><span class="label">產品：</span>${product ? product.name : '-'}</div>
+                    <div class="info-row"><span class="label">數量：</span>${movement.quantity || 0}</div>
+                    <div class="info-row"><span class="label">QR Code：</span>${qrCode}</div>
+                </div>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
+</script>
+{{ end }}
+

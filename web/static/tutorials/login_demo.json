@@ -1,0 +1,25 @@
+{
+  "name": "login_demo",
+  "title": "登入並開啟儀表板",
+  "version": 1,
+  "vars": {
+    "email": "",
+    "password": ""
+  },
+  "steps": [
+    { "action": "goto", "url": "/login" },
+    { "action": "waitFor", "selector": "#loginForm #email", "timeoutMs": 10000 },
+    { "action": "highlight", "selector": "#loginForm #email", "text": { "zh": "輸入示範帳號 Email", "zh-CN": "输入示范账号 Email", "en": "Enter demo email" } },
+    { "action": "type", "selector": "#loginForm #email", "value": "${email}", "clear": true },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#loginForm #password", "text": { "zh": "輸入示範帳號密碼", "zh-CN": "输入示范账号密码", "en": "Enter demo password" } },
+    { "action": "type", "selector": "#loginForm #password", "value": "${password}", "clear": true },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#loginForm button[type='submit']", "text": { "zh": "點擊登入", "zh-CN": "点击登录", "en": "Click Login" } },
+    { "action": "click", "selector": "#loginForm button[type='submit']" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "goto", "url": "/dashboard" },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "done" }
+  ]
+}

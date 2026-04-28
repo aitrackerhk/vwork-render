@@ -1,0 +1,429 @@
+{{ define "pages/order_reports" }}
+<style>
+    .report-period-selector {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card.success {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stats-card.warning {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stats-card.info {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .report-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .report-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px 8px 0 0;
+        margin-bottom: 0;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="bi bi-file-earmark-text"></i> <span data-i18n="menu.orderReports">訂單報表</span></h3>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-success" onclick="exportToExcel()">
+                <i class="bi bi-file-earmark-excel"></i> Excel
+            </button>
+            <button type="button" class="btn btn-danger" onclick="exportToPDF()">
+                <i class="bi bi-file-earmark-pdf"></i> PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- 時間週期選擇器（頂部） -->
+    <div class="report-period-selector">
+        <div class="row align-items-end">
+            <div class="col-md-2">
+                <label class="form-label fw-bold" data-i18n="pages.orderReports.timePeriod">時間週期</label>
+                <select class="form-select" id="periodSelect" onchange="changePeriod()">
+                    <option value="daily" data-i18n="pages.orderReports.daily">每日</option>
+                    <option value="weekly" data-i18n="pages.orderReports.weekly">每週</option>
+                    <option value="monthly" data-i18n="pages.orderReports.monthly">每月</option>
+                    <option value="yearly" data-i18n="pages.orderReports.yearly">每年</option>
+                </select>
+            </div>
+            <div class="col-md-2" id="datePickerContainer">
+                <label class="form-label fw-bold" id="dateLabel" data-i18n="pages.orderReports.selectDate">選擇日期</label>
+                <input type="date" class="form-control" id="datePicker" onchange="loadReport()">
+            </div>
+            <div class="col-md-2" id="startDateContainer" style="display: none;">
+                <label class="form-label fw-bold" data-i18n="pages.orderReports.startDate">開始日期</label>
+                <input type="date" class="form-control" id="startDate" onchange="loadReport()">
+            </div>
+            <div class="col-md-2" id="endDateContainer" style="display: none;">
+                <label class="form-label fw-bold" data-i18n="pages.orderReports.endDate">結束日期</label>
+                <input type="date" class="form-control" id="endDate" onchange="loadReport()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold" data-i18n="pages.orderReports.searchOrderCustomer">搜索訂單號/客戶</label>
+                <input type="text" class="form-control" id="orderSearch" data-i18n-placeholder="pages.orderReports.searchOrderCustomerPlaceholder" placeholder="搜索訂單號或客戶名稱..." onkeypress="if(event.key==='Enter') loadReport()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">&nbsp;</label>
+                <button type="button" class="btn btn-primary w-100" onclick="loadReport()">
+                    <i class="bi bi-search"></i> <span data-i18n="pages.orderReports.query">查詢</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="row mb-4" id="statsCards">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="pages.orderReports.totalOrders">總訂單數</div>
+                        <div class="h3 mb-0" id="totalOrders">0</div>
+                    </div>
+                    <i class="bi bi-cart-check fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card success">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="pages.orderReports.totalAmount">總金額</div>
+                        <div class="h3 mb-0" id="totalAmount">$0.00</div>
+                    </div>
+                    <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card warning">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="pages.orderReports.avgAmount">平均訂單金額</div>
+                        <div class="h3 mb-0" id="avgAmount">$0.00</div>
+                    </div>
+                    <i class="bi bi-graph-up fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card info">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-white-50 small" data-i18n="pages.orderReports.totalItems">總商品數</div>
+                        <div class="h3 mb-0" id="totalItems">0</div>
+                    </div>
+                    <i class="bi bi-box-seam fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 訂單列表 -->
+    <div class="report-table">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th data-i18n="pages.orderReports.orderNumber">訂單號</th>
+                        <th data-i18n="pages.orderReports.date">日期</th>
+                        <th data-i18n="pages.orderReports.customer">客戶</th>
+                        <th data-i18n="pages.orderReports.status">狀態</th>
+                        <th data-i18n="pages.orderReports.itemCount">商品數</th>
+                        <th data-i18n="pages.orderReports.amount">金額</th>
+                        <th data-i18n="pages.orderReports.actions">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4" data-i18n="pages.orderReports.pleaseSelectPeriod">請選擇時間週期以查看報表</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!App.checkAuth()) return;
+        
+        // 設置默認日期為今天
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('datePicker').value = today;
+        document.getElementById('startDate').value = today;
+        document.getElementById('endDate').value = today;
+        
+        // 載入默認報表（今天）
+        loadReport();
+    });
+    
+    function changePeriod() {
+        const period = document.getElementById('periodSelect').value;
+        const datePickerContainer = document.getElementById('datePickerContainer');
+        const startDateContainer = document.getElementById('startDateContainer');
+        const endDateContainer = document.getElementById('endDateContainer');
+        const dateLabel = document.getElementById('dateLabel');
+        
+        if (period === 'daily') {
+            datePickerContainer.style.display = 'block';
+            startDateContainer.style.display = 'none';
+            endDateContainer.style.display = 'none';
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                dateLabel.textContent = I18n.t('pages.orderReports.selectDate');
+            } else {
+                dateLabel.textContent = '選擇日期';
+            }
+        } else if (period === 'weekly') {
+            datePickerContainer.style.display = 'none';
+            startDateContainer.style.display = 'block';
+            endDateContainer.style.display = 'block';
+            // 設置為本週的開始和結束日期
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // 週一
+            const monday = new Date(today.setDate(diff));
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            
+            document.getElementById('startDate').value = monday.toISOString().split('T')[0];
+            document.getElementById('endDate').value = sunday.toISOString().split('T')[0];
+        } else if (period === 'monthly') {
+            datePickerContainer.style.display = 'none';
+            startDateContainer.style.display = 'block';
+            endDateContainer.style.display = 'block';
+            // 設置為本月的開始和結束日期
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            
+            document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('endDate').value = lastDay.toISOString().split('T')[0];
+        } else if (period === 'yearly') {
+            datePickerContainer.style.display = 'none';
+            startDateContainer.style.display = 'block';
+            endDateContainer.style.display = 'block';
+            // 設置為本年的開始和結束日期
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), 0, 1);
+            const lastDay = new Date(today.getFullYear(), 11, 31);
+            
+            document.getElementById('startDate').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('endDate').value = lastDay.toISOString().split('T')[0];
+        }
+        
+        loadReport();
+    }
+    
+    async function loadReport() {
+        const period = document.getElementById('periodSelect').value;
+        let startDate, endDate;
+        
+        if (period === 'daily') {
+            const date = document.getElementById('datePicker').value;
+            if (!date) return;
+            startDate = date;
+            endDate = date;
+        } else {
+            startDate = document.getElementById('startDate').value;
+            endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) return;
+        }
+        
+        const search = document.getElementById('orderSearch').value.trim();
+        
+        try {
+            let url = `/api/v1/orders/report?start_date=${startDate}&end_date=${endDate}`;
+            if (search) {
+                url += `&search=${encodeURIComponent(search)}`;
+            }
+            const data = await App.apiRequest(url);
+            
+            console.log('訂單報表數據:', data);
+            
+            // 更新統計卡片
+            document.getElementById('totalOrders').textContent = data.total_orders || 0;
+            document.getElementById('totalAmount').textContent = '$' + (data.total_amount || 0).toFixed(2);
+            document.getElementById('avgAmount').textContent = '$' + (data.avg_amount || 0).toFixed(2);
+            document.getElementById('totalItems').textContent = data.total_items || 0;
+            
+            // 更新訂單列表
+            const tbody = document.getElementById('ordersTableBody');
+            const orders = data.orders || [];
+            console.log('訂單數量:', orders.length, '訂單數據:', orders);
+            
+            if (orders.length === 0) {
+                const noOrdersText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.orderReports.noOrdersInPeriod') : '該時間段內沒有訂單';
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">${noOrdersText}</td></tr>`;
+                return;
+            }
+            
+            const rows = orders.map(order => {
+                if (!order) {
+                    console.warn('訂單數據為空:', order);
+                    return '';
+                }
+                
+                // 處理 order ID（可能是 UUID 對象或字符串）
+                let orderId = '';
+                if (order.id) {
+                    orderId = typeof order.id === 'string' ? order.id : (order.id.toString ? order.id.toString() : String(order.id));
+                } else if (order.ID) {
+                    orderId = typeof order.ID === 'string' ? order.ID : (order.ID.toString ? order.ID.toString() : String(order.ID));
+                }
+                
+                // 清理 orderId（移除可能的無效值）
+                if (orderId === 'undefined' || orderId === 'null' || orderId === '[object Object]') {
+                    orderId = '';
+                }
+                
+                const orderDate = order.order_date || order.orderDate;
+                const orderDateStr = orderDate ? new Date(orderDate).toLocaleDateString('zh-TW') : '-';
+                
+                const getStatusText = (status) => {
+                    if (typeof I18n !== 'undefined' && I18n.t) {
+                        return I18n.t(`pages.orderReports.${status}`) || status;
+                    }
+                    const statusMap = {
+                        'draft': '草稿',
+                        'confirmed': '已確認',
+                        'processing': '處理中',
+                        'completed': '已完成',
+                        'cancelled': '已取消'
+                    };
+                    return statusMap[status] || status;
+                };
+                
+                const statusBadge = {
+                    'draft': `<span class="badge bg-secondary">${getStatusText('draft')}</span>`,
+                    'confirmed': `<span class="badge bg-info">${getStatusText('confirmed')}</span>`,
+                    'processing': `<span class="badge bg-warning">${getStatusText('processing')}</span>`,
+                    'completed': `<span class="badge bg-success">${getStatusText('completed')}</span>`,
+                    'cancelled': `<span class="badge bg-danger">${getStatusText('cancelled')}</span>`
+                }[order.status] || `<span class="badge bg-secondary">${getStatusText(order.status || 'unknown')}</span>`;
+                
+                const walkInText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.orderReports.walkInCustomer') : '散客';
+                const customerName = (order.customer && order.customer.name) ? order.customer.name : walkInText;
+                const itemCount = (order.order_items && Array.isArray(order.order_items)) ? order.order_items.length : (order.orderItems && Array.isArray(order.orderItems) ? order.orderItems.length : 0);
+                
+                const orderNumber = order.order_number || order.orderNumber || '-';
+                const totalAmount = parseFloat(order.total_amount || order.totalAmount || 0).toFixed(2);
+                
+                // 如果有有效的 orderId，生成鏈接；否則只顯示文本
+                const viewText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.orderReports.view') : '查看';
+                const actionCell = orderId ? 
+                    `<a href="/orders/${orderId}/edit" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> ${viewText}</a>` :
+                    `<span class="text-muted">-</span>`;
+                
+                return `
+                    <tr>
+                        <td>${orderNumber}</td>
+                        <td>${orderDateStr}</td>
+                        <td>${customerName}</td>
+                        <td>${statusBadge}</td>
+                        <td>${itemCount}</td>
+                        <td>$${totalAmount}</td>
+                        <td>${actionCell}</td>
+                    </tr>
+                `;
+            }).filter(row => row !== '').join('');
+            
+            if (rows) {
+                tbody.innerHTML = rows;
+            } else {
+                const noOrdersText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.orderReports.noOrdersInPeriod') : '該時間段內沒有訂單';
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">${noOrdersText}</td></tr>`;
+            }
+        } catch (error) {
+            console.error('載入報表失敗:', error);
+            App.showAlert('載入報表失敗: ' + (error.message || error.toString()), 'danger');
+            
+            // 發生錯誤時，重置統計和列表
+            document.getElementById('totalOrders').textContent = '0';
+            document.getElementById('totalAmount').textContent = '$0.00';
+            document.getElementById('avgAmount').textContent = '$0.00';
+            document.getElementById('totalItems').textContent = '0';
+            const tbody = document.getElementById('ordersTableBody');
+            const loadFailedText = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.orderReports.loadFailed') : '載入失敗，請重試';
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">${loadFailedText}</td></tr>`;
+        }
+    }
+    
+    function getDateRange() {
+        const period = document.getElementById('periodSelect').value;
+        let startDate, endDate;
+        
+        if (period === 'daily') {
+            const date = document.getElementById('datePicker').value;
+            if (!date) {
+                const msg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.orderReports.pleaseSelectDate') : '請選擇日期';
+                App.showAlert(msg, 'warning');
+                return null;
+            }
+            startDate = date;
+            endDate = date;
+        } else {
+            startDate = document.getElementById('startDate').value;
+            endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+                const msg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.orderReports.pleaseSelectDateRange') : '請選擇日期範圍';
+                App.showAlert(msg, 'warning');
+                return null;
+            }
+        }
+        
+        return { startDate, endDate };
+    }
+    
+    function exportToExcel() {
+        const dateRange = getDateRange();
+        if (!dateRange) return;
+        
+        const url = `/api/v1/orders/export/excel?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`;
+        window.open(url, '_blank');
+    }
+    
+    function exportToPDF() {
+        const dateRange = getDateRange();
+        if (!dateRange) return;
+        
+        const url = `/api/v1/orders/export/pdf?start_date=${dateRange.startDate}&end_date=${dateRange.endDate}`;
+        window.open(url, '_blank');
+    }
+</script>
+{{ end }}
+
+

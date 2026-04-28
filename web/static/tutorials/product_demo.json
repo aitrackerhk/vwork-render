@@ -1,0 +1,17 @@
+{
+  "name": "product_demo",
+  "title": "產品與庫存管理",
+  "version": 1,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/products" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#dataTable tr:first-child .btn-outline-primary", "text": { "zh": "管理產品價格與庫存", "zh-CN": "管理产品价格与库存", "en": "Manage pricing and inventory" } },
+    { "action": "click", "selector": "#dataTable tr:first-child .btn-outline-primary" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": ".form-button-bar.show button[type=\"submit\"].btn.btn-primary", "text": { "zh": "點擊「保存」更新產品資料", "zh-CN": "点击「保存」更新产品资料", "en": "Click Save to update product" } },
+    { "action": "click", "selector": ".form-button-bar.show button[type=\"submit\"].btn.btn-primary" },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "done" }
+  ]
+}

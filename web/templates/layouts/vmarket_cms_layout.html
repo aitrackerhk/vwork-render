@@ -1,0 +1,251 @@
+{{define "layouts/vmarket_cms_layout"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{if .Title}}{{.Title}} - {{end}}vMarket</title>
+    <link rel="icon" type="image/png" href="/static/vmarketicon.png">
+    <link rel="apple-touch-icon" href="/static/vmarketicon.png">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vmarket.css">
+    <!-- Select2 CSS (for personal-data phone country code) -->
+    <link href="/static/vendor/select2/select2.min.css" rel="stylesheet" />
+    <link href="/static/vendor/select2-bootstrap5/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+    </style>
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            let currentLang = 'zh';
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) localStorage.setItem('u-nai_lang', currentLang);
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) currentLang = 'zh-CN';
+                else if (browserLang.startsWith('zh')) currentLang = 'zh';
+                else currentLang = 'en';
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            window.__INITIAL_LANG__ = currentLang;
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading'))
+                            document.body.classList.remove('i18n-loading');
+                    }, 5000);
+                } else { requestAnimationFrame(checkBody); }
+            })();
+        })();
+    </script>
+</head>
+<body>
+    {{template "layouts/topnav.html" .}}
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    {{template "layouts/sidemenu_vmarket.html" .}}
+
+    <div class="main-content-wrapper">
+        <div class="main-content">
+            <div id="alertContainer" class="position-fixed start-50 translate-middle-x" style="z-index: 9999; max-width: 500px; top: 60px; margin-top: 10px;"></div>
+            {{embed}}
+        </div>
+    </div>
+
+    <footer class="cms-footer text-center text-muted py-2" style="background-color: #f8f9fa; border-top: 1px solid #dee2e6; margin-top: auto; position: relative; z-index: 1;">
+        <p class="mb-0 small">&copy; 2025 V-sys Limited. All rights reserved.</p>
+    </footer>
+
+    <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS (for personal-data phone country code) -->
+    <script src="/static/vendor/select2/select2.min.js"></script>
+    <!-- Cropper.js for image cropping (for personal-data avatar) -->
+    <link rel="stylesheet" href="/static/vendor/cropperjs/cropper.min.css">
+    <script src="/static/vendor/cropperjs/cropper.min.js"></script>
+    <script src="/static/js/image-cropper.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/draft-manager.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Logout button handler
+        var logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (typeof App !== 'undefined' && App.logout) { App.logout(); }
+            });
+        }
+        var logoutBtnSidemenu = document.getElementById('logoutBtnSidemenu');
+        if (logoutBtnSidemenu) {
+            logoutBtnSidemenu.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (typeof App !== 'undefined' && App.logout) { App.logout(); }
+            });
+        }
+
+        // Load user info for topnav dropdown
+        async function loadTopnavUserInfo() {
+            try {
+                var user = await App.apiRequest('/user/me');
+                if (!user || !user.id || !user.email || !user.name ||
+                    String(user.id).trim() === '' ||
+                    String(user.email).trim() === '' ||
+                    String(user.name).trim() === '') {
+                    if (typeof App !== 'undefined' && App.clearSessionAndRedirect) {
+                        App.clearSessionAndRedirect();
+                    }
+                    return;
+                }
+                try { localStorage.setItem('user', JSON.stringify(user)); } catch (e) {}
+
+                var userNameEl = document.getElementById('userName');
+                if (userNameEl && user.name) {
+                    userNameEl.textContent = user.name;
+                    userNameEl.removeAttribute('data-i18n');
+                }
+
+                // Topbar avatar
+                var avatarImg = document.getElementById('topbarUserAvatar');
+                var avatarIcon = document.getElementById('topbarUserIcon');
+                if (avatarImg) {
+                    var url = (user && user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            if (avatarIcon) avatarIcon.style.display = '';
+                            this.onerror = null;
+                        };
+                    } else {
+                        avatarImg.style.display = 'none';
+                        if (avatarIcon) avatarIcon.style.display = '';
+                    }
+                }
+
+                // Load vCoin balance
+                loadAICoinsBalance();
+            } catch (error) {
+                console.error('Failed to load user info:', error);
+                if (error.status === 401 || (error.message && error.message.indexOf('401') !== -1)) {
+                    if (typeof App !== 'undefined' && App.clearSessionAndRedirect) {
+                        App.clearSessionAndRedirect();
+                    }
+                }
+            }
+        }
+
+        // Load vCoin balance
+        async function loadAICoinsBalance() {
+            try {
+                var token = localStorage.getItem('auth_token');
+                var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                if (!token || !tenantSubdomain) return;
+
+                var resp = await fetch('/api/v1/ai-coins/balance', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                        'X-Tenant-Subdomain': tenantSubdomain
+                    }
+                });
+                if (!resp.ok) return;
+
+                var data = await resp.json();
+                var balance = data.balance || 0;
+                var aiCoinsDisplay = document.getElementById('userAICoinsDisplay');
+                var aiCoinsBalance = document.getElementById('userAICoinsBalance');
+                var aiCoinsDivider = document.getElementById('aiCoinsDivider');
+
+                if (aiCoinsDisplay && aiCoinsBalance) {
+                    aiCoinsBalance.textContent = balance;
+                    aiCoinsDisplay.style.display = 'block';
+                    if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Failed to load vCoin balance:', e);
+            }
+        }
+
+        // Prefill from cache for instant display
+        function prefillUserFromCache() {
+            try {
+                var cachedUser = localStorage.getItem('user');
+                if (cachedUser) {
+                    var user = JSON.parse(cachedUser);
+                    if (user && user.name) {
+                        var userNameEl = document.getElementById('userName');
+                        if (userNameEl) {
+                            userNameEl.textContent = user.name;
+                            userNameEl.removeAttribute('data-i18n');
+                        }
+                        var avatarImg = document.getElementById('topbarUserAvatar');
+                        var avatarIcon = document.getElementById('topbarUserIcon');
+                        if (user.profile_pic) {
+                            var url = String(user.profile_pic);
+                            if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                            if (url && avatarImg) {
+                                avatarImg.src = url;
+                                avatarImg.style.display = 'inline-block';
+                                if (avatarIcon) avatarIcon.style.display = 'none';
+                            }
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // Initialize user info
+        if (typeof App !== 'undefined') {
+            var token = localStorage.getItem('auth_token');
+            if (token) {
+                prefillUserFromCache();
+                loadTopnavUserInfo();
+            }
+        }
+
+        // i18n init
+        if (typeof I18n !== 'undefined' && I18n.init) {
+            I18n.init();
+        }
+
+        // Mobile menu toggle
+        var mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        if (mobileMenuToggle && sidebar) {
+            mobileMenuToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                sidebar.classList.toggle('show');
+                if (overlay) overlay.classList.toggle('show');
+            });
+        }
+        if (overlay && sidebar) {
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            });
+        }
+    });
+    </script>
+</body>
+</html>
+{{end}}

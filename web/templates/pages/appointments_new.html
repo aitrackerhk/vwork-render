@@ -1,0 +1,697 @@
+{{define "pages/appointments_new"}}
+<div class="container-fluid" id="appointmentNewPage" data-id="{{.ID}}">
+  <!-- 標題區 -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1">{{if .ID}}編輯預約{{else}}新增預約{{end}}</h4>
+      <p class="text-muted mb-0 small">依照步驟完成預約</p>
+    </div>
+    <div>
+      <a href="/appointments" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline" data-i18n="common.backToList">返回列表</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 步驟指示器 -->
+  <div class="card mb-4">
+    <div class="card-body py-3">
+      <div class="d-flex justify-content-center">
+        <div class="d-flex align-items-center" id="stepIndicator">
+          <div class="step-item active" data-step="1">
+            <div class="step-circle">1</div>
+            <span class="step-label">選擇服務</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" data-step="2">
+            <div class="step-circle">2</div>
+            <span class="step-label">選擇時間</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item" data-step="3">
+            <div class="step-circle">3</div>
+            <span class="step-label">確認資料</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 步驟 1: 選擇服務 -->
+  <div class="card step-content" id="step1Content">
+    <div class="card-body">
+      <h5 class="card-title mb-4">
+        <i class="bi bi-1-circle text-primary me-2"></i>選擇服務
+      </h5>
+      
+      <!-- 客戶選擇 -->
+      <div class="mb-4">
+        <label class="form-label fw-medium">客戶（可選）</label>
+        <select class="form-select" id="appointmentCustomer" style="width: 100%;"></select>
+        <div class="form-text">可不選客戶，作為私人預約或內部使用。</div>
+      </div>
+
+      <!-- 服務選擇 -->
+      <div class="mb-4">
+        <label class="form-label fw-medium">選擇服務項目</label>
+        <div class="row g-3" id="serviceList">
+          <div class="col-12 text-center py-4 text-muted">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+            載入服務中...
+          </div>
+        </div>
+      </div>
+
+      <!-- 服務員選擇 -->
+      <div class="mb-4">
+        <label class="form-label fw-medium">選擇服務員（可選）</label>
+        <select class="form-select" id="appointmentStaff" style="width: 100%;"></select>
+      </div>
+
+      <div class="text-end">
+        <button class="btn btn-primary btn-lg" id="step1Next" disabled>
+          下一步 <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 步驟 2: 選擇時間 -->
+  <div class="card step-content" id="step2Content" style="display: none;">
+    <div class="card-body">
+      <h5 class="card-title mb-4">
+        <i class="bi bi-2-circle text-primary me-2"></i>選擇時間
+      </h5>
+
+      <div class="row g-4">
+        <!-- 日期選擇 -->
+        <div class="col-md-6">
+          <label class="form-label fw-medium">選擇日期</label>
+          <input type="date" class="form-control form-control-lg" id="appointmentDate">
+        </div>
+
+        <!-- 時間段選擇 -->
+        <div class="col-md-6">
+          <label class="form-label fw-medium">選擇時段</label>
+          <div class="row g-2" id="timeSlotList">
+            <div class="col-12 text-center py-4 text-muted">
+              請先選擇日期
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 時長顯示 -->
+      <div class="mt-4 p-3 bg-light rounded" id="durationInfo" style="display: none;">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>預約時長</span>
+          <span class="fw-medium" id="durationDisplay">-</span>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <span>結束時間</span>
+          <span class="fw-medium" id="endTimeDisplay">-</span>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <button class="btn btn-outline-secondary btn-lg" id="step2Back">
+          <i class="bi bi-arrow-left"></i> 上一步
+        </button>
+        <button class="btn btn-primary btn-lg" id="step2Next" disabled>
+          下一步 <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 步驟 3: 確認資料 -->
+  <div class="card step-content" id="step3Content" style="display: none;">
+    <div class="card-body">
+      <h5 class="card-title mb-4">
+        <i class="bi bi-3-circle text-primary me-2"></i>確認預約資料
+      </h5>
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-3 text-muted">預約資訊</h6>
+              <dl class="mb-0">
+                <dt class="text-muted small">客戶</dt>
+                <dd id="confirmCustomer">-</dd>
+                <dt class="text-muted small">服務</dt>
+                <dd id="confirmService">-</dd>
+                <dt class="text-muted small">服務員</dt>
+                <dd id="confirmStaff">-</dd>
+                <dt class="text-muted small">日期時間</dt>
+                <dd id="confirmDateTime">-</dd>
+                <dt class="text-muted small">時長</dt>
+                <dd id="confirmDuration">-</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <!-- 額外資源 -->
+          <div class="mb-3">
+            <label class="form-label fw-medium">房間（可選）</label>
+            <select class="form-select" id="appointmentRooms" multiple style="width: 100%;"></select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">車輛（可選）</label>
+            <select class="form-select" id="appointmentVehicles" multiple style="width: 100%;"></select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">設備（可選）</label>
+            <select class="form-select" id="appointmentEquipments" multiple style="width: 100%;"></select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">備註</label>
+            <textarea class="form-control" id="appointmentNotes" rows="3" placeholder="輸入備註..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <button class="btn btn-outline-secondary btn-lg" id="step3Back">
+          <i class="bi bi-arrow-left"></i> 上一步
+        </button>
+        <button class="btn btn-success btn-lg" id="confirmAppointment">
+          <i class="bi bi-check-lg me-1"></i>確認預約
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.step-item.active .step-circle,
+.step-item.completed .step-circle {
+  background: var(--bs-primary);
+  color: white;
+}
+.step-item.completed .step-circle {
+  background: var(--bs-success);
+}
+.step-label {
+  font-weight: 500;
+  color: #6c757d;
+  transition: color 0.3s;
+}
+.step-item.active .step-label {
+  color: var(--bs-primary);
+}
+.step-item.completed .step-label {
+  color: var(--bs-success);
+}
+.step-line {
+  width: 60px;
+  height: 2px;
+  background: #e9ecef;
+  margin: 0 1rem;
+}
+.service-card {
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+.service-card:hover {
+  border-color: var(--bs-primary);
+  transform: translateY(-2px);
+}
+.service-card.selected {
+  border-color: var(--bs-primary);
+  background: rgba(var(--bs-primary-rgb), 0.05);
+}
+.time-slot {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+.time-slot:hover {
+  border-color: var(--bs-primary);
+  background: rgba(var(--bs-primary-rgb), 0.05);
+}
+.time-slot.selected {
+  border-color: var(--bs-primary);
+  background: var(--bs-primary);
+  color: white;
+}
+.time-slot.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 768px) {
+  .step-label {
+    display: none;
+  }
+  .step-line {
+    width: 30px;
+  }
+}
+</style>
+
+<script>
+(function() {
+  const FriendlyAppointment = {
+    currentStep: 1,
+    editId: null,
+    selectedService: null,
+    selectedStaff: null,
+    selectedCustomer: null,
+    selectedDate: null,
+    selectedTime: null,
+    services: [],
+    staffs: [],
+
+    async init() {
+      if (!App.checkAuth()) return;
+      
+      const pageEl = document.getElementById('appointmentNewPage');
+      this.editId = pageEl?.dataset?.id || null;
+      
+      // 初始化日期選擇器
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('appointmentDate').value = today;
+      document.getElementById('appointmentDate').min = today;
+      
+      await this.loadData();
+      this.bindEvents();
+      
+      if (this.editId) {
+        await this.loadExisting();
+      }
+    },
+
+    async loadData() {
+      try {
+        // 載入服務
+        const servicesResp = await App.apiRequest('/services?limit=100&status=active');
+        this.services = servicesResp.data || servicesResp || [];
+        this.renderServices();
+        
+        // 初始化 Select2
+        this.initSelect2();
+      } catch (e) {
+        console.error('載入資料失敗:', e);
+        App.showError('載入資料失敗');
+      }
+    },
+
+    initSelect2() {
+      // 客戶選擇
+      $('#appointmentCustomer').select2({
+        theme: 'bootstrap-5',
+        placeholder: '選擇客戶（可不選）',
+        allowClear: true,
+        ajax: {
+          url: App.getApiUrl('/customers'),
+          delay: 300,
+          data: params => ({ search: params.term, limit: 20 }),
+          processResults: data => ({
+            results: (data.data || data || []).map(c => ({
+              id: c.id,
+              text: c.name + (c.phone ? ` (${c.phone})` : '')
+            }))
+          })
+        }
+      });
+
+      // 服務員選擇
+      $('#appointmentStaff').select2({
+        theme: 'bootstrap-5',
+        placeholder: '不指定',
+        allowClear: true,
+        ajax: {
+          url: App.getApiUrl('/service-staffs'),
+          delay: 300,
+          data: params => ({ search: params.term, limit: 20, status: 'active' }),
+          processResults: data => ({
+            results: (data.data || data || []).map(s => ({
+              id: s.id,
+              text: s.name
+            }))
+          })
+        }
+      });
+
+      // 多選：房間、車輛、設備
+      $('#appointmentRooms').select2({
+        theme: 'bootstrap-5',
+        placeholder: '選擇房間',
+        allowClear: true,
+        ajax: {
+          url: App.getApiUrl('/rooms'),
+          delay: 300,
+          data: params => ({ search: params.term, limit: 20 }),
+          processResults: data => ({
+            results: (data.data || data || []).map(r => ({ id: r.id, text: r.name }))
+          })
+        }
+      });
+
+      $('#appointmentVehicles').select2({
+        theme: 'bootstrap-5',
+        placeholder: '選擇車輛',
+        allowClear: true,
+        ajax: {
+          url: App.getApiUrl('/vehicles'),
+          delay: 300,
+          data: params => ({ search: params.term, limit: 20 }),
+          processResults: data => ({
+            results: (data.data || data || []).map(v => ({ id: v.id, text: v.name }))
+          })
+        }
+      });
+
+      $('#appointmentEquipments').select2({
+        theme: 'bootstrap-5',
+        placeholder: '選擇設備',
+        allowClear: true,
+        ajax: {
+          url: App.getApiUrl('/equipments'),
+          delay: 300,
+          data: params => ({ search: params.term, limit: 20 }),
+          processResults: data => ({
+            results: (data.data || data || []).map(e => ({ id: e.id, text: e.name }))
+          })
+        }
+      });
+    },
+
+    renderServices() {
+      const container = document.getElementById('serviceList');
+      if (!this.services.length) {
+        container.innerHTML = `
+          <div class="col-12 text-center py-5">
+            <div class="text-muted mb-3">尚無服務項目</div>
+            <a href="/services/new" class="btn btn-outline-primary">
+              <i class="bi bi-plus-lg me-1"></i>新增服務
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = this.services.map(s => {
+        const duration = s.duration_minutes || 60;
+        const price = s.price || 0;
+        return `
+          <div class="col-md-4 col-sm-6">
+            <div class="card service-card h-100" data-service-id="${s.id}" data-duration="${duration}">
+              <div class="card-body text-center py-3">
+                <i class="bi bi-clipboard-check fs-3 mb-2 text-primary"></i>
+                <div class="fw-medium">${this.escapeHtml(s.name)}</div>
+                <small class="text-muted">$${price.toLocaleString()} / ${duration} 分鐘</small>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 綁定服務卡片點擊
+      container.querySelectorAll('.service-card').forEach(card => {
+        card.addEventListener('click', () => {
+          container.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          this.selectedService = this.services.find(s => s.id === card.dataset.serviceId);
+          document.getElementById('step1Next').disabled = false;
+        });
+      });
+    },
+
+    generateTimeSlots() {
+      const container = document.getElementById('timeSlotList');
+      const selectedDate = document.getElementById('appointmentDate').value;
+      
+      if (!selectedDate) {
+        container.innerHTML = '<div class="col-12 text-center py-4 text-muted">請先選擇日期</div>';
+        return;
+      }
+
+      // 產生時段（每30分鐘一個）
+      const slots = [];
+      for (let h = 8; h <= 21; h++) {
+        for (let m = 0; m < 60; m += 30) {
+          const time = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+          slots.push(time);
+        }
+      }
+
+      container.innerHTML = slots.map(time => `
+        <div class="col-4 col-md-3">
+          <div class="time-slot" data-time="${time}">${time}</div>
+        </div>
+      `).join('');
+
+      // 綁定時段點擊
+      container.querySelectorAll('.time-slot').forEach(slot => {
+        slot.addEventListener('click', () => {
+          if (slot.classList.contains('disabled')) return;
+          container.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+          slot.classList.add('selected');
+          this.selectedTime = slot.dataset.time;
+          this.updateDurationInfo();
+          document.getElementById('step2Next').disabled = false;
+        });
+      });
+    },
+
+    updateDurationInfo() {
+      const infoEl = document.getElementById('durationInfo');
+      const durationEl = document.getElementById('durationDisplay');
+      const endTimeEl = document.getElementById('endTimeDisplay');
+
+      if (!this.selectedService || !this.selectedTime) {
+        infoEl.style.display = 'none';
+        return;
+      }
+
+      const duration = this.selectedService.duration_minutes || 60;
+      durationEl.textContent = `${duration} 分鐘`;
+
+      // 計算結束時間
+      const [hours, minutes] = this.selectedTime.split(':').map(Number);
+      const startMinutes = hours * 60 + minutes;
+      const endMinutes = startMinutes + duration;
+      const endHours = Math.floor(endMinutes / 60);
+      const endMins = endMinutes % 60;
+      endTimeEl.textContent = `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+
+      infoEl.style.display = '';
+    },
+
+    updateConfirmation() {
+      const customerData = $('#appointmentCustomer').select2('data');
+      const staffData = $('#appointmentStaff').select2('data');
+
+      document.getElementById('confirmCustomer').textContent = 
+        customerData && customerData[0] && customerData[0].id ? customerData[0].text : '（無）';
+      document.getElementById('confirmService').textContent = 
+        this.selectedService ? this.selectedService.name : '-';
+      document.getElementById('confirmStaff').textContent = 
+        staffData && staffData[0] && staffData[0].id ? staffData[0].text : '不指定';
+
+      const dateStr = document.getElementById('appointmentDate').value;
+      document.getElementById('confirmDateTime').textContent = 
+        dateStr && this.selectedTime ? `${dateStr} ${this.selectedTime}` : '-';
+      
+      const duration = this.selectedService?.duration_minutes || 60;
+      document.getElementById('confirmDuration').textContent = `${duration} 分鐘`;
+    },
+
+    goToStep(step) {
+      this.currentStep = step;
+      
+      // 更新步驟指示器
+      document.querySelectorAll('.step-item').forEach(item => {
+        const s = parseInt(item.dataset.step);
+        item.classList.remove('active', 'completed');
+        if (s < step) item.classList.add('completed');
+        if (s === step) item.classList.add('active');
+      });
+
+      // 顯示對應內容
+      document.querySelectorAll('.step-content').forEach(c => c.style.display = 'none');
+      document.getElementById(`step${step}Content`).style.display = '';
+
+      // 步驟特定邏輯
+      if (step === 2) {
+        this.generateTimeSlots();
+      } else if (step === 3) {
+        this.updateConfirmation();
+      }
+    },
+
+    bindEvents() {
+      const self = this;
+
+      // 步驟 1 下一步
+      document.getElementById('step1Next').addEventListener('click', () => {
+        if (!this.selectedService) {
+          App.showError('請選擇服務');
+          return;
+        }
+        this.goToStep(2);
+      });
+
+      // 步驟 2 上一步/下一步
+      document.getElementById('step2Back').addEventListener('click', () => this.goToStep(1));
+      document.getElementById('step2Next').addEventListener('click', () => {
+        if (!this.selectedTime) {
+          App.showError('請選擇時段');
+          return;
+        }
+        this.goToStep(3);
+      });
+
+      // 步驟 3 上一步
+      document.getElementById('step3Back').addEventListener('click', () => this.goToStep(2));
+
+      // 日期變更
+      document.getElementById('appointmentDate').addEventListener('change', () => {
+        this.selectedTime = null;
+        document.getElementById('step2Next').disabled = true;
+        this.generateTimeSlots();
+      });
+
+      // 確認預約
+      document.getElementById('confirmAppointment').addEventListener('click', () => this.submit());
+    },
+
+    async submit() {
+      const btn = document.getElementById('confirmAppointment');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>處理中...';
+
+      try {
+        const dateStr = document.getElementById('appointmentDate').value;
+        const [hours, minutes] = this.selectedTime.split(':').map(Number);
+        const duration = this.selectedService?.duration_minutes || 60;
+
+        // 組合開始時間
+        const startTime = new Date(`${dateStr}T${this.selectedTime}:00`);
+        // 組合結束時間
+        const endTime = new Date(startTime.getTime() + duration * 60000);
+
+        const customerVal = $('#appointmentCustomer').val();
+        const staffVal = $('#appointmentStaff').val();
+        const roomIds = $('#appointmentRooms').val() || [];
+        const vehicleIds = $('#appointmentVehicles').val() || [];
+        const equipmentIds = $('#appointmentEquipments').val() || [];
+
+        const payload = {
+          service_id: this.selectedService.id,
+          start_time: startTime.toISOString(),
+          end_time: endTime.toISOString(),
+          status: 'confirmed',
+          notes: document.getElementById('appointmentNotes').value || ''
+        };
+
+        if (customerVal) payload.customer_id = customerVal;
+        if (staffVal) payload.staff_id = staffVal;
+        if (roomIds.length) payload.room_ids = roomIds;
+        if (vehicleIds.length) payload.vehicle_ids = vehicleIds;
+        if (equipmentIds.length) payload.equipment_ids = equipmentIds;
+
+        const url = this.editId ? `/appointments/${this.editId}` : '/appointments';
+        const method = this.editId ? 'PUT' : 'POST';
+
+        await App.apiRequest(url, {
+          method,
+          body: JSON.stringify(payload)
+        });
+
+        App.showSuccess(this.editId ? '預約已更新' : '預約已建立');
+        setTimeout(() => {
+          if (typeof Router !== 'undefined' && Router.go) { Router.go('/appointments'); } else { window.location.href = '/appointments'; }
+        }, 1000);
+      } catch (e) {
+        console.error('提交預約失敗:', e);
+        App.showError(e?.message || '提交預約失敗');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>確認預約';
+      }
+    },
+
+    async loadExisting() {
+      try {
+        const data = await App.apiRequest(`/appointments/${this.editId}`);
+        // 預設選擇服務
+        if (data.service_id) {
+          const card = document.querySelector(`.service-card[data-service-id="${data.service_id}"]`);
+          if (card) {
+            card.click();
+          }
+        }
+        // 預設客戶
+        if (data.customer) {
+          const option = new Option(data.customer.name, data.customer_id, true, true);
+          $('#appointmentCustomer').append(option).trigger('change');
+        }
+        // 預設服務員
+        if (data.staff) {
+          const option = new Option(data.staff.name, data.staff.id, true, true);
+          $('#appointmentStaff').append(option).trigger('change');
+        }
+        // 預設日期時間
+        if (data.start_time) {
+          const dt = new Date(data.start_time);
+          document.getElementById('appointmentDate').value = dt.toISOString().split('T')[0];
+          this.generateTimeSlots();
+          const timeStr = dt.toTimeString().substring(0, 5);
+          const slot = document.querySelector(`.time-slot[data-time="${timeStr}"]`);
+          if (slot) {
+            slot.click();
+          }
+        }
+        // 備註
+        if (data.notes) {
+          document.getElementById('appointmentNotes').value = data.notes;
+        }
+      } catch (e) {
+        console.error('載入預約失敗:', e);
+      }
+    },
+
+    escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+  };
+
+  function waitForAppAndInit() {
+    if (window.App && typeof window.App.apiRequest === 'function' && typeof $ !== 'undefined' && $.fn.select2) {
+      FriendlyAppointment.init();
+      return;
+    }
+    setTimeout(waitForAppAndInit, 50);
+  }
+
+  document.addEventListener('DOMContentLoaded', waitForAppAndInit);
+})();
+</script>
+{{end}}

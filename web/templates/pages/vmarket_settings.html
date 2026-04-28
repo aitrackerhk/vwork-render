@@ -1,0 +1,416 @@
+{{define "pages/vmarket_settings"}}
+<link rel="stylesheet" href="/static/css/vmarket.css">
+<div class="container py-4">
+  <!-- Hero Section -->
+  <div class="vmarket-settings-hero mb-4">
+    <div class="row align-items-center">
+      <div class="col-lg-7">
+        <div class="vmarket-settings-hero-content">
+          <span class="vmarket-settings-badge mb-3">
+            <img src="/static/vmarketlogo.png" alt="VMarket" style="height: 24px;">
+          </span>
+          <h1 class="vmarket-settings-title mb-3" data-i18n="pages.vmarketSettings.heroTitle">讓全球看見您的業務</h1>
+          <p class="vmarket-settings-desc mb-0" data-i18n="pages.vmarketSettings.heroDesc">
+            VMarket 是 V-sys 的企業展示平台，讓您的公司、產品與服務在全球市場上獲得曝光，
+            輕鬆觸及更多潛在客戶。
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="vmarket-settings-hero-visual">
+          <div class="vmarket-visual-globe">
+            <i class="bi bi-globe2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Benefits Section -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="vmarket-benefit-card">
+        <div class="vmarket-benefit-icon">
+          <i class="bi bi-eye"></i>
+        </div>
+        <h5 class="vmarket-benefit-title" data-i18n="pages.vmarketSettings.benefit1Title">全球曝光</h5>
+        <p class="vmarket-benefit-desc mb-0" data-i18n="pages.vmarketSettings.benefit1Desc">在 VMarket 上展示您的企業形象，讓世界各地的潛在客戶發現您。</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="vmarket-benefit-card">
+        <div class="vmarket-benefit-icon vmarket-benefit-icon-purple">
+          <i class="bi bi-box-seam"></i>
+        </div>
+        <h5 class="vmarket-benefit-title" data-i18n="pages.vmarketSettings.benefit2Title">產品展示</h5>
+        <p class="vmarket-benefit-desc mb-0" data-i18n="pages.vmarketSettings.benefit2Desc">將您的產品目錄同步到 VMarket，讓買家輕鬆瀏覽與查詢。</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="vmarket-benefit-card">
+        <div class="vmarket-benefit-icon vmarket-benefit-icon-green">
+          <i class="bi bi-people"></i>
+        </div>
+        <h5 class="vmarket-benefit-title" data-i18n="pages.vmarketSettings.benefit3Title">拓展人脈</h5>
+        <p class="vmarket-benefit-desc mb-0" data-i18n="pages.vmarketSettings.benefit3Desc">與其他企業建立聯繫，開拓商業合作的無限可能。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Card -->
+  <div class="vmarket-settings-card">
+    <div class="vmarket-settings-card-header">
+      <div class="vmarket-settings-card-icon">
+        <i class="bi bi-gear"></i>
+      </div>
+      <div>
+        <h5 class="mb-1" data-i18n="pages.vmarketSettings.title">VMarket 設定</h5>
+        <p class="text-muted mb-0 small" data-i18n="pages.vmarketSettings.cardSubtitle">管理您的 VMarket 曝光設定</p>
+      </div>
+    </div>
+    <div class="vmarket-settings-card-body">
+      <div class="vmarket-toggle-row">
+        <div class="vmarket-toggle-info">
+          <div class="vmarket-toggle-label">
+            <i class="bi bi-broadcast me-2"></i><span data-i18n="pages.vmarketSettings.toggleLabel">加入 VMarket</span>
+          </div>
+          <div class="vmarket-toggle-hint" data-i18n="pages.vmarketSettings.joinHint">開啟後，您的公司將顯示在 VMarket 公開頁面，供全球用戶瀏覽。</div>
+        </div>
+        <div class="form-check form-switch vmarket-toggle-switch">
+          <input class="form-check-input" type="checkbox" id="vmarketJoinedToggle">
+        </div>
+      </div>
+      <div class="vmarket-settings-actions">
+        <button class="btn btn-primary btn-lg vmarket-save-btn" id="vmarketSaveBtn">
+          <i class="bi bi-check-lg me-2"></i><span data-i18n="pages.vmarketSettings.saveBtn">保存設定</span>
+        </button>
+        <a href="{{.BasePath}}/" target="_blank" class="btn btn-outline-secondary btn-lg">
+          <i class="bi bi-box-arrow-up-right me-2"></i><span data-i18n="pages.vmarketSettings.previewBtn">預覽 VMarket</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Footer -->
+  <div class="vmarket-settings-footer mt-4">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <div class="vmarket-info-icon">
+          <i class="bi bi-info-circle"></i>
+        </div>
+      </div>
+      <div class="col">
+        <p class="mb-0 text-muted small" data-i18n="pages.vmarketSettings.infoFooter">
+          加入 VMarket 完全免費。您可以隨時關閉曝光，資料僅顯示您已設定為公開的內容。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* VMarket Settings Page Styles */
+.vmarket-settings-hero {
+  padding: 1rem 0 0.5rem 0;
+  position: relative;
+}
+
+.vmarket-settings-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.vmarket-settings-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.25rem;
+  background: #fff;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.vmarket-settings-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.vmarket-settings-desc {
+  font-size: 1.125rem;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.vmarket-settings-hero-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.vmarket-visual-globe {
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: floatGlobe 4s ease-in-out infinite;
+  border: 2px solid rgba(99, 102, 241, 0.15);
+}
+
+.vmarket-visual-globe i {
+  font-size: 5rem;
+  color: #6366f1;
+}
+
+@keyframes floatGlobe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Benefit Cards */
+.vmarket-benefit-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.75rem;
+  height: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  transition: all 0.3s ease;
+}
+
+.vmarket-benefit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+.vmarket-benefit-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.vmarket-benefit-icon i {
+  font-size: 1.5rem;
+  color: #fff;
+}
+
+.vmarket-benefit-icon-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+.vmarket-benefit-icon-green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.vmarket-benefit-title {
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.vmarket-benefit-desc {
+  font-size: 0.925rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Settings Card */
+.vmarket-settings-card {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.vmarket-settings-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: #f8fafc;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.vmarket-settings-card-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vmarket-settings-card-icon i {
+  font-size: 1.25rem;
+  color: #fff;
+}
+
+.vmarket-settings-card-body {
+  padding: 2rem;
+}
+
+.vmarket-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: #f8fafc;
+  border-radius: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.vmarket-toggle-info {
+  flex: 1;
+}
+
+.vmarket-toggle-label {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.vmarket-toggle-hint {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.vmarket-toggle-switch .form-check-input {
+  width: 3.5rem;
+  height: 1.75rem;
+  cursor: pointer;
+}
+
+.vmarket-toggle-switch .form-check-input:checked {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+
+.vmarket-settings-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.vmarket-save-btn {
+  padding: 0.75rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.vmarket-settings-actions .btn-outline-secondary {
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+}
+
+/* Footer */
+.vmarket-settings-footer {
+  padding: 1rem 1.5rem;
+  background: #f1f5f9;
+  border-radius: 14px;
+}
+
+.vmarket-info-icon {
+  width: 36px;
+  height: 36px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vmarket-info-icon i {
+  font-size: 1rem;
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vmarket-settings-hero {
+    padding: 1rem 0 0.5rem 0;
+  }
+  
+  .vmarket-settings-title {
+    font-size: 1.75rem;
+  }
+  
+  .vmarket-settings-desc {
+    font-size: 1rem;
+  }
+  
+  .vmarket-toggle-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .vmarket-settings-actions {
+    flex-direction: column;
+  }
+  
+  .vmarket-settings-actions .btn {
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+  async function loadVMarketSettings() {
+    try {
+      const resp = await App.apiRequest('/api/v1/tenant/vmarket-settings');
+      const joined = !!(resp && resp.data && resp.data.vmarket_joined);
+      const toggle = document.getElementById('vmarketJoinedToggle');
+      if (toggle) {
+        toggle.checked = joined;
+      }
+    } catch (error) {
+      console.error('載入 VMarket 設定失敗:', error);
+    }
+  }
+
+  async function saveVMarketSettings() {
+    const toggle = document.getElementById('vmarketJoinedToggle');
+    const btn = document.getElementById('vmarketSaveBtn');
+    if (!toggle || !btn) return;
+    const joined = !!toggle.checked;
+
+    try {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-arrow-repeat me-2 spin"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.vmarketSettings.saving') : '保存中...');
+      await App.apiRequest('/api/v1/tenant/vmarket-settings', {
+        method: 'PUT',
+        body: JSON.stringify({ vmarket_joined: joined })
+      });
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.vmarketSettings.saveSuccess') : '已保存 VMarket 設定', 'success');
+    } catch (error) {
+      console.error('保存 VMarket 設定失敗:', error);
+      showAlert((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.vmarketSettings.saveFailed') : '保存失敗', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi bi-check-lg me-2"></i>' + ((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.vmarketSettings.saveBtn') : '保存設定');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadVMarketSettings();
+    const btn = document.getElementById('vmarketSaveBtn');
+    if (btn) {
+      btn.addEventListener('click', saveVMarketSettings);
+    }
+  });
+</script>
+{{end}}

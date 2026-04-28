@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="contact.title">聯絡客服 - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vsys.css">
+    <!-- i18n 防闪烁样式 -->
+    <style>
+        /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+    </style>
+    <!-- i18n 初始化脚本 - 在页面渲染前执行，避免闪烁 -->
+    <script>
+        (function() {
+            // 立即读取语言设置（不等待 DOMContentLoaded）
+            const savedLang = localStorage.getItem('u-nai_lang');
+            // CMS 另一套語言設定（歷史原因）：部分頁面/舊邏輯使用 localStorage.language
+            // 這會造成「頁面多數是中文，但 data-i18n 的區塊被翻成英文」的混搭。
+            // 在 CMS layout 內做一次同步：以 CMS 語言為準，避免困惑。
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            
+            let currentLang = 'zh'; // 默认中文
+            
+            // 若 cmsLang 存在且是支援語系，優先使用並同步到 u-nai_lang
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) {
+                    localStorage.setItem('u-nai_lang', currentLang);
+                }
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                // 检测浏览器语言
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+                    currentLang = 'zh-CN';
+                } else if (browserLang.startsWith('zh')) {
+                    currentLang = 'zh';
+                } else {
+                    currentLang = 'en';
+                }
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            
+            // 将语言设置存储到全局变量，供 i18n.js 使用
+            window.__INITIAL_LANG__ = currentLang;
+            
+            // 无论什么语言，都在 body 渲染后立即添加 i18n-loading 类来隐藏内容
+            // 这样可以防止在翻译应用前显示原始内容（避免繁简切换时的闪烁）
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    
+                    // 添加超时保护：如果 5 秒后 i18n-loading 类还在，自动移除
+                    // 这样可以防止 i18n.js 加载失败时页面内容永远被隐藏
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            console.warn('i18n-loading class still present after 5 seconds, removing it to prevent blank page');
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    // 如果 body 还没渲染，使用 requestAnimationFrame 快速检查
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body class="contact-page">
+    <!-- 導航欄 (vsys style) -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar" >
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
+                <img src="/static/vlogo.png" alt="V-sys" style="height: auto; max-height: 15px; display: block;">
+            </a>
+            <!-- Mobile: App Switcher, Menu Toggle -->
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcherContact">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                <span class="app-switcher-label">vAI</span>
+                            </a>
+                            <a href="/" class="app-switcher-item" data-app="vwork">
+                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                <span class="app-switcher-label">vWork</span>
+                            </a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                <span class="app-switcher-label">vMarket</span>
+                            </a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                <span class="app-switcher-label">vOffice</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="contactMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                        <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                    </button>
+                </li>
+            </ul>
+            <!-- Desktop Menu -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Menu links on the left -->
+                <ul class="navbar-nav me-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/#about" id="navAboutLink" data-i18n="nav.about">關於</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a>
+                    </li>
+                </ul>
+                <!-- Right side: theborderbox -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                                </a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                            <span class="app-switcher-label">vAI</span>
+                                        </a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork">
+                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                            <span class="app-switcher-label">vWork</span>
+                                        </a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                            <span class="app-switcher-label">vMarket</span>
+                                        </a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                            <span class="app-switcher-label">vOffice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                </ul>
+                            </div>
+                            <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+                            </a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                                    <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li id="publicAICoinsDisplay" style="display: none;">
+                                        <a class="dropdown-item" href="/vcoins">
+                                            <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                                            <span class="fw-bold" id="publicAICoinsBalance">0</span>
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" id="publicAICoinsDivider" style="display: none;"></li>
+                                    <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                    <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="contactSidebarOverlay"></div>
+    
+    <!-- Contact Sidebar Menu for mobile (vsys style) -->
+    <div class="sidebar" id="contactSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/" id="sidebarHomeLink">
+                        <i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/#about" id="sidebarAboutLink">
+                        <i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">
+                        <i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-group" style="border-top: 1px solid #dee2e6; margin-top: 0.5rem; padding-top: 0.5rem;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#contactLanguageSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="contactLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="en">English</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item nav-group" id="contactUserDropdownItem" style="display: none;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#contactUserSubmenu" aria-expanded="false">
+                        <img id="contactUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                        <i class="bi bi-person-circle" id="contactUserIcon"></i> <span id="contactUserName" data-i18n="nav.user">用戶</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="contactUserSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/personal-data">
+                                    <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/billing">
+                                    <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="contactLogoutBtn">
+                                    <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item" id="contactLoginItem">
+                    <a class="nav-link" href="/login">
+                        <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">登錄</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 主要內容 -->
+    <div class="container" style="min-height: calc(100vh - 200px); padding-top: calc(var(--topnav-height, 56px) + 32px);">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="text-center mb-4">
+                    <h1 class="display-5 fw-bold mb-2" data-i18n="contact.title">聯絡客服</h1>
+                    <p class="lead text-muted mb-0" data-i18n="contact.subtitle">我們很樂意為您提供幫助</p>
+                </div>
+                
+                <div class="card contact-form-card shadow-lg border-0 p-4" style="border-radius: 1rem; overflow: hidden;">
+                    <div class="card-body">
+                        <div id="alertContainer"></div>
+                        <form id="contactForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="name" class="form-label fw-semibold"><span data-i18n="contact.name">姓名</span> <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-lg" id="name" name="name" required maxlength="50" placeholder="" style="border-radius: 0.5rem;">
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <label for="email" class="form-label fw-semibold"><span data-i18n="contact.email">電子郵件</span> <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control form-control-lg" id="email" name="email" required placeholder="" style="border-radius: 0.5rem;">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="phone" class="form-label fw-semibold"><span data-i18n="contact.phone">電話號碼</span></label>
+                                <input type="tel" class="form-control form-control-lg" id="phone" name="phone" maxlength="20" placeholder="" style="border-radius: 0.5rem;">
+                            </div>
+                            <div class="mb-4">
+                                <label for="product" class="form-label fw-semibold"><span data-i18n="contact.product">相關產品</span></label>
+                                <select class="form-select form-select-lg" id="product" name="product" style="border-radius: 0.5rem;">
+                                    <option value="" data-i18n="contact.productPlaceholder">請選擇產品</option>
+                                    <option value="vwork" data-i18n="contact.productOptions.vwork">vWork</option>
+                                    <option value="vai" data-i18n="contact.productOptions.vai">vAI</option>
+                                    <option value="vmarket" data-i18n="contact.productOptions.vmarket">vMarket</option>
+                                    <option value="voffice" data-i18n="contact.productOptions.voffice">vOffice</option>
+                                    <option value="other" data-i18n="contact.productOptions.other">其他</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label for="subject" class="form-label fw-semibold"><span data-i18n="contact.subject">主題</span> <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control form-control-lg" id="subject" name="subject" required maxlength="100" placeholder="" style="border-radius: 0.5rem;">
+                            </div>
+                            <div class="mb-4">
+                                <label for="message" class="form-label fw-semibold"><span data-i18n="contact.message">訊息內容</span> <span class="text-danger">*</span></label>
+                                <textarea class="form-control form-control-lg" id="message" name="message" rows="6" required maxlength="2000" placeholder="" style="border-radius: 0.5rem; resize: vertical;"></textarea>
+                                <small class="text-muted" data-i18n="contact.maxChars">最多 2000 個字符</small>
+                            </div>
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg px-5 py-3" style="border-radius: 0.5rem; font-weight: 600;" data-i18n="contact.send">
+                                    <i class="bi bi-send me-2"></i><span data-i18n="contact.send">發送訊息</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mt-4 shadow-sm border-0" style="border-radius: 1rem;">
+                    <div class="card-body p-4">
+                        <h5 class="mb-4 fw-bold"><i class="bi bi-info-circle me-2 text-primary"></i><span data-i18n="contact.otherWays">其他聯絡方式</span></h5>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; min-width: 60px;">
+                                        <i class="bi bi-envelope fs-4 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted" data-i18n="contact.emailLabel">電子郵件</div>
+                                        <a href="mailto:info@vsysai.com" class="text-decoration-none fw-semibold">info@vsysai.com</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; min-width: 60px;">
+                                        <i class="bi bi-geo-alt fs-4 text-success"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted" data-i18n="contact.locationLabel">地址</div>
+                                        <span class="fw-semibold" data-i18n="contact.location">香港</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; min-width: 60px;">
+                                        <i class="bi bi-clock fs-4 text-info"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted" data-i18n="contact.hoursLabel">營業時間</div>
+                                        <span class="fw-semibold" data-i18n="contact.hours">週一至週五 9:00 - 18:00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer-light">
+        <div class="container-fluid px-4">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="vWork Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                    <div class="mt-3">
+                        <a href="#" id="vworkFooterWebsiteLink" class="me-3" aria-label="Website"><i class="bi bi-globe"></i></a>
+                        <a href="mailto:info@vsysai.com" class="me-3" aria-label="Email"><i class="bi bi-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" id="footerHomeLink" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/#about" id="footerAboutLink" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contact">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.email">info@vsysai.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span data-i18n="footer.location">香港</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span data-i18n="footer.workingHours">週一至週五 9:00 - 18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 將 footer 移到 main-content 外面
+            const footer = document.querySelector('.site-footer-light');
+            const mainContent = document.querySelector('.main-content');
+            if (footer && mainContent && footer.parentElement === mainContent) {
+                mainContent.parentElement.insertBefore(footer, mainContent.nextSibling);
+            }
+            
+            // 初始化 i18n
+            if (typeof I18n !== 'undefined') {
+                I18n.init();
+            }
+
+            // Auto-select product from ?product= query parameter
+            (function() {
+                const params = new URLSearchParams(window.location.search);
+                const product = (params.get('product') || '').toLowerCase().trim();
+                const productSelect = document.getElementById('product');
+                if (productSelect && product) {
+                    // Map common aliases
+                    const map = { 'vwork': 'vwork', 'vai': 'vai', 'vai': 'vai', 'vmarket': 'vmarket', 'voffice': 'voffice' };
+                    const val = map[product] || product;
+                    // Check if option exists
+                    for (let i = 0; i < productSelect.options.length; i++) {
+                        if (productSelect.options[i].value === val) {
+                            productSelect.value = val;
+                            break;
+                        }
+                    }
+                }
+            })();
+
+            // Nav, footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+            
+            // Contact sidebar toggle for mobile
+            const contactMobileMenuToggle = document.getElementById('contactMobileMenuToggle');
+            const contactSidebar = document.getElementById('contactSidebar');
+            const contactSidebarOverlay = document.getElementById('contactSidebarOverlay');
+            
+            function toggleContactSidebar() {
+                if (contactSidebar) {
+                    contactSidebar.classList.toggle('show');
+                }
+                if (contactSidebarOverlay) {
+                    contactSidebarOverlay.classList.toggle('show');
+                }
+            }
+            
+            if (contactMobileMenuToggle) {
+                contactMobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleContactSidebar();
+                });
+            }
+            
+            if (contactSidebarOverlay) {
+                contactSidebarOverlay.addEventListener('click', function() {
+                    if (contactSidebar) {
+                        contactSidebar.classList.remove('show');
+                    }
+                    contactSidebarOverlay.classList.remove('show');
+                });
+            }
+            
+            // Close sidebar function
+            function closeContactSidebar() {
+                if (contactSidebar) {
+                    contactSidebar.classList.remove('show');
+                }
+                if (contactSidebarOverlay) {
+                    contactSidebarOverlay.classList.remove('show');
+                }
+            }
+            
+            // Close sidebar when clicking on any nav-link (except collapse toggles)
+            const contactNavLinks = document.querySelectorAll('#contactSidebar .nav-link:not(.nav-group-toggle)');
+            contactNavLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Only close if it's not a language link (language links handle closing themselves)
+                    if (!this.hasAttribute('data-lang')) {
+                        closeContactSidebar();
+                    }
+                });
+            });
+            
+            // Contact language dropdown in sidebar
+            const contactLangLinks = document.querySelectorAll('#contactLanguageSubmenu .nav-link[data-lang]');
+            contactLangLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                    // Close sidebar after language change
+                    closeContactSidebar();
+                });
+            });
+            
+            // Contact logout button in sidebar
+            const contactLogoutBtn = document.getElementById('contactLogoutBtn');
+            if (contactLogoutBtn) {
+                contactLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof App !== 'undefined' && App.logout) {
+                        App.logout();
+                    } else {
+                        fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                          .finally(function() {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('tenant_subdomain');
+                            window.location.replace(window.location.pathname + '?logged_out=1');
+                          });
+                    }
+                });
+            }
+            
+            // Desktop language dropdown
+            document.querySelectorAll('[data-lang]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                });
+            });
+            
+            // 從 localStorage 預填充用戶名（避免等待 API 返回時顯示「用戶」）
+            function prefillUserFromCache() {
+                try {
+                    const cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        const user = JSON.parse(cachedUser);
+                        if (user && user.name) {
+                            const userNameSpan = document.getElementById('userName');
+                            const contactUserName = document.getElementById('contactUserName');
+                            if (userNameSpan) {
+                                userNameSpan.textContent = user.name;
+                                // 移除 data-i18n 屬性，防止 i18n 初始化時覆蓋用戶名
+                                userNameSpan.removeAttribute('data-i18n');
+                            }
+                            if (contactUserName) {
+                                contactUserName.textContent = user.name;
+                                contactUserName.removeAttribute('data-i18n');
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // 忽略 localStorage 讀取錯誤，API 會刷新
+                }
+            }
+            
+            // 立即從緩存預填充
+            prefillUserFromCache();
+            
+            // 處理瀏覽器上一頁/下一頁 (bfcache) - re-verify auth state
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    checkAuthAndUpdateNav();
+                }
+            });
+            
+            // 檢查登錄狀態並更新導航欄
+            checkAuthAndUpdateNav();
+            
+            const form = document.getElementById('contactForm');
+            const alertContainer = document.getElementById('alertContainer');
+            
+            function showAlert(message, type) {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            }
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    name: document.getElementById('name').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    product: document.getElementById('product').value,
+                    subject: document.getElementById('subject').value.trim(),
+                    message: document.getElementById('message').value.trim()
+                };
+                
+                if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+                    showAlert(I18n.t('contact.fillAll'), 'warning');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/v1/contact', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showAlert(I18n.t('contact.success'), 'success');
+                        form.reset();
+                    } else {
+                        showAlert(I18n.t('contact.error') + '：' + (data.error || '未知錯誤'), 'danger');
+                    }
+                } catch (error) {
+                    showAlert(I18n.t('contact.error') + '：' + error.message, 'danger');
+                }
+            });
+        });
+        
+        // 載入公開頁面的 vCoin 餘額
+        async function loadPublicAICoinsBalance() {
+            try {
+                const headers = { 'Accept': 'application/json' };
+                const token = localStorage.getItem('auth_token');
+                if (!token || token === 'temp_token') return;
+                headers['Authorization'] = `Bearer ${token}`;
+                const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+                
+                const resp = await fetch('/api/v1/ai-coins/balance', { headers });
+                if (!resp.ok) return;
+                const data = await resp.json();
+                
+                const balance = data.balance || 0;
+                
+                const aiCoinsDisplay = document.getElementById('publicAICoinsDisplay');
+                const aiCoinsBalance = document.getElementById('publicAICoinsBalance');
+                const aiCoinsDivider = document.getElementById('publicAICoinsDivider');
+                
+                if (aiCoinsDisplay && aiCoinsBalance) {
+                    // 只顯示真正的 coin 餘額（不含每日免費次數，因為那是次數不是 coin）
+                    aiCoinsBalance.textContent = balance;
+                    aiCoinsDisplay.style.display = 'block';
+                    if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('載入 vCoin 餘額失敗:', e);
+            }
+        }
+        
+        // 檢查登錄狀態並更新導航欄
+        async function checkAuthAndUpdateNav() {
+            const userDropdownNav = document.getElementById('userDropdown');
+            const userNameSpan = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const loginLink = document.getElementById('loginLink');
+            const contactUserDropdownItem = document.getElementById('contactUserDropdownItem');
+            const contactLoginItem = document.getElementById('contactLoginItem');
+
+            async function fetchCurrentUserSilently() {
+                try {
+                    const headers = { 'Accept': 'application/json' };
+                    const token = localStorage.getItem('auth_token');
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+                    const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                    if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+
+                    const resp = await fetch('/api/v1/user/me', { headers });
+                    if (!resp.ok) return null;
+                    const user = await resp.json();
+
+                    // best-effort：同步保存到 localStorage，方便其他頁面使用（不影響 cookie 登入）
+                    try {
+                        if (user) localStorage.setItem('user', JSON.stringify(user));
+                        if (user && user.tenant && user.tenant.subdomain) {
+                            localStorage.setItem('tenant_subdomain', String(user.tenant.subdomain));
+                        }
+                    } catch (_e) { /* ignore */ }
+                    return user;
+                } catch (_e) {
+                    return null;
+                }
+            }
+
+            const user = await fetchCurrentUserSilently();
+            // If API rejected our token, clear stale localStorage
+            if (!user) {
+                const hadToken = localStorage.getItem('auth_token');
+                if (hadToken) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tenant_subdomain');
+                }
+            }
+            const isLoggedIn = !!(user && user.name);
+
+            if (isLoggedIn) {
+                // 已登錄，顯示用戶下拉菜單
+                if (userDropdownNav) {
+                    userDropdownNav.style.display = '';
+                }
+                if (contactUserDropdownItem) {
+                    contactUserDropdownItem.style.display = 'block';
+                }
+                if (contactLoginItem) {
+                    contactLoginItem.style.display = 'none';
+                }
+                if (loginLink) {
+                    loginLink.style.display = 'none';
+                }
+                
+                // 載入 vCoin 餘額
+                loadPublicAICoinsBalance();
+
+                // 更新用戶名稱
+                if (userNameSpan && user && user.name) {
+                    userNameSpan.textContent = user.name;
+                }
+
+                // Contact sidebar user name
+                const contactUserName = document.getElementById('contactUserName');
+                if (contactUserName && user && user.name) {
+                    contactUserName.textContent = user.name;
+                }
+
+                // 顯示用戶頭像（profile_pic），沒有則顯示 icon - Desktop
+                const avatarImg = document.getElementById('publicUserAvatar');
+                const avatarIcon = document.getElementById('publicUserIcon');
+                if (avatarImg) {
+                    let url = (user && user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                        url = '/' + url;
+                    }
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            this.setAttribute('data-error-handled', 'true');
+                            if (avatarIcon) avatarIcon.style.display = '';
+                            this.onerror = null; // 防止重複觸發
+                        };
+                    } else {
+                        avatarImg.style.display = 'none';
+                        if (avatarIcon) avatarIcon.style.display = '';
+                    }
+                }
+
+                // 顯示用戶頭像（profile_pic），沒有則顯示 icon - Contact Sidebar
+                const contactAvatarImg = document.getElementById('contactUserAvatar');
+                const contactAvatarIcon = document.getElementById('contactUserIcon');
+                if (contactAvatarImg) {
+                    let url = (user && user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                        url = '/' + url;
+                    }
+                    if (url) {
+                        contactAvatarImg.src = url;
+                        contactAvatarImg.style.display = 'inline-block';
+                        if (contactAvatarIcon) contactAvatarIcon.style.display = 'none';
+                        contactAvatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            this.setAttribute('data-error-handled', 'true');
+                            if (contactAvatarIcon) contactAvatarIcon.style.display = '';
+                            this.onerror = null; // 防止重複觸發
+                        };
+                    } else {
+                        contactAvatarImg.style.display = 'none';
+                        if (contactAvatarIcon) contactAvatarIcon.style.display = '';
+                    }
+                }
+                
+                // 綁定登出按鈕
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                              .finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace(window.location.pathname + '?logged_out=1');
+                              });
+                        }
+                    });
+                }
+            } else {
+                // 未登錄
+                if (userDropdownNav) {
+                    userDropdownNav.style.display = 'none';
+                }
+                if (contactUserDropdownItem) {
+                    contactUserDropdownItem.style.display = 'none';
+                }
+                if (contactLoginItem) {
+                    contactLoginItem.style.display = 'block';
+                }
+                if (loginLink) {
+                    loginLink.style.display = '';
+                }
+            }
+        }
+        
+        // 監聽 storage 變化 (cross-tab logout detection)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'auth_token' && !e.newValue) {
+                // auth_token was removed — also clear HTTPOnly cookie then update nav
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === null) {
+                // localStorage.clear() was called
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === 'auth_token') {
+                checkAuthAndUpdateNav();
+            }
+        });
+    </script>
+    <!-- Navbar scroll shadow effect -->
+    <script>
+        (function() {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            
+            function handleScroll() {
+                if (window.scrollY > 60) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+            
+            // Initial check
+            handleScroll();
+            
+            // Listen to scroll events
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
+    </script>
+</body>
+</html>
+

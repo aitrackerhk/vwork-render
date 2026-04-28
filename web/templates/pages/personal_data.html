@@ -1,0 +1,700 @@
+{{ define "pages/personal_data" }}
+    <!-- Cropper.js 已由 cms_layout.html 載入（本地化） -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 data-i18n="pages.personalData.title">帳戶設置</h2>
+    </div>
+
+    <script>
+        if (document.body) {
+            document.body.setAttribute('data-disable-form-button-bar', 'true');
+        }
+    </script>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-person-circle"></i> <span data-i18n="pages.personalData.basicInfo">基本資料</span></h5>
+                </div>
+                <div class="card-body">
+                    <div id="alertContainer"></div>
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.avatar">頭像</label>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div class="profile-pic-preview" style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 2px solid #dee2e6; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                    <img id="profilePicPreview" src="" alt="頭像預覽" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                    <i class="bi bi-person fs-1 text-muted" id="profilePicPlaceholder"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <input type="file" class="form-control" id="profilePicInput" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="uploadProfilePicBtn">
+                                        <i class="bi bi-upload"></i> <span data-i18n="pages.personalData.uploadAvatar">上傳頭像</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="removeProfilePicBtn" style="display: none;">
+                                        <i class="bi bi-trash"></i> <span data-i18n="pages.personalData.removeAvatar">移除頭像</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="text-muted" data-i18n="pages.personalData.avatarHint">支持 JPG、PNG、GIF 格式，建議尺寸 200x200 像素</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.name">姓名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" required maxlength="50">
+                            <small class="text-muted" data-i18n="pages.personalData.maxLength50">最多 50 個字符</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.email">電子郵件 <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="fields.birthDate">出生日期</label>
+                            <input type="date" class="form-control" id="birthDate">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="fields.phoneCountryCode">電話區號</label>
+                            <select class="form-select" id="phoneCountryCode"></select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="fields.phone">電話</label>
+                            <input type="text" class="form-control" id="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.role">角色</label>
+                            <input type="text" class="form-control" id="role" disabled>
+                            <small class="text-muted" data-i18n="pages.personalData.roleHint">角色由管理員設定</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.status">狀態</label>
+                            <input type="text" class="form-control" id="status" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.department">部門</label>
+                            <input type="text" class="form-control" id="department" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.lastLoginAt">最後登錄時間</label>
+                            <input type="text" class="form-control" id="lastLoginAt" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.createdAt">註冊時間</label>
+                            <input type="text" class="form-control" id="createdAt" disabled>
+                        </div>
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> <span data-i18n="pages.personalData.saveChanges">保存更改</span>
+                        </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-shield-lock"></i> <span data-i18n="pages.personalData.changePassword">更改密碼</span></h5>
+                </div>
+                <div class="card-body">
+                    <div id="passwordAlertContainer"></div>
+                    <form id="passwordForm" onsubmit="return handlePasswordForm(event)" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.oldPassword">舊密碼 <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="oldPassword" required minlength="6" maxlength="20">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.newPassword">新密碼 <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="newPassword" required minlength="6" maxlength="20">
+                            <small class="text-muted" data-i18n="pages.personalData.passwordHint">6-20 個字符</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.confirmPassword">確認新密碼 <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" id="confirmPassword" required minlength="6" maxlength="20">
+                        </div>
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                        <button type="button" class="btn btn-warning" onclick="return handlePasswordForm(event)">
+                            <i class="bi bi-key"></i> <span data-i18n="pages.personalData.changePasswordBtn">更改密碼</span>
+                        </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-gear"></i> <span data-i18n="pages.personalData.draftSettings">草稿設置</span></h5>
+                </div>
+                <div class="card-body">
+                    <form id="draftSettingsForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.personalData.draftRetentionDays">草稿自動刪除時長 <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="draftRetentionDays" min="1" max="365" required>
+                                <span class="input-group-text" data-i18n="pages.personalData.days">天</span>
+                            </div>
+                            <small class="text-muted" data-i18n="pages.personalData.draftHint">草稿將在指定天數後自動刪除（默認 7 天）</small>
+                        </div>
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> <span data-i18n="pages.personalData.saveDraftSettings">保存設置</span>
+                        </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> <span data-i18n="pages.personalData.accountInfo">帳戶信息</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        <strong data-i18n="pages.personalData.userId">用戶 ID:</strong>
+                        <div class="text-muted small" id="userIdDisplay">-</div>
+                    </div>
+                    <div class="mb-2">
+                        <strong data-i18n="pages.personalData.tenantId">租戶 ID:</strong>
+                        <div class="text-muted small" id="tenantIdDisplay">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    async function handlePasswordForm(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        console.log('handlePasswordForm triggered');
+
+        const oldPasswordEl = document.getElementById('oldPassword');
+        const newPasswordEl = document.getElementById('newPassword');
+        const confirmPasswordEl = document.getElementById('confirmPassword');
+
+        console.log('oldPasswordEl:', oldPasswordEl);
+        console.log('newPasswordEl:', newPasswordEl);
+        console.log('confirmPasswordEl:', confirmPasswordEl);
+
+        const oldPassword = oldPasswordEl ? oldPasswordEl.value : '';
+        const newPassword = newPasswordEl ? newPasswordEl.value : '';
+        const confirmPassword = confirmPasswordEl ? confirmPasswordEl.value : '';
+
+        console.log('oldPassword:', oldPassword);
+        console.log('newPassword:', newPassword);
+        console.log('confirmPassword:', confirmPassword);
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            App.showAlert(I18n.t('pages.personalData.fillPasswordFields', '請填寫所有密碼欄位'), 'warning');
+            return false;
+        }
+
+        if (newPassword.length < 6 || newPassword.length > 20) {
+            App.showAlert(I18n.t('pages.personalData.passwordLength', '密碼長度必須在 6-20 個字符之間'), 'warning');
+            return false;
+        }
+
+        if (newPassword !== confirmPassword) {
+            App.showAlert(I18n.t('pages.personalData.passwordMismatch', '兩次輸入的密碼不一致'), 'warning');
+            return false;
+        }
+
+        try {
+            console.log('Sending change-password API request...');
+            await App.apiRequest('/api/v1/user/change-password', {
+                method: 'POST',
+                body: JSON.stringify({
+                    old_password: oldPassword,
+                    new_password: newPassword
+                })
+            });
+            console.log('Password change API success');
+            App.showAlert(I18n.t('pages.personalData.passwordChanged', '密碼更改成功'), 'success');
+            document.getElementById('passwordForm').reset();
+        } catch (error) {
+            console.error('Password change API error:', error);
+            const rawMessage = (error && error.message) ? error.message : '';
+            let displayMessage = rawMessage;
+            if (rawMessage === 'Old password incorrect') {
+                displayMessage = (typeof I18n !== 'undefined' && I18n.t)
+                    ? I18n.t('pages.personalData.oldPasswordIncorrect', '舊密碼錯誤')
+                    : '舊密碼錯誤';
+            }
+            const failPrefix = (typeof I18n !== 'undefined' && I18n.t)
+                ? I18n.t('pages.personalData.passwordChangeFailed', '密碼更改失敗')
+                : '密碼更改失敗';
+            App.showAlert(failPrefix + (displayMessage ? (': ' + displayMessage) : ''), 'danger');
+        }
+
+        return false;
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        const apiPath = '/api/v1/user/me';
+        
+        // 載入用戶信息
+        async function loadUserInfo() {
+            try {
+                // 等待 i18n 翻譯載入完成，確保 I18n.t() 能正確翻譯
+                // （產品頁面需並行載入 base + common + product 三個 JSON，可能比 API 慢）
+                const [user] = await Promise.all([
+                    App.apiRequest(apiPath),
+                    typeof I18n !== 'undefined' && I18n.whenReady ? I18n.whenReady(5000) : Promise.resolve()
+                ]);
+                
+                // 填充表單
+                document.getElementById('name').value = user.name || '';
+                document.getElementById('email').value = user.email || '';
+                if (user.birth_date) {
+                    // 將日期轉換為 YYYY-MM-DD 格式
+                    const birthDate = new Date(user.birth_date);
+                    const year = birthDate.getFullYear();
+                    const month = String(birthDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(birthDate.getDate()).padStart(2, '0');
+                    document.getElementById('birthDate').value = `${year}-${month}-${day}`;
+                } else {
+                    document.getElementById('birthDate').value = '';
+                }
+                
+                // 填充電話區號和電話
+                const phoneCountryCodeSelect = document.getElementById('phoneCountryCode');
+                const phoneInput = document.getElementById('phone');
+                
+                // 處理電話：如果電話包含區號，拆分它們
+                if (user.phone) {
+                    const phoneVal = String(user.phone || '').trim();
+                    const parts = phoneVal.split(' ');
+                    if (parts.length > 1 && parts[0].startsWith('+')) {
+                        // 電話包含區號
+                        const phoneCode = parts[0];
+                        const phoneNumber = parts.slice(1).join(' ');
+                        if (phoneCountryCodeSelect && typeof $ !== 'undefined') {
+                            // 初始化 Select2（如果還沒初始化）
+                            if (!$(phoneCountryCodeSelect).hasClass('select2-hidden-accessible')) {
+                                initPhoneCountryCodeSelect2();
+                            }
+                            // 確保選項存在
+                            if ($(phoneCountryCodeSelect).find(`option[value="${phoneCode}"]`).length === 0) {
+                                const newOption = new Option(phoneCode, phoneCode, true, true);
+                                $(phoneCountryCodeSelect).append(newOption);
+                            }
+                            $(phoneCountryCodeSelect).val(phoneCode).trigger('change');
+                        } else if (phoneCountryCodeSelect) {
+                            phoneCountryCodeSelect.value = phoneCode;
+                        }
+                        if (phoneInput) {
+                            phoneInput.value = phoneNumber;
+                        }
+                    } else {
+                        // 只有電話號碼，沒有區號
+                        if (phoneInput) {
+                            phoneInput.value = phoneVal;
+                        }
+                    }
+                } else {
+                    // 沒有電話，設置默認區號
+                    if (phoneCountryCodeSelect && typeof $ !== 'undefined') {
+                        if (!$(phoneCountryCodeSelect).hasClass('select2-hidden-accessible')) {
+                            initPhoneCountryCodeSelect2();
+                        }
+                        // 設置默認值
+                        setTimeout(async () => {
+                            try {
+                                const resp = await App.apiRequest('/api/v1/phone-country-codes');
+                                const codes = (resp && resp.data) ? resp.data : [];
+                                const defaultCode = codes.find(c => c && (c.is_default === true || c.is_default === 'true' || c.is_default === 1));
+                                const finalDefaultCode = defaultCode || (codes.find(c => c.code === '+852') || (codes.length > 0 ? codes[0] : null));
+                                if (finalDefaultCode) {
+                                    if ($(phoneCountryCodeSelect).find(`option[value="${finalDefaultCode.code}"]`).length === 0) {
+                                        const newOption = new Option(finalDefaultCode.code, finalDefaultCode.code, true, true);
+                                        $(phoneCountryCodeSelect).append(newOption);
+                                    }
+                                    $(phoneCountryCodeSelect).val(finalDefaultCode.code).trigger('change');
+                                }
+                            } catch (error) {
+                                console.warn('獲取預設電話區號失敗:', error);
+                            }
+                        }, 100);
+                    }
+                }
+                
+                document.getElementById('role').value = user.role ? user.role.name : '-';
+                document.getElementById('status').value = user.status === 'active'
+                    ? I18n.t('pages.personalData.statusActive', '活躍')
+                    : (user.status === 'inactive'
+                        ? I18n.t('pages.personalData.statusInactive', '非活躍')
+                        : (user.status || '-'));
+                document.getElementById('department').value = user.department ? user.department.name : '-';
+                const locale = (typeof I18n !== 'undefined' && I18n.currentLang === 'en') ? 'en-US' : 'zh-TW';
+                document.getElementById('lastLoginAt').value = user.last_login_at ? new Date(user.last_login_at).toLocaleString(locale) : '-';
+                document.getElementById('createdAt').value = user.created_at ? new Date(user.created_at).toLocaleString(locale) : '-';
+                document.getElementById('userIdDisplay').textContent = user.id || '-';
+                document.getElementById('tenantIdDisplay').textContent = user.tenant_id || '-';
+                
+                // 載入頭像
+                if (user.profile_pic) {
+                    // 確保 URL 是完整的路徑
+                    let imageUrl = user.profile_pic || '';
+                    if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                        imageUrl = '/' + imageUrl;
+                    }
+                    
+                    const preview = document.getElementById('profilePicPreview');
+                    const placeholder = document.getElementById('profilePicPlaceholder');
+                    const removeBtn = document.getElementById('removeProfilePicBtn');
+                    
+                    preview.src = imageUrl;
+                    preview.style.display = 'block';
+                    preview.style.cursor = 'pointer';
+                    placeholder.style.display = 'none';
+                    removeBtn.style.display = 'inline-block';
+                    
+                    // 添加點擊事件以放大圖片
+                    preview.onclick = () => {
+                        showImageLightbox(imageUrl);
+                    };
+                    
+                    // 添加圖片加載錯誤處理
+                    preview.onerror = function() {
+                        this.style.display = 'none';
+                        this.setAttribute('data-error-handled', 'true');
+                        if (placeholder) placeholder.style.display = 'block';
+                        if (removeBtn) removeBtn.style.display = 'none';
+                        this.onerror = null; // 防止重複觸發
+                        console.warn('Failed to load profile picture:', imageUrl);
+                    };
+                } else {
+                    document.getElementById('profilePicPreview').style.display = 'none';
+                    document.getElementById('profilePicPlaceholder').style.display = 'block';
+                    document.getElementById('removeProfilePicBtn').style.display = 'none';
+                }
+            } catch (error) {
+                App.showAlert(I18n.t('pages.personalData.loadUserInfoFailed', '載入用戶信息失敗') + ': ' + error.message, 'danger');
+            }
+        }
+
+        // 移動端按鈕文字優化
+        const updateButtonTextForMobile = () => {
+            if (window.innerWidth <= 768) {
+                const uploadBtn = document.getElementById('uploadProfilePicBtn');
+                const removeBtn = document.getElementById('removeProfilePicBtn');
+                
+                if (uploadBtn) {
+                    const uploadSpan = uploadBtn.querySelector('span[data-i18n="pages.personalData.uploadAvatar"]');
+                    if (uploadSpan && uploadSpan.textContent.includes('頭像')) {
+                        uploadSpan.textContent = I18n.t('pages.personalData.uploadAvatarShort', '上傳');
+                    }
+                }
+                
+                if (removeBtn) {
+                    const removeSpan = removeBtn.querySelector('span[data-i18n="pages.personalData.removeAvatar"]');
+                    if (removeSpan && removeSpan.textContent.includes('頭像')) {
+                        removeSpan.textContent = I18n.t('pages.personalData.removeAvatarShort', '移除');
+                    }
+                }
+            }
+        };
+        
+        // 初始化和窗口大小改變時更新
+        updateButtonTextForMobile();
+        window.addEventListener('resize', updateButtonTextForMobile);
+
+        // 頭像上傳處理
+        const profilePicInput = document.getElementById('profilePicInput');
+        const uploadProfilePicBtn = document.getElementById('uploadProfilePicBtn');
+        const removeProfilePicBtn = document.getElementById('removeProfilePicBtn');
+        const profilePicPreview = document.getElementById('profilePicPreview');
+        const profilePicPlaceholder = document.getElementById('profilePicPlaceholder');
+
+        uploadProfilePicBtn.addEventListener('click', function() {
+            profilePicInput.click();
+        });
+
+        profilePicInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 驗證文件類型
+            if (!file.type.startsWith('image/')) {
+                App.showAlert(I18n.t('pages.personalData.selectImageFile', '請選擇圖片文件'), 'warning');
+                return;
+            }
+
+            // 驗證文件大小（最大 10MB）
+            if (file.size > 10 * 1024 * 1024) {
+                App.showAlert(I18n.t('pages.personalData.imageSizeExceeded', '圖片大小不能超過 10MB'), 'warning');
+                return;
+            }
+
+            // 顯示裁剪模態框
+            const cropper = new ImageCropper({
+                aspectRatio: 1, // 正方形
+                viewMode: 1
+            });
+
+            cropper.showCropModal(file, async (croppedBlob) => {
+            try {
+                // 創建 FormData
+                const formData = new FormData();
+                    formData.append('file', croppedBlob, 'cropped.jpg');
+
+                // 上傳文件
+                const token = localStorage.getItem('auth_token');
+                const uploadResponse = await fetch('/api/v1/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    const errorData = await uploadResponse.json();
+                    throw new Error(errorData.error || I18n.t('pages.personalData.uploadFailed', '上傳失敗'));
+                }
+
+                const uploadData = await uploadResponse.json();
+                
+                // 確保 URL 是完整的路徑
+                let imageUrl = uploadData.url || '';
+                if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                    imageUrl = '/' + imageUrl;
+                }
+                
+                // 更新用戶頭像
+                await App.apiRequest('/api/v1/user/me', {
+                    method: 'PUT',
+                    body: JSON.stringify({ profile_pic: imageUrl })
+                });
+
+                // 更新預覽
+                profilePicPreview.src = imageUrl;
+                profilePicPreview.style.display = 'block';
+                profilePicPreview.style.cursor = 'pointer';
+                profilePicPlaceholder.style.display = 'none';
+                removeProfilePicBtn.style.display = 'inline-block';
+                
+                // 添加點擊事件以放大圖片
+                profilePicPreview.onclick = () => {
+                    showImageLightbox(imageUrl);
+                };
+                
+                // 添加圖片加載錯誤處理
+                profilePicPreview.onerror = function() {
+                    this.style.display = 'none';
+                    profilePicPlaceholder.style.display = 'block';
+                    removeProfilePicBtn.style.display = 'none';
+                    console.warn('Failed to load profile picture:', imageUrl);
+                };
+
+                App.showAlert(I18n.t('pages.personalData.avatarUploadSuccess', '頭像上傳成功'), 'success');
+            } catch (error) {
+                App.showAlert(I18n.t('pages.personalData.avatarUploadFailed', '頭像上傳失敗') + ': ' + error.message, 'danger');
+            }
+            });
+        });
+
+        removeProfilePicBtn.addEventListener('click', async function() {
+            try {
+                await App.apiRequest('/api/v1/user/me', {
+                    method: 'PUT',
+                    body: JSON.stringify({ profile_pic: '' })
+                });
+
+                // 更新預覽
+                profilePicPreview.style.display = 'none';
+                profilePicPlaceholder.style.display = 'block';
+                removeProfilePicBtn.style.display = 'none';
+                profilePicInput.value = '';
+
+                App.showAlert(I18n.t('pages.personalData.avatarRemoved', '頭像已移除'), 'success');
+            } catch (error) {
+                App.showAlert(I18n.t('pages.personalData.avatarRemoveFailed', '移除頭像失敗') + ': ' + error.message, 'danger');
+            }
+        });
+
+        // 更新基本資料
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                birth_date: document.getElementById('birthDate').value || null
+            };
+
+            if (!data.name || !data.email) {
+                App.showAlert(I18n.t('pages.personalData.fillRequired', '請填寫必填項'), 'warning');
+                return;
+            }
+
+            try {
+                await App.apiRequest('/api/v1/user/me', {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+                App.showAlert(I18n.t('pages.personalData.dataUpdated', '資料更新成功'), 'success');
+                loadUserInfo();
+            } catch (error) {
+                App.showAlert(I18n.t('pages.personalData.updateFailed', '更新失敗') + ': ' + error.message, 'danger');
+            }
+        });
+
+        // 更改密碼
+        const passwordForm = document.getElementById('passwordForm');
+        if (passwordForm) {
+            passwordForm.addEventListener('submit', handlePasswordForm);
+        }
+
+        // 載入草稿設置
+        function loadDraftSettings() {
+            const retentionDays = draftManager.loadRetentionDays();
+            document.getElementById('draftRetentionDays').value = retentionDays;
+        }
+
+        // 保存草稿設置
+        document.getElementById('draftSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const days = parseInt(document.getElementById('draftRetentionDays').value);
+            if (isNaN(days) || days < 1 || days > 365) {
+                App.showAlert(I18n.t('pages.personalData.enterValidDays', '請輸入有效的天數（1-365）'), 'warning');
+                return;
+            }
+            draftManager.setRetentionDays(days);
+            App.showAlert(I18n.t('pages.personalData.draftSettingsSaved', '草稿設置已保存'), 'success');
+        });
+
+        // 初始化電話區號 Select2
+        function initPhoneCountryCodeSelect2() {
+            const phoneCountryCodeSelect = document.getElementById('phoneCountryCode');
+            if (!phoneCountryCodeSelect || typeof $ === 'undefined') return;
+            
+            // 銷毀舊的 Select2 實例（如果存在）
+            if ($(phoneCountryCodeSelect).hasClass('select2-hidden-accessible')) {
+                $(phoneCountryCodeSelect).select2('destroy');
+            }
+            
+            $(phoneCountryCodeSelect).select2({
+                theme: 'bootstrap-5',
+                placeholder: (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('fields.searchPhoneCode', '搜索電話區號...') : '搜索電話區號...',
+                allowClear: true,
+                width: '100%',
+                ajax: {
+                    url: '/api/v1/phone-country-codes',
+                    dataType: 'json',
+                    delay: 250,
+                    headers: {
+                        'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || '')
+                    },
+                    data: function(params) {
+                        return {
+                            search: params.term || '',
+                            page: params.page || 1,
+                            limit: 20
+                        };
+                    },
+                    processResults: function(data) {
+                        const results = (data.data || []).map(item => ({
+                            id: item.code,
+                            text: item.code
+                        }));
+                        return { results: results };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 0
+            });
+        }
+        
+        // 初始化電話區號 Select2
+        initPhoneCountryCodeSelect2();
+
+        // 顯示圖片放大彈窗（與 dynamic-list.js 和 dynamic-form.js 相同的樣式）
+        function showImageLightbox(imageUrl) {
+            // 轉義 URL 以防止 XSS
+            const safeImageUrl = String(imageUrl).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // 創建 lightbox modal
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'imageLightbox';
+            modal.setAttribute('tabindex', '-1');
+            modal.setAttribute('data-bs-backdrop', 'static');
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered" style="max-width: 90vw; max-height: 90vh;">
+                    <div class="modal-content" style="border: none; box-shadow: none;">
+                        <div class="modal-header" style="border: none; padding: 0.5rem; justify-content: flex-end;">
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="關閉" style="opacity: 1;"></button>
+                        </div>
+                        <div class="modal-body text-center" style="padding: 0;">
+                            <img src="${safeImageUrl}" class="img-fluid" alt="圖片預覽" style="max-width: 100%; max-height: 85vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 添加背景樣式
+            const style = document.createElement('style');
+            style.textContent = `
+                #imageLightbox .modal-backdrop {
+                    background-color: rgba(0, 0, 0, 0.85) !important;
+                    backdrop-filter: blur(4px);
+                }
+                #imageLightbox .modal-content {
+                    animation: fadeInScale 0.3s ease-out;
+                }
+                @keyframes fadeInScale {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.9);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(modal);
+            const bsModal = new bootstrap.Modal(modal, {
+                backdrop: true,
+                keyboard: true
+            });
+            bsModal.show();
+            
+            // 點擊背景關閉
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal || e.target.classList.contains('modal-dialog')) {
+                    bsModal.hide();
+                }
+            });
+            
+            // ESC 鍵關閉
+            document.addEventListener('keydown', function escHandler(e) {
+                if (e.key === 'Escape' && document.getElementById('imageLightbox')) {
+                    bsModal.hide();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            });
+            
+            modal.addEventListener('hidden.bs.modal', () => {
+                modal.remove();
+                if (style.parentNode) {
+                    style.parentNode.removeChild(style);
+                }
+            });
+        }
+
+        // 初始載入
+        loadUserInfo();
+        loadDraftSettings();
+    });
+</script>
+{{ end }}

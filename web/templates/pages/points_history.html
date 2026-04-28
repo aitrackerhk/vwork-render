@@ -1,0 +1,343 @@
+{{ define "pages/points_history" }}
+<style>
+    .report-period-selector {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+    }
+    
+    .report-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-clock-history me-2"></i><span data-i18n="pointsHistory">積分記錄</span></h2>
+    </div>
+
+    <!-- 篩選器 -->
+    <div class="report-period-selector">
+        <div class="row align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-bold" data-i18n="pointsHistoryPage.searchCustomerLabel">搜索客戶名稱</label>
+                <select class="form-select" id="pointsSearch" style="width: 100%;">
+                    <option value="" data-i18n="pointsHistoryPage.searchCustomerPlaceholder">搜索客戶名稱...</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="fields.type">類型</label>
+                <select class="form-select" id="pointsTypeFilter">
+                    <option value="" data-i18n="common.all">所有類型</option>
+                    <option value="earned" data-i18n="pointsHistoryPage.types.earned">獲得</option>
+                    <option value="redeemed" data-i18n="pointsHistoryPage.types.redeemed">消費</option>
+                    <option value="expired" data-i18n="pointsHistoryPage.types.expired">過期</option>
+                    <option value="adjusted" data-i18n="pointsHistoryPage.types.adjusted">調整</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-bold" data-i18n="fields.customer">客戶</label>
+                <select class="form-select" id="pointsCustomerFilter" style="width: 100%;">
+                    <option value="" data-i18n="common.all">所有客戶</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">&nbsp;</label>
+                <button type="button" class="btn btn-primary w-100" onclick="loadPointsHistory()">
+                    <i class="bi bi-search"></i> <span data-i18n="common.search">搜索</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 客戶積分總計 -->
+    <div id="customerPointsSummary" class="alert alert-info" style="display: none; margin-bottom: 1rem;">
+        <strong data-i18n="pointsHistoryPage.customerTotalPoints">客戶積分總計：</strong><span id="customerTotalPoints">0</span> <span data-i18n="pointsHistoryPage.pointsUnit">積分</span>
+    </div>
+
+    <!-- 表格 -->
+    <div class="report-table">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th data-i18n="fields.date">日期</th>
+                        <th data-i18n="fields.customer">客戶</th>
+                        <th data-i18n="pointsHistoryPage.points">積分</th>
+                        <th data-i18n="fields.type">類型</th>
+                        <th data-i18n="pointsHistoryPage.source">來源</th>
+                        <th data-i18n="fields.description">描述</th>
+                    </tr>
+                </thead>
+                <tbody id="pointsHistoryTable">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4" data-i18n="common.loading">載入中...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 分頁 -->
+    <nav aria-label="Pagination" class="mt-3">
+        <ul class="pagination justify-content-center" id="pointsPagination">
+        </ul>
+    </nav>
+</div>
+
+<script>
+    let pointsCurrentPage = 1;
+    let pointsPageSize = 20;
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+        const getLang = () => {
+            try {
+                return localStorage.getItem('u-nai_lang') || 'zh';
+            } catch (e) {
+                return 'zh';
+            }
+        };
+        const t = (key) => {
+            try {
+                if (typeof I18n !== 'undefined' && I18n.t) return I18n.t(key);
+            } catch (e) {
+                // ignore
+            }
+            return key;
+        };
+
+        const buildCustomersAjaxConfig = () => ({
+            url: '/api/v1/customers',
+            dataType: 'json',
+            delay: 250,
+            headers: {
+                'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || ''),
+                'X-Tenant-Subdomain': localStorage.getItem('tenant_subdomain') || ''
+            },
+            data: function (params) {
+                return {
+                    search: params.term || '',
+                    limit: 50,
+                    page: params.page || 1
+                };
+            },
+            processResults: function (data, params) {
+                params.page = params.page || 1;
+                return {
+                    results: (data.data || []).map(customer => ({
+                        id: customer.id,
+                        text: customer.name + (customer.phone ? ' (' + customer.phone + ')' : '')
+                    })),
+                    pagination: {
+                        more: (data.data || []).length === 50
+                    }
+                };
+            },
+            cache: true
+        });
+
+        // 初始化/重建 Select2（避免 i18n 尚未載入時顯示 key）
+        const initPointsSelect2 = () => {
+            if (typeof $ === 'undefined' || !$.fn || !$.fn.select2) return;
+
+            const PLACEHOLDER_KEY = 'pointsHistoryPage.searchCustomerPlaceholder';
+            const translated = t(PLACEHOLDER_KEY);
+            const lang = getLang();
+            const fallbackPlaceholder = (lang && String(lang).startsWith('zh')) ? '搜尋客戶名稱...' : 'Search customer name...';
+            const placeholder = (translated && translated !== PLACEHOLDER_KEY) ? translated : fallbackPlaceholder;
+
+            const $search = $('#pointsSearch');
+            if ($search.length) {
+                try {
+                    if ($search.hasClass('select2-hidden-accessible')) $search.select2('destroy');
+                } catch (e) {}
+                $search.select2({
+                    theme: 'bootstrap-5',
+                    placeholder,
+                    allowClear: true,
+                    ajax: buildCustomersAjaxConfig(),
+                    minimumInputLength: 0
+                });
+            }
+
+            const $customerFilter = $('#pointsCustomerFilter');
+            if ($customerFilter.length) {
+                const allKey = 'common.all';
+                const allTranslated = t(allKey);
+                const allPlaceholder = (allTranslated && allTranslated !== allKey) ? allTranslated : 'All';
+                try {
+                    if ($customerFilter.hasClass('select2-hidden-accessible')) $customerFilter.select2('destroy');
+                } catch (e) {}
+                $customerFilter.select2({
+                    theme: 'bootstrap-5',
+                    placeholder: allPlaceholder,
+                    allowClear: true,
+                    ajax: buildCustomersAjaxConfig(),
+                    minimumInputLength: 0
+                });
+            }
+        };
+
+        // 先初始化一次（用 fallback 避免 key）
+        initPointsSelect2();
+
+        // i18n 晚到：翻譯 ready 後再重建一次更新 placeholder
+        (function upgradeWhenReady(attempt = 0) {
+            const k = 'pointsHistoryPage.searchCustomerPlaceholder';
+            const v = t(k);
+            if (!v || v === k) {
+                if (attempt < 120) setTimeout(() => upgradeWhenReady(attempt + 1), 100);
+                return;
+            }
+            initPointsSelect2();
+        })();
+
+        // 語言切換後重建（即使目前切語言會 reload，也保留這個保護）
+        if (typeof window !== 'undefined' && window.addEventListener) {
+            window.addEventListener('languageChanged', () => {
+                // 保留目前選擇
+                try {
+                    const s1 = $('#pointsSearch').val();
+                    const s2 = $('#pointsCustomerFilter').val();
+                    initPointsSelect2();
+                    if (s1) $('#pointsSearch').val(s1).trigger('change');
+                    if (s2) $('#pointsCustomerFilter').val(s2).trigger('change');
+                } catch (e) {
+                    initPointsSelect2();
+                }
+            });
+        }
+
+        // 載入積分歷史記錄
+        async function loadPointsHistory(page = 1) {
+            try {
+                pointsCurrentPage = page;
+                const search = $('#pointsSearch').val();
+                const typeFilter = document.getElementById('pointsTypeFilter').value;
+                const customerFilter = $('#pointsCustomerFilter').val();
+                
+                let url = `/api/v1/points?page=${page}&limit=${pointsPageSize}`;
+                if (typeFilter) url += `&points_type=${typeFilter}`;
+                // 優先使用 customerFilter，如果沒有則使用 search
+                const customerId = customerFilter || search;
+                if (customerId) url += `&customer_id=${customerId}`;
+                
+                const data = await App.apiRequest(url);
+                const points = data.data || [];
+                const total = data.total || 0;
+                const totalPages = Math.ceil(total / pointsPageSize);
+                
+                // 如果有選擇客戶，顯示客戶積分總計
+                if (customerId) {
+                    try {
+                        const customer = await App.apiRequest(`/api/v1/customers/${customerId}`);
+                        const totalPoints = customer.total_points || 0;
+                        document.getElementById('customerTotalPoints').textContent = totalPoints;
+                        document.getElementById('customerPointsSummary').style.display = 'block';
+                    } catch (error) {
+                        console.error('Failed to load customer points:', error);
+                        document.getElementById('customerPointsSummary').style.display = 'none';
+                    }
+                } else {
+                    document.getElementById('customerPointsSummary').style.display = 'none';
+                }
+                
+                const tbody = document.getElementById('pointsHistoryTable');
+                if (points.length === 0) {
+                    const noData = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.noData') : '暫無記錄';
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted empty-data-row" data-i18n="common.noData">' + noData + '</td></tr>';
+                    // 更新 i18n 翻譯
+                    if (typeof I18n !== 'undefined' && I18n.updatePage) {
+                        I18n.updatePage();
+                    }
+                } else {
+                    tbody.innerHTML = points.map(point => {
+                        const typeLabels = {
+                            'earned': '<span class="badge bg-success">' + ((typeof I18n !== "undefined" && I18n.t) ? I18n.t("pointsHistoryPage.types.earned") : "獲得") + '</span>',
+                            'redeemed': '<span class="badge bg-danger">' + ((typeof I18n !== "undefined" && I18n.t) ? I18n.t("pointsHistoryPage.types.redeemed") : "消費") + '</span>',
+                            'expired': '<span class="badge bg-secondary">' + ((typeof I18n !== "undefined" && I18n.t) ? I18n.t("pointsHistoryPage.types.expired") : "過期") + '</span>',
+                            'adjusted': '<span class="badge bg-info">' + ((typeof I18n !== "undefined" && I18n.t) ? I18n.t("pointsHistoryPage.types.adjusted") : "調整") + '</span>'
+                        };
+                        const typeLabel = typeLabels[point.points_type] || point.points_type;
+                        const pointsValue = point.points_type === 'redeemed' || point.points_type === 'expired' 
+                            ? `<span class="text-danger">-${point.points}</span>` 
+                            : `<span class="text-success">+${point.points}</span>`;
+                        const date = new Date(point.created_at).toLocaleString((typeof I18n !== 'undefined' && I18n.currentLang === 'en') ? 'en-US' : 'zh-TW');
+                        const unknown = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.unknown') : '未知';
+                        const customerName = point.customer ? point.customer.name : unknown;
+                        const sourceType = point.source_type || '-';
+                        const description = point.description || '-';
+                        
+                        return `
+                            <tr>
+                                <td>${date}</td>
+                                <td>${customerName}</td>
+                                <td>${pointsValue}</td>
+                                <td>${typeLabel}</td>
+                                <td>${sourceType}</td>
+                                <td>${description}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+                
+                // 更新分頁
+                const pagination = document.getElementById('pointsPagination');
+                pagination.innerHTML = '';
+                if (totalPages > 1) {
+                    for (let i = 1; i <= totalPages; i++) {
+                        const li = document.createElement('li');
+                        li.className = `page-item ${i === page ? 'active' : ''}`;
+                        li.innerHTML = `<a class="page-link" href="#" onclick="loadPointsHistory(${i}); return false;">${i}</a>`;
+                        pagination.appendChild(li);
+                    }
+                }
+
+                // mobile：標記第一/最後可見 page-item，方便套左右圓角
+                try {
+                    const items = Array.from(pagination.querySelectorAll('.page-item'))
+                        .filter(li => {
+                            const style = window.getComputedStyle(li);
+                            return style && style.display !== 'none' && style.visibility !== 'hidden';
+                        });
+                    items.forEach(li => li.classList.remove('first-visible', 'last-visible'));
+                    if (items.length > 0) {
+                        items[0].classList.add('first-visible');
+                        items[items.length - 1].classList.add('last-visible');
+                    }
+                } catch (e) {}
+            } catch (error) {
+                console.error('載入積分記錄失敗:', error);
+                const loadFailed = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.loadError') : '載入失敗';
+                document.getElementById('pointsHistoryTable').innerHTML = 
+                    '<tr><td colspan="6" class="text-center text-danger">' + loadFailed + ': ' + error.message + '</td></tr>';
+            }
+        }
+
+        // Select2 變化事件
+        $('#pointsSearch, #pointsCustomerFilter').on('change', function() {
+            loadPointsHistory(1);
+        });
+
+        // 初始載入
+        await loadPointsHistory();
+    });
+</script>
+{{ end }}
+

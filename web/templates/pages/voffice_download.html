@@ -1,0 +1,142 @@
+{{define "pages/voffice_download"}}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="fw-semibold" data-i18n="voffice.download.pageTitle">軟件下載</h3>
+            <p class="text-muted" data-i18n="voffice.download.pageSubtitle">下載 vOffice 桌面應用，在本地使用完整的辦公套件功能。</p>
+        </div>
+    </div>
+
+    <!-- Download Cards -->
+    <div class="row g-4 mb-5">
+        <!-- Windows -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-windows" style="font-size: 3rem; color: #0078d4;"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold">Windows</h5>
+                    <p class="text-muted small" data-i18n="voffice.download.windowsDesc">適用於 Windows 10 及以上版本</p>
+                    <div id="voffice-dl-windows">
+                        <span class="btn btn-primary w-100 disabled" style="opacity: 0.65; pointer-events: none;">
+                            <i class="bi bi-clock me-1"></i> <span data-i18n="voffice.download.comingSoon">即將推出</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- macOS -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-apple" style="font-size: 3rem; color: #333;"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold">macOS</h5>
+                    <p class="text-muted small" data-i18n="voffice.download.macDesc">適用於 macOS 11 及以上版本</p>
+                    <div id="voffice-dl-macos">
+                        <span class="btn btn-primary w-100 disabled" style="opacity: 0.65; pointer-events: none;">
+                            <i class="bi bi-clock me-1"></i> <span data-i18n="voffice.download.comingSoon">即將推出</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Linux -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-ubuntu" style="font-size: 3rem; color: #e95420;"></i>
+                    </div>
+                    <h5 class="card-title fw-semibold">Linux</h5>
+                    <p class="text-muted small" data-i18n="voffice.download.linuxDesc">適用於主流 Linux 發行版</p>
+                    <div id="voffice-dl-linux">
+                        <span class="btn btn-primary w-100 disabled" style="opacity: 0.65; pointer-events: none;">
+                            <i class="bi bi-clock me-1"></i> <span data-i18n="voffice.download.comingSoon">即將推出</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h5 class="fw-semibold mb-3" data-i18n="voffice.download.featuresTitle">vOffice 功能亮點</h5>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-word text-primary mb-2 d-block" style="font-size: 1.5rem;"></i>
+                    <h6 class="fw-semibold" data-i18n="voffice.download.feature1Title">文字處理</h6>
+                    <p class="text-muted small mb-0" data-i18n="voffice.download.feature1Desc">建立和編輯文件，支援 .docx 格式。</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-spreadsheet text-success mb-2 d-block" style="font-size: 1.5rem;"></i>
+                    <h6 class="fw-semibold" data-i18n="voffice.download.feature2Title">試算表</h6>
+                    <p class="text-muted small mb-0" data-i18n="voffice.download.feature2Desc">數據分析和計算，支援 .xlsx 格式。</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body">
+                    <i class="bi bi-file-earmark-ppt text-warning mb-2 d-block" style="font-size: 1.5rem;"></i>
+                    <h6 class="fw-semibold" data-i18n="voffice.download.feature3Title">簡報</h6>
+                    <p class="text-muted small mb-0" data-i18n="voffice.download.feature3Desc">製作專業簡報，支援 .pptx 格式。</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 bg-light h-100">
+                <div class="card-body">
+                    <i class="bi bi-robot text-info mb-2 d-block" style="font-size: 1.5rem;"></i>
+                    <h6 class="fw-semibold" data-i18n="voffice.download.feature4Title">AI 助手</h6>
+                    <p class="text-muted small mb-0" data-i18n="voffice.download.feature4Desc">內建 AI 助手，協助文件編輯與分析。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- V-SYS: Dynamically load download links from latest release API -->
+<script>
+(function() {
+    var platforms = [
+        { key: 'windows', elId: 'voffice-dl-windows', icon: 'bi-download' },
+        { key: 'macos',   elId: 'voffice-dl-macos',   icon: 'bi-download' },
+        { key: 'linux',   elId: 'voffice-dl-linux',    icon: 'bi-download' }
+    ];
+
+    fetch('/api/v1/voffice/latest-release')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            var releases = data.releases || {};
+            platforms.forEach(function(p) {
+                var el = document.getElementById(p.elId);
+                if (!el) return;
+                var rel = releases[p.key];
+                if (rel && rel.download_url) {
+                    var sizeStr = rel.file_size ? ' (' + (rel.file_size / 1048576).toFixed(0) + ' MB)' : '';
+                    var notesHtml = rel.release_notes ? '<p class="text-muted small mt-2 mb-0">' + rel.release_notes + '</p>' : '';
+                    el.innerHTML = '<a href="' + rel.download_url + '" class="btn btn-primary w-100" target="_blank" rel="noopener">'
+                        + '<i class="bi ' + p.icon + ' me-1"></i> '
+                        + '<span data-i18n="voffice.download.downloadBtn">下載</span> v' + rel.version + sizeStr
+                        + '</a>' + notesHtml;
+                }
+                // else: keep default "coming soon" button
+            });
+        })
+        .catch(function() { /* keep default "coming soon" buttons on error */ });
+})();
+</script>
+{{end}}

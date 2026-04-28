@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>vAI - AI 助手</title>
+  <link rel="icon" type="image/png" href="/static/vaiicon.png">
+  <link rel="apple-touch-icon" href="/static/vaiicon.png">
+  <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/static/css/custom.css?v=20260316b">
+  <link rel="stylesheet" href="/static/css/vai.css">
+  <style>
+    body.i18n-loading [data-i18n],
+    body.i18n-loading [data-i18n-placeholder],
+    body.i18n-loading [data-i18n-title],
+    body.i18n-loading [data-i18n-field] {
+      visibility: hidden;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #fff;
+    }
+    /* Light navbar */
+    .vai-chat-navbar {
+      background: #fff !important;
+      border-bottom: 1px solid #e5e7eb;
+      height: 60px;
+    }
+    .vai-chat-navbar .nav-link {
+      color: #6b7280 !important;
+    }
+    .vai-chat-navbar .nav-link:hover {
+      color: #111827 !important;
+    }
+    .vai-chat-navbar .navbar-brand span {
+      color: #111827;
+    }
+    /* Full-page chat layout */
+    .vai-chat-page {
+      display: flex;
+      height: calc(100vh - 60px);
+      margin-top: 60px;
+    }
+    /* Conversation sidebar — light */
+    .vai-chat-page .ai-chat-sidebar {
+      width: 270px;
+      min-width: 270px;
+      background: #f9fafb;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .vai-chat-page .ai-chat-sidebar-header {
+      padding: 0.75rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .vai-chat-page .ai-chat-sidebar-header .btn {
+      color: #8b5cf6;
+      border-color: #8b5cf6;
+      font-size: 0.85rem;
+    }
+    .vai-chat-page .ai-chat-sidebar-header .btn:hover {
+      background: #8b5cf6;
+      border-color: #8b5cf6;
+      color: #fff;
+    }
+    .vai-chat-page .ai-conversation-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+    /* Conversation items — light */
+    .vai-chat-page .ai-conversation-item {
+      padding: 0.6rem 0.75rem;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      color: #374151;
+      transition: background 0.15s;
+    }
+    .vai-chat-page .ai-conversation-item:hover {
+      background: #f3f4f6;
+    }
+    .vai-chat-page .ai-conversation-item.active {
+      background: #ede9fe;
+      color: #6d28d9;
+    }
+    .vai-chat-page .ai-conversation-item .conv-title {
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vai-chat-page .ai-conversation-item .conv-preview {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vai-chat-page .ai-conversation-item .conv-time {
+      font-size: 0.7rem;
+      color: #d1d5db;
+    }
+    /* Main chat area — light */
+    .vai-chat-page .ai-chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: #fff;
+    }
+    /* Conversation header bar */
+    .vai-chat-page .ai-chat-conv-header {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      color: #111827;
+      min-height: 44px;
+    }
+    .vai-chat-page .ai-chat-conv-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    /* Messages area */
+    .vai-chat-page #aiChatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      background: #f9fafb;
+      min-height: 0;
+    }
+    /* Message bubbles — light */
+    .vai-chat-page .message-bubble {
+      max-width: 75%;
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+    .vai-chat-page .message-bubble.user {
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+      color: #fff;
+      margin-left: auto;
+      border-bottom-right-radius: 0.25rem;
+    }
+    .vai-chat-page .message-bubble.ai {
+      background: #fff;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+      border-bottom-left-radius: 0.25rem;
+    }
+    /* Input area */
+    .vai-chat-page .vai-chat-input-area {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid #e5e7eb;
+      background: #fff;
+    }
+    .vai-chat-page #aiMessageInput {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      color: #111827;
+      resize: none;
+      max-height: 120px;
+    }
+    .vai-chat-page #aiMessageInput::placeholder {
+      color: #9ca3af;
+    }
+    .vai-chat-page #aiMessageInput:focus {
+      background: #fff;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 0.2rem rgba(139,92,246,0.15);
+      color: #111827;
+    }
+    .vai-chat-page #aiSendButton {
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+      border: none;
+      color: #fff;
+    }
+    .vai-chat-page #aiSendButton:hover {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    }
+    .vai-chat-page #aiMicButton {
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+      border: none;
+      color: #fff;
+      border-radius: 0 0.375rem 0.375rem 0;
+    }
+    .vai-chat-page #aiMicButton:hover {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    }
+    .vai-chat-page #aiMicButton.recording {
+      background: #dc3545;
+      color: #fff;
+    }
+    /* Upload button */
+    .vai-chat-page .ai-upload-btn {
+      background: transparent;
+      border: 1px solid #d1d5db;
+      border-right: none;
+      color: #6b7280;
+      padding: 0.375rem 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s, background 0.2s;
+      border-radius: 0.375rem 0 0 0.375rem;
+    }
+    .vai-chat-page .ai-upload-btn:hover {
+      color: #8b5cf6;
+      background: #f3f4f6;
+    }
+    .vai-chat-page .ai-upload-btn i {
+      font-size: 1.1rem;
+    }
+    /* File preview area */
+    .vai-chat-page .ai-file-preview-area {
+      padding: 0.5rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .vai-chat-page .ai-file-preview-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.78rem;
+      color: #374151;
+      max-width: 200px;
+    }
+    .vai-chat-page .ai-file-preview-item .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+    }
+    .vai-chat-page .ai-file-preview-item .remove-file {
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 0.85rem;
+      line-height: 1;
+    }
+    .vai-chat-page .ai-file-preview-item .remove-file:hover {
+      color: #ef4444;
+    }
+    /* Attachment cards in chat message bubbles */
+    .vai-chat-page .ai-msg-attachments {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+      max-width: 100%;
+      overflow: hidden;
+    }
+    .vai-chat-page .ai-msg-attachment-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-radius: 6px;
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      max-width: 100%;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .vai-chat-page .ai-msg-attachment-card:hover {
+      filter: brightness(0.95);
+    }
+    .vai-chat-page .message-bubble.ai .ai-msg-attachment-card {
+      background: #f0f1f3;
+      border: 1px solid #e5e7eb;
+      color: #374151;
+    }
+    .vai-chat-page .message-bubble.user .ai-msg-attachment-card {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: inherit;
+    }
+    .vai-chat-page .ai-msg-attachment-card i {
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .vai-chat-page .ai-msg-attachment-card span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    /* Thinking dots */
+    .vai-chat-page .thinking-dots .dot {
+      background: #8b5cf6;
+    }
+    /* Generated images in chat (vai-chat-page overrides) */
+    .vai-chat-page .ai-generated-image-item {
+      border-color: #e5e7eb;
+      background: #fff;
+    }
+    .vai-chat-page .ai-generated-image-actions {
+      background: #fff;
+      border-top-color: #f0f0f0;
+    }
+    .vai-chat-page .message-bubble.ai .ai-generated-image-item {
+      border-color: #e5e7eb;
+    }
+    /* Scrollbar — light */
+    .vai-chat-page .ai-conversation-list::-webkit-scrollbar,
+    .vai-chat-page #aiChatMessages::-webkit-scrollbar {
+      width: 6px;
+    }
+    .vai-chat-page .ai-conversation-list::-webkit-scrollbar-thumb,
+    .vai-chat-page #aiChatMessages::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+    }
+    .vai-chat-page .ai-conversation-list::-webkit-scrollbar-track,
+    .vai-chat-page #aiChatMessages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    /* Navbar pill container — light */
+    .vai-nav-pill {
+      border: 1px solid #e5e7eb;
+      border-radius: 100px;
+      padding: 0.25rem 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      height: 38px;
+      box-sizing: border-box;
+    }
+    .vai-nav-pill .nav-link {
+      padding: 0.2rem 0.4rem !important;
+      color: #6b7280 !important;
+    }
+    .vai-nav-pill .nav-link:hover {
+      color: #111827 !important;
+    }
+    /* Conversation search box — matches CMS global search style */
+    .vai-conv-search .input-group {
+      border: 0;
+      border-radius: 100px;
+      overflow: hidden;
+      background: #F5F5F8;
+      box-shadow: none;
+      height: 38px;
+      align-items: center;
+    }
+    .vai-conv-search .input-group-text {
+      border: 0;
+      background: #F5F5F8;
+      color: #64748b;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 0.65rem;
+    }
+    .vai-conv-search input.form-control {
+      border: 0;
+      background: #F5F5F8;
+      height: 38px;
+      padding: 0.25rem 0.65rem;
+    }
+    .vai-conv-search input.form-control:focus {
+      box-shadow: none;
+      background: #F5F5F8;
+    }
+    .vai-conv-search input.form-control::placeholder {
+      color: #9ca3af;
+    }
+    .vai-conv-search .list-group-item {
+      border-left: 0;
+      border-right: 0;
+      padding: 0.6rem 0.85rem;
+    }
+    .vai-conv-search .list-group-item:first-child {
+      border-top: 0;
+    }
+    .vai-conv-search .list-group-item:last-child {
+      border-bottom: 0;
+    }
+    .vai-conv-search .conv-search-title {
+      font-weight: 500;
+      font-size: 0.85rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vai-conv-search .conv-search-preview {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .vai-conv-search .conv-search-time {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      flex-shrink: 0;
+    }
+    .vai-conv-search .conv-search-highlight {
+      background: #fef08a;
+      border-radius: 2px;
+      padding: 0 1px;
+    }
+    @media (max-width: 575.98px) {
+      .vai-conv-search {
+        max-width: none !important;
+      }
+      .vai-conv-search .input-group {
+        height: 34px;
+      }
+      .vai-conv-search .input-group-text,
+      .vai-conv-search input.form-control {
+        height: 34px;
+        font-size: 0.8rem;
+      }
+    }
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .vai-chat-page .ai-chat-sidebar {
+        position: fixed;
+        left: -270px;
+        top: 60px;
+        bottom: 0;
+        z-index: 1050;
+        transition: left 0.3s ease;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+      }
+      .vai-chat-page .ai-chat-sidebar.show {
+        left: 0;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      var savedLang = localStorage.getItem('u-nai_lang');
+      var cmsLang = localStorage.getItem('language');
+      var browserLang = navigator.language || navigator.userLanguage;
+      var currentLang = 'zh';
+      if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+        currentLang = cmsLang;
+        if (savedLang !== currentLang) localStorage.setItem('u-nai_lang', currentLang);
+      } else if (savedLang) {
+        currentLang = savedLang;
+      } else {
+        if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) currentLang = 'zh-CN';
+        else if (browserLang.startsWith('zh')) currentLang = 'zh';
+        else currentLang = 'en';
+        localStorage.setItem('u-nai_lang', currentLang);
+      }
+      window.__INITIAL_LANG__ = currentLang;
+      (function checkBody() {
+        if (document.body) {
+          document.body.classList.add('i18n-loading');
+          setTimeout(function() {
+            if (document.body && document.body.classList.contains('i18n-loading')) {
+              document.body.classList.remove('i18n-loading');
+            }
+          }, 5000);
+        } else {
+          requestAnimationFrame(checkBody);
+        }
+      })();
+    })();
+  </script>
+</head>
+<body>
+  <!-- vAI Light Navbar — structure matches CMS topnav.html -->
+  <nav class="navbar navbar-expand-lg fixed-top vai-chat-navbar">
+    <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center gap-2">
+        <a class="navbar-brand d-flex align-items-center" href="#" id="navBrandLink">
+          <img src="/static/vai.png" alt="vAI" style="height: 24px;">
+        </a>
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1" id="tenantSwitchBtn" type="button" data-bs-toggle="modal" data-bs-target="#tenantSwitchModal" style="display:none;">
+          <i class="bi bi-buildings"></i>
+          <span id="tenantSwitchName">企業</span>
+          <i class="bi bi-chevron-down"></i>
+        </button>
+      </div>
+      <!-- Mobile: App Switcher, Menu Toggle (right side) -->
+      <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+        <li class="nav-item dropdown" id="mobileAppSwitcherVai">
+          <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+            <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+            <div class="app-switcher-grid">
+              <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                <span class="app-switcher-label">vAI</span>
+              </a>
+              <a href="/" class="app-switcher-item" data-app="vwork">
+                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                <span class="app-switcher-label">vWork</span>
+              </a>
+              <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                <span class="app-switcher-label">vMarket</span>
+              </a>
+              <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                <span class="app-switcher-label">vOffice</span>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item">
+          <button class="navbar-toggler" type="button" id="vaiMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+            <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+          </button>
+        </li>
+      </ul>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <!-- Conversation Search — same position as CMS Global Search -->
+        <div class="me-3 flex-grow-1 d-none d-lg-block" style="max-width: 520px; margin-left: 100px;">
+          <div class="vai-conv-search" id="vaiConvSearch" style="position: relative;">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="vaiConvSearchInput" type="text" class="form-control"
+                     placeholder="搜尋對話..."
+                     data-i18n-placeholder="vai.searchConversation"
+                     autocomplete="off">
+            </div>
+            <div id="vaiConvSearchDropdown" class="list-group shadow-sm"
+                 style="position: absolute; top: 100%; left: 0; right: 0; z-index: 2000; display: none; max-height: 60vh; overflow: auto; border-radius: 12px; margin-top: 6px;">
+            </div>
+          </div>
+        </div>
+        <ul class="navbar-nav ms-auto align-items-center d-none d-lg-flex">
+          <li class="nav-item d-none d-lg-block">
+            <div class="vai-nav-pill">
+              <div class="dropdown">
+                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" title="Applications">
+                  <i class="bi bi-grid-3x3-gap-fill"></i>
+                </a>
+                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                    <div class="app-switcher-grid">
+                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                            <span class="app-switcher-label">vAI</span>
+                        </a>
+                        <a href="/" class="app-switcher-item" data-app="vwork">
+                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                            <span class="app-switcher-label">vWork</span>
+                        </a>
+                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                            <span class="app-switcher-label">vMarket</span>
+                        </a>
+                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                            <span class="app-switcher-label">vOffice</span>
+                        </a>
+                    </div>
+                </div>
+              </div>
+              <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="supportDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem;">
+                  <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="/help" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                  <li><a class="dropdown-item" href="/contact?product=vai" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                </ul>
+              </div>
+              <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem;">
+                  <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                  <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                  <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                </ul>
+              </div>
+              <div class="dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                  <img id="userAvatar" src="" alt="" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid #e5e7eb;">
+                  <i class="bi bi-person-circle" id="userIcon"></i>
+                  <span id="userName"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li id="aiCoinsDisplay" style="display: none;">
+                    <a class="dropdown-item" href="/vcoins">
+                      <svg class="vcoin-icon" width="16" height="16" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="none" stroke="#ffc107" stroke-width="6"/><path d="M22 35 L43 65 L57 65 L78 35 L65 35 L50 55 L35 35 Z" fill="#ffc107"/></svg>
+                      <span class="fw-bold" id="aiCoinsBalance">0</span>
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider" id="aiCoinsDivider" style="display: none;"></li>
+                  <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear me-2"></i><span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                  <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card me-2"></i><span data-i18n="nav.billing">訂閱</span></a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right me-2"></i><span data-i18n="nav.logout">登出</span></a></li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Tenant Switch Modal -->
+  <div class="modal fade" id="tenantSwitchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" data-i18n="tenantSwitch.title">選擇企業</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-muted mb-2" data-i18n="tenantSwitch.selectHint">請選擇要進入的企業</div>
+          <div id="tenantSwitchList" class="list-group"></div>
+          <div class="text-danger small mt-2" id="tenantSwitchError" style="display:none;"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-primary" id="tenantSwitchAddTenant" data-i18n="tenantSwitch.addTenant">新增租戶</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="tenantSwitch.cancel">取消</button>
+          <button type="button" class="btn btn-primary" id="tenantSwitchConfirm" data-i18n="tenantSwitch.confirm">確認</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-Page Chat Interface -->
+  <div class="vai-chat-page" id="vaiChatPage">
+    <!-- Left: Conversation Sidebar -->
+    <div class="ai-chat-sidebar" id="vaiChatSidebar">
+      <div class="ai-chat-sidebar-header">
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="createNewAiConversation()">
+            <i class="bi bi-plus-lg me-1"></i><span data-i18n="vai.chat.newChat">新對話</span>
+          </button>
+          <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="toggleVaiChatSidebar()" title="關閉">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+      <div id="aiConversationList" class="ai-conversation-list">
+        <!-- Rendered by ai-chat.js -->
+      </div>
+    </div>
+    <!-- Right: Chat Main Area -->
+    <div class="ai-chat-main d-flex flex-column flex-grow-1" style="min-width: 0;">
+      <!-- Conversation Header -->
+      <div id="aiChatConvHeader" class="ai-chat-conv-header d-none">
+        <button class="btn btn-sm btn-link text-muted p-0 me-2 d-md-none" onclick="toggleVaiChatSidebar()" title="對話列表">
+          <i class="bi bi-list fs-5"></i>
+        </button>
+        <span id="aiChatConvTitle" class="ai-chat-conv-title flex-grow-1">新對話</span>
+        <button class="btn btn-sm btn-link text-muted p-0 ms-1" onclick="renameCurrentConversation()" title="重命名">
+          <i class="bi bi-pencil"></i>
+        </button>
+        <button class="btn btn-sm btn-link text-danger p-0 ms-1" onclick="deleteCurrentConversation()" title="刪除">
+          <i class="bi bi-trash"></i>
+        </button>
+      </div>
+      <!-- Messages Area -->
+      <div id="aiChatMessages" class="flex-grow-1 overflow-auto p-3" style="min-height: 0;">
+        <div class="text-center p-4">
+          <img src="/static/vai.png" alt="vAi" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 1rem; opacity: 0.6;">
+          <p class="mt-2 text-muted" data-i18n="vai.chat.startConversation">開始與 vAi 助手對話</p>
+          <small class="text-muted" data-i18n="vai.chat.llmConfigured">LLM Endpoint 由系統管理員配置</small>
+        </div>
+      </div>
+      <!-- Input Area -->
+      <div class="vai-chat-input-area">
+        <!-- Hidden file input -->
+        <input type="file" id="aiFileInput" multiple accept=".xls,.xlsx,.doc,.docx,.ppt,.pptx,.pdf,.txt,.jpg,.jpeg,.png,.webm,.wav,.mp3,.m4a,.ogg" style="display: none;">
+        <!-- File preview area (shown when files are attached) -->
+        <div id="aiFilePreviewArea" class="ai-file-preview-area" style="display: none;"></div>
+        <form id="aiChatForm" onsubmit="sendAIMessage(event)">
+          <div class="input-group">
+            <label for="aiFileInput" class="btn ai-upload-btn mb-0" title="上傳文件" style="cursor: pointer;">
+              <i class="bi bi-paperclip"></i>
+            </label>
+            <button type="button" class="btn ai-upload-btn mb-0" id="aiWebSearchToggle" onclick="toggleWebSearch()" data-i18n-title="vai.chat.webSearch" title="Web Search" style="cursor: pointer; position: relative;">
+              <i class="bi bi-globe2"></i>
+            </button>
+            <textarea class="form-control" id="aiMessageInput" rows="1" data-i18n-placeholder="vai.chat.inputMessage" placeholder="輸入訊息給 AI..." style="resize: none; max-height: 120px;"></textarea>
+            <button type="button" class="btn" id="aiMicButton" onclick="toggleAIVoiceInput()" data-i18n-title="vai.chat.voiceInput" title="Voice Input">
+              <i class="bi bi-mic"></i>
+            </button>
+            <button type="submit" class="btn" id="aiSendButton" style="display: none;">
+              <i class="bi bi-send"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/i18n.js"></script>
+  <script src="/static/js/sso.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/ai-chat.js?v=20260318a"></script>
+  <script>
+    (function() {
+      // Language switcher
+      document.querySelectorAll('[data-lang]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          var lang = this.getAttribute('data-lang');
+          if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+            I18n.switchLanguage(lang);
+          }
+        });
+      });
+
+      // Navbar brand link managed by App.updateAppSwitcherLinks() in app.js
+
+      // Mobile sidebar toggle (conversation list)
+      window.toggleVaiChatSidebar = function() {
+        var sidebar = document.getElementById('vaiChatSidebar');
+        if (!sidebar) return;
+        sidebar.classList.toggle('show');
+        // Manage backdrop overlay
+        var backdrop = document.getElementById('vaiChatSidebarBackdrop');
+        if (sidebar.classList.contains('show')) {
+            if (!backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.id = 'vaiChatSidebarBackdrop';
+                backdrop.className = 'vai-sidebar-backdrop';
+                backdrop.style.top = '60px';
+                backdrop.style.bottom = '0';
+                backdrop.onclick = function() { toggleVaiChatSidebar(); };
+                sidebar.parentElement.appendChild(backdrop);
+            }
+            backdrop.style.display = 'block';
+        } else {
+            if (backdrop) backdrop.style.display = 'none';
+        }
+      };
+
+      // Override closeMobileSidebar for this page
+      window.closeMobileSidebar = function() {
+        var sidebar = document.getElementById('vaiChatSidebar');
+        if (sidebar) sidebar.classList.remove('show');
+        var backdrop = document.getElementById('vaiChatSidebarBackdrop');
+        if (backdrop) backdrop.style.display = 'none';
+      };
+
+      // Mobile menu toggle (navbar hamburger) — toggle chat sidebar on mobile
+      var vaiMobileMenuToggle = document.getElementById('vaiMobileMenuToggle');
+      if (vaiMobileMenuToggle) {
+        vaiMobileMenuToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          toggleVaiChatSidebar();
+        });
+      }
+
+      // Load user info for navbar
+      async function loadUserNavInfo() {
+        try {
+          var headers = { 'Accept': 'application/json' };
+          var token = localStorage.getItem('auth_token');
+          if (token && token !== 'temp_token') {
+            headers['Authorization'] = 'Bearer ' + token;
+          }
+          var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+          if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+
+          var resp = await fetch('/api/v1/user/me', { headers: headers });
+          var user = null;
+          if (resp.ok) {
+            user = await resp.json();
+            try { localStorage.setItem('user', JSON.stringify(user)); } catch(_e) {}
+          } else {
+            try {
+              var stored = localStorage.getItem('user');
+              if (stored) user = JSON.parse(stored);
+            } catch(_e) {}
+          }
+
+          // Update app-switcher links based on login state
+          var isLoggedIn = !!(user && user.name);
+          if (typeof App !== 'undefined' && typeof App.updateAppSwitcherLinks === 'function') {
+              App.updateAppSwitcherLinks(isLoggedIn);
+          }
+
+          if (user && user.name) {
+            var nameSpan = document.getElementById('userName');
+            if (nameSpan) nameSpan.textContent = user.name;
+
+            var avatarImg = document.getElementById('userAvatar');
+            var avatarIcon = document.getElementById('userIcon');
+            var url = (user.profile_pic) ? String(user.profile_pic) : '';
+            if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+            if (url && avatarImg) {
+              avatarImg.src = url;
+              avatarImg.style.display = 'inline-block';
+              if (avatarIcon) avatarIcon.style.display = 'none';
+            }
+          }
+
+          // Load vCoin balance
+          try {
+            var coinResp = await fetch('/api/v1/ai-coins/balance', { headers: headers });
+            if (coinResp.ok) {
+              var coinData = await coinResp.json();
+              var balance = coinData.balance || 0;
+              var display = document.getElementById('aiCoinsDisplay');
+              var balanceSpan = document.getElementById('aiCoinsBalance');
+              var divider = document.getElementById('aiCoinsDivider');
+              if (display && balanceSpan) {
+                balanceSpan.textContent = balance;
+                display.style.display = 'block';
+                if (divider) divider.style.display = 'block';
+              }
+            }
+          } catch(_e) {}
+        } catch(e) {
+          console.error('Failed to load user info:', e);
+        }
+      }
+
+      // Logout handler
+      var logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (typeof App !== 'undefined' && App.logout) {
+            App.logout();
+          } else {
+            // Fallback: call server-side logout to clear HTTPOnly cookie
+            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+              .finally(function() {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('tenant_subdomain');
+                window.location.replace(window.location.pathname + '?logged_out=1');
+              });
+          }
+        });
+      }
+
+      // Conversation search
+      (function initConvSearch() {
+        var searchInput = document.getElementById('vaiConvSearchInput');
+        var dropdown = document.getElementById('vaiConvSearchDropdown');
+        var wrap = document.getElementById('vaiConvSearch');
+        if (!searchInput || !dropdown || !wrap) return;
+
+        var timer = null;
+
+        function escHtml(s) {
+          var d = document.createElement('div');
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function highlightMatch(text, query) {
+          if (!query || !text) return escHtml(text || '');
+          var escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          var re = new RegExp('(' + escaped + ')', 'gi');
+          return escHtml(text).replace(re, '<span class="conv-search-highlight">$1</span>');
+        }
+
+        function hide() {
+          dropdown.style.display = 'none';
+          dropdown.innerHTML = '';
+        }
+
+        function render(results, query) {
+          if (!results || results.length === 0) {
+            dropdown.innerHTML = '<div class="list-group-item text-muted small text-center" style="font-size:0.8rem;">沒有匹配的對話</div>';
+            dropdown.style.display = 'block';
+            return;
+          }
+          dropdown.innerHTML = results.map(function(conv) {
+            var timeStr = '';
+            if (typeof formatConvTime === 'function') {
+              timeStr = formatConvTime(conv.updated_at);
+            }
+            var preview = conv.last_message || '';
+            return '<a class="list-group-item list-group-item-action" href="#" data-conv-id="' + escHtml(conv.id) + '" style="cursor:pointer;">' +
+              '<div class="d-flex justify-content-between align-items-start">' +
+                '<div style="min-width:0; flex:1; overflow:hidden;">' +
+                  '<div class="conv-search-title">' + highlightMatch(conv.title, query) + '</div>' +
+                  (preview ? '<div class="conv-search-preview">' + highlightMatch(preview, query) + '</div>' : '') +
+                '</div>' +
+                (timeStr ? '<span class="conv-search-time ms-2">' + escHtml(timeStr) + '</span>' : '') +
+              '</div>' +
+            '</a>';
+          }).join('');
+          dropdown.style.display = 'block';
+        }
+
+        function doSearch() {
+          var q = (searchInput.value || '').trim().toLowerCase();
+          if (!q) { hide(); return; }
+          // Filter from the global aiConversations array (defined in ai-chat.js)
+          var conversations = (typeof aiConversations !== 'undefined') ? aiConversations : [];
+          var results = conversations.filter(function(conv) {
+            if (conv.id === '__pending__') return false;
+            var title = (conv.title || '').toLowerCase();
+            var msg = (conv.last_message || '').toLowerCase();
+            return title.indexOf(q) !== -1 || msg.indexOf(q) !== -1;
+          });
+          render(results, searchInput.value.trim());
+        }
+
+        // Debounced input
+        searchInput.addEventListener('input', function() {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(doSearch, 200);
+        });
+
+        // Enter = immediate search
+        searchInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') { e.preventDefault(); doSearch(); }
+          if (e.key === 'Escape') { hide(); searchInput.value = ''; searchInput.blur(); }
+        });
+
+        // Click on result → switch conversation
+        dropdown.addEventListener('click', function(e) {
+          var item = e.target.closest('[data-conv-id]');
+          if (!item) return;
+          e.preventDefault();
+          var convId = item.getAttribute('data-conv-id');
+          if (convId && typeof switchToConversation === 'function') {
+            switchToConversation(convId);
+          }
+          hide();
+          searchInput.value = '';
+        });
+
+        // Click outside to close
+        document.addEventListener('click', function(e) {
+          if (!wrap.contains(e.target)) hide();
+        });
+      })();
+
+      // Init: load user info + conversations + tenant switcher
+      document.addEventListener('DOMContentLoaded', function() {
+        loadUserNavInfo();
+        // Initialize tenant switcher (since path is "/" it won't auto-init from app.js)
+        if (typeof App !== 'undefined' && App.initTenantSwitcher) {
+          App.initTenantSwitcher();
+        }
+        setTimeout(function() {
+          if (typeof loadAiConversations === 'function') {
+            loadAiConversations();
+          }
+        }, 500);
+      });
+
+      // Cross-tab logout detection
+      window.addEventListener('storage', function(e) {
+        if ((e.key === 'auth_token' && !e.newValue) || e.key === null) {
+          fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+            .finally(function() {
+              window.location.replace(window.location.pathname + '?logged_out=1');
+            });
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

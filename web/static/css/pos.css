@@ -1,0 +1,1022 @@
+/* POS 頁面專用樣式 */
+body.pos-page {
+    background: #F5F5F8;
+    min-height: 100vh;
+}
+
+body.pos-page .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+body.pos-page .sidebar.show {
+    transform: translateX(0);
+}
+
+body.pos-page .main-content {
+    margin-left: 0;
+    padding: 1rem;
+    padding-bottom: 0px;
+}
+
+body.pos-page .sidebar-toggle {
+    display: block;
+}
+
+/* POS 左下角側邊欄切換按鈕 */
+.pos-sidebar-toggle {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1030;
+    width: 56px;
+    height: 56px;
+    border-radius: 0 8px 0 0;
+    background: white;
+    color: #1e293b;
+    border: none;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pos-sidebar-toggle:hover {
+    background: #f8f9fa;
+    transform: scale(1.05);
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.15);
+}
+
+.pos-sidebar-toggle i {
+    color: #1e293b;
+}
+
+/* 自助模式下隱藏 pos-sidebar-toggle */
+body.pos-page.kiosk-mode .pos-sidebar-toggle {
+    display: none !important;
+}
+
+/* 自助模式下隱藏 aiChatFloatingBtn */
+body.pos-page.kiosk-mode #aiChatFloatingBtn,
+body.kiosk-mode #aiChatFloatingBtn {
+    display: none !important;
+}
+
+/* 自助模式下隱藏 borderbox（包含 d-lg-block 的元素） */
+body.kiosk-mode .nav-item.d-none.d-lg-block {
+    display: none !important;
+}
+
+body.kiosk-mode .nav-item.d-none.d-lg-block div[style*="border: 1px solid"] {
+    display: none !important;
+}
+
+/* Topnav 中的切換模式按鈕（自助模式下） - 樣式與 borderbox 一致 */
+#topnavModeToggleBtn {
+    border: 1px solid #dee2e6 !important;
+    border-radius: 100px !important;
+    padding: 0.25rem 0.5rem !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: #1e293b !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    font-weight: 400;
+    height: 38px !important; /* 與 topnav 右側圓角 border box 高度一致 */
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+#topnavModeToggleBtn:hover {
+    background: #f8f9fa !important;
+    border-color: #adb5bd !important;
+    transform: none;
+    box-shadow: none;
+}
+
+#topnavModeToggleBtn i {
+    font-size: 1.2rem;
+    color: #1e293b !important;
+}
+
+#topnavModeToggleBtn span {
+    color: #1e293b !important;
+}
+
+/* POS 卡片樣式優化 */
+body.pos-page .card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    background: white;
+}
+
+body.pos-page .card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+}
+
+body.pos-page .card-header {
+    background: #fafbfc;
+    color: #1e293b;
+    border-radius: 8px 8px 0 0 !important;
+    border: none;
+    padding: 1rem 1.25rem;
+}
+
+/* 購物車固定側邊框 */
+.pos-cart-container {
+    position: fixed;
+    top: 60px;
+    right: 0;
+    width: 400px;
+    height: calc(100vh - 60px);
+    background: white;
+    box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px 0 0 0;
+}
+
+.pos-cart-header {
+    padding: 0.75rem 1rem;
+    background: var(--nir-primary);
+    color: white;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pos-cart-header h5 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.pos-cart-settings-btn {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.16);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.pos-cart-settings-btn:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+.pos-cart-settings-btn:active {
+    transform: scale(0.98);
+}
+
+/* Kiosk 模式按鈕 */
+.pos-cart-mode-btn {
+    width: auto;
+    height: 34px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.16);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+    font-size: 0.875rem;
+}
+
+.pos-cart-mode-btn:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+.pos-cart-mode-btn:active {
+    transform: scale(0.98);
+}
+
+/* Kiosk 模式鍵盤 */
+.kiosk-keyboard {
+    margin-top: 1rem;
+}
+
+.kiosk-keyboard .kiosk-key {
+    font-size: 1.25rem;
+    font-weight: 600;
+    min-height: 60px;
+}
+
+.kiosk-keyboard .btn-lg {
+    font-size: 1.25rem;
+    padding: 0.75rem;
+}
+
+#kioskPhoneInput {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+#kioskCustomerList .card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#kioskCustomerList .card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* Kiosk 模式全寬電話輸入容器 */
+#kioskPhoneInputFullWidthContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100vw - 400px); /* 减去购物车宽度，确保不覆盖购物车 */
+    height: 100vh;
+    background: #f5f5f8;
+    z-index: 1005; /* 低于购物车的 1010，确保购物车可见 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Kiosk 电话输入容器 - 卡片样式 */
+#kioskPhoneInputFullWidthContainer.card {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: auto;
+    margin: 0;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    background: white;
+    padding: 0;
+}
+
+#kioskPhoneInputFullWidthContainer .card-body {
+    padding: 2.5rem;
+}
+
+/* Kiosk 电话输入框样式 */
+#kioskPhoneInputFullWidthContainer #kioskPhoneInput {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+#kioskPhoneInputFullWidthContainer #kioskPhoneInput:focus {
+    border-color: var(--nir-primary, #667eea);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Kiosk 键盘按钮样式优化 */
+#kioskPhoneInputFullWidthContainer .kiosk-key {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    background: white;
+    color: #1e293b;
+}
+
+#kioskPhoneInputFullWidthContainer .kiosk-key:hover {
+    border-color: var(--nir-primary, #667eea);
+    background: #f8fafc;
+    color: var(--nir-primary, #667eea);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#kioskPhoneInputFullWidthContainer .kiosk-key:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Kiosk 操作按钮样式 */
+#kioskPhoneInputFullWidthContainer .btn-danger,
+#kioskPhoneInputFullWidthContainer .btn-primary {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+#kioskPhoneInputFullWidthContainer .btn-danger:hover,
+#kioskPhoneInputFullWidthContainer .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#kioskPhoneInputFullWidthContainer .btn-danger:active,
+#kioskPhoneInputFullWidthContainer .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Kiosk 客户选择结果样式 */
+#kioskPhoneInputFullWidthContainer #kioskCustomerList .card {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    margin-bottom: 0.75rem;
+}
+
+#kioskPhoneInputFullWidthContainer #kioskCustomerList .card:hover {
+    border-color: var(--nir-primary, #667eea);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* 移动设备上，电话输入容器全宽 */
+@media (max-width: 991px) {
+    #kioskPhoneInputFullWidthContainer {
+        width: 100vw;
+        padding: 1rem;
+    }
+    
+    #kioskPhoneInputFullWidthContainer .card-body {
+        padding: 1.5rem;
+    }
+}
+
+/* 确保购物车在 kiosk 模式下始终可见（桌面版） */
+#posCartContainer {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 998 !important;
+}
+
+/* 移动设备上，电话输入容器全宽 */
+@media (max-width: 991px) {
+    #kioskPhoneInputFullWidthContainer {
+        width: 100vw;
+    }
+}
+
+#kioskPhoneInputFullWidthContainer .kiosk-keyboard {
+    max-width: 600px;
+    margin: 2rem auto 0;
+}
+
+.pos-cart-body {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
+}
+
+.pos-cart-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.pos-checkout-step {
+    width: 100%;
+}
+
+.pos-checkout-buttons {
+    width: 100%;
+}
+
+/* 美化滾動條樣式 - 購物車滾動條（與 sidebar 一致） */
+.pos-cart-scrollable::-webkit-scrollbar {
+    width: 10px;
+}
+
+.pos-cart-scrollable::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin: 4px 0;
+}
+
+.pos-cart-scrollable::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: all 0.3s ease;
+}
+
+.pos-cart-scrollable::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pos-cart-scrollable::-webkit-scrollbar-thumb:active {
+    background: #adb5bd;
+}
+
+/* Firefox 滾動條樣式 */
+.pos-cart-scrollable {
+    scrollbar-width: thin;
+    scrollbar-color: #dee2e6 #f8f9fa;
+}
+
+.pos-checkout-step {
+    width: 100%;
+}
+
+.pos-checkout-buttons {
+    width: 100%;
+}
+
+.pos-cart-footer {
+    flex-shrink: 0;
+    border-top: 2px solid #e5e7eb;
+    padding: 0.75rem 1rem;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+.pos-main-content {
+    margin-right: 400px;
+    padding-top: 1rem;
+}
+
+/* POS 頁面 Footer 對齊 */
+body.pos-page .cms-footer {
+    margin-left: 0;
+    margin-right: 400px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* POS 頁面 Footer 對齊 - 與 pos-main-content 置中 */
+body.pos-page .cms-footer {
+    margin-left: 0 !important;
+    margin-right: 400px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* 商品卡片樣式 */
+.pos-product-card {
+    background: white;
+    border-radius: 10px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    text-align: center;
+}
+
+.pos-product-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+}
+
+.pos-product-card .product-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+}
+
+.pos-product-card .product-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    min-height: 2.6em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pos-product-card .product-price {
+    color: #667eea;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: auto;
+}
+
+.pos-product-card .product-code {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* 產品類型和品牌卡片樣式 */
+.pos-filter-card {
+    background: white;
+    border-radius: 8px;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.pos-filter-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+}
+
+.pos-filter-card.active {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.pos-filter-card .filter-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+}
+
+.pos-filter-card .filter-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    min-height: 2.4em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 購物車項目樣式 */
+.pos-cart-item {
+    background: white;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.pos-cart-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+/* 結帳按鈕優化 */
+.pos-cart-footer .btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+}
+
+.pos-cart-footer .btn-success:hover {
+    box-shadow: 0 6px 16px rgba(17, 153, 142, 0.4);
+    background: linear-gradient(135deg, #0d7a6f 0%, #2ddb6f 100%);
+}
+
+.pos-cart-footer .btn-outline-secondary {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.pos-cart-footer .btn-outline-secondary:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 輸入框優化 */
+.pos-cart-scrollable .form-control {
+    border-radius: 6px;
+    border-color: #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.pos-cart-scrollable .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+}
+
+.pos-cart-scrollable .btn-outline-primary {
+    border-color: #667eea;
+    color: #667eea;
+    transition: all 0.2s ease;
+}
+
+.pos-cart-scrollable .btn-outline-primary:hover {
+    background: #667eea;
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* 優惠區域折疊按鈕 */
+#posDiscountCollapse {
+    transition: all 0.3s ease;
+}
+
+#posDiscountToggleIcon {
+    transition: transform 0.3s ease;
+}
+
+/* 客戶選擇區域優化 */
+.pos-customer-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-left: 4px solid #667eea;
+}
+
+.pos-customer-card .card-body {
+    padding: 1.25rem;
+}
+
+/* 確保 quickAddCustomerBtn 不會換行 */
+.pos-customer-card .input-group {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.pos-customer-card .input-group .form-select {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.pos-customer-card .input-group #quickAddCustomerBtn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+/* QR Code 掃描區域 */
+.pos-qr-scanner-area {
+    position: relative;
+    min-height: 120px;
+    border: 2px dashed #667eea;
+    border-radius: 8px;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0.5rem;
+}
+
+.pos-qr-scanner-area.active {
+    border-color: #28a745;
+    background: #000;
+}
+
+.pos-qr-scanner-area #qr-reader {
+    width: 100%;
+    max-width: 100%;
+}
+
+.pos-qr-scanner-area #qr-reader__dashboard_section {
+    padding: 0.5rem;
+}
+
+.pos-qr-scanner-area #qr-reader__dashboard_section_csr {
+    margin-bottom: 0.5rem;
+}
+
+.pos-qr-scanner-area #qrScannerPlaceholder {
+    padding: 0.25rem 0.5rem;
+    flex-shrink: 0;
+}
+
+.pos-qr-scanner-toggle-btn {
+    margin-top: 0.25rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+/* 產品篩選 Tab 樣式 */
+.nav-tabs-sm .nav-link {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border: 1px solid transparent;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.nav-tabs-sm .nav-link:hover {
+    border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.nav-tabs-sm .nav-link.active {
+    color: #495057;
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.pos-edit-order-btn {
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.pos-edit-order-btn:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+/* 搜索框優化 */
+.pos-search-header {
+    background: #fafbfc;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.pos-search-header .input-group-text {
+    background: var(--nir-primary) !important;
+    color: white !important;
+    border: none;
+}
+
+.pos-search-header .input-group-text i {
+    color: white !important;
+}
+
+.pos-search-header .form-control {
+    border-left: none;
+    font-size: 1rem;
+}
+
+.pos-search-header .form-control:focus {
+    border-color: #d1d5db;
+    box-shadow: 0 0 0 0.2rem rgba(209, 213, 219, 0.25);
+}
+
+/* 總計區域優化 */
+.pos-total-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.pos-total-section .fs-4 {
+    color: #667eea;
+    font-weight: 700;
+}
+
+@media (max-width: 1400px) {
+    .pos-cart-container {
+        width: 350px;
+    }
+    .pos-main-content {
+        margin-right: 350px;
+    }
+    body.pos-page .cms-footer {
+        margin-right: 350px;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .pos-cart-container {
+        position: relative;
+        top: 0;
+        width: 100%;
+        height: auto;
+        max-height: 60vh;
+        border-radius: 12px;
+    }
+    .pos-main-content {
+        margin-right: 0;
+    }
+    body.pos-page .cms-footer {
+        margin-right: 0;
+        margin-left: 0 !important;
+    }
+}
+
+/* 產品卡片和購物車滾動條樣式 */
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#cartItems::-webkit-scrollbar {
+    width: 6px;
+}
+
+#cartItems::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#cartItems::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+#productsGrid::-webkit-scrollbar {
+    width: 6px;
+}
+
+#productsGrid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#productsGrid::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+/* ===========================
+   手機版 3-Tab 底部導航佈局
+   斷點: ≤768px (僅手機)
+   =========================== */
+
+/* 桌面版：隱藏手機 Tab Bar */
+.pos-mobile-tabs {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* --- 底部 Tab Bar --- */
+    .pos-mobile-tabs {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50px;
+        background: #fff;
+        display: flex;
+        align-items: stretch;
+        border-top: 1px solid #e5e7eb;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+        z-index: 1050;
+        padding: 0;
+    }
+
+    .pos-mobile-tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: none;
+        color: #94a3b8;
+        font-size: 0.65rem;
+        font-weight: 500;
+        position: relative;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        padding: 6px 0;
+        -webkit-tap-highlight-color: transparent;
+        gap: 3px;
+    }
+
+    .pos-mobile-tab.active {
+        color: var(--nir-primary, #667eea);
+    }
+
+    .pos-mobile-tab i {
+        font-size: 1.15rem;
+        line-height: 1;
+    }
+
+    /* 購物車 Tab Badge */
+    .pos-mobile-tab-badge {
+        position: absolute;
+        top: 1px;
+        right: calc(50% - 20px);
+        background: #ef4444;
+        color: #fff;
+        font-size: 0.55rem;
+        font-weight: 700;
+        border-radius: 8px;
+        min-width: 16px;
+        height: 16px;
+        line-height: 16px;
+        text-align: center;
+        padding: 0 4px;
+    }
+
+    /* --- 主內容區調整 --- */
+    body.pos-page {
+        background: transparent;
+    }
+
+    .pos-main-content {
+        margin-right: 0 !important;
+        padding: 0 !important;
+        padding-bottom: 58px !important;
+    }
+
+    /* 去掉卡片感：無圓角、無陰影、無邊框、無背景，直接平鋪 */
+    body.pos-page .pos-customer-card,
+    body.pos-page #posProductSearchArea {
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        border-left: none !important;
+        margin: 0 !important;
+    }
+
+    body.pos-page .pos-customer-card .card-body,
+    body.pos-page #posProductSearchArea .card-body {
+        padding: 0.75rem !important;
+    }
+
+    body.pos-page #posProductSearchArea .card-header {
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0.75rem !important;
+    }
+
+    body.pos-page .cms-footer {
+        margin-right: 0 !important;
+        padding-bottom: 58px !important;
+    }
+
+    /* --- 面板切換：預設全部隱藏 --- */
+    .pos-customer-card {
+        display: none !important;
+    }
+
+    #posProductSearchArea {
+        display: none !important;
+    }
+
+    /* 用 ID 選擇器覆蓋全域 #posCartContainer { display: flex !important } */
+    #posCartContainer {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* --- Tab Active 狀態：顯示對應面板 --- */
+    body.pos-mobile-tab-customer .pos-customer-card {
+        display: block !important;
+    }
+
+    body.pos-mobile-tab-products #posProductSearchArea {
+        display: block !important;
+    }
+
+    body.pos-mobile-tab-cart #posCartContainer {
+        display: flex !important;
+        visibility: visible !important;
+        position: fixed !important;
+        top: 56px !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 50px !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        z-index: 1040 !important;
+    }
+
+    /* 商品區域高度充滿螢幕（扣掉 topnav + search header + tab bar） */
+    body.pos-mobile-tab-products #posProductSearchArea .card-body {
+        max-height: calc(100vh - 250px);
+        overflow-y: auto;
+    }
+
+    /* 客戶區在手機上也要適當高度 */
+    body.pos-mobile-tab-customer .pos-customer-card .card-body {
+        max-height: calc(100vh - 130px);
+        overflow-y: auto;
+    }
+
+    /* 隱藏桌面版左下角 sidebar toggle */
+    .pos-sidebar-toggle {
+        display: none !important;
+    }
+}

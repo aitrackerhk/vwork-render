@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 620" width="1440" height="620">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed"/>
+      <stop offset="50%" style="stop-color:#a855f7"/>
+      <stop offset="100%" style="stop-color:#ec4899"/>
+    </linearGradient>
+    <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#c084fc;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#f472b6;stop-opacity:0.3"/>
+    </linearGradient>
+    <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#f9a8d4;stop-opacity:0.2"/>
+    </linearGradient>
+    <linearGradient id="doorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="rocketGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#f472b6"/>
+      <stop offset="100%" style="stop-color:#fff"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background gradient -->
+  <rect width="1440" height="620" fill="url(#bgGrad)"/>
+
+  <!-- Decorative waves -->
+  <path d="M0,520 Q180,460 360,490 T720,470 T1080,500 T1440,460 L1440,620 L0,620Z" fill="url(#wave1)"/>
+  <path d="M0,560 Q200,510 400,540 T800,520 T1200,550 T1440,510 L1440,620 L0,620Z" fill="url(#wave2)"/>
+
+  <!-- Large floating circles -->
+  <circle cx="120" cy="100" r="80" fill="#fbbf24" opacity="0.15"/>
+  <circle cx="1350" cy="140" r="100" fill="#34d399" opacity="0.12"/>
+  <circle cx="700" cy="80" r="50" fill="#60a5fa" opacity="0.18"/>
+  <circle cx="1100" cy="500" r="65" fill="#fbbf24" opacity="0.1"/>
+  <circle cx="200" cy="480" r="45" fill="#f472b6" opacity="0.12"/>
+
+  <!-- Small sparkle dots -->
+  <circle cx="300" cy="150" r="4" fill="#fff" opacity="0.6"/>
+  <circle cx="500" cy="100" r="3" fill="#fff" opacity="0.5"/>
+  <circle cx="900" cy="120" r="5" fill="#fff" opacity="0.55"/>
+  <circle cx="1200" cy="180" r="3.5" fill="#fff" opacity="0.5"/>
+  <circle cx="150" cy="300" r="3" fill="#fff" opacity="0.45"/>
+  <circle cx="1300" cy="350" r="4" fill="#fff" opacity="0.5"/>
+  <circle cx="650" cy="500" r="3" fill="#fff" opacity="0.4"/>
+  <circle cx="1050" cy="250" r="3.5" fill="#fff" opacity="0.5"/>
+  <circle cx="400" cy="420" r="2.5" fill="#fff" opacity="0.45"/>
+
+  <!-- Left side: Open door with light -->
+  <g transform="translate(100, 180)">
+    <!-- Door frame -->
+    <rect x="20" y="0" width="120" height="220" rx="14" fill="#fff" opacity="0.15"/>
+    <!-- Open door (angled) -->
+    <g transform="skewY(-3)">
+      <rect x="25" y="10" width="90" height="200" rx="10" fill="url(#doorGrad)" opacity="0.85"/>
+      <!-- Door handle -->
+      <circle cx="100" cy="110" r="5" fill="#fff" opacity="0.8"/>
+      <!-- Door panels -->
+      <rect x="38" y="25" width="64" height="80" rx="6" fill="#fff" opacity="0.2"/>
+      <rect x="38" y="120" width="64" height="70" rx="6" fill="#fff" opacity="0.15"/>
+    </g>
+    <!-- Light rays from door -->
+    <g opacity="0.25">
+      <polygon points="140,50 280,10 280,40" fill="#fbbf24"/>
+      <polygon points="140,90 300,60 300,100" fill="#fbbf24" opacity="0.2"/>
+      <polygon points="140,130 290,120 290,160" fill="#fbbf24" opacity="0.15"/>
+      <polygon points="140,170 270,180 270,210" fill="#fbbf24" opacity="0.12"/>
+    </g>
+  </g>
+
+  <!-- Person walking toward door -->
+  <g transform="translate(330, 260)">
+    <!-- Body -->
+    <circle cx="25" cy="15" r="16" fill="#fbbf24" opacity="0.85"/>
+    <rect x="12" y="31" width="26" height="50" rx="10" fill="#fbbf24" opacity="0.75"/>
+    <!-- Face -->
+    <circle cx="19" cy="12" r="2.5" fill="#fff"/>
+    <circle cx="31" cy="12" r="2.5" fill="#fff"/>
+    <path d="M19,22 Q25,28 31,22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <!-- Arm reaching forward -->
+    <line x1="12" y1="45" x2="-5" y2="35" stroke="#fbbf24" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+    <!-- Walking legs -->
+    <line x1="18" y1="80" x2="10" y2="105" stroke="#fbbf24" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+    <line x1="32" y1="80" x2="40" y2="105" stroke="#fbbf24" stroke-width="5" stroke-linecap="round" opacity="0.7"/>
+  </g>
+
+  <!-- Rocket launching (right side) -->
+  <g transform="translate(1100, 120)">
+    <!-- Rocket body -->
+    <g transform="rotate(-15, 40, 80)">
+      <ellipse cx="40" cy="50" rx="22" ry="50" fill="#fff" opacity="0.8"/>
+      <!-- Rocket nose -->
+      <path d="M40,0 L25,30 L55,30 Z" fill="#f472b6" opacity="0.7"/>
+      <!-- Window -->
+      <circle cx="40" cy="45" r="10" fill="#7c3aed" opacity="0.5"/>
+      <circle cx="40" cy="45" r="6" fill="#fff" opacity="0.3"/>
+      <!-- Fins -->
+      <path d="M18,80 L5,105 L22,90 Z" fill="#fbbf24" opacity="0.7"/>
+      <path d="M62,80 L75,105 L58,90 Z" fill="#fbbf24" opacity="0.7"/>
+      <!-- Flame -->
+      <ellipse cx="40" cy="108" rx="12" ry="18" fill="#fbbf24" opacity="0.7"/>
+      <ellipse cx="40" cy="112" rx="8" ry="14" fill="#f59e0b" opacity="0.6"/>
+      <ellipse cx="40" cy="116" rx="5" ry="10" fill="#fff" opacity="0.4"/>
+    </g>
+    <!-- Smoke trail -->
+    <circle cx="55" cy="200" r="12" fill="#fff" opacity="0.1"/>
+    <circle cx="50" cy="230" r="18" fill="#fff" opacity="0.08"/>
+    <circle cx="60" cy="265" r="22" fill="#fff" opacity="0.06"/>
+  </g>
+
+  <!-- Celebrating hands -->
+  <g transform="translate(750, 180)" opacity="0.4">
+    <!-- Hand 1 (raised) -->
+    <path d="M0,60 L0,30 L8,0 L16,30 L16,60 Z" fill="#fbbf24" opacity="0.7"/>
+    <circle cx="8" cy="0" r="6" fill="#fbbf24" opacity="0.6"/>
+    <!-- Hand 2 -->
+    <path d="M40,55 L40,25 L48,-5 L56,25 L56,55 Z" fill="#60a5fa" opacity="0.7"/>
+    <circle cx="48" cy="-5" r="6" fill="#60a5fa" opacity="0.6"/>
+    <!-- Hand 3 -->
+    <path d="M80,60 L80,30 L88,0 L96,30 L96,60 Z" fill="#34d399" opacity="0.7"/>
+    <circle cx="88" cy="0" r="6" fill="#34d399" opacity="0.6"/>
+  </g>
+
+  <!-- Confetti burst (center) -->
+  <g transform="translate(550, 150)" opacity="0.5">
+    <rect x="0" y="0" width="8" height="20" rx="4" fill="#fbbf24" transform="rotate(15, 4, 10)"/>
+    <rect x="30" y="-10" width="6" height="16" rx="3" fill="#f472b6" transform="rotate(-20, 33, -2)"/>
+    <rect x="60" y="5" width="7" height="18" rx="3.5" fill="#60a5fa" transform="rotate(30, 63, 14)"/>
+    <rect x="-20" y="10" width="6" height="14" rx="3" fill="#34d399" transform="rotate(-10, -17, 17)"/>
+    <circle cx="15" cy="-15" r="4" fill="#fbbf24" opacity="0.7"/>
+    <circle cx="50" cy="-20" r="3" fill="#f472b6" opacity="0.6"/>
+    <circle cx="75" cy="-5" r="3.5" fill="#fff" opacity="0.5"/>
+    <circle cx="-10" cy="-10" r="3" fill="#60a5fa" opacity="0.6"/>
+  </g>
+
+  <!-- Plus sign (joining symbol) -->
+  <g transform="translate(920, 320)" opacity="0.3">
+    <rect x="15" y="0" width="14" height="44" rx="7" fill="#fff"/>
+    <rect x="0" y="15" width="44" height="14" rx="7" fill="#fff"/>
+  </g>
+
+  <!-- Network nodes (community) -->
+  <g transform="translate(1250, 320)" opacity="0.25">
+    <circle cx="0" cy="30" r="12" fill="#fff"/>
+    <circle cx="50" cy="0" r="10" fill="#fff"/>
+    <circle cx="80" cy="50" r="12" fill="#fff"/>
+    <circle cx="40" cy="60" r="8" fill="#fff"/>
+    <line x1="10" y1="25" x2="42" y2="6" stroke="#fff" stroke-width="1.5"/>
+    <line x1="58" y1="5" x2="72" y2="42" stroke="#fff" stroke-width="1.5"/>
+    <line x1="10" y1="38" x2="34" y2="55" stroke="#fff" stroke-width="1.5"/>
+    <line x1="46" y1="58" x2="70" y2="52" stroke="#fff" stroke-width="1.5"/>
+  </g>
+
+  <!-- Welcome mat -->
+  <g transform="translate(130, 410)" opacity="0.25">
+    <rect x="0" y="0" width="100" height="30" rx="6" fill="#fff"/>
+    <rect x="8" y="6" width="84" height="18" rx="4" fill="#7c3aed" opacity="0.3"/>
+  </g>
+
+  <!-- Floating product card -->
+  <g transform="translate(1200, 60)">
+    <rect x="0" y="0" width="100" height="80" rx="14" fill="#fff" opacity="0.15"/>
+    <rect x="10" y="10" width="80" height="35" rx="8" fill="#fff" opacity="0.1"/>
+    <rect x="10" y="52" width="50" height="8" rx="4" fill="#fff" opacity="0.15"/>
+    <rect x="10" y="64" width="30" height="6" rx="3" fill="#fff" opacity="0.1"/>
+  </g>
+
+  <!-- Floating card (left) -->
+  <g transform="translate(60, 80)">
+    <rect x="0" y="0" width="90" height="70" rx="12" fill="#fff" opacity="0.12"/>
+    <rect x="10" y="10" width="70" height="30" rx="7" fill="#fff" opacity="0.08"/>
+    <rect x="10" y="46" width="40" height="7" rx="3.5" fill="#fff" opacity="0.12"/>
+    <rect x="10" y="57" width="25" height="5" rx="2.5" fill="#fff" opacity="0.08"/>
+  </g>
+
+  <!-- Connecting dots/lines -->
+  <g opacity="0.1">
+    <line x1="350" y1="300" x2="500" y2="250" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+    <line x1="900" y1="280" x2="1050" y2="320" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+    <line x1="600" y1="450" x2="780" y2="400" stroke="#fff" stroke-width="1.5" stroke-dasharray="6,6"/>
+  </g>
+
+  <!-- Ground/floor area -->
+  <rect x="80" y="450" width="280" height="8" rx="4" fill="#fff" opacity="0.08"/>
+  <rect x="1050" y="430" width="240" height="6" rx="3" fill="#fff" opacity="0.06"/>
+
+  <!-- Small decorative shapes -->
+  <rect x="500" y="200" width="16" height="16" rx="4" fill="#fbbf24" opacity="0.2" transform="rotate(15, 508, 208)"/>
+  <rect x="820" y="160" width="12" height="12" rx="3" fill="#34d399" opacity="0.2" transform="rotate(30, 826, 166)"/>
+  <polygon points="680,440 686,452 698,452 688,460 692,472 680,464 668,472 672,460 662,452 674,452" fill="#fbbf24" opacity="0.15"/>
+  <polygon points="440,100 444,108 452,108 446,114 448,122 440,116 432,122 434,114 428,108 436,108" fill="#fff" opacity="0.25"/>
+  <polygon points="1320,430 1323,436 1330,436 1325,440 1327,446 1320,442 1313,446 1315,440 1310,436 1317,436" fill="#fff" opacity="0.2"/>
+
+  <!-- Triangle confetti -->
+  <polygon points="460,130 470,115 480,130" fill="#fbbf24" opacity="0.15" transform="rotate(20, 470, 122)"/>
+  <polygon points="1050,200 1058,188 1066,200" fill="#60a5fa" opacity="0.12" transform="rotate(-10, 1058, 194)"/>
+  <polygon points="180,420 188,408 196,420" fill="#34d399" opacity="0.15" transform="rotate(15, 188, 414)"/>
+
+  <!-- Extra celebration sparkles -->
+  <circle cx="600" cy="100" r="5" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="680" cy="130" r="3" fill="#fff" opacity="0.4"/>
+  <circle cx="520" cy="120" r="4" fill="#f472b6" opacity="0.45"/>
+  <circle cx="640" cy="80" r="3.5" fill="#60a5fa" opacity="0.4"/>
+</svg>

@@ -1,0 +1,17 @@
+{
+  "name": "order_demo",
+  "title": "訂單處理流程",
+  "version": 1,
+  "vars": {},
+  "steps": [
+    { "action": "goto", "url": "/orders" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": "#dataTable tr:first-child .btn-outline-primary", "text": { "zh": "處理待辦訂單與發貨", "zh-CN": "处理待办订单与发货", "en": "Handle pending orders and shipping" } },
+    { "action": "click", "selector": "#dataTable tr:first-child .btn-outline-primary" },
+    { "action": "sleep", "ms": 1000 },
+    { "action": "highlight", "selector": ".form-button-bar.show button[type=\"submit\"].btn.btn-primary", "text": { "zh": "點擊「保存」更新訂單", "zh-CN": "点击「保存」更新订单", "en": "Click Save to update order" } },
+    { "action": "click", "selector": ".form-button-bar.show button[type=\"submit\"].btn.btn-primary" },
+    { "action": "sleep", "ms": 1500 },
+    { "action": "done" }
+  ]
+}

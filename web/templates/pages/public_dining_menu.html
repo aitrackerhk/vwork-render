@@ -1,0 +1,490 @@
+{{define "pages/public_dining_menu"}}
+<style>
+  body { padding-top: 112px; }
+  .dining-header { position: fixed; top: 0; left: 0; right: 0; z-index: 1040; background: #fff; border-bottom: 1px solid #e5e7eb; min-height: 84px; }
+  .dining-header .brand { display: flex; align-items: center; gap: 0.75rem; }
+  .dining-header img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+  .cart-fab { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 1040; width: auto; max-width: calc(100% - 32px); }
+  .cart-fab .btn { border-radius: 999px; padding: 0.65rem 1.2rem; box-shadow: 0 6px 20px rgba(0,0,0,0.15); white-space: nowrap; }
+  @media (max-width: 576px) {
+    .cart-fab { bottom: 12px; }
+    .cart-fab .btn { padding: 0.45rem 0.8rem; font-size: 0.85rem; }
+    .cart-fab .badge { font-size: 0.7rem; }
+  }
+  .product-card { cursor: pointer; }
+  .product-img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; }
+</style>
+
+<div class="dining-header py-2">
+  <div class="container d-flex align-items-center justify-content-between">
+    <div class="brand">
+      {{if .TenantLogo}}<img src="{{.TenantLogo}}" alt="logo">{{end}}
+      <div>
+        <div class="fw-bold">{{.TenantName}}</div>
+        <div class="text-muted small">{{if .DiningTableCode}}<span data-i18n="pages.publicDiningMenu.tableNo">桌號</span> {{.DiningTableCode}}{{else if .DiningTableID}}<span data-i18n="pages.publicDiningMenu.tableNo">桌號</span> {{.DiningTableID}}{{end}}</div>
+      </div>
+    </div>
+    <div class="text-muted small">{{if .MenuCategory}}<span data-i18n="pages.publicDiningMenu.category">類別：</span>{{.MenuCategory}}{{else}}<span data-i18n="pages.publicDiningMenu.showAll">顯示全部產品</span>{{end}}</div>
+  </div>
+</div>
+
+<div class="container" style="margin-top: 100px;">
+  {{if not .Products}}
+  <div class="alert alert-light border" data-i18n="pages.publicDiningMenu.noProducts">目前沒有可點餐的產品</div>
+  {{else}}
+  <div class="row g-3">
+    {{range .Products}}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm product-card" data-product-id="{{.ID}}">
+        <div class="card-body">
+          <div class="d-flex gap-3">
+            <div class="flex-shrink-0">
+              <img src="{{if .ImageURL}}{{.ImageURL}}{{else}}/static/product.jpg{{end}}" class="product-img" alt="{{.Name}}" onerror="this.src='/static/product.jpg'">
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-bold mb-1">{{.Name}}</div>
+              {{if .Description}}
+              <div class="text-muted small mb-2" style="white-space: pre-wrap;">{{.Description}}</div>
+              {{end}}
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="fw-bold">$ {{printf "%.2f" .Price}}</div>
+                {{if .Category}}
+                <span class="badge bg-light text-dark">{{.Category}}</span>
+                {{end}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{end}}
+  </div>
+  {{end}}
+</div>
+
+{{if .MenuOnly}}
+<div class="modal fade" id="menuOnlyModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title"><i class="bi bi-info-circle me-2"></i><span data-i18n="pages.publicDiningMenu.viewOnly">僅供瀏覽</span></h5>
+      </div>
+      <div class="modal-body">
+        <p class="mb-0" id="menuOnlyMessage">{{.MenuOnlyMessage}}</p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-i18n="pages.publicDiningMenu.understood">我知道了</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{else}}
+<div class="cart-fab d-flex gap-2">
+  <button class="btn btn-primary" id="cartOpenBtn">
+    <i class="bi bi-cart3 me-1"></i> <span data-i18n="pages.publicDiningMenu.cart">購物車</span> <span class="badge bg-light text-dark ms-2" id="cartCount">0</span>
+  </button>
+  <button class="btn btn-outline-secondary" id="orderOpenBtn">
+    <i class="bi bi-receipt me-1"></i> <span data-i18n="pages.publicDiningMenu.orders">訂單</span>
+  </button>
+</div>
+{{end}}
+
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productModalTitle" data-i18n="pages.publicDiningMenu.product">產品</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-5">
+            <img id="productModalImage" class="w-100 rounded" alt="" style="object-fit: cover; height: 240px;">
+          </div>
+          <div class="col-md-7">
+            <div class="text-muted small mb-2" id="productModalCategory"></div>
+            <div class="mb-2" id="productModalDescription"></div>
+            <div class="fw-bold fs-4 mb-3" id="productModalPrice"></div>
+            <div id="productModalAttributes"></div>
+            {{if not .MenuOnly}}
+            <div class="d-flex align-items-center gap-2 mt-3">
+              <label class="form-label mb-0" data-i18n="pages.publicDiningMenu.quantity">數量</label>
+              <input type="number" id="productModalQty" class="form-control" style="max-width: 100px;" min="1" value="1">
+            </div>
+            {{end}}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="common.close">關閉</button>
+        {{if not .MenuOnly}}
+        <button type="button" class="btn btn-primary" id="addToCartBtn" data-i18n="pages.publicDiningMenu.addToCart">加入購物車</button>
+        {{end}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" data-i18n="pages.publicDiningMenu.cart">購物車</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="cartModalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="pages.publicDiningMenu.continueShopping">繼續選購</button>
+        <button type="button" class="btn btn-primary" id="cartConfirmBtn" data-i18n="pages.publicDiningMenu.confirmOrder">確認下單</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" data-i18n="pages.publicDiningMenu.orderedItems">已下單</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="orderModalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" data-i18n="common.close">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    function wdT(key, fallback) { return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback; }
+    const subdomain = "{{.Subdomain}}";
+    const diningTableId = "{{.DiningTableID}}";
+    const diningTableCode = "{{.DiningTableCode}}";
+    const diningQueueId = "{{.DiningQueueID}}";
+    const diningTicketNumber = "{{.DiningTicketNumber}}";
+    const menuOnly = {{if .MenuOnly}}true{{else}}false{{end}};
+    const cartKey = 'dining_cart_' + subdomain;
+
+    // 如果是只讀模式，頁面載入後顯示提示 popup
+    if (menuOnly) {
+      document.addEventListener('DOMContentLoaded', function() {
+        const menuOnlyModalEl = document.getElementById('menuOnlyModal');
+        if (menuOnlyModalEl) {
+          const modal = new bootstrap.Modal(menuOnlyModalEl);
+          modal.show();
+        }
+      });
+    }
+
+    const cartCountEl = document.getElementById('cartCount');
+    const cartOpenBtn = document.getElementById('cartOpenBtn');
+    const orderOpenBtn = document.getElementById('orderOpenBtn');
+    const cartModalEl = document.getElementById('cartModal');
+    const cartModalBody = document.getElementById('cartModalBody');
+    const cartConfirmBtn = document.getElementById('cartConfirmBtn');
+    const orderModalEl = document.getElementById('orderModal');
+    const orderModalBody = document.getElementById('orderModalBody');
+    const productModalEl = document.getElementById('productModal');
+    const productModalTitle = document.getElementById('productModalTitle');
+    const productModalImage = document.getElementById('productModalImage');
+    const productModalCategory = document.getElementById('productModalCategory');
+    const productModalDescription = document.getElementById('productModalDescription');
+    const productModalPrice = document.getElementById('productModalPrice');
+    const productModalAttributes = document.getElementById('productModalAttributes');
+    const productModalQty = document.getElementById('productModalQty');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+
+    let currentProduct = null;
+    let currentAttributes = [];
+    let cart = [];
+    let currentOrderId = '';
+    let currentOrder = null;
+
+    function loadCart() {
+      try {
+        const raw = localStorage.getItem(cartKey);
+        cart = raw ? JSON.parse(raw) : [];
+      } catch (_e) {
+        cart = [];
+      }
+      updateCartCount();
+    }
+
+    function saveCart() {
+      try { localStorage.setItem(cartKey, JSON.stringify(cart)); } catch (_e) {}
+      updateCartCount();
+    }
+
+    function updateCartCount() {
+      const count = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+      if (cartCountEl) cartCountEl.textContent = String(count);
+    }
+
+    async function fetchOrder() {
+      if (!diningTableId && !diningTableCode && !diningQueueId) return null;
+      const qs = new URLSearchParams();
+      if (diningQueueId) qs.set('dining_queue_id', diningQueueId);
+      if (diningTableId) qs.set('dining_table_id', diningTableId);
+      if (diningTableCode) qs.set('dining_table_code', diningTableCode);
+      try {
+        const resp = await fetch(`/api/v1/public/${encodeURIComponent(subdomain)}/dining/orders?` + qs.toString());
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) return null;
+        currentOrder = data;
+        currentOrderId = data.order_id || data.id || '';
+        return data;
+      } catch (_e) {
+        return null;
+      }
+    }
+
+    function renderOrderModal() {
+      if (!orderModalBody) return;
+      if (!currentOrder || !currentOrder.items || currentOrder.items.length === 0) {
+        orderModalBody.innerHTML = '<div class="text-muted">' + wdT('pages.publicDiningMenu.notOrdered', '尚未下單') + '</div>';
+        return;
+      }
+      const total = currentOrder.items.reduce((sum, it) => sum + (it.total_price || 0), 0);
+      orderModalBody.innerHTML = `
+        <div class="list-group mb-3">
+          ${currentOrder.items.map(it => {
+            const name = it.product_name || (it.product && it.product.name) || '';
+            const attrs = (it.product_attributes || []).map(a => `${a.name || a.attribute_id}:${a.value}`).join('、');
+            return `
+              <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="fw-bold">${name}</div>
+                    ${attrs ? `<div class="text-muted small">${attrs}</div>` : ''}
+                  </div>
+                  <div class="text-end">$ ${formatPrice(it.unit_price)}</div>
+                </div>
+                <div class="text-muted small mt-1">${wdT('pages.publicDiningMenu.qtyLabel', '數量')} ${it.quantity}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="d-flex justify-content-between fw-bold">
+          <div>${wdT('pages.publicDiningMenu.total', '合計')}</div>
+          <div>$ ${formatPrice(total)}</div>
+        </div>
+      `;
+    }
+
+    function formatPrice(n) {
+      return Number(n || 0).toFixed(2);
+    }
+
+    function openProductModal(productId) {
+      if (!productId) return;
+      fetch(`/api/v1/public/${encodeURIComponent(subdomain)}/products/${productId}`)
+        .then(r => r.json())
+        .then(data => {
+          const product = data.product || data;
+          currentProduct = product;
+          currentAttributes = Array.isArray(data.attributes) ? data.attributes : [];
+          productModalTitle.textContent = product.name || wdT('pages.publicDiningMenu.product', '產品');
+          productModalImage.src = product.image_url || '/static/product.jpg';
+          productModalImage.onerror = function() { this.src = '/static/product.jpg'; };
+          productModalImage.style.display = '';
+          productModalCategory.textContent = product.category ? wdT('pages.publicDiningMenu.categoryLabel', '類別：') + product.category : '';
+          productModalDescription.textContent = product.description || '';
+          productModalPrice.textContent = `$ ${formatPrice(product.price)}`;
+          productModalQty.value = 1;
+          renderAttributes();
+          const modal = new bootstrap.Modal(productModalEl);
+          modal.show();
+        });
+    }
+
+    function renderAttributes() {
+      if (!productModalAttributes) return;
+      if (!currentAttributes.length) {
+        productModalAttributes.innerHTML = '<div class="text-muted small">' + wdT('pages.publicDiningMenu.noAttributes', '無產品屬性') + '</div>';
+        return;
+      }
+      productModalAttributes.innerHTML = currentAttributes.map((attr, idx) => {
+        const options = Array.isArray(attr.options) ? attr.options : (Array.isArray(attr.values) ? attr.values : []);
+        const required = attr.is_required ? 'required' : '';
+        return `
+          <div class="mb-2">
+            <label class="form-label">${attr.name || wdT('pages.publicDiningMenu.attribute', '屬性')}</label>
+            <select class="form-select" data-attr-index="${idx}" ${required}>
+              <option value="">${wdT('pages.publicDiningMenu.pleaseSelect', '請選擇')}</option>
+              ${options.map(o => `<option value="${o}">${o}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function collectSelectedAttributes() {
+      const attrs = [];
+      const selects = productModalAttributes.querySelectorAll('select[data-attr-index]');
+      selects.forEach(sel => {
+        const idx = Number(sel.getAttribute('data-attr-index'));
+        const attr = currentAttributes[idx];
+        const value = sel.value;
+        if (attr && value) {
+          attrs.push({ attribute_id: attr.id, value, name: attr.name || '' });
+        }
+      });
+      return attrs;
+    }
+
+    function addToCart() {
+      if (!currentProduct) return;
+      const qty = Number(productModalQty.value || 1);
+      if (!qty || qty <= 0) return;
+      const attrs = collectSelectedAttributes();
+      const key = `${currentProduct.id}::${JSON.stringify(attrs)}`;
+      const existing = cart.find(i => i.key === key);
+      if (existing) {
+        existing.quantity += qty;
+      } else {
+        cart.push({
+          key,
+          product_id: currentProduct.id,
+          name: currentProduct.name,
+          price: currentProduct.price,
+          quantity: qty,
+          attributes: attrs
+        });
+      }
+      saveCart();
+      bootstrap.Modal.getInstance(productModalEl).hide();
+    }
+
+    function renderCart() {
+      if (!cartModalBody) return;
+      if (!cart.length) {
+        cartModalBody.innerHTML = '<div class="text-muted">' + wdT('pages.publicDiningMenu.cartEmpty', '購物車是空的') + '</div>';
+        return;
+      }
+      const total = cart.reduce((sum, item) => sum + item.quantity * item.price, 0);
+      cartModalBody.innerHTML = `
+        <div class="list-group mb-3">
+          ${cart.map((item, idx) => {
+            const attrText = (item.attributes || []).map(a => `${a.name || a.attribute_id}:${a.value}`).join('、');
+            return `
+              <div class="list-group-item">
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <div class="fw-bold">${item.name}</div>
+                    ${attrText ? `<div class="text-muted small">${attrText}</div>` : ''}
+                  </div>
+                  <div class="text-end">
+                    <div>$ ${formatPrice(item.price)}</div>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                  <div class="input-group" style="max-width: 140px;">
+                    <button class="btn btn-outline-secondary btn-sm" data-action="dec" data-index="${idx}">-</button>
+                    <input class="form-control form-control-sm text-center" value="${item.quantity}" readonly>
+                    <button class="btn btn-outline-secondary btn-sm" data-action="inc" data-index="${idx}">+</button>
+                  </div>
+                  <button class="btn btn-outline-danger btn-sm" data-action="remove" data-index="${idx}">${wdT('pages.publicDiningMenu.remove', '移除')}</button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="d-flex justify-content-between fw-bold">
+          <div>${wdT('pages.publicDiningMenu.total', '合計')}</div>
+          <div>$ ${formatPrice(total)}</div>
+        </div>
+      `;
+    }
+
+    async function submitOrder() {
+      if (!cart.length) return;
+      cartConfirmBtn.disabled = true;
+      try {
+        const payload = {
+          items: cart.map(i => ({
+            product_id: i.product_id,
+            quantity: i.quantity,
+            product_attributes: (i.attributes || []).map(a => ({ attribute_id: a.attribute_id, value: a.value }))
+          })),
+          dining_table_id: diningTableId,
+          dining_table_code: diningTableCode,
+          dining_queue_id: diningQueueId,
+          dining_ticket_number: diningTicketNumber
+        };
+
+        let url = `/api/v1/public/${encodeURIComponent(subdomain)}/dining/orders`;
+        if (currentOrderId) {
+          url = `/api/v1/public/${encodeURIComponent(subdomain)}/dining/orders/${currentOrderId}/items`;
+        }
+
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data.error || wdT('pages.publicDiningMenu.orderFailed', '下單失敗'));
+        cart = [];
+        saveCart();
+        if (data.order_id) currentOrderId = data.order_id;
+        await fetchOrder();
+        cartModalBody.innerHTML = `
+          <div class="text-center py-4">
+            <div class="display-6 text-success mb-2">${wdT('pages.publicDiningMenu.orderSuccess', '下單成功')}</div>
+            <div class="text-muted">${wdT('pages.publicDiningMenu.orderNumber', '訂單編號')} ${data.order_number || ''}</div>
+          </div>
+        `;
+      } catch (err) {
+        cartModalBody.innerHTML = `<div class="text-danger">${err.message || wdT('pages.publicDiningMenu.orderFailed', '下單失敗')}</div>`;
+      } finally {
+        cartConfirmBtn.disabled = false;
+      }
+    }
+
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('click', () => openProductModal(card.getAttribute('data-product-id')));
+    });
+
+    if (addToCartBtn) addToCartBtn.addEventListener('click', addToCart);
+
+    if (cartOpenBtn) {
+      cartOpenBtn.addEventListener('click', () => {
+        renderCart();
+        new bootstrap.Modal(cartModalEl).show();
+      });
+    }
+
+    if (orderOpenBtn) {
+      orderOpenBtn.addEventListener('click', async () => {
+        await fetchOrder();
+        renderOrderModal();
+        new bootstrap.Modal(orderModalEl).show();
+      });
+    }
+
+    if (cartModalBody) {
+      cartModalBody.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!target || !target.getAttribute) return;
+        const action = target.getAttribute('data-action');
+        const idx = Number(target.getAttribute('data-index'));
+        if (!action || Number.isNaN(idx)) return;
+        const item = cart[idx];
+        if (!item) return;
+        if (action === 'inc') item.quantity += 1;
+        if (action === 'dec') item.quantity = Math.max(1, item.quantity - 1);
+        if (action === 'remove') cart.splice(idx, 1);
+        saveCart();
+        renderCart();
+      });
+    }
+
+    if (cartConfirmBtn) cartConfirmBtn.addEventListener('click', submitOrder);
+
+    loadCart();
+    fetchOrder();
+  })();
+</script>
+{{end}}

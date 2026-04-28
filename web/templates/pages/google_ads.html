@@ -1,0 +1,475 @@
+{{ define "pages/google_ads" }}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-google me-2"></i><span data-i18n="pages.googleAds.title">Google 廣告</span></h2>
+    <button class="btn btn-primary" id="saveAllBtn">
+        <i class="bi bi-save"></i> <span data-i18n="pages.googleAds.saveAll">保存設定</span>
+    </button>
+</div>
+
+<div id="alertContainer"></div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><span data-i18n="pages.googleAds.accountTitle">Google 帳號連接</span></h5>
+                <span id="accountStatusBadge" class="badge bg-secondary" data-i18n="pages.googleAds.disconnected">未連接</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small" data-i18n="pages.googleAds.accountHint">
+                    連接 Google Ads 帳號後即可發佈與更新廣告。此頁面先保存連接資訊，之後可接入正式 API。
+                </p>
+                <div class="mb-3">
+                    <label class="form-label" data-i18n="pages.googleAds.accountEmail">Google 帳號電郵</label>
+                    <div class="form-control-plaintext" id="googleAccountEmail" aria-live="polite">-</div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" id="connectAccountBtn">
+                        <i class="bi bi-link-45deg"></i> <span data-i18n="pages.googleAds.connect">連接</span>
+                    </button>
+                    <button class="btn btn-outline-danger" id="disconnectAccountBtn">
+                        <i class="bi bi-x-circle"></i> <span data-i18n="pages.googleAds.disconnect">解除連接</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-megaphone"></i> <span data-i18n="pages.googleAds.publishTitle">快速發佈</span></h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small" data-i18n="pages.googleAds.publishHint">
+                    建立廣告後可直接發佈或暫停，並保留更新記錄。
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-primary" id="addCampaignBtn">
+                        <i class="bi bi-plus-circle"></i> <span data-i18n="pages.googleAds.addAd">新增廣告</span>
+                    </button>
+                    <button class="btn btn-primary" id="publishAllBtn">
+                        <i class="bi bi-send"></i> <span data-i18n="pages.googleAds.publishAll">發佈全部</span>
+                    </button>
+                    <button class="btn btn-outline-secondary" id="pauseAllBtn">
+                        <i class="bi bi-pause-circle"></i> <span data-i18n="pages.googleAds.pauseAll">全部暫停</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-badge-ad"></i> <span data-i18n="pages.googleAds.campaignList">廣告清單</span></h5>
+        <span class="text-muted small" id="campaignCount">0</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th data-i18n="pages.googleAds.columns.name">名稱</th>
+                        <th data-i18n="pages.googleAds.columns.status">狀態</th>
+                        <th data-i18n="pages.googleAds.columns.budget">每日預算</th>
+                        <th data-i18n="pages.googleAds.columns.target">目標網址</th>
+                        <th data-i18n="pages.googleAds.columns.updatedAt">更新時間</th>
+                        <th data-i18n="pages.googleAds.columns.actions">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="campaignTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4" data-i18n="pages.googleAds.empty">尚未建立廣告</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 廣告表單 Modal -->
+<div class="modal fade" id="campaignModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="campaignModalTitle" data-i18n="pages.googleAds.modal.title">新增廣告</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-i18n-aria-label="common.close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" data-i18n="pages.googleAds.fields.name">廣告名稱</label>
+                        <input type="text" class="form-control" id="campaignName" placeholder="例如：冬季促銷">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" data-i18n="pages.googleAds.fields.status">狀態</label>
+                        <select class="form-select" id="campaignStatus">
+                            <option value="draft" data-i18n="pages.googleAds.status.draft">草稿</option>
+                            <option value="active" data-i18n="pages.googleAds.status.active">發佈中</option>
+                            <option value="paused" data-i18n="pages.googleAds.status.paused">暫停</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" data-i18n="pages.googleAds.fields.budget">每日預算</label>
+                        <input type="number" class="form-control" id="campaignBudget" min="0" step="0.01" placeholder="例如：100">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" data-i18n="pages.googleAds.fields.targetUrl">目標網址</label>
+                        <input type="url" class="form-control" id="campaignTargetUrl" placeholder="https://...">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" data-i18n="pages.googleAds.fields.startDate">開始日期</label>
+                        <input type="date" class="form-control" id="campaignStartDate">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" data-i18n="pages.googleAds.fields.endDate">結束日期</label>
+                        <input type="date" class="form-control" id="campaignEndDate">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" data-i18n="pages.googleAds.fields.content">廣告內容</label>
+                        <textarea class="form-control" id="campaignContent" rows="4" placeholder="輸入廣告文案..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+                <button type="button" class="btn btn-success" id="generateAdBtn">
+                    <i class="bi bi-stars"></i> <span data-i18n="pages.googleAds.generateAd">AI 生成廣告</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="saveCampaignBtn" data-i18n="pages.googleAds.saveAd">保存廣告</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    if (!App.checkAuth()) return;
+
+    const apiPath = '/enterprises/me';
+    const alertContainer = document.getElementById('alertContainer');
+    const saveAllBtn = document.getElementById('saveAllBtn');
+    const connectAccountBtn = document.getElementById('connectAccountBtn');
+    const disconnectAccountBtn = document.getElementById('disconnectAccountBtn');
+    const accountStatusBadge = document.getElementById('accountStatusBadge');
+    const accountEmailInput = document.getElementById('googleAccountEmail');
+    const addCampaignBtn = document.getElementById('addCampaignBtn');
+    const publishAllBtn = document.getElementById('publishAllBtn');
+    const pauseAllBtn = document.getElementById('pauseAllBtn');
+    const campaignTableBody = document.getElementById('campaignTableBody');
+    const campaignCount = document.getElementById('campaignCount');
+
+    const modalEl = document.getElementById('campaignModal');
+    const campaignModal = modalEl ? new bootstrap.Modal(modalEl) : null;
+    const campaignModalTitle = document.getElementById('campaignModalTitle');
+    const saveCampaignBtn = document.getElementById('saveCampaignBtn');
+    const generateAdBtn = document.getElementById('generateAdBtn');
+
+    const formFields = {
+        name: document.getElementById('campaignName'),
+        status: document.getElementById('campaignStatus'),
+        budget: document.getElementById('campaignBudget'),
+        targetUrl: document.getElementById('campaignTargetUrl'),
+        startDate: document.getElementById('campaignStartDate'),
+        endDate: document.getElementById('campaignEndDate'),
+        content: document.getElementById('campaignContent')
+    };
+
+    let enterprise = null;
+    let googleAds = { account: { connected: false, email: '' }, campaigns: [] };
+    let editingIndex = null;
+
+    function t(key, fallback) {
+        try {
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                const v = I18n.t(key);
+                if (v === key || v === undefined || v === null || v === '') return fallback;
+                return v;
+            }
+        } catch {}
+        return fallback;
+    }
+
+    function showAlert(message, type = 'success') {
+        if (!alertContainer) return;
+        alertContainer.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    }
+
+    function renderAccount() {
+        const connected = !!googleAds.account.connected;
+        if (accountEmailInput) {
+            accountEmailInput.textContent = googleAds.account.email || '-';
+        }
+        accountStatusBadge.className = `badge ${connected ? 'bg-success' : 'bg-secondary'}`;
+        accountStatusBadge.textContent = connected
+            ? t('pages.googleAds.connected', '已連接')
+            : t('pages.googleAds.disconnected', '未連接');
+        connectAccountBtn.disabled = connected;
+        disconnectAccountBtn.disabled = !connected;
+    }
+
+    function renderCampaigns() {
+        const list = Array.isArray(googleAds.campaigns) ? googleAds.campaigns : [];
+        campaignCount.textContent = list.length;
+        if (list.length === 0) {
+            campaignTableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">${t('pages.googleAds.empty', '尚未建立廣告')}</td>
+                </tr>
+            `;
+            return;
+        }
+        campaignTableBody.innerHTML = list.map((item, index) => {
+            const statusLabel = t(`pages.googleAds.status.${item.status}`, item.status || 'draft');
+            const statusClass = item.status === 'active' ? 'success' : (item.status === 'paused' ? 'warning' : 'secondary');
+            const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-';
+            return `
+                <tr>
+                    <td>${item.name || '-'}</td>
+                    <td><span class="badge bg-${statusClass}">${statusLabel}</span></td>
+                    <td>${item.budget ? Number(item.budget).toFixed(2) : '-'}</td>
+                    <td>${item.target_url ? `<a href="${item.target_url}" target="_blank">${item.target_url}</a>` : '-'}</td>
+                    <td>${updatedAt}</td>
+                    <td class="text-nowrap">
+                        <button class="btn btn-sm btn-outline-primary" data-action="edit" data-index="${index}">
+                            <i class="bi bi-pencil"></i> ${t('pages.googleAds.actions.edit', '編輯')}
+                        </button>
+                        <button class="btn btn-sm btn-outline-success" data-action="publish" data-index="${index}">
+                            <i class="bi bi-send"></i> ${t('pages.googleAds.actions.publish', '發佈')}
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" data-action="pause" data-index="${index}">
+                            <i class="bi bi-pause"></i> ${t('pages.googleAds.actions.pause', '暫停')}
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" data-action="delete" data-index="${index}">
+                            <i class="bi bi-trash"></i> ${t('pages.googleAds.actions.delete', '刪除')}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function openCampaignModal(index = null) {
+        editingIndex = index;
+        if (index === null) {
+            campaignModalTitle.textContent = t('pages.googleAds.modal.title', '新增廣告');
+            formFields.name.value = '';
+            formFields.status.value = 'draft';
+            formFields.budget.value = '';
+            formFields.targetUrl.value = '';
+            formFields.startDate.value = '';
+            formFields.endDate.value = '';
+            formFields.content.value = '';
+        } else {
+            const item = googleAds.campaigns[index];
+            campaignModalTitle.textContent = t('pages.googleAds.modal.editTitle', '更新廣告');
+            formFields.name.value = item.name || '';
+            formFields.status.value = item.status || 'draft';
+            formFields.budget.value = item.budget || '';
+            formFields.targetUrl.value = item.target_url || '';
+            formFields.startDate.value = item.start_date || '';
+            formFields.endDate.value = item.end_date || '';
+            formFields.content.value = item.content || '';
+        }
+        if (campaignModal) campaignModal.show();
+    }
+
+    function upsertCampaign() {
+        const payload = {
+            name: formFields.name.value.trim(),
+            status: formFields.status.value || 'draft',
+            budget: formFields.budget.value ? Number(formFields.budget.value) : null,
+            target_url: formFields.targetUrl.value.trim(),
+            start_date: formFields.startDate.value || null,
+            end_date: formFields.endDate.value || null,
+            content: formFields.content.value.trim(),
+            updated_at: new Date().toISOString()
+        };
+        if (!payload.name) {
+            showAlert(t('pages.googleAds.validation.nameRequired', '請填寫廣告名稱'), 'warning');
+            return false;
+        }
+        if (editingIndex === null) {
+            googleAds.campaigns.push(payload);
+        } else {
+            googleAds.campaigns[editingIndex] = payload;
+        }
+        renderCampaigns();
+        if (campaignModal) campaignModal.hide();
+        return true;
+    }
+
+    async function saveAll() {
+        if (!enterprise || !enterprise.name) {
+            showAlert(t('pages.googleAds.validation.enterpriseNameRequired', '請先到企業設置填寫企業名稱'), 'warning');
+            return;
+        }
+        try {
+            await App.apiRequest(apiPath, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    name: enterprise.name,
+                    timezone: enterprise.timezone || 'Asia/Hong_Kong',
+                    status: enterprise.status || 'active',
+                    extra_fields: {
+                        google_ads: googleAds
+                    }
+                })
+            });
+            showAlert(t('pages.googleAds.saved', '已保存 Google 廣告設定'), 'success');
+            await loadEnterprise();
+        } catch (error) {
+            showAlert(t('pages.googleAds.saveFailed', '保存失敗') + ': ' + error.message, 'danger');
+        }
+    }
+
+    async function loadEnterprise() {
+        try {
+            enterprise = await App.apiRequest(apiPath);
+            const extra = enterprise.extra_fields || {};
+            googleAds = extra.google_ads || { account: { connected: false, email: '' }, campaigns: [] };
+            if (!googleAds.account) googleAds.account = { connected: false, email: '' };
+            if (!Array.isArray(googleAds.campaigns)) googleAds.campaigns = [];
+            renderAccount();
+            renderCampaigns();
+        } catch (error) {
+            showAlert(t('pages.googleAds.loadFailed', '載入失敗') + ': ' + error.message, 'danger');
+        }
+    }
+
+    saveAllBtn.addEventListener('click', saveAll);
+
+    connectAccountBtn.addEventListener('click', async () => {
+        try {
+            const resp = await App.apiRequest('/google-ads/connect-url', { method: 'POST' });
+            if (resp && resp.url) {
+                window.location.href = resp.url;
+            } else {
+                showAlert(t('pages.googleAds.connectFailed', '連接失敗'), 'danger');
+            }
+        } catch (error) {
+            const msg = error?.error || error?.message || t('pages.googleAds.connectFailed', '連接失敗');
+            showAlert(msg, 'danger');
+        }
+    });
+
+    disconnectAccountBtn.addEventListener('click', async () => {
+        try {
+            await App.apiRequest('/google-ads/disconnect', { method: 'POST' });
+            googleAds.account = { connected: false, email: '' };
+            renderAccount();
+            await saveAll();
+        } catch (error) {
+            const msg = error?.error || error?.message || t('pages.googleAds.disconnectFailed', '解除連接失敗');
+            showAlert(msg, 'danger');
+        }
+    });
+
+    addCampaignBtn.addEventListener('click', () => openCampaignModal());
+
+    saveCampaignBtn.addEventListener('click', () => {
+        if (upsertCampaign()) saveAll();
+    });
+
+    generateAdBtn.addEventListener('click', async () => {
+        generateAdBtn.disabled = true;
+        const originalHTML = generateAdBtn.innerHTML;
+        generateAdBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + t('pages.googleAds.generating', 'AI 生成中...');
+        try {
+            const data = await App.apiRequest('/google-ads/generate', { method: 'POST' });
+            if (data) {
+                if (data.name) formFields.name.value = data.name;
+                if (data.budget) formFields.budget.value = data.budget;
+                if (data.target_url) formFields.targetUrl.value = data.target_url;
+                if (data.content) formFields.content.value = data.content;
+                // Set default dates: today to 30 days later
+                const today = new Date();
+                const endDate = new Date(today);
+                endDate.setDate(endDate.getDate() + 30);
+                if (!formFields.startDate.value) {
+                    formFields.startDate.value = today.toISOString().split('T')[0];
+                }
+                if (!formFields.endDate.value) {
+                    formFields.endDate.value = endDate.toISOString().split('T')[0];
+                }
+                showAlert(t('pages.googleAds.generateSuccess', 'AI 已根據企業資料生成廣告，請檢查並調整後保存。'), 'success');
+            }
+        } catch (error) {
+            const msg = error?.error || error?.message || t('pages.googleAds.generateFailed', 'AI 生成失敗');
+            showAlert(msg, 'danger');
+        } finally {
+            generateAdBtn.disabled = false;
+            generateAdBtn.innerHTML = originalHTML;
+        }
+    });
+
+    publishAllBtn.addEventListener('click', async () => {
+        googleAds.campaigns = googleAds.campaigns.map(item => ({
+            ...item,
+            status: 'active',
+            updated_at: new Date().toISOString()
+        }));
+        renderCampaigns();
+        await saveAll();
+    });
+
+    pauseAllBtn.addEventListener('click', async () => {
+        googleAds.campaigns = googleAds.campaigns.map(item => ({
+            ...item,
+            status: 'paused',
+            updated_at: new Date().toISOString()
+        }));
+        renderCampaigns();
+        await saveAll();
+    });
+
+    campaignTableBody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        const index = Number(btn.getAttribute('data-index'));
+        if (Number.isNaN(index)) return;
+        if (action === 'edit') {
+            openCampaignModal(index);
+            return;
+        }
+        if (action === 'delete') {
+            if (!confirm(t('pages.googleAds.confirmDelete', '確定要刪除這則廣告嗎？'))) return;
+            googleAds.campaigns.splice(index, 1);
+            renderCampaigns();
+            await saveAll();
+            return;
+        }
+        if (action === 'publish') {
+            googleAds.campaigns[index].status = 'active';
+            googleAds.campaigns[index].updated_at = new Date().toISOString();
+            renderCampaigns();
+            await saveAll();
+            return;
+        }
+        if (action === 'pause') {
+            googleAds.campaigns[index].status = 'paused';
+            googleAds.campaigns[index].updated_at = new Date().toISOString();
+            renderCampaigns();
+            await saveAll();
+        }
+    });
+
+    const params = new URLSearchParams(window.location.search || '');
+    if (params.get('google_ads') === 'connected') {
+        showAlert(t('pages.googleAds.connected', '已連接'), 'success');
+        params.delete('google_ads');
+        const clean = window.location.pathname + (params.toString() ? `?${params.toString()}` : '');
+        window.history.replaceState({}, '', clean);
+    }
+
+    await loadEnterprise();
+});
+</script>
+{{ end }}

@@ -1,0 +1,377 @@
+{{ define "pages/document_settings" }}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 id="pageTitle"><i class="bi bi-file-earmark-text me-2"></i><span data-i18n="menu.documentSettings">文件設定</span></h3>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="style-tab" data-bs-toggle="tab" data-bs-target="#style-pane" type="button" role="tab" aria-controls="style-pane" aria-selected="true" data-i18n="pages.documentSettings.documentStyle">文件樣式</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="invoice-tab" data-bs-toggle="tab" data-bs-target="#invoice-pane" type="button" role="tab" aria-controls="invoice-pane" aria-selected="false" data-i18n="pages.documentSettings.invoiceSettings">發票設定</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="shipping-tab" data-bs-toggle="tab" data-bs-target="#shipping-pane" type="button" role="tab" aria-controls="shipping-pane" aria-selected="false" data-i18n="pages.documentSettings.shippingNoteSettings">發貨單設定</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="contract-tab" data-bs-toggle="tab" data-bs-target="#contract-pane" type="button" role="tab" aria-controls="contract-pane" aria-selected="false" data-i18n="pages.documentSettings.contractSettings">合約設定</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="settingsTabContent">
+
+                <!-- 文件樣式 Tab -->
+                <div class="tab-pane fade show active" id="style-pane" role="tabpanel" aria-labelledby="style-tab">
+                    <form id="styleSettingsForm">
+                        <p class="text-muted mb-4" data-i18n="pages.documentSettings.styleDesc">這些設定會套用到所有文件（發票、報價單、發貨單、合約等）的 PDF 輸出。</p>
+                        
+                        <!-- Logo 設定 -->
+                        <h5 class="mb-3"><i class="bi bi-image me-2"></i><span data-i18n="pages.documentSettings.logoSettings">Logo 設定</span></h5>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.documentSettings.documentLogo">文件 Logo</label>
+                            <div class="d-flex align-items-center gap-3 mb-2">
+                                <div id="docLogoPreview" style="width:120px;height:60px;border:1px dashed #ccc;border-radius:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fafafa;">
+                                    <img id="docLogoImage" src="" style="max-width:100%;max-height:100%;display:none;" />
+                                    <span id="docLogoPlaceholder" class="text-muted small" data-i18n="pages.documentSettings.noLogo">未上傳</span>
+                                </div>
+                                <div>
+                                    <input type="file" id="docLogoFile" accept="image/*" style="display:none;" />
+                                    <input type="hidden" id="docLogoUrl" value="" />
+                                    <button type="button" class="btn btn-sm btn-outline-primary me-2" id="uploadDocLogoBtn">
+                                        <i class="bi bi-upload"></i> <span data-i18n="pages.documentSettings.uploadLogo">上傳 Logo</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" id="removeDocLogoBtn" style="display:none;">
+                                        <i class="bi bi-trash"></i> <span data-i18n="pages.documentSettings.removeLogo">移除</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <small class="text-muted" data-i18n="pages.documentSettings.logoFallbackDesc">未上傳時將使用「企業設定」中的企業 Logo。</small>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label" data-i18n="pages.documentSettings.logoWidth">Logo 寬度 (pt)</label>
+                                <input type="number" class="form-control" id="logoWidth" min="0" max="400" step="1" value="0" />
+                                <small class="text-muted" data-i18n="pages.documentSettings.logoWidthDesc">0 = 自動（最大為頁面寬度 35%）</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label" data-i18n="pages.documentSettings.logoHeight">Logo 高度 (pt)</label>
+                                <input type="number" class="form-control" id="logoHeight" min="0" max="200" step="1" value="0" />
+                                <small class="text-muted" data-i18n="pages.documentSettings.logoHeightDesc">0 = 自動（最大為 35pt）</small>
+                            </div>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <!-- 字型大小設定 -->
+                        <h5 class="mb-3"><i class="bi bi-fonts me-2"></i><span data-i18n="pages.documentSettings.fontSettings">字型大小設定</span></h5>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="pages.documentSettings.titleFontSize">標題字型大小 (pt)</label>
+                                <input type="number" class="form-control" id="titleFontSize" min="10" max="40" step="0.5" value="0" />
+                                <small class="text-muted" data-i18n="pages.documentSettings.titleFontSizeDesc">0 = 預設 22pt（標題會以粗體顯示）</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="pages.documentSettings.bodyFontSize">內文字型大小 (pt)</label>
+                                <input type="number" class="form-control" id="bodyFontSize" min="6" max="20" step="0.5" value="0" />
+                                <small class="text-muted" data-i18n="pages.documentSettings.bodyFontSizeDesc">0 = 預設 11pt</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label" data-i18n="pages.documentSettings.notesFontSize">條款/備註字型大小 (pt)</label>
+                                <input type="number" class="form-control" id="notesFontSize" min="6" max="16" step="0.5" value="0" />
+                                <small class="text-muted" data-i18n="pages.documentSettings.notesFontSizeDesc">0 = 預設 10pt</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                            <button type="button" class="btn btn-primary" onclick="saveStyleSettings()"><i class="bi bi-save"></i> <span data-i18n="pages.documentSettings.saveStyleSettings">保存文件樣式</span></button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 發票設定 Tab -->
+                <div class="tab-pane fade" id="invoice-pane" role="tabpanel" aria-labelledby="invoice-tab">
+                    <form id="invoiceSettingsForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.documentSettings.invoiceTerms">發票條款</label>
+                            <textarea class="form-control" id="invoiceTerms" rows="10" data-i18n-placeholder="pages.documentSettings.invoiceTermsPlaceholder" placeholder="輸入發票條款內容..."></textarea>
+                            <small class="text-muted" data-i18n="pages.documentSettings.invoiceTermsDesc">這些條款將顯示在每張發票的底部</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.documentSettings.invoiceNotes">發票備註</label>
+                            <textarea class="form-control" id="invoiceNotes" rows="5" data-i18n-placeholder="pages.documentSettings.invoiceNotesPlaceholder" placeholder="輸入發票備註內容..."></textarea>
+                            <small class="text-muted" data-i18n="pages.documentSettings.invoiceNotesDesc">這些備註將顯示在發票的備註區域</small>
+                        </div>
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                            <button type="button" class="btn btn-primary" onclick="saveInvoiceSettings()"><i class="bi bi-save"></i> <span data-i18n="pages.documentSettings.saveInvoiceSettings">保存發票設定</span></button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- 發貨單設定 Tab -->
+                <div class="tab-pane fade" id="shipping-pane" role="tabpanel" aria-labelledby="shipping-tab">
+                    <form id="shippingSettingsForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.documentSettings.shippingTerms">發貨單條款</label>
+                            <textarea class="form-control" id="shippingTerms" rows="10" data-i18n-placeholder="pages.documentSettings.shippingTermsPlaceholder" placeholder="輸入發貨單條款內容..."></textarea>
+                            <small class="text-muted" data-i18n="pages.documentSettings.shippingTermsDesc">這些條款將顯示在每張發貨單的底部</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.documentSettings.shippingNotes">發貨單備註</label>
+                            <textarea class="form-control" id="shippingNotes" rows="5" data-i18n-placeholder="pages.documentSettings.shippingNotesPlaceholder" placeholder="輸入發貨單備註內容..."></textarea>
+                            <small class="text-muted" data-i18n="pages.documentSettings.shippingNotesDesc">這些備註將顯示在發貨單的備註區域</small>
+                        </div>
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                            <button type="button" class="btn btn-primary" onclick="saveShippingSettings()"><i class="bi bi-save"></i> <span data-i18n="pages.documentSettings.saveShippingNoteSettings">保存發貨單設定</span></button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 合約設定 Tab -->
+                <div class="tab-pane fade" id="contract-pane" role="tabpanel" aria-labelledby="contract-tab">
+                    <form id="contractSettingsForm">
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.documentSettings.contractTerms">合約條款</label>
+                            <textarea class="form-control" id="contractTerms" rows="10" data-i18n-placeholder="pages.documentSettings.contractTermsPlaceholder" placeholder="輸入合約條款內容..."></textarea>
+                            <small class="text-muted" data-i18n="pages.documentSettings.contractTermsDesc">這些條款將顯示在每份合約的條款區域</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" data-i18n="pages.documentSettings.contractNotes">合約備註</label>
+                            <textarea class="form-control" id="contractNotes" rows="5" data-i18n-placeholder="pages.documentSettings.contractNotesPlaceholder" placeholder="輸入合約備註內容..."></textarea>
+                            <small class="text-muted" data-i18n="pages.documentSettings.contractNotesDesc">這些備註將顯示在每份合約的備註區域</small>
+                        </div>
+                        <div class="d-flex gap-2 mt-4 form-buttons-container">
+                            <button type="button" class="btn btn-primary" onclick="saveContractSettings()"><i class="bi bi-save"></i> <span data-i18n="pages.documentSettings.saveContractSettings">保存合約設定</span></button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // --- 載入文件樣式設定 ---
+        try {
+            const styleSettings = await App.apiRequest('/document-settings?document_type=style');
+            if (styleSettings.logo_url) {
+                document.getElementById('docLogoUrl').value = styleSettings.logo_url;
+                const img = document.getElementById('docLogoImage');
+                img.src = styleSettings.logo_url;
+                img.style.display = 'block';
+                document.getElementById('docLogoPlaceholder').style.display = 'none';
+                document.getElementById('removeDocLogoBtn').style.display = 'inline-block';
+            }
+            document.getElementById('logoWidth').value = styleSettings.logo_width || 0;
+            document.getElementById('logoHeight').value = styleSettings.logo_height || 0;
+            document.getElementById('titleFontSize').value = styleSettings.title_font_size || 0;
+            document.getElementById('bodyFontSize').value = styleSettings.body_font_size || 0;
+            document.getElementById('notesFontSize').value = styleSettings.notes_font_size || 0;
+        } catch (error) {
+            console.error('Failed to load style settings:', error);
+        }
+        
+        // --- 載入發票設定 ---
+        try {
+            const invoiceSettings = await App.apiRequest('/document-settings?document_type=invoice');
+            document.getElementById('invoiceTerms').value = invoiceSettings.terms || '';
+            document.getElementById('invoiceNotes').value = invoiceSettings.notes || '';
+        } catch (error) {
+            console.error('Failed to load invoice settings:', error);
+        }
+        
+        // --- 載入發貨單設定 ---
+        try {
+            const shippingSettings = await App.apiRequest('/document-settings?document_type=shipping_note');
+            document.getElementById('shippingTerms').value = shippingSettings.terms || '';
+            document.getElementById('shippingNotes').value = shippingSettings.notes || '';
+        } catch (error) {
+            console.error('Failed to load shipping settings:', error);
+        }
+
+        // --- 載入合約設定 ---
+        try {
+            const contractSettings = await App.apiRequest('/document-settings?document_type=contract');
+            document.getElementById('contractTerms').value = contractSettings.terms || '';
+            document.getElementById('contractNotes').value = contractSettings.notes || '';
+        } catch (error) {
+            console.error('Failed to load contract settings:', error);
+        }
+
+        // --- Logo 上傳處理 ---
+        const docLogoFile = document.getElementById('docLogoFile');
+        const uploadDocLogoBtn = document.getElementById('uploadDocLogoBtn');
+        const removeDocLogoBtn = document.getElementById('removeDocLogoBtn');
+        const docLogoImage = document.getElementById('docLogoImage');
+        const docLogoPlaceholder = document.getElementById('docLogoPlaceholder');
+
+        uploadDocLogoBtn.addEventListener('click', function() {
+            docLogoFile.click();
+        });
+
+        docLogoFile.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                App.showAlert('請選擇圖片文件', 'warning');
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                App.showAlert('圖片大小不能超過 10MB', 'warning');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/api/v1/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + (localStorage.getItem('auth_token') || ''),
+                        'X-Tenant-Subdomain': localStorage.getItem('tenant_subdomain') || ''
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || '上傳失敗');
+                }
+
+                const result = await response.json();
+                if (result.url) {
+                    let imageUrl = result.url;
+                    if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/')) {
+                        imageUrl = '/' + imageUrl;
+                    }
+                    document.getElementById('docLogoUrl').value = imageUrl;
+                    docLogoImage.src = imageUrl;
+                    docLogoImage.style.display = 'block';
+                    docLogoPlaceholder.style.display = 'none';
+                    removeDocLogoBtn.style.display = 'inline-block';
+
+                    const successMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.documentSettings.logoUploadSuccess') : 'Logo 上傳成功';
+                    App.showAlert(successMsg, 'success');
+                }
+            } catch (error) {
+                console.error('Logo upload failed:', error);
+                const errorMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.documentSettings.logoUploadFailed') : 'Logo 上傳失敗';
+                App.showAlert(errorMsg + ': ' + error.message, 'danger');
+            }
+        });
+
+        removeDocLogoBtn.addEventListener('click', function() {
+            document.getElementById('docLogoUrl').value = '';
+            docLogoImage.src = '';
+            docLogoImage.style.display = 'none';
+            docLogoPlaceholder.style.display = 'block';
+            removeDocLogoBtn.style.display = 'none';
+        });
+    });
+
+    // --- 保存文件樣式 ---
+    async function saveStyleSettings() {
+        const logoUrl = document.getElementById('docLogoUrl').value || null;
+        const logoWidth = parseFloat(document.getElementById('logoWidth').value) || 0;
+        const logoHeight = parseFloat(document.getElementById('logoHeight').value) || 0;
+        const titleFontSize = parseFloat(document.getElementById('titleFontSize').value) || 0;
+        const bodyFontSize = parseFloat(document.getElementById('bodyFontSize').value) || 0;
+        const notesFontSize = parseFloat(document.getElementById('notesFontSize').value) || 0;
+
+        try {
+            await App.apiRequest('/document-settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    document_type: 'style',
+                    terms: '',
+                    notes: '',
+                    logo_url: logoUrl,
+                    logo_width: logoWidth,
+                    logo_height: logoHeight,
+                    title_font_size: titleFontSize,
+                    body_font_size: bodyFontSize,
+                    notes_font_size: notesFontSize
+                })
+            });
+            const successMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.documentSettings.settingsSaved') : '文件樣式已保存';
+            App.showAlert(successMsg, 'success');
+        } catch (error) {
+            const failedMsg = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t('pages.documentSettings.saveFailed') : '保存失敗';
+            App.showAlert(failedMsg + ': ' + error.message, 'danger');
+        }
+    }
+    
+    async function saveInvoiceSettings() {
+        const terms = document.getElementById('invoiceTerms').value;
+        const notes = document.getElementById('invoiceNotes').value;
+        
+        try {
+            await App.apiRequest('/document-settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    document_type: 'invoice',
+                    terms: terms,
+                    notes: notes
+                })
+            });
+            const successMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentSettings.settingsSaved') : '發票設定已保存';
+            App.showAlert(successMsg, 'success');
+        } catch (error) {
+            const failedMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentSettings.saveFailed') : '保存失敗';
+            App.showAlert(failedMsg + ': ' + error.message, 'danger');
+        }
+    }
+    
+    async function saveShippingSettings() {
+        const terms = document.getElementById('shippingTerms').value;
+        const notes = document.getElementById('shippingNotes').value;
+        
+        try {
+            await App.apiRequest('/document-settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    document_type: 'shipping_note',
+                    terms: terms,
+                    notes: notes
+                })
+            });
+            const successMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentSettings.settingsSaved') : '發貨單設定已保存';
+            App.showAlert(successMsg, 'success');
+        } catch (error) {
+            const failedMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentSettings.saveFailed') : '保存失敗';
+            App.showAlert(failedMsg + ': ' + error.message, 'danger');
+        }
+    }
+
+    async function saveContractSettings() {
+        const terms = document.getElementById('contractTerms').value;
+        const notes = document.getElementById('contractNotes').value;
+
+        try {
+            await App.apiRequest('/document-settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    document_type: 'contract',
+                    terms: terms,
+                    notes: notes
+                })
+            });
+            const successMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentSettings.settingsSaved') : '合約設定已保存';
+            App.showAlert(successMsg, 'success');
+        } catch (error) {
+            const failedMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentSettings.saveFailed') : '保存失敗';
+            App.showAlert(failedMsg + ': ' + error.message, 'danger');
+        }
+    }
+
+</script>
+{{ end }}

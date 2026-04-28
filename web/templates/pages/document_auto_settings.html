@@ -1,0 +1,127 @@
+{{ define "pages/document_auto_settings" }}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 id="pageTitle"><i class="bi bi-sliders me-2"></i><span data-i18n="menu.documentAutoSettings">單據設定</span></h3>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="autoSettingsForm">
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoGenerateOrderCommission" checked>
+                        <label class="form-check-label" for="autoGenerateOrderCommission" data-i18n="pages.documentAutoSettings.autoGenerateOrderCommission">自動生成訂單傭金支出（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoGenerateOrderCommissionDesc">開啟後：訂單保存時會自動生成「佣金」支出，不再需要手動按鈕。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoGenerateServiceOrderCommission" checked>
+                        <label class="form-check-label" for="autoGenerateServiceOrderCommission" data-i18n="pages.documentAutoSettings.autoGenerateServiceOrderCommission">自動生成服務單傭金支出（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoGenerateServiceOrderCommissionDesc">開啟後：服務單保存時會自動生成「佣金」支出，不再需要手動按鈕。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoGenerateOrderTaxes" checked>
+                        <label class="form-check-label" for="autoGenerateOrderTaxes" data-i18n="pages.documentAutoSettings.autoGenerateOrderTaxes">自動生成訂單稅務支出（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoGenerateOrderTaxesDesc">需先在「產品稅」設定「訂單預設包含」，並在訂單中勾選稅項。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoGenerateServiceTaxes" checked>
+                        <label class="form-check-label" for="autoGenerateServiceTaxes" data-i18n="pages.documentAutoSettings.autoGenerateServiceTaxes">自動生成服務稅務支出（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoGenerateServiceTaxesDesc">需先在「服務稅」設定「服務單預設包含」，並在服務單中勾選稅項。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoGenerateOrderPayment" checked>
+                        <label class="form-check-label" for="autoGenerateOrderPayment" data-i18n="pages.documentAutoSettings.autoGenerateOrderPayment">自動生成訂單付款(發票)（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoGenerateOrderPaymentDesc">開啟後：訂單保存時會自動生成付款記錄（發票），使用訂單總金額和系統預設付款方式/收款賬戶。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoGenerateServiceOrderPayment" checked>
+                        <label class="form-check-label" for="autoGenerateServiceOrderPayment" data-i18n="pages.documentAutoSettings.autoGenerateServiceOrderPayment">自動生成服務單付款(發票)（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoGenerateServiceOrderPaymentDesc">開啟後：服務單保存時會自動生成付款記錄（發票），使用服務單總金額和系統預設付款方式/收款賬戶。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoGeneratePurchaseOrderExpense" checked>
+                        <label class="form-check-label" for="autoGeneratePurchaseOrderExpense" data-i18n="pages.documentAutoSettings.autoGeneratePurchaseOrderExpense">自動生成採購單支出記錄（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoGeneratePurchaseOrderExpenseDesc">開啟後：採購單保存時會自動生成一筆支出記錄，使用採購單總金額和系統預設支出付款方式/付款賬戶。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoUseLastSupplierQuotationPrice" checked>
+                        <label class="form-check-label" for="autoUseLastSupplierQuotationPrice" data-i18n="pages.documentAutoSettings.autoUseLastSupplierQuotationPrice">採購單明細單價預設為同供應商最後報價（預設開啟）</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoUseLastSupplierQuotationPriceDesc">開啟後：在新增/編輯採購單時，選擇產品會自動帶入「同供應商 + 同產品」最近一筆報價單價；若找不到報價則回退產品成本。</small>
+                </div>
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="autoCalculateOrderShipping">
+                        <label class="form-check-label" for="autoCalculateOrderShipping" data-i18n="pages.documentAutoSettings.autoCalculateOrderShipping">自動計算訂單運費</label>
+                    </div>
+                    <small class="text-muted" data-i18n="pages.documentAutoSettings.autoCalculateOrderShippingDesc">開啟後：/orders/new 會根據客戶默認地址，從「物流公司」計算最便宜運費並加到訂單。</small>
+                </div>
+
+                <div class="d-flex gap-2 mt-4 form-buttons-container">
+                    <button type="button" class="btn btn-primary" onclick="saveAutoSettings()"><i class="bi bi-save"></i> <span data-i18n="pages.documentAutoSettings.saveDocumentSettings">保存單據設定</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+        try {
+            const auto = await App.apiRequest('/document-auto-settings');
+            document.getElementById('autoGenerateOrderCommission').checked = auto.auto_generate_order_commission !== false;
+            document.getElementById('autoGenerateServiceOrderCommission').checked = auto.auto_generate_service_order_commission !== false;
+            document.getElementById('autoGenerateOrderTaxes').checked = auto.auto_generate_order_taxes !== false;
+            document.getElementById('autoGenerateServiceTaxes').checked = auto.auto_generate_service_taxes !== false;
+            document.getElementById('autoGenerateOrderPayment').checked = auto.auto_generate_order_payment !== false;
+            document.getElementById('autoGenerateServiceOrderPayment').checked = auto.auto_generate_service_order_payment !== false;
+            document.getElementById('autoGeneratePurchaseOrderExpense').checked = auto.auto_generate_purchase_order_expense !== false;
+            document.getElementById('autoUseLastSupplierQuotationPrice').checked = auto.auto_use_last_supplier_quotation_price !== false;
+            document.getElementById('autoCalculateOrderShipping').checked = auto.auto_calculate_order_shipping === true;
+        } catch (error) {
+            console.error('Failed to load auto settings:', error);
+        }
+    });
+
+    async function saveAutoSettings() {
+        try {
+            await App.apiRequest('/document-auto-settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    auto_generate_order_commission: document.getElementById('autoGenerateOrderCommission').checked,
+                    auto_generate_service_order_commission: document.getElementById('autoGenerateServiceOrderCommission').checked,
+                    auto_generate_order_taxes: document.getElementById('autoGenerateOrderTaxes').checked,
+                    auto_generate_service_taxes: document.getElementById('autoGenerateServiceTaxes').checked,
+                    auto_generate_order_payment: document.getElementById('autoGenerateOrderPayment').checked,
+                    auto_generate_service_order_payment: document.getElementById('autoGenerateServiceOrderPayment').checked,
+                    auto_generate_purchase_order_expense: document.getElementById('autoGeneratePurchaseOrderExpense').checked,
+                    auto_use_last_supplier_quotation_price: document.getElementById('autoUseLastSupplierQuotationPrice').checked,
+                    auto_calculate_order_shipping: document.getElementById('autoCalculateOrderShipping').checked
+                })
+            });
+            const successMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentAutoSettings.settingsSaved') : '單據設定已保存';
+            App.showAlert(successMsg, 'success');
+        } catch (error) {
+            const failedMsg = typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.documentAutoSettings.saveFailed') : '保存失敗';
+            App.showAlert(failedMsg + ': ' + error.message, 'danger');
+        }
+    }
+</script>
+{{ end }}
+
+

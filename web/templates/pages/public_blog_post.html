@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+{{$lang := .PublicDefaultLang}}
+{{if not $lang}}{{$lang = "zh"}}{{end}}
+{{$htmlLang := "zh-TW"}}
+{{if eq $lang "en"}}{{$htmlLang = "en"}}{{else if eq $lang "zh-CN"}}{{$htmlLang = "zh-CN"}}{{end}}
+<html lang="{{$htmlLang}}" data-theme="{{.ThemeID}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{.SEO.Title}}</title>
+  {{template "partials/seo_head" .}}
+  {{$icon := "/static/vworkicon.png"}}
+  {{if .TenantIcon}}{{$icon = .TenantIcon}}{{end}}
+  <link rel="icon" type="image/png" href="{{$icon}}">
+  <link rel="apple-touch-icon" href="{{$icon}}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <script>
+    window.__PUBLIC_DEFAULT_LANG = "{{$lang}}";
+  </script>
+  <script src="/static/js/i18n.js"></script>
+  <script>
+    (function() {
+      window._pt = function(key, fallback) {
+        if (window.I18n && typeof I18n.t === 'function') {
+          var v = I18n.t(key);
+          if (v && v !== key) return v;
+        }
+        return fallback || key;
+      };
+      if (window.I18n && typeof I18n.whenReady === 'function') {
+        I18n.whenReady().then(function() {
+          document.querySelectorAll('[data-pt]').forEach(function(el) {
+            var key = el.getAttribute('data-pt');
+            if (!key) return;
+            var translated = I18n.t(key);
+            if (translated && translated !== key) el.textContent = translated;
+          });
+          document.querySelectorAll('[data-pt-placeholder]').forEach(function(el) {
+            var key = el.getAttribute('data-pt-placeholder');
+            if (!key) return;
+            var translated = I18n.t(key);
+            if (translated && translated !== key) el.placeholder = translated;
+          });
+          document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n');
+            if (!key) return;
+            var translated = I18n.t(key);
+            if (translated && translated !== key) el.textContent = translated;
+          });
+        });
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      {{.ThemeCSS | safeCSS}}
+    }
+    body {
+      font-family: var(--theme-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+      background-color: var(--theme-bg, #ffffff);
+      color: var(--theme-text, #333333);
+    }
+    .card {
+      background-color: var(--theme-card-bg, #ffffff);
+      border-color: var(--theme-card-border, #dee2e6);
+      box-shadow: var(--theme-card-shadow, 0 0.125rem 0.25rem rgba(0,0,0,0.075));
+    }
+    .bg-light { background-color: var(--theme-surface, #f8f9fa) !important; }
+    .text-muted { color: var(--theme-text-muted, #6c757d) !important; }
+    .navbar {
+      background-color: var(--theme-nav-bg, #ffffff);
+    }
+    .navbar-brand { color: var(--theme-nav-text, #333333) !important; }
+    .nav-link { color: var(--theme-nav-text, #333333) !important; }
+    header a { color: inherit !important; }
+    .nav-link:hover, .nav-link:focus { color: var(--theme-nav-hover, #007bff) !important; }
+    .navbar-toggler { border-color: var(--theme-nav-border, #dee2e6); }
+    .btn-primary {
+      background-color: var(--theme-btn-primary-bg, #007bff);
+      border-color: var(--theme-btn-primary-bg, #007bff);
+      color: var(--theme-btn-primary-text, #ffffff);
+    }
+    .btn-outline-primary {
+      color: var(--theme-primary, #007bff);
+      border-color: var(--theme-primary, #007bff);
+    }
+    .btn-outline-primary:hover {
+      background-color: var(--theme-primary, #007bff);
+      border-color: var(--theme-primary, #007bff);
+      color: var(--theme-btn-primary-text, #ffffff);
+    }
+    .text-primary { color: var(--theme-primary, #007bff) !important; }
+    a:not(header a):not(nav a):not(.navbar a) { color: var(--theme-primary, #007bff); }
+    a:not(header a):not(nav a):not(.navbar a):hover { color: var(--theme-primary-hover, #0056b3); }
+    .form-control, .form-select {
+      background-color: var(--theme-card-bg, #ffffff);
+      color: var(--theme-text, #333333);
+      border-color: var(--theme-card-border, #dee2e6);
+    }
+    .modal-content {
+      background-color: var(--theme-card-bg, #ffffff);
+      color: var(--theme-text, #333333);
+    }
+
+    /* Nav support */
+    :root { --public-topbar-height: 36px; }
+    @media (min-width: 992px) {
+      .nav-bottom-menu { display: flex !important; }
+      .nav-bottom-menu .navbar-nav { flex-direction: row !important; }
+    }
+    .public-nav-topbar { transition: transform 0.25s ease, opacity 0.25s ease; }
+    .public-nav-topbar.is-hidden { transform: translateY(-100%); opacity: 0; }
+    .public-nav-topbar-fixed.is-hidden + .public-page-nav.fixed-top { top: 0 !important; }
+    body.has-public-fixed-nav { padding-top: 60px; }
+    body.has-public-fixed-nav.has-public-topbar { padding-top: calc(60px + var(--public-topbar-height)); }
+    body.has-public-fixed-nav.has-public-topbar.public-topbar-hidden { padding-top: 60px; }
+
+    /* Blog article styles */
+    .blog-article {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+    .blog-article h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--theme-heading-color, #333333);
+    }
+    .blog-article .blog-meta {
+      font-size: 0.9rem;
+      color: var(--theme-text-muted, #6c757d);
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+    .blog-article .blog-featured-image {
+      width: 100%;
+      max-height: 500px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .blog-article .blog-content {
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+    .blog-article .blog-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.375rem;
+    }
+    .blog-article .blog-content h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 1rem; }
+    .blog-article .blog-content h3 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+    .blog-article .blog-content p { margin-bottom: 1rem; }
+    .blog-article .blog-content blockquote {
+      border-left: 4px solid var(--theme-primary, #007bff);
+      padding: 0.75rem 1rem;
+      margin: 1.5rem 0;
+      background: var(--theme-surface, #f8f9fa);
+      border-radius: 0 0.375rem 0.375rem 0;
+    }
+    .blog-article .blog-content pre {
+      background: var(--theme-surface, #f8f9fa);
+      padding: 1rem;
+      border-radius: 0.375rem;
+      overflow-x: auto;
+    }
+    .blog-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+      text-decoration: none;
+      margin-bottom: 1rem;
+    }
+
+    /* Chat styles (same as public_page) */
+    .tenant-chat-floating-btn {
+      position: fixed; bottom: 2rem; right: 2rem;
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--theme-primary, #0d6efd);
+      color: var(--theme-btn-primary-text, white);
+      border: none;
+      box-shadow: 0 4px 12px rgba(var(--theme-primary-rgb, 13, 110, 253), 0.4);
+      font-size: 1.5rem; cursor: pointer; z-index: 1055;
+      transition: all 0.3s ease;
+      display: flex; align-items: center; justify-content: center; opacity: 0.9;
+    }
+    .tenant-chat-floating-btn:hover { opacity: 1; transform: scale(1.1); }
+    @media (max-width: 768px) {
+      .tenant-chat-floating-btn { width: 48px; height: 48px; bottom: 1.5rem; right: 1.5rem; font-size: 1.2rem; }
+    }
+    #tenantChatModal .modal-dialog { height: calc(100dvh - 2rem); max-height: calc(100vh - 100px); max-width: 1400px; width: 96vw; }
+    #tenantChatModal .modal-content { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+    #tenantChatModal .modal-body { flex: 1 1 auto !important; min-height: 0 !important; }
+    #tenantChatMessages { flex-grow: 1; overflow-y: auto; padding: 1rem; background: var(--theme-surface, #f8f9fa); min-height: 0; }
+    #tenantChatMessages .message-bubble { max-width: 80%; margin-bottom: 1rem; padding: 0.75rem 1rem; border-radius: 1rem; word-wrap: break-word; }
+    #tenantChatMessages .message-bubble.user { background: var(--theme-btn-primary-bg, #667eea); color: var(--theme-btn-primary-text, white); margin-left: auto; }
+    #tenantChatMessages .message-bubble.ai { background: var(--theme-surface, #f0f4f8); color: var(--theme-text, #1a202c); border: 1px solid var(--theme-card-border, #cbd5e0); margin-right: auto; }
+  </style>
+</head>
+<body>
+  <div id="pageContent">
+    {{/* Render header/nav/footer from homepage components */}}
+    {{range .Page.Components}}
+
+      {{if eq .ComponentType "header"}}
+        {{$data := .ComponentData}}
+        {{$bgColor := index $data "bg_color"}}
+        {{if not $bgColor}}{{$bgColor = index $data "background_color"}}{{end}}
+        {{if not $bgColor}}{{$bgColor = "var(--theme-nav-bg, #f8f9fa)"}}{{end}}
+        {{$padding := index $data "padding"}}
+        {{if not $padding}}{{$padding = "1rem 0"}}{{end}}
+        {{$menuTextColor := index $data "menu_text_color"}}
+        {{if not $menuTextColor}}{{$menuTextColor = index $data "text_color"}}{{end}}
+        {{if not $menuTextColor}}{{$menuTextColor = "var(--theme-nav-text, #333333)"}}{{end}}
+        {{$borderColor := "var(--theme-nav-border, #dee2e6)"}}
+        {{$elementStyles := index $data "element_styles"}}
+        {{$logoTextStyle := ""}}
+        {{if $elementStyles}}{{$logoTextStyle = index $elementStyles "logo_text"}}{{end}}
+        <header style="background-color: {{$bgColor | safeCSS}}; color: {{$menuTextColor | safeCSS}}; border-bottom: 1px solid {{$borderColor | safeCSS}}; padding: {{$padding | safeCSS}};">
+          <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                {{if index $data "logo"}}
+                  <a href="/co/{{$.Subdomain}}/" style="text-decoration: none;">
+                    <img src="{{index $data "logo"}}" alt="Logo" style="max-height: 40px; max-width: 150px;">
+                  </a>
+                {{else}}
+                  {{$logoText := index $data "logo_text"}}
+                  {{if not $logoText}}{{$logoText = "Logo"}}{{end}}
+                  <a class="navbar-brand mb-0" href="/co/{{$.Subdomain}}/" style="color: {{$menuTextColor | safeCSS}}; font-weight: bold; font-size: 1.25rem; text-decoration: none;{{if $logoTextStyle}} {{safeCSS $logoTextStyle}}{{end}}">
+                    {{$logoText}}
+                  </a>
+                {{end}}
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                {{$showLoginIcon := index $data "show_login_icon"}}
+                {{if $showLoginIcon}}
+                  {{$loginLink := index $data "login_icon_link"}}
+                  {{if not $loginLink}}{{$loginLink = printf "/co/%s/user/" $.Subdomain}}{{end}}
+                  <a href="{{$loginLink}}" style="color: {{$menuTextColor | safeCSS}}; font-size: 1.5rem; text-decoration: none;" title="Login"><i class="bi bi-person-circle"></i></a>
+                {{end}}
+                {{$showCartIcon := index $data "show_cart_icon"}}
+                {{if $showCartIcon}}
+                  {{$cartLink := index $data "cart_icon_link"}}
+                  {{if not $cartLink}}{{$cartLink = printf "/co/%s/cart/" $.Subdomain}}{{end}}
+                  <a href="{{$cartLink}}" style="color: {{$menuTextColor | safeCSS}}; font-size: 1.5rem; text-decoration: none; position: relative;" title="Cart"><i class="bi bi-cart"></i></a>
+                {{end}}
+              </div>
+            </div>
+          </div>
+          {{$menuItems := index $data "menu_items"}}
+          {{if $menuItems}}
+            <div class="container-fluid" style="border-top: 1px solid {{$borderColor | safeCSS}}; margin-top: 0.75rem; padding-top: 0.75rem;">
+              <nav class="navbar navbar-expand-lg p-0">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNav{{.ID}}" aria-controls="headerNav{{.ID}}" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="headerNav{{.ID}}">
+                  <ul class="navbar-nav">
+                    {{range $index, $item := $menuItems}}
+                      {{$link := index $item "link"}}
+                      {{if not $link}}{{$link = "#"}}{{end}}
+                      {{$text := index $item "text"}}
+                      {{if not $text}}{{$text = "Link"}}{{end}}
+                      {{$textKey := index $item "text_i18n"}}
+                      {{$menuItemStyleKey := printf "menu_item_text_%d" $index}}
+                      {{$menuItemStyle := ""}}
+                      {{if $elementStyles}}{{$menuItemStyle = index $elementStyles $menuItemStyleKey}}{{end}}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{$link}}" style="color: {{$menuTextColor | safeCSS}}; text-decoration: none;{{if $menuItemStyle}} {{safeCSS $menuItemStyle}}{{end}}">
+                          {{if $textKey}}<span data-i18n="{{$textKey}}">{{$text}}</span>{{else}}{{$text}}{{end}}
+                        </a>
+                      </li>
+                    {{end}}
+                  </ul>
+                </div>
+              </nav>
+            </div>
+          {{end}}
+        </header>
+
+      {{else if eq .ComponentType "nav"}}
+        {{$data := .ComponentData}}
+        {{$navBgColor := index $data "bg_color"}}
+        {{if not $navBgColor}}{{$navBgColor = index $data "background_color"}}{{end}}
+        {{if not $navBgColor}}{{$navBgColor = "var(--theme-nav-bg, #ffffff)"}}{{end}}
+        {{$menuTextColor := index $data "menu_text_color"}}
+        {{if not $menuTextColor}}{{$menuTextColor = "var(--theme-nav-text, #333333)"}}{{end}}
+        {{$isFixed := index $data "fixed"}}
+        {{$menuPosition := index $data "menu_position"}}
+        {{if not $menuPosition}}{{$menuPosition = "right"}}{{end}}
+        {{$navBorderColor := index $data "nav_border_color"}}
+        {{if not $navBorderColor}}{{$navBorderColor = "var(--theme-nav-border, #dee2e6)"}}{{end}}
+        {{$showTopbar := index $data "show_topbar"}}
+        {{$topbarText := index $data "topbar_text"}}
+        {{$topbarBgColor := index $data "topbar_bg_color"}}
+        {{if not $topbarBgColor}}{{$topbarBgColor = "var(--theme-surface, #f1f1f1)"}}{{end}}
+        {{$topbarTextColor := index $data "topbar_text_color"}}
+        {{if not $topbarTextColor}}{{$topbarTextColor = "var(--theme-primary, #f97316)"}}{{end}}
+        {{$topbarHideOnScroll := index $data "topbar_hide_on_scroll"}}
+
+        {{if $showTopbar}}
+        <div class="public-nav-topbar{{if $isFixed}} public-nav-topbar-fixed{{end}}" style="background: {{$topbarBgColor | safeCSS}}; color: {{$topbarTextColor | safeCSS}}; text-align: center; padding: 6px 0; font-size: 13px; font-weight: 700;{{if $isFixed}} position: fixed; top: 0; left: 0; right: 0; z-index: 1041;{{end}}"{{if $topbarHideOnScroll}} data-topbar-hide-on-scroll="true"{{end}}>
+          {{$topbarText}}
+        </div>
+        {{end}}
+
+        <nav class="navbar navbar-expand-lg public-page-nav{{if $isFixed}} fixed-top{{end}}{{if eq $menuPosition "bottom"}} flex-wrap{{end}}" style="background-color: {{$navBgColor | safeCSS}}; border-bottom: 1px solid {{$navBorderColor | safeCSS}};{{if and $isFixed $showTopbar}} top: 36px;{{end}}" data-nav-fixed="{{$isFixed}}" data-nav-has-topbar="{{$showTopbar}}">
+          <div class="container-fluid{{if eq $menuPosition "bottom"}} flex-wrap{{end}}">
+            {{$elementStyles := index $data "element_styles"}}
+            {{$logoTextStyle := ""}}
+            {{if $elementStyles}}{{$logoTextStyle = index $elementStyles "logo_text"}}{{end}}
+
+            {{if eq $menuPosition "bottom"}}
+              <div class="d-flex w-100 align-items-center justify-content-between" style="padding: 0.5rem 0;">
+                <a class="navbar-brand mb-0" href="/co/{{$.Subdomain}}/" style="color: {{$menuTextColor | safeCSS}}; font-weight: bold; font-size: 1.25rem;{{if $logoTextStyle}} {{safeCSS $logoTextStyle}}{{end}}">
+                  {{if index $data "logo"}}<img src="{{index $data "logo"}}" alt="Logo" style="max-height: 40px; max-width: 150px;">{{else}}{{index $data "logo_text"}}{{end}}
+                </a>
+                <div class="d-flex align-items-center">
+                  <div class="d-flex align-items-center gap-3">
+                    {{$showLoginIcon := index $data "show_login_icon"}}
+                    {{if $showLoginIcon}}
+                      <a href="/co/{{$.Subdomain}}/user/" style="color: {{$menuTextColor | safeCSS}}; font-size: 1.25rem; text-decoration: none;" title="Login"><i class="bi bi-person-circle"></i></a>
+                    {{end}}
+                    {{$showCartIcon := index $data "show_cart_icon"}}
+                    {{if $showCartIcon}}
+                      <a href="/co/{{$.Subdomain}}/cart/" style="color: {{$menuTextColor | safeCSS}}; font-size: 1.25rem; text-decoration: none; position: relative;" title="Cart"><i class="bi bi-cart"></i></a>
+                    {{end}}
+                  </div>
+                  <button class="navbar-toggler ms-2 d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav{{.ID}}" aria-controls="navbarNav{{.ID}}" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="collapse navbar-collapse nav-bottom-menu w-100" id="navbarNav{{.ID}}" style="border-top: 1px solid var(--theme-nav-border, rgba(0,0,0,0.08));">
+                <ul class="navbar-nav flex-lg-row flex-wrap justify-content-center gap-1" style="padding: 0.4rem 0;">
+                  {{$menuItems := index $data "menu_items"}}
+                  {{if $menuItems}}
+                    {{range $index, $item := $menuItems}}
+                      {{$link := index $item "link"}}
+                      {{if not $link}}{{$link = "#"}}{{end}}
+                      {{$text := index $item "text"}}
+                      {{if not $text}}{{$text = "Link"}}{{end}}
+                      {{$textKey := index $item "text_i18n"}}
+                      {{$menuItemStyleKey := printf "menu_item_text_%d" $index}}
+                      {{$menuItemStyle := ""}}
+                      {{if $elementStyles}}{{$menuItemStyle = index $elementStyles $menuItemStyleKey}}{{end}}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{$link}}" style="color: {{$menuTextColor | safeCSS}}; font-weight: 500;{{if $menuItemStyle}} {{safeCSS $menuItemStyle}}{{end}}">
+                          {{if $textKey}}<span data-i18n="{{$textKey}}">{{$text}}</span>{{else}}{{$text}}{{end}}
+                        </a>
+                      </li>
+                    {{end}}
+                  {{end}}
+                </ul>
+              </div>
+            {{else}}
+              <a class="navbar-brand" href="/co/{{$.Subdomain}}/" style="color: {{$menuTextColor | safeCSS}}; font-weight: bold; font-size: 1.25rem;{{if $logoTextStyle}} {{safeCSS $logoTextStyle}}{{end}}">
+                {{if index $data "logo"}}<img src="{{index $data "logo"}}" alt="Logo" style="max-height: 40px; max-width: 150px;">{{else}}{{index $data "logo_text"}}{{end}}
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav{{.ID}}" aria-controls="navbarNav{{.ID}}" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse justify-content-end" id="navbarNav{{.ID}}">
+                <ul class="navbar-nav align-items-lg-center">
+                  {{$menuItems := index $data "menu_items"}}
+                  {{if $menuItems}}
+                    {{range $index, $item := $menuItems}}
+                      {{$link := index $item "link"}}
+                      {{if not $link}}{{$link = "#"}}{{end}}
+                      {{$text := index $item "text"}}
+                      {{if not $text}}{{$text = "Link"}}{{end}}
+                      {{$textKey := index $item "text_i18n"}}
+                      {{$menuItemStyleKey := printf "menu_item_text_%d" $index}}
+                      {{$menuItemStyle := ""}}
+                      {{if $elementStyles}}{{$menuItemStyle = index $elementStyles $menuItemStyleKey}}{{end}}
+                      <li class="nav-item">
+                        <a class="nav-link" href="{{$link}}" style="color: {{$menuTextColor | safeCSS}};{{if $menuItemStyle}} {{safeCSS $menuItemStyle}}{{end}}">
+                          {{if $textKey}}<span data-i18n="{{$textKey}}">{{$text}}</span>{{else}}{{$text}}{{end}}
+                        </a>
+                      </li>
+                    {{end}}
+                  {{end}}
+                  {{$showLoginIcon := index $data "show_login_icon"}}
+                  {{if $showLoginIcon}}
+                    <li class="nav-item">
+                      <a class="nav-link" href="/co/{{$.Subdomain}}/user/" style="color: {{$menuTextColor | safeCSS}}; font-size: 1.25rem;" title="Login"><i class="bi bi-person-circle"></i></a>
+                    </li>
+                  {{end}}
+                  {{$showCartIcon := index $data "show_cart_icon"}}
+                  {{if $showCartIcon}}
+                    <li class="nav-item">
+                      <a class="nav-link" href="/co/{{$.Subdomain}}/cart/" style="color: {{$menuTextColor | safeCSS}}; font-size: 1.25rem; position: relative;" title="Cart"><i class="bi bi-cart"></i></a>
+                    </li>
+                  {{end}}
+                </ul>
+              </div>
+            {{end}}
+          </div>
+        </nav>
+
+      {{else if eq .ComponentType "footer"}}
+        {{/* Footer is rendered after the article below */}}
+
+      {{end}}
+    {{end}}
+
+    {{/* Blog article body */}}
+    <article class="blog-article">
+      <a href="/co/{{.Subdomain}}/" class="blog-back-link" onclick="if(history.length>1){history.back();return false;}">
+        <i class="bi bi-arrow-left"></i>
+        <span data-pt="publicSite.blog.backToBlog">Back to Blog</span>
+      </a>
+
+      <h1>{{.Blog.Title}}</h1>
+
+      <div class="blog-meta">
+        {{if .Blog.PublishedAt}}
+          <span><i class="bi bi-calendar3"></i> {{.Blog.PublishedAt.Format "2006-01-02"}}</span>
+        {{end}}
+        {{if .Blog.Category}}
+          <span><i class="bi bi-tag"></i> {{.Blog.Category}}</span>
+        {{end}}
+        {{if gt .Blog.ViewCount 0}}
+          <span><i class="bi bi-eye"></i> {{.Blog.ViewCount}}</span>
+        {{end}}
+      </div>
+
+      {{if .Blog.FeaturedImage}}
+        <img src="{{.Blog.FeaturedImage}}" alt="{{.Blog.Title}}" class="blog-featured-image">
+      {{end}}
+
+      <div class="blog-content">
+        {{if .Blog.Content}}
+          {{.Blog.Content | safeHTML}}
+        {{else}}
+          <p class="text-muted" data-pt="publicSite.blog.noContent">No content</p>
+        {{end}}
+      </div>
+    </article>
+
+    {{/* Render footer components */}}
+    {{range .Page.Components}}
+      {{if eq .ComponentType "footer"}}
+        {{$data := .ComponentData}}
+        {{$bgColor := index $data "bg_color"}}
+        {{if not $bgColor}}{{$bgColor = "var(--theme-footer-bg, #f8f9fa)"}}{{end}}
+        {{$textColor := index $data "text_color"}}
+        {{if not $textColor}}{{$textColor = "var(--theme-footer-text, #6c757d)"}}{{end}}
+        {{$padding := index $data "padding"}}
+        {{$logo := index $data "logo"}}
+        {{$column1Content := index $data "column1_content" | default "Company intro text"}}
+        {{$column1Key := index $data "column1_content_i18n"}}
+        {{$column2MenuItems := index $data "column2_menu_items"}}
+        {{$column3MenuItems := index $data "column3_menu_items"}}
+        {{$column4MenuItems := index $data "column4_menu_items"}}
+        {{$copyright := index $data "copyright" | default "All rights reserved"}}
+        {{$copyrightKey := index $data "copyright_i18n"}}
+        {{$borderColor := index $data "border_color"}}
+        {{if not $borderColor}}{{$borderColor = "var(--theme-footer-border, rgba(0,0,0,0.1))"}}{{end}}
+        <footer style="background-color: {{$bgColor | safeCSS}}; color: {{$textColor | safeCSS}};{{if $padding}} padding: {{$padding | safeCSS}};{{end}}">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-3 mb-3 mb-md-0">
+                {{if $logo}}<img src="{{$logo}}" alt="Logo" style="max-height: 40px; margin-bottom: 1rem;">{{end}}
+                <div style="white-space: pre-line;">
+                  {{if $column1Key}}<span data-i18n="{{$column1Key}}">{{$column1Content}}</span>{{else}}<span data-pt="publicSite.footer.companyIntro">{{$column1Content}}</span>{{end}}
+                </div>
+              </div>
+              <div class="col-md-3 mb-3 mb-md-0">
+                <ul class="list-unstyled">
+                  {{range $column2MenuItems}}
+                    {{$tKey := index . "text_i18n"}}
+                    <li class="mb-2">
+                      <a href="{{index . "link" | default "#"}}" class="text-decoration-none" style="color: {{$textColor | safeCSS}};">
+                        {{if $tKey}}<span data-i18n="{{$tKey}}">{{index . "text" | default "Link"}}</span>{{else}}{{index . "text" | default "Link"}}{{end}}
+                      </a>
+                    </li>
+                  {{end}}
+                </ul>
+              </div>
+              <div class="col-md-3 mb-3 mb-md-0">
+                <ul class="list-unstyled">
+                  {{range $column3MenuItems}}
+                    {{$tKey := index . "text_i18n"}}
+                    <li class="mb-2">
+                      <a href="{{index . "link" | default "#"}}" class="text-decoration-none" style="color: {{$textColor | safeCSS}};">
+                        {{if $tKey}}<span data-i18n="{{$tKey}}">{{index . "text" | default "Link"}}</span>{{else}}{{index . "text" | default "Link"}}{{end}}
+                      </a>
+                    </li>
+                  {{end}}
+                </ul>
+              </div>
+              <div class="col-md-3 mb-3 mb-md-0">
+                <ul class="list-unstyled">
+                  {{range $column4MenuItems}}
+                    {{$tKey := index . "text_i18n"}}
+                    <li class="mb-2">
+                      <a href="{{index . "link" | default "#"}}" class="text-decoration-none" style="color: {{$textColor | safeCSS}};">
+                        {{if $tKey}}<span data-i18n="{{$tKey}}">{{index . "text" | default "Link"}}</span>{{else}}{{index . "text" | default "Link"}}{{end}}
+                      </a>
+                    </li>
+                  {{end}}
+                </ul>
+              </div>
+            </div>
+            <div class="row mt-4 pt-3" style="border-top: 1px solid {{$borderColor | safeCSS}};">
+              <div class="col-12 text-center">
+                <p class="mb-0" style="font-size: 0.875rem;">
+                  {{if $copyrightKey}}<span data-i18n="{{$copyrightKey}}">{{$copyright}}</span>{{else}}<span data-pt="publicSite.footer.copyright">{{$copyright}}</span>{{end}}
+                </p>
+              </div>
+            </div>
+          </div>
+        </footer>
+      {{end}}
+    {{end}}
+  </div>
+
+  {{if .PublicChatEnabled}}
+  <button class="tenant-chat-floating-btn" id="tenantChatFloatingBtn" type="button" data-bs-toggle="modal" data-bs-target="#tenantChatModal" title="Talk to us">
+    <i class="bi bi-chat-dots"></i>
+  </button>
+  <div class="modal fade" id="tenantChatModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" data-pt="publicSite.chat.talkToUs">Talk to us</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0 d-flex flex-column tenant-chat-modal-body">
+          <div id="tenantChatMessages" class="flex-grow-1 overflow-auto p-3 bg-light" style="min-height: 0;">
+            <div class="text-center p-4 text-muted">
+              <p class="mt-2" data-pt="publicSite.chat.startChat">Start a conversation with us</p>
+            </div>
+          </div>
+          <div class="border-top p-3 bg-white">
+            <form id="tenantChatForm" action="javascript:void(0)" onsubmit="return false;">
+              <div class="input-group">
+                <textarea id="tenantChatInput" class="form-control" rows="1" placeholder="Type a message..." style="resize: none; max-height: 120px;"></textarea>
+                <button class="btn btn-success" type="submit" id="tenantChatSendBtn"><i class="bi bi-send"></i></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {{end}}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {{if .PublicChatEnabled}}
+  <script src="/static/js/public-tenant-chat.js"></script>
+  {{end}}
+  <script>
+    // Handle fixed nav + topbar scroll behavior (same as public_page)
+    (function() {
+      const nav = document.querySelector('.public-page-nav');
+      if (!nav) return;
+      const isFixed = nav.getAttribute('data-nav-fixed') === 'true';
+      const hasTopbar = nav.getAttribute('data-nav-has-topbar') === 'true';
+      const topbar = document.querySelector('.public-nav-topbar');
+      const body = document.body;
+      if (isFixed) {
+        body.classList.add('has-public-fixed-nav');
+        if (hasTopbar && topbar) {
+          body.classList.add('has-public-topbar');
+          const hideOnScroll = topbar.getAttribute('data-topbar-hide-on-scroll') !== 'false';
+          if (hideOnScroll) {
+            function handleTopbarScroll() {
+              const shouldHide = window.scrollY > 20;
+              topbar.classList.toggle('is-hidden', shouldHide);
+              body.classList.toggle('public-topbar-hidden', shouldHide);
+            }
+            handleTopbarScroll();
+            window.addEventListener('scroll', handleTopbarScroll, { passive: true });
+          }
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

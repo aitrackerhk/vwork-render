@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="helpPage.title">支援中心 - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vsys.css">
+    <!-- i18n 防闪烁样式 -->
+    <style>
+        /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+    </style>
+    <!-- i18n 初始化脚本 - 在页面渲染前执行，避免闪烁 -->
+    <script>
+        (function() {
+            // 立即读取语言设置（不等待 DOMContentLoaded）
+            const savedLang = localStorage.getItem('u-nai_lang');
+            // CMS 另一套語言設定（歷史原因）：部分頁面/舊邏輯使用 localStorage.language
+            // 這會造成「頁面多數是中文，但 data-i18n 的區塊被翻成英文」的混搭。
+            // 在 CMS layout 內做一次同步：以 CMS 語言為準，避免困惑。
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            
+            let currentLang = 'zh'; // 默认中文
+            
+            // 若 cmsLang 存在且是支援語系，優先使用並同步到 u-nai_lang
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) {
+                    localStorage.setItem('u-nai_lang', currentLang);
+                }
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                // 检测浏览器语言
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+                    currentLang = 'zh-CN';
+                } else if (browserLang.startsWith('zh')) {
+                    currentLang = 'zh';
+                } else {
+                    currentLang = 'en';
+                }
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            
+            // 将语言设置存储到全局变量，供 i18n.js 使用
+            window.__INITIAL_LANG__ = currentLang;
+            
+            // 无论什么语言，都在 body 渲染后立即添加 i18n-loading 类来隐藏内容
+            // 这样可以防止在翻译应用前显示原始内容（避免繁简切换时的闪烁）
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    
+                    // 添加超时保护：如果 5 秒后 i18n-loading 类还在，自动移除
+                    // 这样可以防止 i18n.js 加载失败时页面内容永远被隐藏
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            console.warn('i18n-loading class still present after 5 seconds, removing it to prevent blank page');
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    // 如果 body 还没渲染，使用 requestAnimationFrame 快速检查
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body>
+    <!-- V-sys Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar" >
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
+                <img src="/static/vlogo.png" alt="V-sys" style="height: auto; max-height: 15px; display: block;">
+            </a>
+            <!-- Mobile: App Switcher, Menu Toggle -->
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcherHelp">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                <span class="app-switcher-label">vAI</span>
+                            </a>
+                            <a href="/" class="app-switcher-item" data-app="vwork">
+                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                <span class="app-switcher-label">vWork</span>
+                            </a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                <span class="app-switcher-label">vMarket</span>
+                            </a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                <span class="app-switcher-label">vOffice</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="helpMobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                        <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                    </button>
+                </li>
+            </ul>
+            <!-- Desktop Menu -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首頁</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about" id="navAboutLink" data-i18n="nav.about">關於</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a>
+                    </li>
+                </ul>
+                <!-- Right: theborderbox -->
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                                </a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                            <span class="app-switcher-label">vAI</span>
+                                        </a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork">
+                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                            <span class="app-switcher-label">vWork</span>
+                                        </a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                            <span class="app-switcher-label">vMarket</span>
+                                        </a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                            <span class="app-switcher-label">vOffice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help/vwork" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=vwork" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                </ul>
+                            </div>
+                            <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+                            </a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                                    <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                    <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="helpSidebarOverlay"></div>
+    
+    <!-- Help Sidebar Menu for mobile -->
+    <div class="sidebar" id="helpSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="/" id="sidebarHomeLink">
+                        <i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about" id="sidebarAboutLink">
+                        <i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/contact">
+                        <i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#helpLanguageSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="helpLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="zh">繁體中文</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="zh-CN">简体中文</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-lang="en">English</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item nav-group" id="helpUserDropdownItem" style="display: none;">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#helpUserSubmenu" aria-expanded="false">
+                        <img id="helpUserAvatar" src="" alt="User" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                        <i class="bi bi-person-circle" id="helpUserIcon"></i> <span id="helpUserName" data-i18n="nav.user">用戶</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="helpUserSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/personal-data">
+                                    <i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/billing">
+                                    <i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="helpLogoutBtn">
+                                    <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item" id="helpLoginItem">
+                    <a class="nav-link" href="/login">
+                        <i class="bi bi-box-arrow-in-right"></i> <span data-i18n="nav.login">登錄</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- 主要內容 -->
+    <div class="container-fluid px-3 py-4" style="min-height: calc(100vh - 200px); padding-top: 80px !important;">
+    {{ if not .Category }}
+    <!-- 主页面：显示分类列表 -->
+    <!-- 搜索栏 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h3 mb-3"><i class="bi bi-question-circle me-2"></i><span data-i18n="helpPage.title">支援中心</span></h1>
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="helpSearch" data-i18n-placeholder="helpPage.searchPlaceholder" placeholder="搜尋幫助內容..." onkeyup="searchHelp()">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要分类 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h5 mb-3"><i class="bi bi-grid me-2"></i><span data-i18n="helpPage.mainFeatures">主要功能</span></h2>
+            <div class="row g-3">
+                <!-- 账户管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/account" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-person-circle fs-2 text-primary me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.account.title">帳戶管理</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.account.items.accountSettings">帳戶設定</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.account.items.manageSubscription">管理訂閱</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.account.items.accountBilling">帳戶收費</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.account.items.storeSettings">商店設定</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- 商品管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/product" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-box-seam fs-2 text-success me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.product.title">商品管理</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.product.items.manageProducts">管理商品</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.product.items.productDetails">商品詳細資訊</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.product.items.searchFilterSort">搜尋、篩選及排序商品</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.product.items.barcodeQrcode">商品條碼及二維碼</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.product.items.importExport">匯入及匯出商品</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- 訂單管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/order" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-cart-check fs-2 text-warning me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.order.title">訂單管理</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.order.items.manageOrders">管理訂單</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.order.items.orderDetails">訂單詳細資訊</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.order.items.orderStatus">訂單狀態管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.order.items.paymentProcessing">付款處理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.order.items.invoiceGeneration">發票生成</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- 客戶管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/customer" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-people fs-2 text-info me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.customer.title">客戶管理</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.customer.items.customerData">客戶資料管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.customer.items.memberLevel">會員等級設定</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.customer.items.pointsManagement">積分管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.customer.items.couponSystem">優惠券系統</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.customer.items.customerAnalysis">客戶分析報告</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- 服務管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/service" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-briefcase fs-2 text-danger me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.service.title">服務管理</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.service.items.serviceItems">服務項目管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.service.items.appointmentSystem">預約系統</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.service.items.serviceOrder">服務單處理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.service.items.serviceStaff">服務員管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.service.items.resourceManagement">資源管理</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- POS 收銀 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/pos" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-cash-coin fs-2 text-success me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.pos.title">POS 收銀系統</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.pos.items.quickCheckout">快速結帳</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.pos.items.salesRecords">銷售記錄</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.pos.items.paymentManagement">付款管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.pos.items.posSettings">POS 設定</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- POS 自助 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/pos-self-service" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-display fs-2 text-primary me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.posSelfService.title">POS 自助</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.posSelfService.items.selfCheckout">自助結帳</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.posSelfService.items.productBrowse">商品瀏覽</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.posSelfService.items.memberLogin">會員登入</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.posSelfService.items.selfServiceSettings">自助服務設定</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- vBuilder 網站 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/vbuilder" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-file-earmark-text fs-2 text-info me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.vbuilder.title">vBuilder 網站</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.vbuilder.items.pageManagement">頁面管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.vbuilder.items.blogManagement">博客管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.vbuilder.items.websiteTheme">網站主題</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.vbuilder.items.websiteSettings">網站設定</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- 項目管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/project" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="bi bi-folder fs-2 text-warning me-3"></i>
+                                <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.project.title">項目管理</span></h5>
+                            </div>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.project.items.createProject">創建項目</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.project.items.taskManagement">項目任務管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.project.items.resourceManagement">項目資源管理</span></li>
+                                <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.project.items.analysisReport">項目分析報告</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <!-- 優惠管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/promotion" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-ticket-perforated fs-2 text-danger me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.promotion.title">優惠管理</span></h5>
+            </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.promotion.items.couponManagement">優惠券管理</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.promotion.items.pointsSystem">積分系統</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.promotion.items.pointsHistory">積分記錄</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.promotion.items.pointsSettings">積分設置</span></li>
+                                </ul>
+        </div>
+                        </div>
+                    </a>
+    </div>
+
+                <!-- 資源管理 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/resource" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-boxes fs-2 text-info me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.resource.title">資源管理</span></h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.resource.items.storeManagement">店舖管理</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.resource.items.roomManagement">房間管理</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.resource.items.equipmentManagement">設備管理</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.resource.items.vehicleManagement">車輛管理</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.resource.items.resourceCalendar">資源使用日曆</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- 個人工具 -->
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/personal-tools" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-person fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.personalTools.title">個人工具</span></h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.personalTools.items.calendar">日曆</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.personalTools.items.reminders">提醒事項</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.personalTools.items.notifications">提示資訊</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.personalTools.items.messages">訊息</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpPage.categories.personalTools.items.notes">備忘</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 其他分类 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h5 mb-3"><i class="bi bi-book me-2"></i><span data-i18n="helpPage.otherFeatures">其他功能</span></h2>
+            <div class="row g-3">
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/getting-started" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-rocket-takeoff fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.gettingStarted.title">快速入門指南</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/tutorial-videos" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-camera-video fs-2 text-danger me-3"></i>
+                                    <h5 class="card-title mb-0">教學影片庫</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/import-export" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-arrow-left-right fs-2 text-success me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.importExport.title">匯入 / 匯出</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/inventory" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-archive fs-2 text-secondary me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.inventory.title">庫存管理</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/accounting" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-calculator fs-2 text-info me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.accounting.title">會計管理</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/hr" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-person-badge fs-2 text-warning me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.hr.title">HR 人力資源</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/dynamic-fields" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-sliders fs-2 text-success me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.dynamicFields.title">動態字段功能</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/reports" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-file-earmark-text fs-2 text-danger me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.reports.title">報表功能</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/ai" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-robot fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.ai.title">vAi 智能助手</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/purchase" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-cart-plus fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.purchase.title">採購管理</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/supplier" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-truck fs-2 text-info me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.supplier.title">供應商管理</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/warehouse" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-building fs-2 text-secondary me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.warehouse.title">倉庫管理</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/project" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-folder fs-2 text-warning me-3"></i>
+                                    <h5 class="card-title mb-0">項目管理</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/store" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-shop fs-2 text-success me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.store.title">店舖管理</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <a href="/help/vwork/website" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-globe fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0"><span data-i18n="helpPage.categories.website.title">網站管理</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 聯絡支援 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-headset me-2"></i><span data-i18n="helpPage.needMoreHelp">需要更多幫助？</span></h5>
+                    <p class="card-text"><span data-i18n="helpPage.needMoreHelpDesc">如果您遇到問題或需要進一步的協助，請：</span></p>
+                    <ul>
+                        <li><span data-i18n="helpPage.needMoreHelpItem1">使用右下角的 <strong>vAi 智能助手</strong> 獲取即時幫助</span></li>
+                        <li><span data-i18n="helpPage.needMoreHelpItem2">前往 <a href="/contact" class="text-decoration-none">聯絡客服</a> 頁面提交問題</span></li>
+                        <li><span data-i18n="helpPage.needMoreHelpItem3">查看系統右上角的 <strong>提示資訊</strong>，了解系統通知</span></li>
+                    </ul>
+                    <p class="text-muted small mt-3 mb-0"><i class="bi bi-info-circle me-1"></i><span data-i18n="helpPage.continuousUpdate">我們會持續更新系統功能，為您提供更好的使用體驗。</span></p>
+                        </div>
+            </div>
+        </div>
+    </div>
+    {{ else }}
+    <!-- 分类详情页面 -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/help/vwork" data-i18n="helpPage.title">支援中心</a></li>
+                    <li class="breadcrumb-item active">{{ .CategoryTitle }}</li>
+                </ol>
+            </nav>
+                    </div>
+                </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    {{ if eq .Category "account" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-person-circle me-2 text-primary"></i>帳戶管理</h1>
+                            <h6 class="fw-bold mb-3">帳戶設定</h6>
+                            <p>在 <strong>設定 → 個人資料</strong> 中，您可以：</p>
+                            <ul>
+                                <li>修改個人資料：姓名、電子郵件、電話等</li>
+                                <li>更改密碼</li>
+                                <li>設定語言偏好</li>
+                                <li>管理通知設定</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">管理訂閱</h6>
+                            <p>在 <strong>設定 → 訂閱管理</strong> 中，您可以：</p>
+                            <ul>
+                                <li>查看當前訂閱方案</li>
+                                <li>升級或降級訂閱方案</li>
+                                <li>查看訂閱歷史記錄</li>
+                                <li>管理付款方式</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">商店設定</h6>
+                            <p>在 <strong>設定 → 企業設置</strong> 中，您可以：</p>
+                            <ul>
+                                <li>設定商店基本信息</li>
+                                <li>自定義商店外觀</li>
+                                <li>設定稅務資訊</li>
+                                <li>管理付款和運送方式</li>
+                            </ul>
+
+                    {{ else if eq .Category "product" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-box-seam me-2 text-success"></i>商品管理</h1>
+                            <h6 class="fw-bold mb-3">新增商品</h6>
+                            <ol>
+                                <li>前往 <strong>產品管理 → 產品</strong></li>
+                                <li>點擊 <strong>新增產品</strong> 按鈕</li>
+                                <li>填寫產品基本信息：名稱、描述、價格</li>
+                                <li>設定庫存數量（如果啟用庫存管理）</li>
+                                <li>選擇產品分類、品牌、屬性等</li>
+                                <li>上傳產品圖片</li>
+                                <li>設定產品條碼或二維碼（可選）</li>
+                                <li>儲存產品</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">搜尋、篩選及排序商品</h6>
+                            <p>在產品列表頁面，您可以：</p>
+                            <ul>
+                                <li>使用搜尋框搜尋產品名稱或條碼</li>
+                                <li>使用篩選器按分類、品牌、價格範圍等篩選</li>
+                                <li>點擊欄位標題進行排序（名稱、價格、庫存等）</li>
+                                <li>使用進階搜尋功能進行多條件搜尋</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">匯入及匯出商品</h6>
+                            <p>批量管理商品：</p>
+                            <ul>
+                                <li><strong>匯出商品</strong>：點擊 <strong>匯出 Excel</strong> 或 <strong>匯出 PDF</strong> 按鈕</li>
+                                <li><strong>匯入商品</strong>：點擊 <strong>匯入</strong> 按鈕，選擇 Excel 檔案，系統會自動解析並匯入商品資料</li>
+                                <li>匯入前請確保 Excel 檔案格式正確，包含必要的欄位（名稱、價格等）</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">商品條碼及二維碼</h6>
+                            <ul>
+                                <li>系統支援自動生成商品條碼和二維碼</li>
+                                <li>在 POS 系統中，可以使用掃描器掃描條碼快速添加商品</li>
+                                <li>可以列印條碼標籤貼在商品上</li>
+                            </ul>
+
+                    {{ else if eq .Category "import-export" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-arrow-left-right me-2 text-success"></i>匯入 / 匯出</h1>
+                            <p>您可以在多個模組（例如：客戶、商品、訂單、服務單、採購單、發票、庫存報表等）的列表頁面，使用 <strong>匯出</strong> 或 <strong>匯入 Excel</strong> 來批量處理資料。</p>
+
+                            <h6 class="fw-bold mt-4 mb-3">匯出（Excel / PDF）</h6>
+                            <ol>
+                                <li>進入任一資料列表頁（例如：<strong>客戶</strong>、<strong>商品</strong>、<strong>訂單</strong>）</li>
+                                <li>在列表右上角的操作區，點擊 <strong>匯出 Excel</strong> 或 <strong>匯出 PDF</strong></li>
+                                <li>系統會下載檔案到您的電腦</li>
+                            </ol>
+                            <p class="text-muted small mb-0">提示：若列表沒有資料，系統會提示「沒有資料，不能匯出」。</p>
+
+                            <h6 class="fw-bold mt-4 mb-3">匯入（Excel）</h6>
+                            <ol>
+                                <li>進入支援匯入的列表頁</li>
+                                <li>點擊 <strong>匯入 Excel</strong>（或先下載 <strong>匯入模板</strong>）</li>
+                                <li>依照模板欄位填寫後上傳 Excel，系統會自動解析並匯入</li>
+                            </ol>
+                            <p class="text-muted small mb-0">提示：若看到「下載匯入 Excel（不含資料/含資料）」表示該模組提供模板功能；匯入前請先確認欄位格式與必填欄位。</p>
+
+                    {{ else if eq .Category "order" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-cart-check me-2 text-warning"></i>訂單管理</h1>
+                            <h6 class="fw-bold mb-3">創建訂單</h6>
+                            <ol>
+                                <li>前往 <strong>訂單管理 → 訂單</strong></li>
+                                <li>點擊 <strong>新增訂單</strong> 按鈕</li>
+                                <li>選擇客戶（或創建新客戶）</li>
+                                <li>添加產品或服務項目：
+                                    <ul>
+                                        <li>點擊 <strong>添加產品</strong> 按鈕</li>
+                                        <li>搜尋並選擇產品</li>
+                                        <li>設定數量和單價</li>
+                                        <li>如有需要，設定折扣</li>
+                                    </ul>
+                                </li>
+                                <li>選擇付款方式（現金、信用卡、轉帳等）</li>
+                                <li>選擇運送方式（如適用）</li>
+                                <li>填寫備註（可選）</li>
+                                <li>點擊 <strong>儲存</strong> 完成訂單創建</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">訂單狀態管理</h6>
+                            <p>訂單狀態包括：</p>
+                            <ul>
+                                <li><strong>報價單</strong>：報價單狀態的訂單</li>
+                                <li><strong>已確認</strong>：已確認的訂單</li>
+                                <li><strong>處理中</strong>：正在處理的訂單</li>
+                                <li><strong>已完成</strong>：已完成的訂單</li>
+                                <li><strong>已取消</strong>：已取消的訂單</li>
+                            </ul>
+                            <p>您可以在訂單詳情頁面更改訂單狀態。</p>
+
+                            <h6 class="fw-bold mt-4 mb-3">發票生成</h6>
+                            <ol>
+                                <li>在訂單詳情頁面，點擊 <strong>生成發票</strong> 按鈕</li>
+                                <li>系統會自動生成發票號碼</li>
+                                <li>可以預覽發票內容</li>
+                                <li>可以列印或下載 PDF 格式的發票</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">報價單管理</h6>
+                            <p>創建報價單：</p>
+                            <ol>
+                                <li>前往 <strong>訂單管理 → 報價單</strong></li>
+                                <li>點擊 <strong>新增報價單</strong></li>
+                                <li>填寫報價單信息（類似創建訂單）</li>
+                                <li>報價單可以轉換為正式訂單</li>
+                            </ol>
+
+                    {{ else if eq .Category "customer" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-people me-2 text-info"></i>客戶管理</h1>
+                            <h6 class="fw-bold mb-3">客戶資料管理</h6>
+                            <ol>
+                                <li>前往 <strong>客戶管理 → 客戶</strong></li>
+                                <li>點擊 <strong>新增客戶</strong> 創建新客戶</li>
+                                <li>填寫客戶基本信息：姓名、電話、電子郵件、地址等</li>
+                                <li>可以為客戶添加多個地址</li>
+                                <li>設定客戶的會員等級</li>
+                                <li>儲存客戶資料</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">會員等級設定</h6>
+                            <ol>
+                                <li>前往 <strong>客戶管理 → 會員等級</strong></li>
+                                <li>點擊 <strong>新增會員等級</strong></li>
+                                <li>設定等級名稱、折扣率、積分倍數等</li>
+                                <li>設定升級條件（如累積消費金額）</li>
+                                <li>儲存設定</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">積分管理</h6>
+                            <ul>
+                                <li>系統自動記錄客戶的積分變動</li>
+                                <li>可以在 <strong>客戶管理 → 積分記錄</strong> 中查看所有積分變動</li>
+                                <li>可以手動調整客戶積分</li>
+                                <li>客戶可以使用積分抵扣訂單金額</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">優惠券系統</h6>
+                            <ol>
+                                <li>前往 <strong>客戶管理 → 優惠券</strong></li>
+                                <li>點擊 <strong>新增優惠券</strong></li>
+                                <li>設定優惠券類型（折扣、固定金額等）</li>
+                                <li>設定使用條件和有效期</li>
+                                <li>可以發送優惠券給指定客戶</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">客戶分析報告</h6>
+                            <p>在 <strong>客戶管理 → 客戶分析報告</strong> 中，您可以查看：</p>
+                            <ul>
+                                <li>客戶消費統計</li>
+                                <li>客戶活躍度分析</li>
+                                <li>客戶價值分析</li>
+                                <li>會員等級分布</li>
+                            </ul>
+
+                    {{ else if eq .Category "service" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-briefcase me-2 text-danger"></i>服務管理</h1>
+                            <h6 class="fw-bold mb-3">服務項目管理</h6>
+                            <ol>
+                                <li>前往 <strong>服務管理 → 服務</strong></li>
+                                <li>點擊 <strong>新增服務</strong></li>
+                                <li>填寫服務信息：名稱、描述、價格、時長等</li>
+                                <li>選擇服務類型</li>
+                                <li>設定服務員（可選）</li>
+                                <li>儲存服務資料</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">預約系統</h6>
+                            <ol>
+                                <li>前往 <strong>服務管理 → 預約</strong></li>
+                                <li>點擊 <strong>新增預約</strong></li>
+                                <li>選擇客戶和服務項目</li>
+                                <li>選擇預約日期和時間</li>
+                                <li>選擇服務員（如適用）</li>
+                                <li>選擇房間或設備（如適用）</li>
+                                <li>儲存預約</li>
+                            </ol>
+                            <p>系統會在預約時間前發送提醒通知。</p>
+
+                            <h6 class="fw-bold mt-4 mb-3">服務單處理</h6>
+                            <ol>
+                                <li>前往 <strong>服務管理 → 服務單</strong></li>
+                                <li>可以從預約創建服務單，或直接創建新服務單</li>
+                                <li>記錄服務內容和結果</li>
+                                <li>處理付款</li>
+                                <li>完成服務單</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">資源管理</h6>
+                            <ul>
+                                <li><strong>房間管理</strong>：在 <strong>服務管理 → 房間</strong> 中管理服務房間</li>
+                                <li><strong>設備管理</strong>：在 <strong>服務管理 → 設備</strong> 中管理服務設備</li>
+                                <li><strong>資源使用日曆</strong>：在 <strong>服務管理 → 資源使用日曆</strong> 中查看資源使用情況</li>
+                            </ul>
+
+                    {{ else if eq .Category "pos" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-cash-coin me-2 text-success"></i>POS 收銀系統</h1>
+                            <h6 class="fw-bold mb-3">使用 POS 系統</h6>
+                            <ol>
+                                <li>前往 <strong>POS 收銀台</strong></li>
+                                <li>選擇客戶（可選，也可以直接結帳）</li>
+                                <li>添加商品到購物車：
+                                    <ul>
+                                        <li>搜尋商品名稱或掃描條碼</li>
+                                        <li>點擊商品添加到購物車</li>
+                                        <li>調整數量</li>
+                                    </ul>
+                                </li>
+                                <li>如有需要，應用折扣或優惠券</li>
+                                <li>選擇付款方式</li>
+                                <li>點擊 <strong>結帳</strong> 完成交易</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">POS 設定</h6>
+                            <p>在 <strong>設定 → POS 設定</strong> 中，您可以：</p>
+                            <ul>
+                                <li>設定預設付款方式</li>
+                                <li>設定收據列印選項</li>
+                                <li>設定稅務顯示方式</li>
+                                <li>自定義 POS 界面</li>
+                            </ul>
+
+                    {{ else if eq .Category "pos-self-service" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-display me-2 text-primary"></i>POS 自助</h1>
+                        <h6 class="fw-bold mb-3">什麼是 POS 自助？</h6>
+                        <p>POS 自助（Kiosk Mode）是專為零售門店設計的自助收銀模式，讓顧客可以自行完成結帳流程，無需店員協助。</p>
+
+                        <h6 class="fw-bold mt-4 mb-3">使用 POS 自助</h6>
+                        <ol>
+                            <li>前往 <strong>POS 收銀台</strong></li>
+                            <li>點擊右上角的 <strong>Kiosk 模式</strong> 按鈕</li>
+                            <li>系統會切換到自助收銀界面</li>
+                            <li>顧客可以自行掃描商品條碼或搜尋商品</li>
+                            <li>添加商品到購物車</li>
+                            <li>選擇付款方式完成結帳</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">POS 自助功能特點</h6>
+                        <ul>
+                            <li><strong>簡潔界面</strong>：隱藏不必要的功能，專注於核心結帳流程</li>
+                            <li><strong>快速結帳</strong>：優化操作流程，提升結帳效率</li>
+                            <li><strong>多種付款</strong>：支持現金、信用卡、移動支付等多種付款方式</li>
+                            <li><strong>會員登入</strong>：顧客可以登入會員帳號，享受會員優惠</li>
+                            <li><strong>自助服務</strong>：適合無人店、自助服務區等場景</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">自助服務設定</h6>
+                        <ul>
+                            <li>在 <strong>設定 → POS 設定</strong> 中配置自助模式選項</li>
+                            <li>設定自助模式的預設付款方式</li>
+                            <li>設定是否允許顧客修改商品數量</li>
+                            <li>設定是否顯示商品詳細信息</li>
+                        </ul>
+
+                    {{ else if eq .Category "vbuilder" }}
+                        <!-- vBuilder help content removed -->
+
+                    {{ else if eq .Category "getting-started" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-rocket-takeoff me-2 text-primary"></i>快速入門指南</h1>
+                        <h6 class="fw-bold mb-3">第一步：設置企業信息</h6>
+                        <ol>
+                            <li>登入系統後，點擊左側選單的 <strong>設定 → 企業設置</strong></li>
+                            <li>填寫企業基本信息：企業名稱、地址、聯絡電話、電子郵件等</li>
+                            <li>上傳企業 Logo（可選）</li>
+                            <li>設定企業的稅務資訊和貨幣</li>
+                            <li>點擊 <strong>儲存</strong> 完成設置</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">第二步：添加客戶</h6>
+                        <ol>
+                            <li>前往 <strong>客戶管理 → 客戶</strong></li>
+                            <li>點擊右上角的 <strong>新增客戶</strong> 按鈕</li>
+                            <li>填寫客戶基本信息：姓名、電話、電子郵件、地址等</li>
+                            <li>設定客戶的會員等級（可選）</li>
+                            <li>儲存客戶資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">第三步：建立產品目錄</h6>
+                        <ol>
+                            <li>前往 <strong>產品管理 → 產品</strong></li>
+                            <li>點擊 <strong>新增產品</strong> 按鈕</li>
+                            <li>填寫產品信息：名稱、描述、價格、庫存數量等</li>
+                            <li>設定產品分類、品牌、屬性等</li>
+                            <li>上傳產品圖片（可選）</li>
+                            <li>儲存產品資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">第四步：創建訂單</h6>
+                        <ol>
+                            <li>前往 <strong>訂單管理 → 訂單</strong></li>
+                            <li>點擊 <strong>新增訂單</strong> 按鈕</li>
+                            <li>選擇客戶</li>
+                            <li>添加產品或服務項目，設定數量和價格</li>
+                            <li>選擇付款方式和運送方式</li>
+                            <li>點擊 <strong>儲存</strong> 完成訂單創建</li>
+                        </ol>
+
+                    {{ else if eq .Category "inventory" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-archive me-2 text-secondary"></i>庫存管理</h1>
+                            <h6 class="fw-bold mb-3">庫存自動更新</h6>
+                            <p>系統會在以下情況自動更新庫存：</p>
+                            <ul>
+                                <li>創建訂單時，自動減少庫存</li>
+                                <li>創建採購單時，自動增加庫存</li>
+                                <li>取消訂單時，自動恢復庫存</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">出入貨記錄</h6>
+                            <ol>
+                                <li>前往 <strong>庫存管理 → 出入貨記錄</strong></li>
+                                <li>查看所有庫存變動記錄</li>
+                                <li>可以按日期、產品、倉庫等篩選</li>
+                                <li>可以匯出記錄報表</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">庫存盤點</h6>
+                            <ol>
+                                <li>前往 <strong>庫存管理 → 庫存盤點</strong></li>
+                                <li>點擊 <strong>新增盤點</strong></li>
+                                <li>選擇倉庫</li>
+                                <li>輸入實際庫存數量</li>
+                                <li>系統會自動計算盤點差異</li>
+                                <li>確認後更新庫存</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">低庫存預警</h6>
+                            <ul>
+                                <li>系統會自動監控庫存數量</li>
+                                <li>當庫存低於設定值時，會在 <strong>庫存管理 → 低庫存預警</strong> 中顯示</li>
+                                <li>可以設定每個產品的最低庫存數量</li>
+                            </ul>
+
+                    {{ else if eq .Category "accounting" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-calculator me-2 text-info"></i>會計管理</h1>
+                            <h6 class="fw-bold mb-3">會計總覽</h6>
+                            <p>在 <strong>會計管理 → 會計總覽</strong> 中，您可以查看：</p>
+                            <ul>
+                                <li>總收入、總支出</li>
+                                <li>淨利潤</li>
+                                <li>各類收入支出統計</li>
+                                <li>財務趨勢圖表</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">收入記錄</h6>
+                            <ol>
+                                <li>前往 <strong>會計管理 → 收入</strong></li>
+                                <li>點擊 <strong>新增收入</strong></li>
+                                <li>選擇收入類別</li>
+                                <li>輸入金額和日期</li>
+                                <li>選擇銀行賬戶（如適用）</li>
+                                <li>填寫備註</li>
+                                <li>儲存記錄</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">支出管理</h6>
+                            <ol>
+                                <li>前往 <strong>會計管理 → 支出</strong></li>
+                                <li>點擊 <strong>新增支出</strong></li>
+                                <li>選擇支出類別</li>
+                                <li>輸入金額和日期</li>
+                                <li>選擇銀行賬戶</li>
+                                <li>可以上傳發票或收據（可選）</li>
+                                <li>儲存記錄</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">銀行賬戶管理</h6>
+                            <ol>
+                                <li>前往 <strong>會計管理 → 銀行賬戶</strong></li>
+                                <li>點擊 <strong>新增銀行賬戶</strong></li>
+                                <li>填寫賬戶信息：銀行名稱、賬戶號碼、餘額等</li>
+                                <li>儲存賬戶資料</li>
+                            </ol>
+
+                    {{ else if eq .Category "hr" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-person-badge me-2 text-warning"></i>HR 人力資源</h1>
+                            <h6 class="fw-bold mb-3">打卡系統</h6>
+                            <ol>
+                                <li>前往 <strong>HR 管理 → 打卡</strong></li>
+                                <li>點擊 <strong>打卡</strong> 按鈕進行上下班打卡</li>
+                                <li>系統會自動記錄打卡時間和位置（如啟用）</li>
+                                <li>可以在 <strong>打卡記錄</strong> 中查看所有打卡記錄</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">請假管理</h6>
+                            <ol>
+                                <li>前往 <strong>HR 管理 → 請假申請</strong></li>
+                                <li>點擊 <strong>新增請假申請</strong></li>
+                                <li>選擇請假類型（年假、病假、事假等）</li>
+                                <li>選擇請假日期範圍</li>
+                                <li>填寫請假原因</li>
+                                <li>提交申請，等待審批</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">薪資管理</h6>
+                            <ol>
+                                <li>前往 <strong>HR 管理 → 薪資記錄</strong></li>
+                                <li>點擊 <strong>新增薪資記錄</strong></li>
+                                <li>選擇員工</li>
+                                <li>輸入基本工資、獎金、扣除項目等</li>
+                                <li>系統會自動計算總額</li>
+                                <li>儲存薪資記錄</li>
+                            </ol>
+
+                    {{ else if eq .Category "dynamic-fields" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-sliders me-2 text-success"></i>動態字段功能</h1>
+                            <h6 class="fw-bold mb-3">什麼是動態字段？</h6>
+                            <p>動態字段功能允許您為任何數據表添加自定義字段，無需修改數據庫結構。這讓您可以根據業務需求靈活擴展系統功能。</p>
+
+                            <h6 class="fw-bold mt-4 mb-3">如何使用動態字段？</h6>
+                            <ol>
+                                <li>進入任何數據管理頁面（如客戶、產品、訂單等）</li>
+                                <li>點擊 <strong>編輯</strong> 按鈕</li>
+                                <li>在表單中找到 <strong>動態字段</strong> 區域</li>
+                                <li>點擊 <strong>新增字段</strong> 按鈕</li>
+                                <li>輸入字段名稱和值</li>
+                                <li>選擇字段類型（文字、數字、日期等）</li>
+                                <li>儲存後，這些自定義字段會顯示在該記錄中</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">動態字段的應用場景</h6>
+                            <ul>
+                                <li>為客戶添加特殊標記或備註</li>
+                                <li>為產品添加額外的規格信息</li>
+                                <li>為訂單添加特殊要求</li>
+                                <li>儲存業務特定的額外資訊</li>
+                            </ul>
+
+                    {{ else if eq .Category "reports" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-file-earmark-text me-2 text-danger"></i>報表功能</h1>
+                            <h6 class="fw-bold mb-3">可用的報表</h6>
+                            <ul>
+                                <li><strong>客戶分析報告</strong>：在 <strong>客戶管理 → 客戶分析報告</strong> 中查看</li>
+                                <li><strong>項目分析報告</strong>：在 <strong>項目管理 → 項目分析報告</strong> 中查看</li>
+                                <li><strong>訂單報表</strong>：在 <strong>訂單管理 → 訂單報表</strong> 中查看</li>
+                                <li><strong>會計總覽</strong>：在 <strong>會計管理 → 會計總覽</strong> 中查看財務狀況</li>
+                                <li><strong>庫存報表</strong>：在 <strong>庫存管理</strong> 中查看庫存統計</li>
+                            </ul>
+
+                            <h6 class="fw-bold mt-4 mb-3">匯出功能</h6>
+                            <p>大部分列表頁面都支援匯出功能：</p>
+                            <ul>
+                                <li><strong>匯出 Excel</strong>：點擊 <strong>匯出 Excel</strong> 按鈕，下載 Excel 格式的數據</li>
+                                <li><strong>匯出 PDF</strong>：點擊 <strong>匯出 PDF</strong> 按鈕，下載 PDF 格式的報表</li>
+                                <li>匯出的數據包含當前篩選條件下的所有記錄</li>
+                            </ul>
+
+                    {{ else if eq .Category "ai" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-robot me-2 text-primary"></i>vAi 智能助手</h1>
+                            <h6 class="fw-bold mb-3">什麼是 vAi？</h6>
+                            <p>vAi 是系統內建的 AI 智能助手，可以幫助您處理各種業務問題，回答系統使用問題，協助數據分析，提供業務建議等。</p>
+
+                            <h6 class="fw-bold mt-4 mb-3">如何使用 vAi？</h6>
+                            <ol>
+                                <li>點擊右下角的 <strong>vAi</strong> 浮動按鈕</li>
+                                <li>在對話框中輸入您的問題</li>
+                                <li>vAi 會即時回答您的問題</li>
+                                <li>您可以繼續提問，vAi 會記住對話上下文</li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-4 mb-3">vAi 可查詢的資料：</h6>
+                            <ul>
+                                <li>最新客戶、消費最高客戶</li>
+                                <li>最新訂單、最近訂單、最大金額訂單</li>
+                                <li>最新產品、低庫存產品</li>
+                                <li>最新預約、即將到來預約、預約查詢（支援時間區間/服務人員/客戶/狀態）</li>
+                                <li>可用房間、設備、車輛</li>
+                                <li>最新服務單</li>
+                                <li>最新員工、最新服務員、部門列表</li>
+                                <li>員工排工/班表</li>
+                                <li>最新項目</li>
+                                <li>近期假期</li>
+                                <li>總體統計、儀表板統計</li>
+                                <li>教學/幫助文件</li>
+                            </ul>
+
+                            <p class="text-muted small mt-3"><i class="bi bi-lightbulb me-1"></i>提示：vAi 可以理解自然語言，您可以用日常對話的方式提問。</p>
+
+                    {{ else if eq .Category "purchase" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-cart-plus me-2 text-primary"></i>採購管理</h1>
+                        <h6 class="fw-bold mb-3">創建採購單</h6>
+                        <ol>
+                            <li>前往 <strong>採購管理 → 採購單</strong></li>
+                            <li>點擊 <strong>新增採購單</strong> 按鈕</li>
+                            <li>選擇供應商</li>
+                            <li>添加產品項目，設定數量和價格</li>
+                            <li>選擇付款方式和運送方式</li>
+                            <li>填寫備註（可選）</li>
+                            <li>點擊 <strong>儲存</strong> 完成採購單創建</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">採購單狀態管理</h6>
+                        <p>採購單狀態包括：</p>
+                        <ul>
+                            <li><strong>待處理</strong>：新創建的採購單</li>
+                            <li><strong>已確認</strong>：已確認的採購單</li>
+                            <li><strong>已收貨</strong>：已收到貨物的採購單</li>
+                            <li><strong>已完成</strong>：已完成的採購單</li>
+                            <li><strong>已取消</strong>：已取消的採購單</li>
+                    </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">收貨管理</h6>
+                        <ol>
+                            <li>在採購單詳情頁面，點擊 <strong>收貨</strong> 按鈕</li>
+                            <li>確認收貨數量</li>
+                            <li>系統會自動更新庫存</li>
+                            <li>可以生成收貨單</li>
+                        </ol>
+
+                    {{ else if eq .Category "supplier" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-truck me-2 text-info"></i>供應商管理</h1>
+                        <h6 class="fw-bold mb-3">新增供應商</h6>
+                        <ol>
+                            <li>前往 <strong>供應商管理 → 供應商</strong></li>
+                            <li>點擊 <strong>新增供應商</strong> 按鈕</li>
+                            <li>填寫供應商基本信息：名稱、電話、電子郵件、地址等</li>
+                            <li>設定供應商的聯絡人信息</li>
+                            <li>填寫付款條件和備註</li>
+                            <li>儲存供應商資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">供應商管理功能</h6>
+                        <ul>
+                            <li>查看供應商的採購歷史記錄</li>
+                            <li>管理供應商的聯絡信息</li>
+                            <li>查看供應商的付款記錄</li>
+                            <li>管理供應商的產品目錄</li>
+                        </ul>
+
+                    {{ else if eq .Category "warehouse" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-building me-2 text-secondary"></i>倉庫管理</h1>
+                        <h6 class="fw-bold mb-3">新增倉庫</h6>
+                        <ol>
+                            <li>前往 <strong>庫存管理 → 倉庫</strong></li>
+                            <li>點擊 <strong>新增倉庫</strong> 按鈕</li>
+                            <li>填寫倉庫基本信息：名稱、地址、聯絡電話等</li>
+                            <li>設定倉庫的管理員</li>
+                            <li>儲存倉庫資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">倉庫庫存管理</h6>
+                        <ul>
+                            <li>查看每個倉庫的庫存情況</li>
+                            <li>在不同倉庫之間調撥庫存</li>
+                            <li>設定倉庫的預設狀態</li>
+                            <li>管理倉庫的出入貨記錄</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">多倉庫管理</h6>
+                        <p>系統支援多倉庫管理，您可以：</p>
+                        <ul>
+                            <li>為不同產品設定不同的倉庫</li>
+                            <li>查看所有倉庫的庫存總覽</li>
+                            <li>在不同倉庫之間進行庫存調撥</li>
+                        </ul>
+
+                    {{ else if eq .Category "project" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-folder me-2 text-warning"></i><span data-i18n="helpPage.categories.project.title">項目管理</span></h1>
+                        <h6 class="fw-bold mb-3">創建項目</h6>
+                        <ol>
+                            <li>前往 <strong>項目管理 → 項目</strong></li>
+                            <li>點擊 <strong>新增項目</strong> 按鈕</li>
+                            <li>填寫項目基本信息：名稱、描述、開始日期、結束日期等</li>
+                            <li>選擇項目類型</li>
+                            <li>設定項目負責人</li>
+                            <li>儲存項目資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">項目任務管理</h6>
+                        <ul>
+                            <li>為項目添加任務</li>
+                            <li>設定任務的負責人和截止日期</li>
+                            <li>追蹤任務的完成進度</li>
+                            <li>查看項目的整體進度</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">項目資源管理</h6>
+                        <ul>
+                            <li>為項目預留資源（房間、設備等）</li>
+                            <li>查看資源使用情況</li>
+                            <li>管理項目的相關支出</li>
+                            <li>上傳項目相關文件</li>
+                        </ul>
+
+                    {{ else if eq .Category "store" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-shop me-2 text-success"></i>店舖管理</h1>
+                        <h6 class="fw-bold mb-3">新增店舖</h6>
+                        <ol>
+                            <li>前往 <strong>店舖管理 → 店舖</strong></li>
+                            <li>點擊 <strong>新增店舖</strong> 按鈕</li>
+                            <li>填寫店舖基本信息：名稱、地址、電話等</li>
+                            <li>上傳店舖圖片（可選）</li>
+                            <li>設定店舖的營業時間</li>
+                            <li>儲存店舖資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">店舖功能</h6>
+                        <ul>
+                            <li>管理多個店舖的資料</li>
+                            <li>為每個店舖設定不同的員工</li>
+                            <li>查看各店舖的銷售統計</li>
+                            <li>在 POS 系統中選擇店舖</li>
+                        </ul>
+
+                    {{ else if eq .Category "website" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-globe me-2 text-primary"></i>網站管理</h1>
+                        <h6 class="fw-bold mb-3">網站主題設定</h6>
+                        <ol>
+                            <li>前往 <strong>vBuilder 網站 → 網站主題</strong></li>
+                            <li>選擇網站主題樣式</li>
+                            <li>自定義顏色、字體等</li>
+                            <li>預覽主題效果</li>
+                            <li>儲存設定</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">頁面管理</h6>
+                        <ol>
+                            <li>前往 <strong>vBuilder 網站 → 頁面管理</strong></li>
+                            <li>點擊 <strong>新增頁面</strong> 創建新頁面</li>
+                            <li>使用拖放式編輯器設計頁面</li>
+                            <li>添加各種元件（產品列表、圖片、文字等）</li>
+                            <li>設定頁面為首頁（可選）</li>
+                            <li>發布頁面</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">博客管理</h6>
+                        <ul>
+                            <li>創建和管理博客文章</li>
+                            <li>設定文章分類和標籤</li>
+                            <li>上傳文章封面圖片</li>
+                            <li>發布和管理博客內容</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">網站設定</h6>
+                        <ul>
+                            <li>設定網站的基本信息</li>
+                            <li>配置 SEO 設定</li>
+                            <li>管理網站的域名設定</li>
+                            <li>設定網站的社交媒體連結</li>
+                        </ul>
+
+                    {{ else if eq .Category "promotion" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-ticket-perforated me-2 text-danger"></i>優惠管理</h1>
+                        <h6 class="fw-bold mb-3">優惠券管理</h6>
+                        <ol>
+                            <li>前往 <strong>優惠管理 → 優惠券</strong></li>
+                            <li>點擊 <strong>新增優惠券</strong> 按鈕</li>
+                            <li>設定優惠券類型：折扣券、固定金額券等</li>
+                            <li>設定優惠券的使用條件和有效期</li>
+                            <li>設定優惠券的使用次數限制</li>
+                            <li>生成優惠券代碼或自動生成</li>
+                            <li>儲存優惠券設定</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">積分系統</h6>
+                        <ol>
+                            <li>前往 <strong>優惠管理 → 積分</strong></li>
+                            <li>查看客戶的積分餘額</li>
+                            <li>手動調整客戶積分（增加或扣除）</li>
+                            <li>查看積分變動記錄</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">積分記錄</h6>
+                        <ul>
+                            <li>查看所有客戶的積分變動歷史</li>
+                            <li>篩選特定客戶或時間範圍的積分記錄</li>
+                            <li>查看積分獲取來源（購買、活動等）</li>
+                            <li>查看積分使用記錄</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">積分設置</h6>
+                        <ul>
+                            <li>設定積分獲取規則（如：每消費 1 元獲得 1 積分）</li>
+                            <li>設定積分使用規則（如：100 積分可抵扣 1 元）</li>
+                            <li>設定積分有效期</li>
+                            <li>設定積分等級對應的折扣率</li>
+                        </ul>
+
+                    {{ else if eq .Category "resource" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-boxes me-2 text-info"></i>資源管理</h1>
+                        <h6 class="fw-bold mb-3">店舖管理</h6>
+                        <ol>
+                            <li>前往 <strong>資源管理 → 店舖</strong></li>
+                            <li>點擊 <strong>新增店舖</strong> 按鈕</li>
+                            <li>填寫店舖基本信息：名稱、地址、電話等</li>
+                            <li>上傳店舖圖片（可選）</li>
+                            <li>設定店舖的營業時間</li>
+                            <li>分配店舖員工</li>
+                            <li>儲存店舖資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">房間管理</h6>
+                        <ol>
+                            <li>前往 <strong>資源管理 → 房間</strong></li>
+                            <li>點擊 <strong>新增房間</strong> 按鈕</li>
+                            <li>填寫房間信息：名稱、容量、設備等</li>
+                            <li>設定房間的可用時間</li>
+                            <li>上傳房間圖片（可選）</li>
+                            <li>儲存房間資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">設備管理</h6>
+                        <ol>
+                            <li>前往 <strong>資源管理 → 設備</strong></li>
+                            <li>點擊 <strong>新增設備</strong> 按鈕</li>
+                            <li>填寫設備信息：名稱、型號、狀態等</li>
+                            <li>設定設備的維護記錄</li>
+                            <li>儲存設備資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">車輛管理</h6>
+                        <ol>
+                            <li>前往 <strong>資源管理 → 車輛</strong></li>
+                            <li>點擊 <strong>新增車輛</strong> 按鈕</li>
+                            <li>填寫車輛信息：車牌號、型號、狀態等</li>
+                            <li>設定車輛的使用記錄</li>
+                            <li>儲存車輛資料</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">資源使用日曆</h6>
+                        <ul>
+                            <li>查看所有資源（房間、設備、車輛）的使用情況</li>
+                            <li>按日期查看資源預約情況</li>
+                            <li>預約或釋放資源</li>
+                            <li>查看資源使用衝突和可用時段</li>
+                        </ul>
+
+                    {{ else if eq .Category "personal-tools" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-person me-2 text-primary"></i>個人工具</h1>
+                        <h6 class="fw-bold mb-3">日曆</h6>
+                        <ol>
+                            <li>前往 <strong>個人工具 → 日曆</strong></li>
+                            <li>查看月曆、週曆或日曆視圖</li>
+                            <li>點擊日期添加事件</li>
+                            <li>設定事件的時間、地點和提醒</li>
+                            <li>查看和管理所有事件</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">提醒事項</h6>
+                        <ol>
+                            <li>前往 <strong>個人工具 → 提醒</strong></li>
+                            <li>點擊 <strong>新增提醒</strong> 按鈕</li>
+                            <li>填寫提醒內容和時間</li>
+                            <li>設定提醒方式（系統通知、郵件等）</li>
+                            <li>標記提醒為已完成</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">提示資訊</h6>
+                        <ul>
+                            <li>查看系統發送的所有通知</li>
+                            <li>標記通知為已讀或未讀</li>
+                            <li>篩選不同類型的通知</li>
+                            <li>刪除不需要的通知</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">訊息</h6>
+                        <ol>
+                            <li>前往 <strong>個人工具 → 訊息</strong></li>
+                            <li>查看收到的訊息</li>
+                            <li>發送新訊息給其他用戶</li>
+                            <li>回覆訊息</li>
+                            <li>管理訊息對話</li>
+                        </ol>
+
+                        <h6 class="fw-bold mt-4 mb-3">備忘</h6>
+                        <ol>
+                            <li>前往 <strong>個人工具 → 備忘</strong></li>
+                            <li>點擊 <strong>新增備忘</strong> 按鈕</li>
+                            <li>填寫備忘內容</li>
+                            <li>設定備忘的分類或標籤</li>
+                            <li>編輯或刪除備忘</li>
+                        </ol>
+
+                    {{ else if eq .Category "tutorial-videos" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-camera-video me-2 text-danger"></i>教學影片庫</h1>
+                        <p class="text-muted">
+                            這裡用來集中展示 vWork 的教學影片。影片可以由 vCapture 的「vWork 教學」功能自動生成，再上傳到系統或 CDN。
+                        </p>
+                        <div class="alert alert-light border">
+                            <div class="fw-semibold mb-2">如何生成教學影片</div>
+                            <ol class="mb-0">
+                                <li>在本機啟動 vWork</li>
+                                <li>開啟 vCapture，點右上角 <strong>vWork 教學</strong></li>
+                                <li>選擇 Scenario（例如 <span class="font-monospace">login_demo</span>）並輸入示範帳密</li>
+                                <li>按 <strong>開始生成</strong>，等待自動錄影完成</li>
+                            </ol>
+                        </div>
+                        <p class="mb-0">
+                            目前尚未配置影片清單；你可以先把 mp4 放到 <span class="font-monospace">web/uploads/</span> 或外部儲存，再在此頁加入播放連結。
+                        </p>
+
+                    {{ else if eq .Category "dns-setup" }}
+                        <h1 class="h3 mb-4"><i class="bi bi-diagram-3 me-2 text-primary"></i>DNS 設定</h1>
+                        <p class="text-muted">
+                            這頁會一步步教你在網域註冊商的 DNS 管理介面新增 CNAME。
+                            若你還未有網域，可先到
+                            <a href="https://www.godaddy.com/domains" target="_blank" rel="noopener">GoDaddy</a> 或
+                            <a href="https://domains.squarespace.com/" target="_blank" rel="noopener">Squarespace</a>
+                            購買。
+                        </p>
+
+                        <h6 class="fw-bold mb-3">步驟 1：找到 DNS 管理介面</h6>
+                        <ul>
+                            <li>登入你的網域註冊商後台</li>
+                            <li>找到該網域（Domain）</li>
+                            <li>進入 <strong>DNS / DNS Records / 管理 DNS</strong></li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">步驟 2：新增 CNAME 記錄</h6>
+                        <div class="alert alert-light border">
+                            <div class="fw-semibold mb-2">新增一筆 CNAME</div>
+                            <div class="row g-2">
+                                <div class="col-12 col-md-4">
+                                    <div class="small text-muted">類型（Type）</div>
+                                    <div class="font-monospace">CNAME</div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="small text-muted">名稱（Host / Name）</div>
+                                    <div class="font-monospace">www</div>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="small text-muted">TTL</div>
+                                    <div class="font-monospace">Auto / 5m / 30m</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="small text-muted">指向（Value / Target / Points to）</div>
+                                    <div class="font-monospace">{{ .CustomDomainCnameTarget }}</div>
+                                </div>
+                            </div>
+                            <div class="small text-muted mt-2">
+                                有些 DNS 介面要求「名稱」填完整網域，則填 <strong>www.你的網域</strong>（例如：www.example.com）。
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mt-4 mb-3">步驟 3：回到系統檢查</h6>
+                        <ul>
+                            <li>回到 <a href="/website-domains">自訂網域 &amp; SSL</a></li>
+                            <li>依步驟按「檢查 DNS」直到顯示 OK</li>
+                            <li>OK 後系統會在背景自動處理 SSL，你只需要在最後一步按「更新狀態」查看</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">常見問題／錯誤排除</h6>
+                        <ul>
+                            <li><strong>提示已存在記錄</strong>：如果 www 已有 A / AAAA / CNAME，請先刪除舊的再新增新的（同一個名稱不可同時存在衝突記錄）。</li>
+                            <li><strong>找不到 CNAME</strong>：有些平台把它叫做「別名 / Alias」，但類型仍是 CNAME。</li>
+                            <li><strong>檢查一直未完成</strong>：DNS 生效通常 5–60 分鐘，最慢可到 24 小時；也可能是你填錯了 Host/Target。</li>
+                            <li><strong>www 以外的網域</strong>：目前版本只支援 www。</li>
+                        </ul>
+
+                    {{ else }}
+                        <h1 class="h3 mb-4">支援中心</h1>
+                        <p>找不到該分類的幫助內容，請返回 <a href="/help/vwork">支援中心首頁</a>。</p>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+        </div>
+</div>
+
+    <!-- Footer -->
+    <footer class="site-footer-light">
+        <div class="container-fluid px-4">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="V-sys Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" id="footerProductVWork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" id="footerInfoHome" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/" id="footerInfoAbout" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
+                        <li class="mb-2"><a href="/sales-partner" class="text-muted text-decoration-none" data-i18n="footer.salesPartnerJoin">銷售商加盟</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contactUs">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none">info@vsysai.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span data-i18n="footer.location">香港</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span data-i18n="footer.hours">週一至週五 9:00 - 18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+<style>
+.help-category-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.help-category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+</style>
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 將 footer 移到 main-content 外面
+            const footer = document.querySelector('.site-footer-light');
+            const mainContent = document.querySelector('.main-content');
+            if (footer && mainContent && footer.parentElement === mainContent) {
+                mainContent.parentElement.insertBefore(footer, mainContent.nextSibling);
+            }
+            
+            // 初始化 i18n
+            if (typeof I18n !== 'undefined') {
+                I18n.init();
+            }
+
+            // Nav, footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+            
+            // Help sidebar toggle for mobile
+            const helpMobileMenuToggle = document.getElementById('helpMobileMenuToggle');
+            const helpSidebar = document.getElementById('helpSidebar');
+            const helpSidebarOverlay = document.getElementById('helpSidebarOverlay');
+            
+            function toggleHelpSidebar() {
+                if (helpSidebar) {
+                    helpSidebar.classList.toggle('show');
+                }
+                if (helpSidebarOverlay) {
+                    helpSidebarOverlay.classList.toggle('show');
+                }
+            }
+            
+            if (helpMobileMenuToggle) {
+                helpMobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleHelpSidebar();
+                });
+            }
+            
+            if (helpSidebarOverlay) {
+                helpSidebarOverlay.addEventListener('click', function() {
+                    if (helpSidebar) {
+                        helpSidebar.classList.remove('show');
+                    }
+                    helpSidebarOverlay.classList.remove('show');
+                });
+            }
+            
+            // Close sidebar function
+            function closeHelpSidebar() {
+                if (helpSidebar) {
+                    helpSidebar.classList.remove('show');
+                }
+                if (helpSidebarOverlay) {
+                    helpSidebarOverlay.classList.remove('show');
+                }
+            }
+            
+            // Close sidebar when clicking on any nav-link (except collapse toggles)
+            const helpNavLinks = document.querySelectorAll('#helpSidebar .nav-link:not(.nav-group-toggle)');
+            helpNavLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Only close if it's not a language link (language links handle closing themselves)
+                    if (!this.hasAttribute('data-lang')) {
+                        closeHelpSidebar();
+                    }
+                });
+            });
+            
+            // Help language dropdown in sidebar
+            const helpLangLinks = document.querySelectorAll('#helpLanguageSubmenu .nav-link[data-lang]');
+            helpLangLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                    // Close sidebar after language change
+                    closeHelpSidebar();
+                });
+            });
+            
+            // Help logout button in sidebar
+            const helpLogoutBtn = document.getElementById('helpLogoutBtn');
+            if (helpLogoutBtn) {
+                helpLogoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof App !== 'undefined' && App.logout) {
+                        App.logout();
+                    } else {
+                        fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                          .finally(function() {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('tenant_subdomain');
+                            window.location.replace(window.location.pathname + '?logged_out=1');
+                          });
+                    }
+                });
+            }
+            
+            // Desktop language dropdown
+            document.querySelectorAll('[data-lang]').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                });
+            });
+            
+            // 從 localStorage 預填充用戶名（避免等待 API 返回時顯示「用戶」）
+            function prefillUserFromCache() {
+                try {
+                    const cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        const user = JSON.parse(cachedUser);
+                        if (user && user.name) {
+                            const userNameSpan = document.getElementById('userName');
+                            const helpUserName = document.getElementById('helpUserName');
+                            if (userNameSpan) {
+                                userNameSpan.textContent = user.name;
+                                // 移除 data-i18n 屬性，防止 i18n 初始化時覆蓋用戶名
+                                userNameSpan.removeAttribute('data-i18n');
+                            }
+                            if (helpUserName) {
+                                helpUserName.textContent = user.name;
+                                helpUserName.removeAttribute('data-i18n');
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // 忽略 localStorage 讀取錯誤，API 會刷新
+                }
+            }
+            
+            // 立即從緩存預填充
+            prefillUserFromCache();
+            
+            // 處理瀏覽器上一頁/下一頁 (bfcache) - re-verify auth state
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    checkAuthAndUpdateNav();
+                }
+            });
+            
+            // 檢查登錄狀態並更新導航欄
+            checkAuthAndUpdateNav();
+            
+            // Help search function
+function searchHelp() {
+    const searchTerm = document.getElementById('helpSearch')?.value.toLowerCase() || '';
+    const categoryCards = document.querySelectorAll('.help-category-card');
+    
+    categoryCards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            card.closest('.col-md-4, .col-lg-3').style.display = '';
+        } else {
+            card.closest('.col-md-4, .col-lg-3').style.display = 'none';
+        }
+    });
+    
+    if (searchTerm === '') {
+    categoryCards.forEach(card => {
+            card.closest('.col-md-4, .col-lg-3').style.display = '';
+        });
+    }
+}
+            window.searchHelp = searchHelp;
+        });
+        
+        // 檢查登錄狀態並更新導航欄
+        async function checkAuthAndUpdateNav() {
+            const loginLink = document.getElementById('loginLink');
+            const userDropdownNav = document.getElementById('userDropdown');
+            const userNameSpan = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const helpUserDropdownItem = document.getElementById('helpUserDropdownItem');
+            const helpLoginItem = document.getElementById('helpLoginItem');
+
+            async function fetchCurrentUserSilently() {
+                try {
+                    const headers = { 'Accept': 'application/json' };
+                    const token = localStorage.getItem('auth_token');
+                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                    const sub = localStorage.getItem('tenant_subdomain');
+                    if (sub) headers['X-Tenant-Subdomain'] = sub;
+                    const resp = await fetch('/api/v1/user/me', { headers });
+                    if (!resp.ok) return null;
+                    const user = await resp.json();
+                    try {
+                        if (user) localStorage.setItem('user', JSON.stringify(user));
+                        if (user && user.tenant && user.tenant.subdomain) {
+                            localStorage.setItem('tenant_subdomain', String(user.tenant.subdomain));
+                        }
+                    } catch (_e) { /* ignore */ }
+                    return user;
+                } catch (_) { return null; }
+            }
+
+            const user = await fetchCurrentUserSilently();
+            // If API rejected our token, clear stale localStorage
+            if (!user) {
+                const hadToken = localStorage.getItem('auth_token');
+                if (hadToken) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tenant_subdomain');
+                }
+            }
+            const isLoggedIn = !!(user && user.name);
+
+            if (isLoggedIn) {
+                if (loginLink) loginLink.style.display = 'none';
+                if (userDropdownNav) userDropdownNav.style.display = '';
+                if (helpUserDropdownItem) helpUserDropdownItem.style.display = 'block';
+                if (helpLoginItem) helpLoginItem.style.display = 'none';
+                if (userNameSpan) userNameSpan.textContent = user.name;
+
+                // Help sidebar user name
+                const helpUserName = document.getElementById('helpUserName');
+                if (helpUserName) helpUserName.textContent = user.name;
+
+                // Avatar - Desktop
+                const avatarImg = document.getElementById('publicUserAvatar');
+                const avatarIcon = document.getElementById('publicUserIcon');
+                if (avatarImg) {
+                    let url = (user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            if (avatarIcon) avatarIcon.style.display = '';
+                        };
+                    }
+                }
+
+                // Avatar - Help Sidebar
+                const helpAvatarImg = document.getElementById('helpUserAvatar');
+                const helpAvatarIcon = document.getElementById('helpUserIcon');
+                if (helpAvatarImg) {
+                    let url = (user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                    if (url) {
+                        helpAvatarImg.src = url;
+                        helpAvatarImg.style.display = 'inline-block';
+                        if (helpAvatarIcon) helpAvatarIcon.style.display = 'none';
+                        helpAvatarImg.onerror = function() {
+                            helpAvatarImg.style.display = 'none';
+                            if (helpAvatarIcon) helpAvatarIcon.style.display = '';
+                        };
+                    }
+                }
+
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                              .finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace(window.location.pathname + '?logged_out=1');
+                              });
+                        }
+                    });
+                }
+            } else {
+                if (loginLink) loginLink.style.display = '';
+                if (userDropdownNav) userDropdownNav.style.display = 'none';
+                if (helpUserDropdownItem) helpUserDropdownItem.style.display = 'none';
+                if (helpLoginItem) helpLoginItem.style.display = 'block';
+            }
+        }
+        
+        // 監聽 storage 變化 (cross-tab logout detection)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'auth_token' && !e.newValue) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === null) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === 'auth_token') {
+                checkAuthAndUpdateNav();
+            }
+        });
+</script>
+    <!-- Navbar scroll shadow effect -->
+    <script>
+        (function() {
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            
+            function handleScroll() {
+                if (window.scrollY > 60) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+            
+            // Initial check
+            handleScroll();
+            
+            // Listen to scroll events
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
+    </script>
+</body>
+</html>

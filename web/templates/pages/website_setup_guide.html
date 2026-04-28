@@ -1,0 +1,1559 @@
+{{define "pages/website_setup_guide"}}
+<style>
+    /* 重置 body margin */
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .website-guide-wrapper {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        min-height: calc(100vh - 60px);
+    }
+
+    .website-guide-container {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    /* 左側說明區域 */
+    .guide-content {
+        position: sticky;
+        top: 80px;
+    }
+
+    .guide-content .logo-section {
+        margin-bottom: 2rem;
+    }
+
+    .guide-content .logo-section img {
+        height: 24px;
+        margin-bottom: 1.5rem;
+    }
+
+    .guide-content .welcome-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+
+    .guide-content h1 {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 2.5rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+
+    .guide-content .subtitle {
+        color: #64748b;
+        font-size: 1.125rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+
+    .guide-content .features-list {
+        list-style: none;
+        padding: 0;
+        margin: 2rem 0;
+    }
+
+    .guide-content .features-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        color: #475569;
+        font-size: 0.9375rem;
+    }
+
+    .guide-content .features-list li i {
+        color: #0d6efd;
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+        flex-shrink: 0;
+    }
+
+    .guide-content .help-text {
+        background: #f8f9fa;
+        border-left: 3px solid #0d6efd;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-top: 2rem;
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+
+    /* 右側選擇區域 */
+    .website-selection {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .website-selection h2 {
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .question-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .question-card h3 {
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-bottom: 1rem;
+    }
+
+    .option-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .option-btn {
+        flex: 1;
+        padding: 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+    /* Mobile */
+    @media (max-width: 767.98px) {
+        .website-guide-wrapper {
+            padding: 1rem;
+        }
+
+        /* mobile：右側選擇區塊不要卡片樣式（移除 bg/border/shadow，padding 0） */
+        .website-selection {
+            background: transparent;
+            box-shadow: none;
+            border: none;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        /* option-btn 每行一個 */
+        .option-buttons {
+            flex-direction: column;
+        }
+        .option-btn {
+            width: 100%;
+        }
+
+        /* mobile: actions 區塊改成直向 */
+        .website-actions {
+            flex-direction: column;
+        }
+        .website-actions .btn-apply,
+        .website-actions .btn-skip {
+            width: 100%;
+        }
+    }
+
+    /* Bold Yellow theme preview */
+    .theme-preview-bold-yellow { background: #0a0a0a; }
+    .theme-preview-bold-yellow .tp-nav { background: #0a0a0a; border-bottom: 1px solid #333333; }
+    .theme-preview-bold-yellow .tp-hero { background: #1a1a1a; }
+    .theme-preview-bold-yellow .tp-hero-title { background: #ffd600; }
+    .theme-preview-bold-yellow .tp-hero-text { background: rgba(245,245,245,0.5); }
+    .theme-preview-bold-yellow .tp-hero-btn { background: #ffd600; }
+    .theme-preview-bold-yellow .tp-card { background: #1a1a1a; border: 1px solid #333333; }
+    .theme-preview-bold-yellow .tp-footer { background: #050505; border-top: 1px solid rgba(255,214,0,0.2); }
+    .theme-preview-bold-yellow .tp-content { background: #0a0a0a; }
+
+    /* Cyberpunk Dark theme preview */
+    .theme-preview-cyberpunk-dark { background: #0d0221; }
+    .theme-preview-cyberpunk-dark .tp-nav { background: #0d0221; border-bottom: 1px solid #2d1166; }
+    .theme-preview-cyberpunk-dark .tp-hero { background: #1a0a3e; }
+    .theme-preview-cyberpunk-dark .tp-hero-title { background: #00f0ff; }
+    .theme-preview-cyberpunk-dark .tp-hero-text { background: rgba(224,215,245,0.4); }
+    .theme-preview-cyberpunk-dark .tp-hero-btn { background: #00f0ff; }
+    .theme-preview-cyberpunk-dark .tp-card { background: #1a0a3e; border: 1px solid #2d1166; }
+    .theme-preview-cyberpunk-dark .tp-footer { background: #05010f; border-top: 1px solid rgba(0,240,255,0.15); }
+    .theme-preview-cyberpunk-dark .tp-content { background: #0d0221; }
+
+    /* Arctic Frost theme preview */
+    .theme-preview-arctic-frost { background: #f0f6fa; }
+    .theme-preview-arctic-frost .tp-nav { background: #ffffff; border-bottom: 1px solid #c8dce8; }
+    .theme-preview-arctic-frost .tp-hero { background: #2c5f7c; }
+    .theme-preview-arctic-frost .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-arctic-frost .tp-hero-text { background: rgba(255,255,255,0.6); }
+    .theme-preview-arctic-frost .tp-hero-btn { background: #ffffff; }
+    .theme-preview-arctic-frost .tp-card { background: #ffffff; border: 1px solid #c8dce8; }
+    .theme-preview-arctic-frost .tp-footer { background: #0f2132; }
+    .theme-preview-arctic-frost .tp-content { background: #f0f6fa; }
+
+    /* Mono Gray theme preview */
+    .theme-preview-mono-gray { background: #ffffff; }
+    .theme-preview-mono-gray .tp-nav { background: #ffffff; border-bottom: 1px solid #e0e0e0; }
+    .theme-preview-mono-gray .tp-hero { background: #2c2c2c; }
+    .theme-preview-mono-gray .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-mono-gray .tp-hero-text { background: rgba(255,255,255,0.5); }
+    .theme-preview-mono-gray .tp-hero-btn { background: #ffffff; }
+    .theme-preview-mono-gray .tp-card { background: #ffffff; border: 1px solid #e0e0e0; }
+    .theme-preview-mono-gray .tp-footer { background: #1a1a1a; }
+    .theme-preview-mono-gray .tp-content { background: #ffffff; }
+
+    /* Noir Red theme preview */
+    .theme-preview-noir-red { background: #0e0e0e; }
+    .theme-preview-noir-red .tp-nav { background: #0e0e0e; border-bottom: 1px solid #2a2a2a; }
+    .theme-preview-noir-red .tp-hero { background: #1c1c1c; }
+    .theme-preview-noir-red .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-noir-red .tp-hero-text { background: rgba(229,229,229,0.5); }
+    .theme-preview-noir-red .tp-hero-btn { background: #dc2626; }
+    .theme-preview-noir-red .tp-card { background: #1c1c1c; border: 1px solid #2a2a2a; }
+    .theme-preview-noir-red .tp-footer { background: #050505; border-top: 1px solid rgba(220,38,38,0.2); }
+    .theme-preview-noir-red .tp-content { background: #0e0e0e; }
+
+    /* Lavender Dream theme preview */
+    .theme-preview-lavender-dream { background: #faf8ff; }
+    .theme-preview-lavender-dream .tp-nav { background: #ffffff; border-bottom: 1px solid #e0d4f5; }
+    .theme-preview-lavender-dream .tp-hero { background: #7c3aed; }
+    .theme-preview-lavender-dream .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-lavender-dream .tp-hero-text { background: rgba(255,255,255,0.6); }
+    .theme-preview-lavender-dream .tp-hero-btn { background: #ffffff; }
+    .theme-preview-lavender-dream .tp-card { background: #ffffff; border: 1px solid #e0d4f5; }
+    .theme-preview-lavender-dream .tp-footer { background: #1e1533; }
+    .theme-preview-lavender-dream .tp-content { background: #faf8ff; }
+
+    /* Clean Amber theme preview */
+    .theme-preview-clean-amber { background: #ffffff; }
+    .theme-preview-clean-amber .tp-nav { background: #ffffff; border-bottom: 1px solid #e7e5e4; }
+    .theme-preview-clean-amber .tp-hero { background: #1c1917; }
+    .theme-preview-clean-amber .tp-hero-title { background: #fbbf24; }
+    .theme-preview-clean-amber .tp-hero-text { background: rgba(254,252,232,0.5); }
+    .theme-preview-clean-amber .tp-hero-btn { background: #d97706; }
+    .theme-preview-clean-amber .tp-card { background: #ffffff; border: 1px solid #e7e5e4; }
+    .theme-preview-clean-amber .tp-footer { background: #0c0a09; }
+    .theme-preview-clean-amber .tp-content { background: #ffffff; }
+
+    /* Clean Crimson theme preview */
+    .theme-preview-clean-crimson { background: #ffffff; }
+    .theme-preview-clean-crimson .tp-nav { background: #ffffff; border-bottom: 1px solid #e7e5e4; }
+    .theme-preview-clean-crimson .tp-hero { background: #1c1917; }
+    .theme-preview-clean-crimson .tp-hero-title { background: #fca5a5; }
+    .theme-preview-clean-crimson .tp-hero-text { background: rgba(254,242,242,0.5); }
+    .theme-preview-clean-crimson .tp-hero-btn { background: #dc2626; }
+    .theme-preview-clean-crimson .tp-card { background: #ffffff; border: 1px solid #e7e5e4; }
+    .theme-preview-clean-crimson .tp-footer { background: #0c0a09; }
+    .theme-preview-clean-crimson .tp-content { background: #ffffff; }
+
+    /* Midnight Teal theme preview */
+    .theme-preview-midnight-teal { background: #0f1729; }
+    .theme-preview-midnight-teal .tp-nav { background: #0f1729; border-bottom: 1px solid #1e2a42; }
+    .theme-preview-midnight-teal .tp-hero { background: #172033; }
+    .theme-preview-midnight-teal .tp-hero-title { background: #14b8a6; }
+    .theme-preview-midnight-teal .tp-hero-text { background: rgba(209,213,219,0.4); }
+    .theme-preview-midnight-teal .tp-hero-btn { background: #14b8a6; }
+    .theme-preview-midnight-teal .tp-card { background: #172033; border: 1px solid #1e2a42; }
+    .theme-preview-midnight-teal .tp-footer { background: #080d18; border-top: 1px solid rgba(20,184,166,0.15); }
+    .theme-preview-midnight-teal .tp-content { background: #0f1729; }
+
+    /* More themes button */
+    .btn-more-themes {
+        background: transparent;
+        border: 1px solid #e5e7eb;
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        color: #64748b;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-more-themes:hover {
+        background: #f8f9fa;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+    .btn-more-themes i {
+        transition: transform 0.3s ease;
+    }
+    .btn-more-themes.expanded i {
+        transform: rotate(180deg);
+    }
+
+    .option-btn:hover {
+        border-color: #0d6efd;
+        background: rgba(13, 110, 253, 0.05);
+    }
+
+    .option-btn.selected {
+        border-color: #0d6efd;
+        background: rgba(13, 110, 253, 0.1);
+    }
+
+    .option-btn .icon {
+        font-size: 2rem;
+        color: #0d6efd;
+        margin-bottom: 0.5rem;
+    }
+
+    .option-btn .label {
+        font-weight: 500;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+
+    .option-btn .description {
+        font-size: 0.875rem;
+        color: #64748b;
+    }
+
+    .theme-selection {
+        display: none;
+        margin-top: 1.5rem;
+    }
+
+    .theme-selection.show {
+        display: block;
+    }
+
+    .theme-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .theme-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+
+    .theme-card:hover {
+        border-color: #0d6efd;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .theme-card.selected {
+        border-color: #0d6efd;
+        background: rgba(13, 110, 253, 0.03);
+    }
+
+    .theme-card .theme-check {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        font-size: 1.25rem;
+        color: #0d6efd;
+        display: none;
+    }
+    .theme-card.selected .theme-check {
+        display: block;
+    }
+
+    .theme-card .theme-info {
+        padding: 0.75rem 1rem;
+    }
+    .theme-card .name {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.95rem;
+        margin-bottom: 0.15rem;
+    }
+    .theme-card .theme-desc {
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+
+    /* Mini website preview */
+    .theme-preview {
+        height: 130px;
+        padding: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        overflow: hidden;
+    }
+    .tp-nav {
+        height: 12px;
+        border-radius: 2px;
+    }
+    .tp-hero {
+        flex: 1;
+        border-radius: 3px;
+        padding: 0.4rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+    }
+    .tp-hero-title {
+        width: 60%;
+        height: 7px;
+        border-radius: 2px;
+    }
+    .tp-hero-text {
+        width: 40%;
+        height: 4px;
+        border-radius: 2px;
+    }
+    .tp-hero-btn {
+        width: 24%;
+        height: 8px;
+        border-radius: 3px;
+        margin-top: 2px;
+    }
+    .tp-content {
+        display: flex;
+        gap: 0.2rem;
+        height: 26px;
+    }
+    .tp-card {
+        flex: 1;
+        border-radius: 2px;
+    }
+    .tp-footer {
+        height: 10px;
+        border-radius: 2px;
+    }
+
+    /* Default theme preview */
+    .theme-preview-default { background: #ffffff; }
+    .theme-preview-default .tp-nav { background: #ffffff; border-bottom: 1px solid #dee2e6; }
+    .theme-preview-default .tp-hero { background: #007bff; }
+    .theme-preview-default .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-default .tp-hero-text { background: rgba(255,255,255,0.6); }
+    .theme-preview-default .tp-hero-btn { background: #ffffff; }
+    .theme-preview-default .tp-card { background: #f8f9fa; border: 1px solid #dee2e6; }
+    .theme-preview-default .tp-footer { background: #f8f9fa; }
+    .theme-preview-default .tp-content { background: #ffffff; }
+
+    /* Modern Dark theme preview */
+    .theme-preview-modern-dark { background: #0f172a; }
+    .theme-preview-modern-dark .tp-nav { background: #1e293b; }
+    .theme-preview-modern-dark .tp-hero { background: #1e293b; }
+    .theme-preview-modern-dark .tp-hero-title { background: rgba(241,245,249,0.9); }
+    .theme-preview-modern-dark .tp-hero-text { background: rgba(226,232,240,0.5); }
+    .theme-preview-modern-dark .tp-hero-btn { background: #6366f1; }
+    .theme-preview-modern-dark .tp-card { background: #1e293b; border: 1px solid #334155; }
+    .theme-preview-modern-dark .tp-footer { background: #0f172a; border-top: 1px solid #334155; }
+    .theme-preview-modern-dark .tp-content { background: #0f172a; }
+
+    /* Nature Green theme preview */
+    .theme-preview-nature-green { background: #fafdf7; }
+    .theme-preview-nature-green .tp-nav { background: #ffffff; border-bottom: 1px solid #d5e3d0; }
+    .theme-preview-nature-green .tp-hero { background: #2e7d32; }
+    .theme-preview-nature-green .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-nature-green .tp-hero-text { background: rgba(255,255,255,0.6); }
+    .theme-preview-nature-green .tp-hero-btn { background: #ffffff; }
+    .theme-preview-nature-green .tp-card { background: #ffffff; border: 1px solid #d5e3d0; }
+    .theme-preview-nature-green .tp-footer { background: #1a2e1a; }
+    .theme-preview-nature-green .tp-content { background: #fafdf7; }
+
+    /* Ocean Blue theme preview */
+    .theme-preview-ocean-blue { background: #f7fafc; }
+    .theme-preview-ocean-blue .tp-nav { background: #ffffff; border-bottom: 1px solid #cbd5e0; }
+    .theme-preview-ocean-blue .tp-hero { background: #2b6cb0; }
+    .theme-preview-ocean-blue .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-ocean-blue .tp-hero-text { background: rgba(255,255,255,0.6); }
+    .theme-preview-ocean-blue .tp-hero-btn { background: #ffffff; }
+    .theme-preview-ocean-blue .tp-card { background: #ffffff; border: 1px solid #cbd5e0; }
+    .theme-preview-ocean-blue .tp-footer { background: #0d2137; }
+    .theme-preview-ocean-blue .tp-content { background: #f7fafc; }
+
+    /* Warm Sunset theme preview */
+    .theme-preview-warm-sunset { background: #fffaf5; }
+    .theme-preview-warm-sunset .tp-nav { background: #ffffff; border-bottom: 1px solid #f0d9c4; }
+    .theme-preview-warm-sunset .tp-hero { background: #e8590c; }
+    .theme-preview-warm-sunset .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-warm-sunset .tp-hero-text { background: rgba(255,255,255,0.6); }
+    .theme-preview-warm-sunset .tp-hero-btn { background: #ffffff; }
+    .theme-preview-warm-sunset .tp-card { background: #ffffff; border: 1px solid #f0d9c4; }
+    .theme-preview-warm-sunset .tp-footer { background: #2d1a0e; }
+    .theme-preview-warm-sunset .tp-content { background: #fffaf5; }
+
+    /* Rose Elegant theme preview */
+    .theme-preview-rose-elegant { background: #fdf8f9; }
+    .theme-preview-rose-elegant .tp-nav { background: #ffffff; border-bottom: 1px solid #edcdd6; }
+    .theme-preview-rose-elegant .tp-hero { background: #be4b6e; }
+    .theme-preview-rose-elegant .tp-hero-title { background: rgba(255,255,255,0.9); }
+    .theme-preview-rose-elegant .tp-hero-text { background: rgba(255,255,255,0.6); }
+    .theme-preview-rose-elegant .tp-hero-btn { background: #ffffff; }
+    .theme-preview-rose-elegant .tp-card { background: #ffffff; border: 1px solid #edcdd6; }
+    .theme-preview-rose-elegant .tp-footer { background: #2d1a22; }
+    .theme-preview-rose-elegant .tp-content { background: #fdf8f9; }
+
+    .website-actions {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 1.5rem;
+    }
+
+    .btn-apply {
+        flex: 1;
+        background: #0d6efd;
+        color: white;
+        border: none;
+        padding: 0.875rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-apply:hover:not(:disabled) {
+        background: #0b5ed7;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn-apply:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-skip {
+        background: transparent;
+        color: #64748b;
+        border: 1px solid #e5e7eb;
+        padding: 0.875rem 2rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-skip:hover {
+        background: #f8f9fa;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-success {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .alert-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    /* VMarket addon checkbox (subscribe-now tailor-made style) */
+    .addon-checkbox {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 1.5rem;
+    }
+    .addon-checkbox:hover {
+        border-color: #0d6efd;
+        background: rgba(13, 110, 253, 0.03);
+    }
+    .addon-checkbox.checked {
+        border-color: #0d6efd;
+        background: rgba(13, 110, 253, 0.05);
+    }
+    .addon-checkbox input[type="checkbox"] {
+        margin-top: 0.2rem;
+        width: 1.125rem;
+        height: 1.125rem;
+        flex-shrink: 0;
+        accent-color: #0d6efd;
+        cursor: pointer;
+    }
+    .addon-checkbox .addon-info {
+        flex: 1;
+    }
+    .addon-checkbox .addon-title {
+        font-weight: 600;
+        font-size: 0.9375rem;
+        color: #1e293b;
+        margin-bottom: 0.125rem;
+    }
+    .addon-checkbox .addon-desc {
+        font-size: 0.8125rem;
+        color: #64748b;
+        margin: 0;
+    }
+    .addon-checkbox .addon-badge {
+        font-weight: 600;
+        color: #10b981;
+        font-size: 0.8125rem;
+        white-space: nowrap;
+        background: rgba(16, 185, 129, 0.1);
+        padding: 0.25rem 0.75rem;
+        border-radius: 100px;
+    }
+    .addon-learn-more {
+        color: #0d6efd;
+        font-size: 0.8125rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 0.375rem;
+    }
+    .addon-learn-more:hover {
+        text-decoration: underline;
+        color: #0b5ed7;
+    }
+
+    /* VMarket Info Modal */
+    .vmarket-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(4px);
+    }
+    .vmarket-modal-overlay.show {
+        display: flex;
+    }
+    .vmarket-modal {
+        background: #fff;
+        border-radius: 1.25rem;
+        max-width: 640px;
+        width: 90%;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+        animation: modalSlideIn 0.3s ease;
+    }
+    @keyframes modalSlideIn {
+        from { opacity: 0; transform: translateY(20px) scale(0.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .vmarket-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 2rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .vmarket-modal-header h3 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #0f172a;
+    }
+    .vmarket-modal-close {
+        background: #f1f5f9;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #64748b;
+        font-size: 1.125rem;
+    }
+    .vmarket-modal-close:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+    .vmarket-modal-body {
+        padding: 1.5rem 2rem 2rem;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 0;
+    }
+    .vmarket-modal-logo {
+        text-align: center;
+        margin-bottom: 1.25rem;
+    }
+    .vmarket-modal-logo img {
+        height: 32px;
+    }
+    .vmarket-modal-desc {
+        color: #64748b;
+        font-size: 0.9375rem;
+        line-height: 1.7;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .vmarket-modal-benefits {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (max-width: 480px) {
+        .vmarket-modal-benefits {
+            grid-template-columns: 1fr;
+        }
+    }
+    .vmarket-modal-benefit {
+        background: #f8fafc;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .vmarket-modal-benefit-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.625rem;
+    }
+    .vmarket-modal-benefit-icon i {
+        font-size: 1.125rem;
+        color: #fff;
+    }
+    .vmarket-modal-benefit-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+    .vmarket-modal-benefit-icon.purple { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); }
+    .vmarket-modal-benefit-icon.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .vmarket-modal-benefit-icon.amber { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+    .vmarket-modal-benefit h5 {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+    .vmarket-modal-benefit p {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.5;
+    }
+    .vmarket-modal-footer {
+        text-align: center;
+        padding: 0 2rem 1.5rem;
+        color: #94a3b8;
+        font-size: 0.8125rem;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 992px) {
+        .website-guide-container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .guide-content {
+            position: static;
+        }
+
+        .guide-content h1 {
+            font-size: 2rem;
+        }
+
+        .guide-content .logo-section img,
+        .guide-content img[src="/static/logo3.png"] {
+            height: 18px !important;
+            max-height: 18px !important;
+        }
+    }
+</style>
+
+<div class="website-guide-wrapper">
+    <div class="website-guide-container">
+        <!-- 左側說明區域 -->
+        <div class="guide-content">
+            <div class="logo-section">
+                <img src="/static/logo3.png" alt="vWork">
+            </div>
+            <div class="welcome-badge" data-i18n="pages.websiteSetupGuide.welcome">🌐 網站設置</div>
+            <h1 data-i18n="pages.websiteSetupGuide.question">是否需要網站？</h1>
+            <p class="subtitle" data-i18n="pages.websiteSetupGuide.subtitle">
+                為您的業務創建一個專業的網站，展示產品、服務，並與客戶互動。
+            </p>
+
+            <ul class="features-list">
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.websiteSetupGuide.feature1">專業的網站設計和布局</span>
+                </li>
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.websiteSetupGuide.feature2">自定義頁面和內容管理</span>
+                </li>
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.websiteSetupGuide.feature3">產品展示和電商功能</span>
+                </li>
+                <li>
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span data-i18n="pages.websiteSetupGuide.feature4">隨時可以啟用或停用</span>
+                </li>
+            </ul>
+
+            <div class="help-text">
+                <strong>💡 <span data-i18n="common.tip">提示</span>：</strong> <span data-i18n="pages.websiteSetupGuide.tip">如果您現在不需要網站，可以稍後在系統設置中啟用。選擇「不需要」將跳過此步驟。</span>
+            </div>
+        </div>
+
+        <!-- 右側選擇區域 -->
+        <div class="website-selection">
+            <h2 data-i18n="pages.websiteSetupGuide.title">網站設置</h2>
+
+            <div id="alertContainer"></div>
+
+            <!-- 問題 1: 是否需要網站 -->
+            <div class="question-card" id="needWebsiteCard">
+                <h3 data-i18n="pages.websiteSetupGuide.question">您是否需要網站？</h3>
+                <div class="option-buttons">
+                    <div class="option-btn" data-value="yes" onclick="selectNeedWebsite('yes')">
+                        <div class="icon"><i class="bi bi-check-circle"></i></div>
+                        <div class="label" data-i18n="pages.websiteSetupGuide.need">需要</div>
+                        <div class="description" data-i18n="pages.websiteSetupGuide.needDesc">創建專業網站</div>
+                    </div>
+                    <div class="option-btn" data-value="no" onclick="selectNeedWebsite('no')">
+                        <div class="icon"><i class="bi bi-x-circle"></i></div>
+                        <div class="label" data-i18n="pages.websiteSetupGuide.dontNeed">不需要</div>
+                        <div class="description" data-i18n="pages.websiteSetupGuide.dontNeedDesc">稍後再設置</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 問題 2: 網站類型（如果需要網站） -->
+            <div class="question-card" id="websiteTypeCard" style="display: none;">
+                <h3 data-i18n="pages.websiteSetupGuide.selectWebsiteType">選擇網站類型</h3>
+                <div class="option-buttons">
+                    <div class="option-btn" data-value="ecommerce" onclick="selectWebsiteType('ecommerce')">
+                        <div class="icon"><i class="bi bi-cart"></i></div>
+                        <div class="label" data-i18n="pages.websiteSetupGuide.ecommerce">電商網站</div>
+                        <div class="description" data-i18n="pages.websiteSetupGuide.ecommerceDesc">包含購物車、結帳等功能</div>
+                    </div>
+                    <div class="option-btn" data-value="general" onclick="selectWebsiteType('general')">
+                        <div class="icon"><i class="bi bi-globe"></i></div>
+                        <div class="label" data-i18n="pages.websiteSetupGuide.general">一般網站</div>
+                        <div class="description" data-i18n="pages.websiteSetupGuide.generalDesc">展示型網站</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主題選擇（如果需要網站） -->
+            <div class="theme-selection" id="themeSelection">
+                <h3 style="margin-bottom: 1rem;" data-i18n="pages.websiteSetupGuide.selectTheme">選擇主題</h3>
+                <div class="theme-cards">
+                    <!-- Default Theme -->
+                    <div class="theme-card selected" data-theme="default" onclick="selectTheme('default')">
+                        <div class="theme-preview theme-preview-default">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.default.name">默認主題</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.default.description">簡潔明亮的經典風格</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Modern Dark Theme -->
+                    <div class="theme-card" data-theme="modern-dark" onclick="selectTheme('modern-dark')">
+                        <div class="theme-preview theme-preview-modern-dark">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.modernDark.name">現代深色</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.modernDark.description">優雅的深色風格，適合科技和創意類網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Nature Green Theme -->
+                    <div class="theme-card" data-theme="nature-green" onclick="selectTheme('nature-green')">
+                        <div class="theme-preview theme-preview-nature-green">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.natureGreen.name">自然綠意</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.natureGreen.description">清新自然的綠色系，適合餐飲、健康和環保類網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Ocean Blue Theme -->
+                    <div class="theme-card" data-theme="ocean-blue" onclick="selectTheme('ocean-blue')">
+                        <div class="theme-preview theme-preview-ocean-blue">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.oceanBlue.name">海洋藍</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.oceanBlue.description">清爽專業的藍色系，適合企業、金融和醫療類網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Warm Sunset Theme -->
+                    <div class="theme-card" data-theme="warm-sunset" onclick="selectTheme('warm-sunset')">
+                        <div class="theme-preview theme-preview-warm-sunset">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.warmSunset.name">暖陽橘</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.warmSunset.description">溫暖活力的橘色系，適合餐飲、旅遊和生活類網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Rose Elegant Theme -->
+                    <div class="theme-card" data-theme="rose-elegant" onclick="selectTheme('rose-elegant')">
+                        <div class="theme-preview theme-preview-rose-elegant">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.roseElegant.name">玫瑰典雅</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.roseElegant.description">柔和典雅的粉紫色系，適合美容、婚禮和時尚類網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+
+                    <!-- Extra themes (hidden by default) -->
+                    <!-- Bold Yellow Theme -->
+                    <div class="theme-card theme-extra" data-theme="bold-yellow" onclick="selectTheme('bold-yellow')" style="display:none;">
+                        <div class="theme-preview theme-preview-bold-yellow">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.boldYellow.name">黑金銳利</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.boldYellow.description">高對比黃黑配色，適合潮牌、運動和創意機構網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Cyberpunk Dark Theme -->
+                    <div class="theme-card theme-extra" data-theme="cyberpunk-dark" onclick="selectTheme('cyberpunk-dark')" style="display:none;">
+                        <div class="theme-preview theme-preview-cyberpunk-dark">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.cyberpunkDark.name">賽博朋克</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.cyberpunkDark.description">霓虹青與洋紅映襯深紫底色，適合遊戲、科技和未來風格網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Arctic Frost Theme -->
+                    <div class="theme-card theme-extra" data-theme="arctic-frost" onclick="selectTheme('arctic-frost')" style="display:none;">
+                        <div class="theme-preview theme-preview-arctic-frost">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.arcticFrost.name">北極霜</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.arcticFrost.description">清冷冰藍色調，適合企業官網、SaaS 和專業服務網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Mono Gray Theme -->
+                    <div class="theme-card theme-extra" data-theme="mono-gray" onclick="selectTheme('mono-gray')" style="display:none;">
+                        <div class="theme-preview theme-preview-mono-gray">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.monoGray.name">黑白灰</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.monoGray.description">經典黑白灰配色，適合極簡作品集和編輯風格網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Noir Red Theme -->
+                    <div class="theme-card theme-extra" data-theme="noir-red" onclick="selectTheme('noir-red')" style="display:none;">
+                        <div class="theme-preview theme-preview-noir-red">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.noirRed.name">黑白紅</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.noirRed.description">戲劇感黑白搭配正紅點綴，適合奢侈品牌、夜生活和高端形象網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Lavender Dream Theme -->
+                    <div class="theme-card theme-extra" data-theme="lavender-dream" onclick="selectTheme('lavender-dream')" style="display:none;">
+                        <div class="theme-preview theme-preview-lavender-dream">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.lavenderDream.name">薰衣草夢</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.lavenderDream.description">柔和夢幻的紫色調，適合養生、美容和創意作品集網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Clean Amber Theme -->
+                    <div class="theme-card theme-extra" data-theme="clean-amber" onclick="selectTheme('clean-amber')" style="display:none;">
+                        <div class="theme-preview theme-preview-clean-amber">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.cleanAmber.name">白底琥珀</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.cleanAmber.description">白底搭配琥珀黃與黑色點綴，適合現代品牌和電商網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Clean Crimson Theme -->
+                    <div class="theme-card theme-extra" data-theme="clean-crimson" onclick="selectTheme('clean-crimson')" style="display:none;">
+                        <div class="theme-preview theme-preview-clean-crimson">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.cleanCrimson.name">白底赤紅</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.cleanCrimson.description">白底搭配正紅與黑色點綴，適合媒體、新聞和大膽品牌網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                    <!-- Midnight Teal Theme -->
+                    <div class="theme-card theme-extra" data-theme="midnight-teal" onclick="selectTheme('midnight-teal')" style="display:none;">
+                        <div class="theme-preview theme-preview-midnight-teal">
+                            <div class="tp-nav"></div>
+                            <div class="tp-hero">
+                                <div class="tp-hero-title"></div>
+                                <div class="tp-hero-text"></div>
+                                <div class="tp-hero-btn"></div>
+                            </div>
+                            <div class="tp-content">
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                                <div class="tp-card"></div>
+                            </div>
+                            <div class="tp-footer"></div>
+                        </div>
+                        <div class="theme-info">
+                            <div class="name" data-i18n="pages.websiteTheme.themes.midnightTeal.name">午夜青</div>
+                            <div class="theme-desc" data-i18n="pages.websiteTheme.themes.midnightTeal.description">深藍黑底配青綠色調，適合 SaaS 儀表板和科技產品網站</div>
+                        </div>
+                        <div class="theme-check"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                </div>
+
+                <!-- More themes button -->
+                <div style="text-align: center; margin-top: 1rem; margin-bottom: 1.5rem;">
+                    <button type="button" class="btn-more-themes" id="btnMoreThemes" onclick="toggleMoreThemes()" data-i18n="pages.websiteSetupGuide.moreThemes">
+                        更多主題 <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- VMarket Join Option (subscribe-now addon style) -->
+            <label class="addon-checkbox checked" id="addonVmarket" onclick="toggleAddonVmarket()">
+                <input type="checkbox" id="addonVmarketCheck" checked>
+                <div class="addon-info">
+                    <div class="addon-title"><i class="bi bi-globe2 me-1"></i><img src="/static/vmarketlogo.png" alt="VMarket" style="height: 18px; vertical-align: middle; margin-left: 2px;"></div>
+                    <p class="addon-desc" data-i18n="pages.websiteSetupGuide.vmarketAddonDesc">加入 VMarket 讓更多人找到你，免費曝光你的公司與產品。</p>
+                    <a class="addon-learn-more" onclick="event.preventDefault(); event.stopPropagation(); showVmarketModal();" data-i18n="pages.websiteSetupGuide.vmarketLearnMore">了解更多 <i class="bi bi-arrow-right-short"></i></a>
+                </div>
+                <div class="addon-badge" data-i18n="pages.websiteSetupGuide.vmarketFree">免費</div>
+            </label>
+
+            <div class="website-actions">
+                <button class="btn-apply" id="btnApply" disabled data-i18n="pages.websiteSetupGuide.completeSetup">完成設置</button>
+                <button class="btn-skip" id="btnSkip" data-i18n="pages.websiteSetupGuide.skip">跳過</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VMarket Info Modal -->
+<div class="vmarket-modal-overlay" id="vmarketModal" onclick="hideVmarketModal(event)">
+    <div class="vmarket-modal" onclick="event.stopPropagation();">
+        <div class="vmarket-modal-header">
+            <h3 data-i18n="pages.websiteSetupGuide.vmarketModalTitle">VMarket 是什麼？</h3>
+            <button class="vmarket-modal-close" onclick="hideVmarketModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="vmarket-modal-body">
+            <div class="vmarket-modal-logo">
+                <img src="/static/vmarketlogo.png" alt="VMarket" onerror="this.style.display='none'">
+            </div>
+            <p class="vmarket-modal-desc" data-i18n="pages.websiteSetupGuide.vmarketModalDesc">
+                VMarket 是 V-sys 的企業展示平台，讓您的公司、產品與服務在全球市場上獲得曝光，輕鬆觸及更多潛在客戶。
+            </p>
+            <div class="vmarket-modal-benefits">
+                <div class="vmarket-modal-benefit">
+                    <div class="vmarket-modal-benefit-icon blue"><i class="bi bi-eye"></i></div>
+                    <h5 data-i18n="pages.vmarketSettings.benefit1Title">全球曝光</h5>
+                    <p data-i18n="pages.vmarketSettings.benefit1Desc">在 VMarket 上展示您的企業形象，讓世界各地的潛在客戶發現您。</p>
+                </div>
+                <div class="vmarket-modal-benefit">
+                    <div class="vmarket-modal-benefit-icon purple"><i class="bi bi-box-seam"></i></div>
+                    <h5 data-i18n="pages.vmarketSettings.benefit2Title">產品展示</h5>
+                    <p data-i18n="pages.vmarketSettings.benefit2Desc">將您的產品目錄同步到 VMarket，讓買家輕鬆瀏覽與查詢。</p>
+                </div>
+                <div class="vmarket-modal-benefit">
+                    <div class="vmarket-modal-benefit-icon green"><i class="bi bi-people"></i></div>
+                    <h5 data-i18n="pages.vmarketSettings.benefit3Title">拓展人脈</h5>
+                    <p data-i18n="pages.vmarketSettings.benefit3Desc">與其他企業建立聯繫，開拓商業合作的無限可能。</p>
+                </div>
+                <div class="vmarket-modal-benefit">
+                    <div class="vmarket-modal-benefit-icon amber"><i class="bi bi-arrow-repeat"></i></div>
+                    <h5 data-i18n="pages.websiteSetupGuide.vmarketBenefit4Title">一站管理</h5>
+                    <p data-i18n="pages.websiteSetupGuide.vmarketBenefit4Desc">在 vWork 更新資料即自動同步到 VMarket，無需重複維護。</p>
+                </div>
+            </div>
+            <div class="vmarket-modal-footer" data-i18n="pages.websiteSetupGuide.vmarketModalFooter">
+                加入 VMarket 完全免費。您可以隨時在設定中關閉曝光。
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let needWebsite = null;
+    let websiteType = null;
+    let selectedTheme = 'default';
+    let joinVmarket = true;
+    const t = (key, fallback) => (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(key) : fallback;
+
+    // API 請求
+    async function apiRequest(url, options = {}) {
+        if (typeof App !== 'undefined' && App.apiRequest) {
+            return await App.apiRequest(url, options);
+        }
+
+        const token = document.cookie.split('; ').find(row => row.startsWith('auth_token='))?.split('=')[1];
+        const defaultOptions = {
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+            }
+        };
+
+        const response = await fetch(url, { ...defaultOptions, ...options });
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || t('common.requestFailed', 'Request failed'));
+        }
+        
+        return data;
+    }
+
+    // 顯示提示訊息
+    function showAlert(message, type = 'success') {
+        const container = document.getElementById('alertContainer');
+        container.innerHTML = `
+            <div class="alert alert-${type}">
+                ${message}
+            </div>
+        `;
+        setTimeout(() => {
+            container.innerHTML = '';
+        }, 5000);
+    }
+
+    // VMarket addon toggle
+    function toggleAddonVmarket() {
+        var cb = document.getElementById('addonVmarketCheck');
+        if (!cb) return;
+        var label = document.getElementById('addonVmarket');
+        setTimeout(function() {
+            joinVmarket = cb.checked;
+            if (joinVmarket) {
+                label.classList.add('checked');
+            } else {
+                label.classList.remove('checked');
+            }
+        }, 0);
+    }
+
+    // VMarket info modal
+    function showVmarketModal() {
+        var modal = document.getElementById('vmarketModal');
+        if (modal) modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+    function hideVmarketModal(e) {
+        if (e && e.target && e.target !== document.getElementById('vmarketModal')) return;
+        var modal = document.getElementById('vmarketModal');
+        if (modal) modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+
+    // Load existing vmarket join status
+    async function loadVmarketStatus() {
+        try {
+            const resp = await apiRequest('/api/v1/tenant/vmarket-settings');
+            const joined = !!(resp && resp.data && resp.data.vmarket_joined);
+            var cb = document.getElementById('addonVmarketCheck');
+            var label = document.getElementById('addonVmarket');
+            if (cb && joined) {
+                cb.checked = true;
+                joinVmarket = true;
+                if (label) label.classList.add('checked');
+            }
+        } catch (e) {
+            // ignore - user may not have vmarket settings yet
+        }
+    }
+
+    // 選擇是否需要網站
+    function selectNeedWebsite(value) {
+        needWebsite = value;
+        
+        // 更新 UI
+        document.querySelectorAll('#needWebsiteCard .option-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        document.querySelector(`#needWebsiteCard .option-btn[data-value="${value}"]`).classList.add('selected');
+
+        if (value === 'yes') {
+            document.getElementById('websiteTypeCard').style.display = 'block';
+            document.getElementById('themeSelection').classList.add('show');
+        } else {
+            document.getElementById('websiteTypeCard').style.display = 'none';
+            document.getElementById('themeSelection').classList.remove('show');
+            websiteType = null;
+        }
+
+        checkCanApply();
+    }
+
+    // 選擇網站類型
+    function selectWebsiteType(value) {
+        websiteType = value;
+        
+        // 更新 UI
+        document.querySelectorAll('#websiteTypeCard .option-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        document.querySelector(`#websiteTypeCard .option-btn[data-value="${value}"]`).classList.add('selected');
+
+        checkCanApply();
+    }
+
+    // 選擇主題
+    function selectTheme(theme) {
+        selectedTheme = theme;
+        
+        // 更新 UI
+        document.querySelectorAll('.theme-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.querySelector(`.theme-card[data-theme="${theme}"]`).classList.add('selected');
+    }
+
+    // 切換更多主題顯示
+    let moreThemesExpanded = false;
+    function toggleMoreThemes() {
+        moreThemesExpanded = !moreThemesExpanded;
+        const extras = document.querySelectorAll('.theme-extra');
+        const btn = document.getElementById('btnMoreThemes');
+        extras.forEach(el => {
+            el.style.display = moreThemesExpanded ? '' : 'none';
+        });
+        btn.classList.toggle('expanded', moreThemesExpanded);
+        const lessText = t('pages.websiteSetupGuide.lessThemes', '收起');
+        const moreText = t('pages.websiteSetupGuide.moreThemes', '更多主題');
+        btn.innerHTML = moreThemesExpanded
+            ? lessText + ' <i class="bi bi-chevron-up"></i>'
+            : moreText + ' <i class="bi bi-chevron-down"></i>';
+    }
+
+    // 檢查是否可以應用
+    function checkCanApply() {
+        const btnApply = document.getElementById('btnApply');
+        if (needWebsite === 'no') {
+            btnApply.disabled = false;
+        } else if (needWebsite === 'yes' && websiteType) {
+            btnApply.disabled = false;
+        } else {
+            btnApply.disabled = true;
+        }
+    }
+
+    // 應用設置
+    async function applySettings() {
+        try {
+            document.getElementById('btnApply').disabled = true;
+            document.getElementById('btnApply').textContent = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSetupGuide.settingUp') : '設置中...');
+
+            if (needWebsite === 'no') {
+                // 不需要網站，但仍處理 vmarket 加入
+                await handleVmarketJoin();
+                localStorage.setItem('website_setup_completed', 'true');
+                setTimeout(() => {
+                    redirectToProductPage();
+                }, 500);
+                return;
+            }
+
+            // 需要網站，保存設置
+            const websiteEnabled = needWebsite === 'yes';
+            const updates = {
+                website_enabled: websiteEnabled,
+                website_theme: selectedTheme,
+                website_type: websiteType
+            };
+
+            await apiRequest('/api/v1/tenant/website-theme', {
+                method: 'PUT',
+                body: JSON.stringify(updates)
+            });
+
+            // 如果是電商網站，導入默認頁面
+            if (websiteType === 'ecommerce') {
+                showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSetupGuide.creatingEcommercePages') : '正在創建電商網站頁面...'), 'success');
+                // 觸發創建默認頁面（通過 API）
+                try {
+                    const lang = (typeof I18n !== 'undefined' && I18n.currentLang)
+                        ? I18n.currentLang
+                        : (localStorage.getItem('u-nai_lang') || localStorage.getItem('language') || 'zh');
+                    await apiRequest(`/api/v1/pages/create-default-ecommerce?lang=${encodeURIComponent(lang)}`, {
+                        method: 'POST'
+                    });
+                } catch (error) {
+                    console.warn('創建默認頁面失敗（可能已存在）:', error);
+                }
+            } else if (websiteType === 'general') {
+                // 一般網站，創建基本頁面
+                showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSetupGuide.creatingPages') : '正在創建網站頁面...'), 'success');
+                try {
+                    const lang = (typeof I18n !== 'undefined' && I18n.currentLang)
+                        ? I18n.currentLang
+                        : (localStorage.getItem('u-nai_lang') || localStorage.getItem('language') || 'zh');
+                    await apiRequest(`/api/v1/pages/create-default-general?lang=${encodeURIComponent(lang)}`, {
+                        method: 'POST'
+                    });
+                } catch (error) {
+                    console.warn('創建默認頁面失敗（可能已存在）:', error);
+                }
+            }
+
+            // 處理 VMarket 加入
+            await handleVmarketJoin();
+
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSetupGuide.setupComplete') : '網站設置完成！正在跳轉...'), 'success');
+            localStorage.setItem('website_setup_completed', 'true');
+            
+            setTimeout(() => {
+                redirectToProductPage();
+            }, 1500);
+        } catch (error) {
+            console.error('應用設置失敗:', error);
+            showAlert((typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSetupGuide.setupFailed') : '應用設置失敗') + ': ' + error.message, 'error');
+            document.getElementById('btnApply').disabled = false;
+            document.getElementById('btnApply').textContent = (typeof I18n !== 'undefined' && I18n.t ? I18n.t('pages.websiteSetupGuide.completeSetup') : '完成設置');
+        }
+    }
+
+    // 處理 VMarket 加入
+    async function handleVmarketJoin() {
+        if (!joinVmarket) return;
+        try {
+            await apiRequest('/api/v1/tenant/vmarket-settings', {
+                method: 'PUT',
+                body: JSON.stringify({ vmarket_joined: true })
+            });
+        } catch (error) {
+            console.warn('加入 VMarket 失敗:', error);
+        }
+    }
+
+    // 跳過設置
+    async function skipSetup() {
+        // 即使跳過，也處理 vmarket 加入
+        await handleVmarketJoin();
+        localStorage.setItem('website_setup_completed', 'true');
+        redirectToProductPage();
+    }
+
+    // 綁定事件
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('btnApply').addEventListener('click', applySettings);
+        document.getElementById('btnSkip').addEventListener('click', skipSetup);
+        loadVmarketStatus();
+    });
+</script>
+{{end}}
+
+
+
+

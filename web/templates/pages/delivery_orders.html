@@ -1,0 +1,669 @@
+{{ define "pages/delivery_orders" }}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 id="pageTitle"><i class="bi bi-bag-check me-2"></i><span data-i18n="pages.deliveryOrders.title">外賣訂單</span></h3>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" onclick="syncOrders()">
+                <i class="bi bi-arrow-repeat me-1"></i><span data-i18n="pages.deliveryOrders.syncOrders">同步訂單</span>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" onclick="loadOrders()">
+                <i class="bi bi-arrow-clockwise me-1"></i><span data-i18n="common.refresh">刷新</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 篩選器 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label small text-muted" data-i18n="pages.deliveryOrders.platform">平台</label>
+                    <select class="form-select form-select-sm" id="filterPlatform" onchange="loadOrders()">
+                        <option value="" data-i18n="pages.deliveryOrders.allPlatforms">全部平台</option>
+                        <option value="foodpanda">Foodpanda</option>
+                        <option value="keeta">Keeta 美團</option>
+                        <option value="deliveroo">Deliveroo 戶戶送</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted" data-i18n="pages.deliveryOrders.statusLabel">狀態</label>
+                    <select class="form-select form-select-sm" id="filterStatus" onchange="loadOrders()">
+                        <option value="" data-i18n="pages.deliveryOrders.allStatuses">全部狀態</option>
+                        <option value="pending" data-i18n="pages.deliveryOrders.statusPending">待處理</option>
+                        <option value="accepted" data-i18n="pages.deliveryOrders.statusAccepted">已接單</option>
+                        <option value="preparing" data-i18n="pages.deliveryOrders.statusPreparing">準備中</option>
+                        <option value="ready" data-i18n="pages.deliveryOrders.statusReady">待取餐</option>
+                        <option value="picked_up" data-i18n="pages.deliveryOrders.statusPickedUp">已取餐</option>
+                        <option value="delivered" data-i18n="pages.deliveryOrders.statusDelivered">已送達</option>
+                        <option value="cancelled" data-i18n="pages.deliveryOrders.statusCancelled">已取消</option>
+                        <option value="rejected" data-i18n="pages.deliveryOrders.statusRejected">已拒絕</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted" data-i18n="pages.deliveryOrders.date">日期</label>
+                    <input type="date" class="form-control form-control-sm" id="filterDate" onchange="loadOrders()">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted" data-i18n="pages.deliveryOrders.search">搜尋</label>
+                    <input type="text" class="form-control form-control-sm" id="filterSearch" 
+                           data-i18n-placeholder="pages.deliveryOrders.searchPlaceholder" placeholder="訂單編號、客戶名稱..." onkeyup="debounceSearch()">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 訂單統計 -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card bg-warning bg-opacity-10 border-warning">
+                <div class="card-body text-center py-3">
+                    <h3 class="mb-0 text-warning" id="statPending">0</h3>
+                    <small class="text-muted" data-i18n="pages.deliveryOrders.statusPending">待處理</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-info bg-opacity-10 border-info">
+                <div class="card-body text-center py-3">
+                    <h3 class="mb-0 text-info" id="statPreparing">0</h3>
+                    <small class="text-muted" data-i18n="pages.deliveryOrders.statusPreparing">準備中</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-primary bg-opacity-10 border-primary">
+                <div class="card-body text-center py-3">
+                    <h3 class="mb-0 text-primary" id="statReady">0</h3>
+                    <small class="text-muted" data-i18n="pages.deliveryOrders.statusReady">待取餐</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-success bg-opacity-10 border-success">
+                <div class="card-body text-center py-3">
+                    <h3 class="mb-0 text-success" id="statDelivered">0</h3>
+                    <small class="text-muted" data-i18n="pages.deliveryOrders.completed">已完成</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-danger bg-opacity-10 border-danger">
+                <div class="card-body text-center py-3">
+                    <h3 class="mb-0 text-danger" id="statCancelled">0</h3>
+                    <small class="text-muted" data-i18n="pages.deliveryOrders.statusCancelled">已取消</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 訂單列表 -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 120px;" data-i18n="pages.deliveryOrders.platform">平台</th>
+                            <th style="width: 150px;" data-i18n="pages.deliveryOrders.orderNumber">訂單編號</th>
+                            <th style="width: 100px;" data-i18n="pages.deliveryOrders.statusLabel">狀態</th>
+                            <th data-i18n="pages.deliveryOrders.customer">客戶</th>
+                            <th data-i18n="pages.deliveryOrders.orderContent">訂單內容</th>
+                            <th style="width: 100px;" data-i18n="pages.deliveryOrders.amount">金額</th>
+                            <th style="width: 150px;" data-i18n="pages.deliveryOrders.orderTime">下單時間</th>
+                            <th style="width: 150px;" data-i18n="pages.deliveryOrders.actions">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                <p class="mt-2 mb-0" data-i18n="common.loading">載入中...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 分頁 -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="text-muted small">
+            <span data-i18n="pages.deliveryOrders.showing">顯示</span> <span id="showingFrom">0</span> - <span id="showingTo">0</span><span data-i18n="pages.deliveryOrders.totalPrefix">，共</span> <span id="totalCount">0</span> <span data-i18n="pages.deliveryOrders.totalSuffix">筆</span>
+        </div>
+        <nav>
+            <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<!-- 訂單詳情 Modal -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-receipt me-2"></i><span data-i18n="pages.deliveryOrders.orderDetail">訂單詳情</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailContent">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer" id="orderDetailFooter">
+                <!-- Dynamic action buttons -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function wdT(key, fallback) { return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback; }
+
+let currentPage = 1;
+const pageSize = 20;
+let searchTimeout = null;
+
+// 頁面載入時初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 設置日期為今天
+    document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
+    loadOrders();
+    
+    // 每 30 秒自動刷新
+    setInterval(loadOrders, 30000);
+});
+
+// 防抖搜尋
+function debounceSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(loadOrders, 300);
+}
+
+// 載入訂單
+async function loadOrders(page = 1) {
+    currentPage = page;
+    
+    const params = new URLSearchParams({
+        page: page,
+        page_size: pageSize,
+        platform: document.getElementById('filterPlatform').value,
+        status: document.getElementById('filterStatus').value,
+        date: document.getElementById('filterDate').value,
+        search: document.getElementById('filterSearch').value
+    });
+    
+    try {
+        const response = await fetch(`/api/v1/delivery-orders?${params}`);
+        if (!response.ok) throw new Error(wdT('pages.deliveryOrders.loadFailed', '載入失敗，請重試'));
+        
+        const result = await response.json();
+        renderOrders(result.data || []);
+        renderPagination(result.pagination || {});
+        updateStats(result.stats || {});
+    } catch (error) {
+        console.error(wdT('pages.deliveryOrders.loadFailed', '載入訂單失敗:'), error);
+        document.getElementById('ordersTableBody').innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-5 text-danger">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">${wdT('pages.deliveryOrders.loadFailed', '載入失敗，請重試')}</p>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// 渲染訂單列表
+function renderOrders(orders) {
+    const tbody = document.getElementById('ordersTableBody');
+    
+    if (orders.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">${wdT('pages.deliveryOrders.noOrders', '暫無訂單')}</p>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = orders.map(order => `
+        <tr class="${order.status === 'pending' ? 'table-warning' : ''}">
+            <td>
+                <span class="badge" style="background-color: ${getPlatformColor(order.platform)};">
+                    ${getPlatformName(order.platform)}
+                </span>
+            </td>
+            <td>
+                <a href="javascript:void(0)" onclick="showOrderDetail('${order.id}')">
+                    ${order.platform_order_id}
+                </a>
+            </td>
+            <td>${getStatusBadge(order.status)}</td>
+            <td>
+                <div>${order.customer_name || '-'}</div>
+                <small class="text-muted">${order.customer_phone || ''}</small>
+            </td>
+            <td>
+                <div class="text-truncate" style="max-width: 200px;" title="${getItemsSummary(order.items)}">
+                    ${getItemsSummary(order.items)}
+                </div>
+                <small class="text-muted">${order.items?.length || 0} ${wdT('pages.deliveryOrders.itemsCount', '項商品')}</small>
+            </td>
+            <td>
+                <strong>$${(order.total_amount || 0).toFixed(2)}</strong>
+            </td>
+            <td>
+                <div>${formatDateTime(order.order_time)}</div>
+            </td>
+            <td>
+                ${getActionButtons(order)}
+            </td>
+        </tr>
+    `).join('');
+}
+
+// 取得平台顏色
+function getPlatformColor(platform) {
+    switch (platform) {
+        case 'foodpanda': return '#d70f64';
+        case 'keeta': return '#ffcc00';
+        case 'deliveroo': return '#00ccbc';
+        default: return '#6c757d';
+    }
+}
+
+// 取得平台名稱
+function getPlatformName(platform) {
+    switch (platform) {
+        case 'foodpanda': return 'Foodpanda';
+        case 'keeta': return 'Keeta';
+        case 'deliveroo': return 'Deliveroo';
+        default: return platform;
+    }
+}
+
+// 取得狀態徽章
+function getStatusBadge(status) {
+    const statusMap = {
+        'pending': { class: 'bg-warning', text: wdT('pages.deliveryOrders.statusPending', '待處理') },
+        'accepted': { class: 'bg-info', text: wdT('pages.deliveryOrders.statusAccepted', '已接單') },
+        'preparing': { class: 'bg-info', text: wdT('pages.deliveryOrders.statusPreparing', '準備中') },
+        'ready': { class: 'bg-primary', text: wdT('pages.deliveryOrders.statusReady', '待取餐') },
+        'picked_up': { class: 'bg-primary', text: wdT('pages.deliveryOrders.statusPickedUp', '已取餐') },
+        'delivered': { class: 'bg-success', text: wdT('pages.deliveryOrders.statusDelivered', '已送達') },
+        'cancelled': { class: 'bg-secondary', text: wdT('pages.deliveryOrders.statusCancelled', '已取消') },
+        'rejected': { class: 'bg-danger', text: wdT('pages.deliveryOrders.statusRejected', '已拒絕') }
+    };
+    const s = statusMap[status] || { class: 'bg-secondary', text: status };
+    return `<span class="badge ${s.class}">${s.text}</span>`;
+}
+
+// 取得商品摘要
+function getItemsSummary(items) {
+    if (!items || items.length === 0) return '-';
+    return items.map(item => `${item.name} x${item.quantity}`).join(', ');
+}
+
+// 取得操作按鈕
+function getActionButtons(order) {
+    let buttons = [];
+    
+    switch (order.status) {
+        case 'pending':
+            buttons.push(`<button class="btn btn-success btn-sm me-1" onclick="acceptOrder('${order.id}')">
+                <i class="bi bi-check"></i> ${wdT('pages.deliveryOrders.acceptBtn', '接單')}
+            </button>`);
+            buttons.push(`<button class="btn btn-danger btn-sm" onclick="rejectOrder('${order.id}')">
+                <i class="bi bi-x"></i> ${wdT('pages.deliveryOrders.rejectBtn', '拒絕')}
+            </button>`);
+            break;
+        case 'accepted':
+            buttons.push(`<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.id}', 'preparing')">
+                <i class="bi bi-fire"></i> ${wdT('pages.deliveryOrders.startPreparing', '開始準備')}
+            </button>`);
+            break;
+        case 'preparing':
+            buttons.push(`<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.id}', 'ready')">
+                <i class="bi bi-check-circle"></i> ${wdT('pages.deliveryOrders.readyBtn', '準備完成')}
+            </button>`);
+            break;
+        case 'ready':
+            buttons.push(`<button class="btn btn-primary btn-sm" onclick="updateOrderStatus('${order.id}', 'picked_up')">
+                <i class="bi bi-bicycle"></i> ${wdT('pages.deliveryOrders.pickedUpBtn', '已取餐')}
+            </button>`);
+            break;
+    }
+    
+    buttons.push(`<button class="btn btn-outline-secondary btn-sm ms-1" onclick="showOrderDetail('${order.id}')">
+        <i class="bi bi-eye"></i>
+    </button>`);
+    
+    return buttons.join('');
+}
+
+// 格式化日期時間
+function formatDateTime(dateStr) {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return date.toLocaleString('zh-TW', {
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// 接受訂單
+async function acceptOrder(orderId) {
+    if (!confirm(wdT('pages.deliveryOrders.acceptConfirm', '確定要接受此訂單嗎？'))) return;
+    
+    try {
+        const response = await fetch(`/api/v1/delivery-orders/${orderId}/accept`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            showToast('success', wdT('pages.deliveryOrders.orderAccepted', '訂單已接受'));
+            loadOrders(currentPage);
+        } else {
+            const result = await response.json();
+            showToast('error', result.message || wdT('pages.deliveryOrders.actionFailed', '操作失敗'));
+        }
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryOrders.actionFailed', '操作失敗'));
+        console.error(error);
+    }
+}
+
+// 拒絕訂單
+async function rejectOrder(orderId) {
+    const reason = prompt(wdT('pages.deliveryOrders.rejectPrompt', '請輸入拒絕原因（可選）：'));
+    if (reason === null) return; // 用戶取消
+    
+    try {
+        const response = await fetch(`/api/v1/delivery-orders/${orderId}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason: reason })
+        });
+        
+        if (response.ok) {
+            showToast('success', wdT('pages.deliveryOrders.orderRejected', '訂單已拒絕'));
+            loadOrders(currentPage);
+        } else {
+            const result = await response.json();
+            showToast('error', result.message || wdT('pages.deliveryOrders.actionFailed', '操作失敗'));
+        }
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryOrders.actionFailed', '操作失敗'));
+        console.error(error);
+    }
+}
+
+// 更新訂單狀態
+async function updateOrderStatus(orderId, status) {
+    try {
+        const response = await fetch(`/api/v1/delivery-orders/${orderId}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: status })
+        });
+        
+        if (response.ok) {
+            showToast('success', wdT('pages.deliveryOrders.statusUpdated', '狀態已更新'));
+            loadOrders(currentPage);
+        } else {
+            const result = await response.json();
+            showToast('error', result.message || wdT('pages.deliveryOrders.actionFailed', '操作失敗'));
+        }
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryOrders.actionFailed', '操作失敗'));
+        console.error(error);
+    }
+}
+
+// 同步訂單
+async function syncOrders() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + wdT('pages.deliveryOrders.syncingOrders', '同步中...');
+    
+    try {
+        // First, get all enabled integrations to know which platforms to sync
+        const intResp = await fetch('/api/v1/delivery-integrations');
+        if (!intResp.ok) {
+            showToast('error', wdT('pages.deliveryOrders.cannotGetPlatforms', '無法獲取平台列表'));
+            return;
+        }
+        const integrations = await intResp.json();
+        const enabledPlatforms = integrations
+            .filter(i => i.is_enabled && i.is_connected)
+            .map(i => i.platform);
+
+        if (enabledPlatforms.length === 0) {
+            showToast('warning', wdT('pages.deliveryOrders.noPlatforms', '沒有已啟用並連接的外賣平台'));
+            return;
+        }
+
+        let successCount = 0;
+        let errors = [];
+        for (const platform of enabledPlatforms) {
+            const response = await fetch(`/api/v1/delivery-orders/sync?platform=${platform}`, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                successCount++;
+            } else {
+                const result = await response.json();
+                errors.push(`${platform}: ${result.error || wdT('pages.deliveryOrders.syncFailed', '同步失敗')}`);
+            }
+        }
+
+        if (successCount > 0) {
+            showToast('success', wdT('pages.deliveryOrders.syncedPlatforms', `已同步 ${successCount} 個平台的訂單`).replace('{count}', successCount));
+            loadOrders();
+        }
+        if (errors.length > 0) {
+            showToast('error', errors.join('; '));
+        }
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryOrders.syncFailed', '同步失敗'));
+        console.error(error);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+// 顯示訂單詳情
+async function showOrderDetail(orderId) {
+    try {
+        const response = await fetch(`/api/v1/delivery-orders/${orderId}`);
+        if (!response.ok) throw new Error(wdT('pages.deliveryOrders.loadOrderDetailFailed', '載入訂單詳情失敗'));
+        
+        const result = await response.json();
+        const order = result.data;
+        
+        const content = document.getElementById('orderDetailContent');
+        content.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-2">${wdT('pages.deliveryOrders.orderInfo', '訂單資訊')}</h6>
+                    <table class="table table-sm">
+                        <tr>
+                            <td class="text-muted" style="width: 100px;">${wdT('pages.deliveryOrders.platformLabel', '平台')}</td>
+                            <td><span class="badge" style="background-color: ${getPlatformColor(order.platform)};">${getPlatformName(order.platform)}</span></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">${wdT('pages.deliveryOrders.orderNumberLabel', '訂單編號')}</td>
+                            <td><code>${order.platform_order_id}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">${wdT('pages.deliveryOrders.statusHeader', '狀態')}</td>
+                            <td>${getStatusBadge(order.status)}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">${wdT('pages.deliveryOrders.orderTimeLabel', '下單時間')}</td>
+                            <td>${new Date(order.order_time).toLocaleString('zh-TW')}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-2">${wdT('pages.deliveryOrders.customerInfo', '客戶資訊')}</h6>
+                    <table class="table table-sm">
+                        <tr>
+                            <td class="text-muted" style="width: 100px;">${wdT('pages.deliveryOrders.customerName', '姓名')}</td>
+                            <td>${order.customer_name || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">${wdT('pages.deliveryOrders.customerPhone', '電話')}</td>
+                            <td>${order.customer_phone || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">${wdT('pages.deliveryOrders.customerAddress', '地址')}</td>
+                            <td>${order.delivery_address || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">${wdT('pages.deliveryOrders.customerNotes', '備註')}</td>
+                            <td>${order.notes || '-'}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <h6 class="text-muted mb-2">${wdT('pages.deliveryOrders.orderItems', '訂單明細')}</h6>
+            <table class="table table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>${wdT('pages.deliveryOrders.itemName', '商品')}</th>
+                        <th style="width: 80px;">${wdT('pages.deliveryOrders.itemQuantity', '數量')}</th>
+                        <th style="width: 100px;">${wdT('pages.deliveryOrders.itemUnitPrice', '單價')}</th>
+                        <th style="width: 100px;">${wdT('pages.deliveryOrders.itemSubtotal', '小計')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${(order.items || []).map(item => `
+                        <tr>
+                            <td>
+                                ${item.name}
+                                ${item.options ? `<br><small class="text-muted">${item.options}</small>` : ''}
+                            </td>
+                            <td>${item.quantity}</td>
+                            <td>$${(item.unit_price || 0).toFixed(2)}</td>
+                            <td>$${((item.unit_price || 0) * (item.quantity || 1)).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>${wdT('pages.deliveryOrders.subtotal', '小計')}</strong></td>
+                        <td><strong>$${(order.subtotal || 0).toFixed(2)}</strong></td>
+                    </tr>
+                    ${order.delivery_fee ? `
+                    <tr>
+                        <td colspan="3" class="text-end">${wdT('pages.deliveryOrders.deliveryFee', '運費')}</td>
+                        <td>$${order.delivery_fee.toFixed(2)}</td>
+                    </tr>
+                    ` : ''}
+                    ${order.discount ? `
+                    <tr>
+                        <td colspan="3" class="text-end text-success">${wdT('pages.deliveryOrders.discount', '折扣')}</td>
+                        <td class="text-success">-$${order.discount.toFixed(2)}</td>
+                    </tr>
+                    ` : ''}
+                    <tr>
+                        <td colspan="3" class="text-end"><strong>${wdT('pages.deliveryOrders.total', '總計')}</strong></td>
+                        <td><strong class="text-primary">$${(order.total_amount || 0).toFixed(2)}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        `;
+        
+        // 設置 footer 操作按鈕
+        const footer = document.getElementById('orderDetailFooter');
+        footer.innerHTML = `
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${wdT('pages.deliveryOrders.closeButton', '關閉')}</button>
+            ${order.status === 'pending' ? `
+                <button type="button" class="btn btn-danger" onclick="rejectOrder('${order.id}'); bootstrap.Modal.getInstance(document.getElementById('orderDetailModal')).hide();">${wdT('pages.deliveryOrders.rejectOrder', '拒絕訂單')}</button>
+                <button type="button" class="btn btn-success" onclick="acceptOrder('${order.id}'); bootstrap.Modal.getInstance(document.getElementById('orderDetailModal')).hide();">${wdT('pages.deliveryOrders.acceptOrder', '接受訂單')}</button>
+            ` : ''}
+        `;
+        
+        const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+        modal.show();
+    } catch (error) {
+        showToast('error', wdT('pages.deliveryOrders.loadOrderDetailFailed', '載入訂單詳情失敗'));
+        console.error(error);
+    }
+}
+
+// 渲染分頁
+function renderPagination(pagination) {
+    const { total = 0, page = 1, page_size = pageSize, total_pages = 1 } = pagination;
+    
+    document.getElementById('showingFrom').textContent = total > 0 ? (page - 1) * page_size + 1 : 0;
+    document.getElementById('showingTo').textContent = Math.min(page * page_size, total);
+    document.getElementById('totalCount').textContent = total;
+    
+    const paginationEl = document.getElementById('pagination');
+    if (total_pages <= 1) {
+        paginationEl.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="javascript:void(0)" onclick="loadOrders(${page - 1})">${wdT('pages.deliveryOrders.prevPage', '上一頁')}</a>
+    </li>`;
+    
+    for (let i = 1; i <= total_pages; i++) {
+        if (i === 1 || i === total_pages || (i >= page - 2 && i <= page + 2)) {
+            html += `<li class="page-item ${i === page ? 'active' : ''}">
+                <a class="page-link" href="javascript:void(0)" onclick="loadOrders(${i})">${i}</a>
+            </li>`;
+        } else if (i === page - 3 || i === page + 3) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+    
+    html += `<li class="page-item ${page === total_pages ? 'disabled' : ''}">
+        <a class="page-link" href="javascript:void(0)" onclick="loadOrders(${page + 1})">${wdT('pages.deliveryOrders.nextPage', '下一頁')}</a>
+    </li>`;
+    
+    paginationEl.innerHTML = html;
+}
+
+// 更新統計
+function updateStats(stats) {
+    document.getElementById('statPending').textContent = stats.pending || 0;
+    document.getElementById('statPreparing').textContent = (stats.accepted || 0) + (stats.preparing || 0);
+    document.getElementById('statReady').textContent = stats.ready || 0;
+    document.getElementById('statDelivered').textContent = (stats.picked_up || 0) + (stats.delivered || 0);
+    document.getElementById('statCancelled').textContent = (stats.cancelled || 0) + (stats.rejected || 0);
+}
+
+// 顯示 Toast 通知
+function showToast(type, message) {
+    if (typeof Toastify !== 'undefined') {
+        Toastify({
+            text: message,
+            duration: 3000,
+            gravity: 'top',
+            position: 'right',
+            style: {
+                background: type === 'success' ? '#198754' : '#dc3545'
+            }
+        }).showToast();
+    } else {
+        alert(message);
+    }
+}
+</script>
+{{ end }}

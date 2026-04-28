@@ -1,0 +1,3360 @@
+/* vAI Landing Page Styles */
+
+.vai-body {
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0d0d2b 100%);
+  color: #e0e0e0;
+  min-height: 100vh;
+}
+
+.vai-navbar {
+  background: rgba(10, 10, 26, 0.85) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.5rem 0;
+}
+
+.vai-navbar .nav-link {
+  color: #b0b0c0 !important;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.vai-navbar .nav-link:hover {
+  color: #fff !important;
+}
+
+.vai-navbar .navbar-brand img {
+  filter: brightness(1.2);
+}
+
+/* Hero Section */
+.vai-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 20px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vai-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, rgba(139, 92, 246, 0.06) 0%, transparent 50%);
+  animation: vai-glow 12s ease-in-out infinite alternate;
+}
+
+@keyframes vai-glow {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-3%, -3%); }
+}
+
+.vai-hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  text-align: center;
+}
+
+.vai-hero-content h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.vai-hero-content h1 .vai-gradient-text {
+  background: linear-gradient(135deg, #a78bfa, #c4b5fd, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.vai-hero-content .vai-subtitle {
+  font-size: 1.15rem;
+  color: #9ca3af;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* AI Chat Demo Section */
+.vai-chat-demo {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.vai-chat-demo-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.vai-chat-demo-header img {
+  width: 28px;
+  height: 28px;
+}
+
+.vai-chat-demo-header span {
+  color: #d1d5db;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.vai-chat-demo-messages {
+  padding: 1rem;
+  min-height: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.vai-demo-msg {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  animation: vai-msg-in 0.4s ease-out;
+}
+
+@keyframes vai-msg-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vai-demo-msg.user {
+  justify-content: flex-end;
+}
+
+.vai-demo-msg .msg-bubble {
+  max-width: 80%;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.vai-demo-msg.ai .msg-bubble {
+  background: rgba(139, 92, 246, 0.15);
+  color: #d1d5db;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.vai-demo-msg.user .msg-bubble {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vai-chat-demo-input {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.vai-chat-demo-input input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.vai-chat-demo-input input::placeholder {
+  color: #6b7280;
+}
+
+.vai-chat-demo-input input:focus {
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.vai-chat-demo-input button {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.vai-chat-demo-input button:hover {
+  opacity: 0.85;
+}
+
+/* Features Section */
+.vai-features {
+  padding: 60px 20px;
+  position: relative;
+}
+
+.vai-feature-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.vai-feature-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.vai-feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #a78bfa;
+}
+
+.vai-feature-card h5 {
+  color: #e5e7eb;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.vai-feature-card p {
+  color: #9ca3af;
+  font-size: 0.85rem;
+  margin-bottom: 0;
+}
+
+/* CTA Button */
+.vai-btn-primary {
+  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.vai-btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  color: #fff;
+}
+
+.vai-btn-outline {
+  background: transparent;
+  color: #a78bfa;
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.vai-btn-outline:hover {
+  background: rgba(167, 139, 250, 0.1);
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.5);
+}
+
+/* Footer override for dark theme */
+.vai-body .site-footer-light {
+  background: rgba(10, 10, 26, 0.9) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #9ca3af;
+}
+
+.vai-body .site-footer-light a {
+  color: #9ca3af !important;
+}
+
+.vai-body .site-footer-light a:hover {
+  color: #d1d5db !important;
+}
+
+.vai-body .site-footer-light h6 {
+  color: #e5e7eb;
+}
+
+.vai-body .site-footer-light .text-muted {
+  color: #6b7280 !important;
+}
+
+.vai-body .site-footer-light hr {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Typing indicator */
+.vai-typing {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.vai-typing span {
+  width: 6px;
+  height: 6px;
+  background: #a78bfa;
+  border-radius: 50%;
+  animation: vai-typing-dot 1.2s infinite;
+}
+
+.vai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.vai-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes vai-typing-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+  30% { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vai-hero-content h1 {
+    font-size: 2rem;
+  }
+  .vai-hero-content .vai-subtitle {
+    font-size: 1rem;
+  }
+  .vai-chat-demo {
+    max-width: 100%;
+  }
+}
+
+/* === vAI Full-Page Chat (login 後) === */
+
+/* === vAI Icon Sidebar === */
+
+/* Hide CMS-specific topnav elements on Vai pages (body.vai-page set by topnav.html) */
+body.vai-page #nav-notifications-topbar,
+body.vai-page #nav-notifications-topbar-mobile,
+body.vai-page #nav-messages-topbar,
+body.vai-page #nav-messages-topbar-mobile,
+body.vai-page #cmsGlobalSearch {
+  display: none !important;
+}
+
+/* vAI Global Search (topnav) — inherits .cms-global-search pill style from custom.css */
+.vai-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  margin-top: 6px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.vai-search-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.55rem 0.75rem;
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.vai-search-item:last-child {
+  border-bottom: none;
+}
+.vai-search-item:hover {
+  background: #f5f7ff;
+  color: #333;
+}
+.vai-search-item-body {
+  flex: 1;
+  min-width: 0;
+}
+.vai-search-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vai-search-title mark {
+  background: #fff3cd;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+.vai-search-preview {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vai-search-preview mark {
+  background: #fff3cd;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+.vai-search-role {
+  font-weight: 600;
+  color: #666;
+}
+.vai-search-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.vai-icon-sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  background: #fff;
+  border-right: 1px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0.5rem;
+  z-index: 1040;
+}
+
+.vai-icon-sidebar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  padding: 0.5rem 0;
+  margin-bottom: 0.25rem;
+  border-radius: 8px;
+  color: #6c757d;
+  text-decoration: none;
+  font-size: 0.65rem;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+
+.vai-icon-sidebar-item i {
+  font-size: 1.3rem;
+  margin-bottom: 2px;
+}
+
+.vai-icon-sidebar-item:hover {
+  background: #f0f0f0;
+  color: #333;
+  text-decoration: none;
+}
+
+.vai-icon-sidebar-item.active {
+  background: #e8e0ff;
+  color: #8b5cf6;
+}
+
+.vai-with-icon-sidebar {
+  margin-left: 0 !important;
+  padding-left: 60px !important;
+}
+
+@media (max-width: 768px) {
+  /* Icon sidebar becomes compact horizontal bottom tab bar on mobile */
+  .vai-icon-sidebar {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 44px;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 0 0.5rem;
+    border-right: none;
+    border-top: 1px solid #dee2e6;
+    z-index: 1050;
+  }
+  .vai-icon-sidebar-item {
+    width: auto;
+    padding: 0.4rem 0.75rem;
+    margin-bottom: 0;
+    flex-direction: row;
+  }
+  .vai-icon-sidebar-item span {
+    display: none;
+  }
+  .vai-icon-sidebar-item i {
+    font-size: 1.1rem;
+    margin-bottom: 0;
+  }
+  .vai-with-icon-sidebar {
+    margin-left: 0 !important;
+    padding-left: 0 !important;
+    padding-bottom: 44px !important;
+  }
+  /* Reduce main-content min-height to account for bottom icon bar */
+  .vai-with-icon-sidebar.main-content-wrapper {
+    min-height: calc(100vh - 60px - 44px);
+    min-height: calc(100dvh - 60px - 44px);
+  }
+  .vai-with-icon-sidebar .main-content {
+    min-height: calc(100vh - 60px - 44px);
+    min-height: calc(100dvh - 60px - 44px);
+  }
+}
+
+/* === vAI Full-Page Chat === */
+.vai-chat-fullpage {
+  display: flex;
+  height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
+  background: #f8f9fa;
+}
+
+.vai-chat-fullpage .ai-chat-sidebar {
+  width: 270px;
+  min-width: 270px;
+  border-right: 1px solid #dee2e6;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.vai-chat-fullpage .ai-chat-sidebar-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.vai-chat-fullpage .ai-conversation-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.vai-chat-fullpage .ai-chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vai-chat-fullpage .ai-chat-conv-header {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  background: #fff;
+  display: flex;
+  align-items: center;
+}
+
+.vai-chat-fullpage .ai-chat-messages-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background: #f8f9fa;
+}
+
+.vai-chat-fullpage .ai-chat-input-area {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #dee2e6;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .vai-chat-fullpage {
+    height: calc(100vh - 60px - 44px); /* minus topnav + bottom tab bar */
+    height: calc(100dvh - 60px - 44px);
+  }
+  .vai-chat-fullpage .ai-chat-sidebar {
+    position: fixed;
+    left: -270px;
+    top: 60px;
+    bottom: 44px;
+    z-index: 1050;
+    transition: left 0.3s;
+  }
+  .vai-chat-fullpage .ai-chat-sidebar.show {
+    left: 0;
+  }
+}
+
+/* Sidebar backdrop overlay (mobile) — must be below sidebar (z-index: 1040) */
+.vai-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 44px;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1039;
+}
+
+/* === AI Generated Images in Chat === */
+.ai-generated-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.ai-generated-image-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  max-width: 300px;
+}
+
+.ai-generated-image-item img {
+  display: block;
+  max-width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  border-radius: 7px 7px 0 0;
+}
+
+.ai-generated-image-item img:hover {
+  opacity: 0.9;
+}
+
+.ai-generated-image-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  background: #f9fafb;
+  border-top: 1px solid #f0f0f0;
+}
+
+.ai-generated-image-actions .btn {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+}
+
+/* AI Image Lightbox (full-screen preview) */
+.ai-image-lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: aiLightboxFadeIn 0.2s ease;
+}
+
+@keyframes aiLightboxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ai-image-lightbox-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  cursor: default;
+  max-width: 90vw;
+  max-height: 90vh;
+}
+
+.ai-image-lightbox-content img {
+  max-width: 90vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.ai-image-lightbox-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ai-image-lightbox-actions .btn {
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 768px) {
+  .ai-generated-image-item {
+    max-width: 100%;
+  }
+  .ai-generated-image-item img {
+    max-height: 220px;
+  }
+}
+
+/* === AI Generated Document Card in Chat === */
+.ai-generated-doc-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ai-generated-doc-card:hover {
+  border-color: #ddd6fe;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+}
+
+.ai-doc-card-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.ai-doc-card-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ai-doc-card-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-doc-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.ai-doc-card-type {
+  font-weight: 500;
+}
+
+.ai-doc-card-size::before {
+  content: '\00B7';
+  margin-right: 0.5rem;
+}
+
+.ai-doc-card-download {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none !important;
+}
+
+@media (max-width: 768px) {
+  .ai-generated-doc-card {
+    padding: 0.6rem 0.75rem;
+    gap: 0.5rem;
+  }
+  .ai-doc-card-icon {
+    display: none;
+  }
+  .ai-doc-card-title {
+    font-size: 0.82rem;
+  }
+  .ai-doc-card-download {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+  }
+  .ai-doc-card-download .me-1 {
+    margin-right: 0 !important;
+  }
+}
+
+/* === AI Generated Video Card in Chat === */
+.ai-generated-video-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  flex-wrap: wrap;
+}
+
+.ai-generated-video-card:hover {
+  border-color: #c4b5fd;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.12);
+}
+
+/* When video is done, card becomes vertical layout with player on top */
+.ai-generated-video-card[data-video-status="done"] {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+
+.ai-video-card-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: #ede9fe;
+  border-radius: 8px;
+  color: #8b5cf6;
+}
+
+.ai-video-card-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ai-video-card-title {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-video-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2px;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.ai-video-card-spec {
+  font-weight: 500;
+}
+
+.ai-video-card-status {
+  font-weight: 500;
+}
+
+.ai-video-card-player {
+  width: 100%;
+  line-height: 0;
+}
+
+.ai-video-card-player video {
+  width: 100%;
+  display: block;
+  border-radius: 10px 10px 0 0;
+}
+
+.ai-video-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+}
+
+.ai-video-card-download {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none !important;
+}
+
+.ai-video-card-hint {
+  width: 100%;
+  padding: 0.4rem 0.75rem 0;
+  font-size: 0.78rem;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  margin-top: 0.3rem;
+}
+.ai-video-card-hint a {
+  color: #198754;
+  text-decoration: none;
+  font-weight: 500;
+}
+.ai-video-card-hint a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .ai-generated-video-card {
+    padding: 0.6rem 0.75rem;
+    gap: 0.5rem;
+  }
+  .ai-generated-video-card[data-video-status="done"] {
+    padding: 0;
+  }
+  .ai-video-card-icon {
+    display: none;
+  }
+  .ai-video-card-title {
+    font-size: 0.82rem;
+  }
+  .ai-video-card-download {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+  }
+  .ai-video-card-footer {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* === vAI Sketch Tool === */
+.vai-sketch-page {
+  display: flex;
+  height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
+  background: #f8f9fa;
+}
+
+.vai-sketch-sidebar {
+  width: 270px;
+  min-width: 270px;
+  border-right: 1px solid #dee2e6;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.vai-sketch-sidebar-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Sidebar Tabs (My Sketches / Chat Generated) */
+.vai-sidebar-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.vai-sidebar-tab {
+  flex: 1;
+  border: none;
+  background: #f8f9fa;
+  color: #666;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 5px 4px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vai-sidebar-tab:not(:last-child) {
+  border-right: 1px solid #e0e0e0;
+}
+
+.vai-sidebar-tab:hover {
+  background: #eef0f4;
+  color: #444;
+}
+
+.vai-sidebar-tab.active {
+  background: #8b5cf6;
+  color: #fff;
+}
+
+/* Chat Generation Thumbnails in Sidebar */
+.vai-chat-gen-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.vai-chat-gen-thumb-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #bbb;
+  font-size: 0.9rem;
+}
+
+.vai-chat-gen-item {
+  font-size: 0.82rem;
+}
+
+.vai-sketch-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.vai-sketch-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s;
+  font-size: 0.85rem;
+}
+
+.vai-sketch-list-item:hover {
+  background: #f8f9fa;
+}
+
+.vai-sketch-list-item.active {
+  background: #e8e0ff;
+  color: #8b5cf6;
+}
+
+.vai-sketch-list-item i:first-child {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.vai-sketch-list-item .sketch-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.vai-sketch-list-item .sketch-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.vai-sketch-list-item .sketch-time {
+  font-size: 0.7rem;
+  color: #999;
+}
+
+/* Sketch Toolbar */
+.vai-sketch-toolbar {
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid #dee2e6;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.vai-sketch-toolbar .btn-group .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.vai-sketch-toolbar .btn-group .btn.active {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #fff;
+}
+
+.vai-color-input {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 1px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important;
+  cursor: pointer;
+}
+
+.vai-stroke-range {
+  height: 4px;
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* Aspect ratio select in toolbar */
+.vai-aspect-select {
+  width: auto !important;
+  min-width: 65px;
+  padding: 0.2rem 1.6rem 0.2rem 0.4rem !important;
+  font-size: 0.78rem !important;
+  height: 28px;
+}
+
+/* Main area — flex column to keep AI bar always at bottom */
+.vai-sketch-main {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Canvas + Properties row — fills remaining space between toolbar and AI bar */
+.vai-sketch-canvas-row {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Canvas wrapper */
+.vai-sketch-canvas-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #e9ecef;
+  min-width: 0;
+}
+
+/* Generating overlay — blocks canvas interaction during AI generation */
+.vai-sketch-generating-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.88);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.vai-sketch-generating-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.vai-sketch-generating-content p {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.vai-sketch-generating-content small {
+  font-size: 0.78rem;
+}
+
+/* ─── Image Library Overlay ─────────────────────────────────── */
+.vai-sketch-library-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.96);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 25;
+  overflow-y: auto;
+  padding: 2rem 1rem;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.vai-sketch-library-inner {
+  width: 100%;
+  max-width: 800px;
+}
+
+.vai-sketch-library-header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.vai-sketch-library-header h6 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.vai-sketch-library-header small {
+  font-size: 0.82rem;
+  color: #888;
+}
+
+.vai-sketch-library-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.vai-sketch-library-tab {
+  border: 1px solid #ddd;
+  background: #f8f9fa;
+  color: #555;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 4px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.vai-sketch-library-tab:hover {
+  background: #eef0f4;
+  border-color: #ccc;
+  color: #333;
+}
+
+.vai-sketch-library-tab.active {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #fff;
+}
+
+.vai-sketch-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.vai-sketch-library-item {
+  border-radius: 10px;
+  border: 2px solid #e8e8e8;
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+
+.vai-sketch-library-item:hover {
+  border-color: #8b5cf6;
+  box-shadow: 0 3px 12px rgba(139, 92, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.vai-sketch-library-item img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+}
+
+.vai-sketch-library-item-title {
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  color: #555;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Blank (skip) card */
+.vai-sketch-library-blank {
+  border-style: dashed;
+  border-color: #ccc;
+}
+
+.vai-sketch-library-blank:hover {
+  border-color: #8b5cf6;
+}
+
+.vai-sketch-library-blank-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3/4;
+  color: #aaa;
+  gap: 6px;
+}
+
+.vai-sketch-library-blank-inner i {
+  font-size: 2rem;
+}
+
+.vai-sketch-library-blank-inner span {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.vai-sketch-library-blank:hover .vai-sketch-library-blank-inner {
+  color: #8b5cf6;
+}
+
+/* Responsive: smaller cards on mobile */
+@media (max-width: 576px) {
+  .vai-sketch-library-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  .vai-sketch-library-overlay {
+    padding: 1rem 0.5rem;
+  }
+}
+
+/* Aspect Ratio Prompt Modal */
+.vai-ratio-prompt-content {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Attachment preview (reference image above prompt bar) */
+.vai-sketch-attach-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.vai-sketch-attach-item {
+  position: relative;
+  display: inline-block;
+}
+.vai-sketch-attach-preview img,
+.vai-sketch-attach-item img {
+  height: 56px;
+  max-width: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+}
+.vai-sketch-attach-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: #dc3545;
+  color: #fff;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.vai-sketch-attach-remove:hover {
+  background: #b02a37;
+}
+.vai-sketch-attach-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  border: 2px dashed #bbb;
+  color: #888;
+  font-size: 24px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.vai-sketch-attach-add:hover {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.vai-sketch-canvas-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #e9ecef;
+  min-width: 0;
+}
+
+.vai-sketch-canvas-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+}
+
+.vai-sketch-text-input {
+  position: absolute;
+  min-width: 120px;
+  min-height: 30px;
+  max-width: 400px;
+  max-height: 200px;
+  font-size: 16px;
+  font-family: sans-serif;
+  border: 1px dashed #8b5cf6;
+  background: rgba(255,255,255,0.95);
+  padding: 4px 6px;
+  outline: none;
+  resize: both;
+  z-index: 10;
+}
+
+/* Image Picker Modal — Product Grid */
+.vai-product-img-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.vai-product-img-item {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: #fafafa;
+}
+
+.vai-product-img-item:hover {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+}
+
+.vai-product-img-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.vai-product-img-name {
+  padding: 4px 6px;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #555;
+  text-align: center;
+}
+
+/* Upload Dropzone */
+.vai-upload-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.vai-upload-dropzone:hover {
+  border-color: #8b5cf6;
+  background: #f8f8ff;
+}
+
+/* AI Generate Bar — always stick to bottom, never shrink */
+#vaiSketchAiBar {
+  flex-shrink: 0;
+  position: relative;
+}
+
+.vai-sketch-ai-bar {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid #dee2e6;
+  background: #fff;
+}
+
+.vai-sketch-ai-bar input {
+  flex: 1;
+}
+
+/* Sketch prompt textarea — same style as #aiMessageInput */
+#vaiSketchPrompt {
+  border-radius: 0.375rem 0 0 0.375rem;
+  padding: 0.75rem 1rem;
+  border-right: none;
+}
+#vaiSketchPrompt:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+  border-right: none;
+}
+
+/* History button — seamless between textarea and send button */
+#vaiSketchHistoryBtn {
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  border-color: #dee2e6;
+  color: #6c757d;
+}
+#vaiSketchHistoryBtn:hover {
+  border-color: #dee2e6;
+  background: #f8f9fa;
+  color: #495057;
+}
+#vaiSketchHistoryBtn:focus {
+  border-color: #8b5cf6;
+  box-shadow: none;
+}
+#vaiSketchHistoryBtn.active {
+  background: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+}
+
+/* Send (generate) button — matches #aiSendButton style, purple/indigo color */
+#vaiSketchGenBtn {
+  border-radius: 0 0.375rem 0.375rem 0;
+  border-left: none;
+}
+#vaiSketchGenBtn.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%) !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  transition: all 0.2s ease;
+}
+#vaiSketchGenBtn.btn-primary:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+  transform: translateY(-1px);
+}
+#vaiSketchGenBtn.btn-primary:active {
+  transform: translateY(0);
+}
+#vaiSketchGenBtn.btn-primary:focus,
+#vaiSketchGenBtn.btn-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25), 0 6px 16px rgba(139, 92, 246, 0.2);
+}
+
+/* vai-sketch STT mic button — rightmost, matches generate button gradient */
+.vai-stt-btn.btn-primary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%) !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 0 0.375rem 0.375rem 0;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  transition: all 0.2s ease;
+}
+.vai-stt-btn.btn-primary:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%) !important;
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+}
+.vai-stt-btn.btn-primary.btn-danger,
+.vai-stt-btn.btn-primary.recording {
+  background: #dc3545 !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+.vai-sketch-ai-result {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.vai-sketch-ai-result-img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+/* Generation History Panel — floats above AI bar, does not affect canvas size */
+.vai-sketch-gen-history {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 4px;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  max-height: 50vh;
+  overflow-y: auto;
+  z-index: 20;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.vai-sketch-gen-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vai-gen-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #eee;
+  cursor: default;
+  transition: background 0.15s;
+}
+
+.vai-gen-history-item:hover {
+  background: #f5f5ff;
+}
+
+.vai-gen-history-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.vai-gen-history-thumb-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #aaa;
+  font-size: 1rem;
+}
+
+.vai-gen-history-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.vai-gen-history-prompt {
+  font-size: 0.8rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333;
+}
+
+.vai-gen-history-time {
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 2px;
+}
+
+.vai-gen-history-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+/* Properties Panel (right side, shown on object select) */
+.vai-sketch-props {
+  width: 220px;
+  min-width: 220px;
+  border-left: 1px solid #dee2e6;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.2s, min-width 0.2s, opacity 0.2s;
+}
+
+.vai-sketch-props-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.vai-sketch-props-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.6rem 0.75rem;
+}
+
+.vai-sketch-props-body label {
+  font-size: 0.75rem;
+  color: #6c757d;
+  margin-bottom: 0.15rem;
+  display: block;
+}
+
+.vai-sketch-props-body .form-control,
+.vai-sketch-props-body .form-select {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.4rem;
+}
+
+.vai-sketch-props-body .form-control-color {
+  width: 100% !important;
+  height: 28px !important;
+  padding: 2px !important;
+}
+
+.vai-sketch-props-body .props-section {
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.vai-sketch-props-body .props-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.vai-sketch-props-body .props-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.vai-sketch-props-body .props-row > div {
+  flex: 1;
+}
+
+.vai-sketch-props-footer {
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+/* Sketch page responsive */
+@media (max-width: 768px) {
+  .vai-sketch-page {
+    height: calc(100vh - 60px - 44px); /* minus topnav + bottom tab bar */
+    height: calc(100dvh - 60px - 44px);
+  }
+  .vai-sketch-sidebar {
+    position: fixed;
+    left: 0;
+    top: 56px;
+    bottom: 0;
+    z-index: 1040;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 270px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+  .vai-sketch-sidebar.show {
+    transform: translateX(0);
+  }
+  .vai-sketch-toolbar {
+    padding: 0.25rem 0.4rem;
+  }
+  .vai-sketch-toolbar > .d-flex {
+    flex-wrap: nowrap;
+    gap: 0.2rem !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .vai-sketch-toolbar > .d-flex::-webkit-scrollbar {
+    display: none;
+  }
+  .vai-sketch-toolbar .vr {
+    display: none;
+  }
+  .vai-sketch-toolbar .vai-stroke-range {
+    width: 40px !important;
+  }
+  .vai-sketch-toolbar label.small {
+    display: none !important;
+  }
+  .vai-sketch-toolbar .vai-aspect-select {
+    min-width: 55px;
+    font-size: 0.72rem !important;
+    padding: 0.15rem 1.4rem 0.15rem 0.3rem !important;
+  }
+  .vai-sketch-toolbar .vai-color-input {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .vai-sketch-toolbar .btn-group .btn {
+    padding: 0.2rem 0.35rem;
+    font-size: 0.8rem;
+  }
+  .vai-sketch-toolbar .btn-sm {
+    padding: 0.2rem 0.35rem;
+    font-size: 0.8rem;
+  }
+  #vaiSketchStrokeWidthLabel {
+    display: none;
+  }
+  .vai-sketch-props {
+    display: none !important;
+  }
+  /* AI bar compact on mobile */
+  .vai-sketch-ai-bar,
+  #vaiSketchAiBar {
+    padding: 0.4rem 0.5rem !important;
+  }
+}
+
+/* ─── vAI Video Page ─────────────────────────────────────────── */
+
+.vai-video-page {
+  display: flex;
+  height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
+}
+
+.vai-video-sidebar {
+  width: 270px;
+  min-width: 270px;
+  border-right: 1px solid #e0e0e0;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.vai-video-sidebar-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.vai-video-sidebar-footer {
+  padding: 0.75rem;
+  border-top: 1px solid #eee;
+  background: #fff;
+}
+
+/* History list in sidebar */
+.vai-video-history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.25rem 0;
+}
+
+.vai-history-item {
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.vai-history-item:hover {
+  background: #f0f4ff;
+}
+
+.vai-history-item.active {
+  background: #e8eeff;
+  border-left-color: #8b5cf6;
+}
+
+.vai-history-delete {
+  opacity: 0.5;
+  color: #dc3545 !important;
+  transition: opacity 0.15s;
+}
+
+.vai-history-item:hover .vai-history-delete,
+.vai-history-delete:hover {
+  opacity: 1;
+}
+
+/* Shot strip (horizontal chips) */
+.vai-video-shot-strip {
+  border-bottom: 1px solid #eee;
+  background: #fafafa;
+  padding: 0.5rem 1rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.vai-shot-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 16px;
+  border: 1px solid #dee2e6;
+  background: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vai-shot-chip:hover {
+  background: #f0f4ff;
+  border-color: #c4b5fd;
+}
+
+.vai-shot-chip.active {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #fff;
+}
+
+.vai-shot-chip-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 16px;
+  border: 1px dashed #adb5bd;
+  background: transparent;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #6c757d;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vai-shot-chip-add:hover {
+  border-color: #8b5cf6;
+  color: #8b5cf6;
+}
+
+.vai-shot-chip-chat {
+  gap: 0.35rem;
+  border-color: #c4b5fd;
+  color: #7c3aed;
+  font-weight: 500;
+}
+
+.vai-shot-chip-chat:hover {
+  background: #f5f3ff;
+  border-color: #8b5cf6;
+}
+
+.vai-shot-chip-chat.active {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #fff;
+}
+
+/* Main editor area */
+.vai-video-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.vai-video-toolbar {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.vai-video-editor {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.vai-video-shot-editor {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.vai-video-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 300px;
+  color: #6c757d;
+}
+
+.vai-video-section {
+  margin-bottom: 1.5rem;
+}
+
+.vai-video-section label {
+  display: block;
+}
+
+/* Reference image preview */
+.vai-video-ref-preview {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.vai-video-ref-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  gap: 0.5rem;
+}
+
+.vai-video-ref-img-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.vai-video-ref-img-wrapper img {
+  max-width: 100%;
+  max-height: 200px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 6px;
+}
+
+.vai-video-ref-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  border-radius: 50%;
+}
+
+/* Video preview */
+.vai-video-preview {
+  margin-top: 1rem;
+}
+
+.vai-video-preview video {
+  background: #000;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Progress bar */
+.vai-video-progress {
+  margin-bottom: 1rem;
+}
+
+/* Combined result */
+.vai-video-combined video {
+  background: #000;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ─── vAI Video Chat Mode ────────────────────────────────────── */
+
+.vai-video-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.vai-video-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  background: #f8f9fa;
+  position: relative;
+}
+
+/* Reuse vai-chat's .message-bubble styles (defined in custom.css).
+   No custom bubble classes needed — vai-video chat now renders
+   the same d-flex + .message-bubble + .avatar-circle HTML as vai-chat. */
+
+/* Suggestions */
+.vai-chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.vai-chat-suggestion {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.vai-chat-suggestion:hover {
+  background: #f0e7ff;
+  border-color: #8b5cf6;
+  color: #7c3aed;
+}
+
+/* Storyboard card in chat */
+.vai-chat-storyboard {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.vai-chat-storyboard-header {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f8f0ff, #eef2ff);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.vai-chat-storyboard-header h6 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.vai-chat-storyboard-header small {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.vai-chat-storyboard-shots {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.vai-chat-storyboard-shot {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s ease;
+}
+
+.vai-chat-storyboard-shot:last-child {
+  border-bottom: none;
+}
+
+.vai-chat-storyboard-shot:hover {
+  background: #fafbfc;
+}
+
+.vai-chat-storyboard-shot-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vai-chat-storyboard-shot-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.vai-chat-storyboard-shot-desc {
+  font-size: 0.8rem;
+  color: #334155;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+
+.vai-chat-storyboard-shot-meta {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.vai-chat-storyboard-shot-meta span {
+  margin-right: 0.75rem;
+}
+
+.vai-chat-storyboard-actions {
+  padding: 0.75rem 1rem;
+  background: #fafbfc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Storyboard card (new chat-first UX classes) */
+.vai-storyboard-card {
+  background: #fff !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.vai-storyboard-header {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f8f0ff, #eef2ff);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.vai-storyboard-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.vai-storyboard-summary {
+  font-size: 0.8rem;
+  color: #475569;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+
+.vai-storyboard-meta {
+  font-size: 0.75rem;
+}
+
+.vai-storyboard-shots {
+  padding: 0;
+  margin: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.vai-storyboard-shot {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s ease;
+}
+
+.vai-storyboard-shot:last-child {
+  border-bottom: none;
+}
+
+.vai-storyboard-shot:hover {
+  background: #fafbfc;
+}
+
+.vai-storyboard-shot-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vai-storyboard-shot-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.vai-storyboard-shot-desc {
+  font-size: 0.8rem;
+  color: #334155;
+  line-height: 1.4;
+  margin-bottom: 0.25rem;
+}
+
+.vai-storyboard-shot-meta {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.vai-storyboard-narration {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-style: italic;
+  margin-top: 0.25rem;
+  line-height: 1.3;
+}
+
+.vai-storyboard-actions {
+  padding: 0.75rem 1rem;
+  background: #fafbfc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Shot type badges */
+.vai-shot-type-scene {
+  background: #8b5cf6 !important;
+  color: #fff !important;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.vai-shot-type-talking {
+  background: #f59e0b !important;
+  color: #fff !important;
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.vai-shot-num-talking {
+  background: #f59e0b !important;
+}
+
+.vai-storyboard-dialogue {
+  font-size: 0.75rem;
+  color: #92400e;
+  background: #fffbeb;
+  border-left: 3px solid #f59e0b;
+  padding: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+  line-height: 1.3;
+  border-radius: 0 4px 4px 0;
+}
+
+.vai-storyboard-character {
+  font-size: 0.7rem;
+  color: #78716c;
+  margin-top: 0.2rem;
+}
+
+/* Character reference image cards (between header and shots) */
+.vai-storyboard-characters {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fefefe;
+}
+
+.vai-character-card {
+  transition: box-shadow 0.15s ease;
+}
+
+.vai-character-card:hover {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* Generation overlay on storyboard card */
+.vai-gen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 12px;
+}
+
+.vai-gen-overlay-content {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.vai-gen-overlay-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  width: 200px;
+  margin: 0 auto;
+}
+
+.vai-gen-overlay-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* Talking shot generation progress */
+.vai-tts-progress {
+  font-size: 0.7rem;
+  color: #6366f1;
+  margin-top: 0.25rem;
+}
+
+.vai-lipsync-progress {
+  font-size: 0.7rem;
+  color: #f59e0b;
+  margin-top: 0.25rem;
+}
+
+/* Typing indicator (3 dots animation) */
+/* Batch generation progress */
+/* Progress indicator (inside chat bubble) */
+.vai-batch-progress {
+  padding: 0.25rem 0;
+  min-width: 220px;
+}
+
+.vai-batch-progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.vai-batch-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b5cf6, #6d28d9);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.vai-batch-progress-text {
+  font-size: 0.75rem;
+}
+
+/* Per-shot progress cards in chat view */
+.vai-gen-shot-card {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  margin-bottom: 0.3rem;
+  background: #fafafa;
+  transition: border-color 0.2s;
+}
+.vai-gen-shot-card:has(.spinner-border) {
+  border-color: #86b7fe;
+  background: #f0f7ff;
+}
+.vai-gen-shot-card:has(.text-success) {
+  border-color: #a3cfbb;
+  background: #f0faf4;
+}
+.vai-gen-shot-card:has(.text-danger) {
+  border-color: #f1aeb5;
+  background: #fdf0f0;
+}
+.vai-gen-shot-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Video generation history panel (combined videos) */
+.vai-video-gen-history {
+  position: relative;
+  margin-top: 4px;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  max-height: 50vh;
+  overflow-y: auto;
+  z-index: 20;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.vai-video-gen-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vai-chat-select {
+  width: auto !important;
+  font-size: 0.75rem !important;
+  padding: 0.2rem 1.8rem 0.2rem 0.5rem !important;
+  background-position: right 0.4rem center !important;
+  background-size: 12px 12px !important;
+  border-color: #e2e8f0;
+}
+
+/* Image thumbnail style in attachment preview */
+.vai-attach-thumb {
+  position: relative;
+  padding: 2px !important;
+  max-width: none;
+}
+.vai-attach-thumb-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  display: block;
+}
+.vai-attach-thumb .remove-file {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  color: #6c757d;
+}
+.vai-attach-thumb .remove-file:hover {
+  color: #dc3545;
+  background: #fff5f5;
+}
+
+/* Typing indicator */
+.vai-chat-typing {
+  display: flex;
+  gap: 4px;
+  padding: 0.5rem 0;
+}
+
+.vai-chat-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #94a3b8;
+  animation: vaiTypingBounce 1.4s infinite ease-in-out both;
+}
+
+.vai-chat-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.vai-chat-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* Generation progress in chat */
+.vai-chat-gen-progress {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.vai-chat-gen-shot {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  font-size: 0.8rem;
+}
+
+.vai-chat-gen-shot .badge {
+  font-size: 0.65rem;
+  min-width: 48px;
+}
+
+/* ─── vAI Video Card-Based Storyboard Editor ────────────────── */
+
+.vai-edit-shot-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px !important;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.vai-edit-shot-card:hover {
+  border-color: #c4b5fd;
+}
+
+.vai-edit-shot-card .card-body {
+  padding: 0.5rem !important;
+}
+
+.vai-edit-shot-card .vai-edit-shot-num {
+  font-size: 0.7rem;
+  min-width: 24px;
+  text-align: center;
+}
+
+.vai-edit-shot-card .form-select-sm,
+.vai-edit-shot-card .form-control-sm {
+  font-size: 0.8rem !important;
+  padding: 0.2rem 0.4rem;
+}
+
+.vai-edit-shot-card textarea.form-control-sm {
+  font-size: 0.82rem !important;
+  line-height: 1.4;
+  resize: vertical;
+  min-height: 36px;
+}
+
+.vai-edit-shot-card .form-label {
+  font-size: 0.72rem !important;
+  font-weight: 500;
+}
+
+.vai-edit-shot-card .vai-edit-shot-delete {
+  opacity: 0.5;
+  transition: opacity 0.15s;
+}
+
+.vai-edit-shot-card:hover .vai-edit-shot-delete {
+  opacity: 1;
+}
+
+/* ─── vAI Video Mobile Responsive ───────────────────────────── */
+
+@media (max-width: 767.98px) {
+  .vai-video-page {
+    height: calc(100vh - 60px - 44px); /* minus topnav + bottom icon bar */
+    height: calc(100dvh - 60px - 44px);
+  }
+  .vai-video-sidebar {
+    position: fixed;
+    left: 0;
+    top: 60px;
+    bottom: 44px;
+    z-index: 1040;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 270px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+  .vai-video-sidebar.show {
+    transform: translateX(0);
+  }
+  .vai-video-shot-editor {
+    padding: 1rem;
+  }
+  .vai-video-ref-img-wrapper img {
+    max-height: 150px;
+  }
+  /* Shot strip: smooth horizontal scroll, hide scrollbar */
+  .vai-video-shot-strip {
+    padding: 0.35rem 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .vai-video-shot-strip::-webkit-scrollbar {
+    display: none;
+  }
+  .vai-video-shot-strip {
+    scrollbar-width: none;
+  }
+  .vai-shot-chip {
+    min-width: 32px;
+    height: 28px;
+    font-size: 0.72rem;
+    padding: 0 0.5rem;
+  }
+  .vai-shot-chip-chat {
+    font-size: 0.72rem;
+    padding: 0 0.6rem;
+    height: 28px;
+  }
+  /* Chat messages: smooth scroll, tighter padding */
+  .vai-video-chat-messages {
+    padding: 0.75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .vai-chat-storyboard-shot {
+    padding: 0.5rem 0.75rem;
+  }
+  /* Quick settings row compact on mobile */
+  .vai-chat-select {
+    font-size: 0.72rem;
+    padding: 0.15rem 0.3rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   vAI Document Generation Page
+   ═══════════════════════════════════════════════════════════════ */
+
+.vai-docs-page {
+  display: flex;
+  height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
+  background: #f8f9fa;
+}
+
+.vai-docs-sidebar {
+  width: 270px;
+  min-width: 270px;
+  border-right: 1px solid #dee2e6;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.vai-docs-sidebar-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.vai-docs-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.vai-docs-list-item {
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f5f5f5;
+  transition: background 0.15s;
+  font-size: 0.85rem;
+}
+
+.vai-docs-list-item:hover {
+  background: #f8f9fa;
+}
+
+.vai-docs-list-item.active {
+  background: #e8e0ff;
+}
+
+.vai-docs-list-item .doc-title {
+  font-weight: 500;
+  font-size: 0.82rem;
+}
+
+.vai-docs-list-item .doc-meta {
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
+/* Main content area */
+.vai-docs-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.vai-docs-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  background: #fff;
+}
+
+.vai-docs-form {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.vai-docs-form-inner {
+  width: 100%;
+  max-width: 820px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.vai-docs-detail {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.vai-docs-detail-inner {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Document type selector */
+.vai-doc-type-selector {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.vai-doc-type-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1rem 0.5rem;
+  border: 2px solid #dee2e6;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.vai-doc-type-option:hover {
+  border-color: #adb5bd;
+  background: #f8f9fa;
+}
+
+.vai-doc-type-option.active {
+  border-color: #8b5cf6;
+  background: #f0edff;
+}
+
+.vai-doc-type-option i {
+  font-size: 1.8rem;
+}
+
+/* ─── vAI Docs Mobile Responsive ───────────────────────────── */
+
+@media (max-width: 767.98px) {
+  .vai-docs-sidebar {
+    position: fixed;
+    left: 0;
+    top: 56px;
+    bottom: 0;
+    z-index: 1040;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 270px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  }
+  .vai-docs-sidebar.show {
+    transform: translateX(0);
+  }
+  .vai-docs-form {
+    padding: 1rem;
+  }
+  .vai-docs-form-inner {
+    padding: 1.25rem;
+  }
+  .vai-docs-detail {
+    padding: 1rem;
+  }
+  .vai-doc-type-selector {
+    gap: 0.5rem;
+  }
+  .vai-doc-type-option {
+    padding: 0.75rem 0.25rem;
+    font-size: 0.78rem;
+  }
+  .vai-doc-type-option i {
+    font-size: 1.4rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   vAI Application Center Page
+   ═══════════════════════════════════════════════════════════════ */
+
+.vai-apps-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
+  background: #f8f9fa;
+}
+
+.vai-apps-header {
+  padding: 1.5rem 2rem 0;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.vai-apps-header-inner {
+}
+
+/* Search */
+.vai-apps-search-wrapper {
+  position: relative;
+  max-width: 400px;
+  margin-bottom: 1rem;
+}
+
+.vai-apps-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.vai-apps-search {
+  padding-left: 36px !important;
+  border-radius: 20px !important;
+  border: 1px solid #dee2e6 !important;
+  font-size: 0.9rem !important;
+  height: 38px;
+}
+
+.vai-apps-search:focus {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 0.15rem rgba(139, 92, 246, 0.15) !important;
+}
+
+/* Category Tabs */
+.vai-apps-categories {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.vai-apps-categories::-webkit-scrollbar {
+  display: none;
+}
+
+.vai-apps-categories-inner {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 2rem;
+  white-space: nowrap;
+}
+
+.vai-apps-category-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  border: 1px solid #dee2e6;
+  background: #fff;
+  color: #495057;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vai-apps-category-btn:hover {
+  background: #f0f0f0;
+  border-color: #adb5bd;
+}
+
+.vai-apps-category-btn.active {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+  color: #fff;
+}
+
+.vai-apps-category-btn i {
+  font-size: 0.9rem;
+}
+
+/* Apps Grid */
+.vai-apps-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+}
+
+.vai-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+/* Category Section Title in Grid */
+.vai-apps-section-title {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid #eee;
+}
+
+.vai-apps-section-title:first-child {
+  margin-top: 0;
+}
+
+.vai-apps-section-title i {
+  font-size: 1.1rem;
+  color: #8b5cf6;
+}
+
+.vai-apps-section-title span {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.vai-apps-section-count {
+  font-size: 0.75rem;
+  color: #999;
+  margin-left: auto;
+}
+
+/* App Card */
+.vai-app-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+
+.vai-app-card:hover {
+  border-color: #ddd6fe;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.1);
+  transform: translateY(-1px);
+  color: inherit;
+  text-decoration: none;
+}
+
+.vai-app-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.vai-app-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.vai-app-card-name {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #1f2937;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vai-app-card-desc {
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Empty State */
+.vai-apps-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+  text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .vai-apps-page {
+    height: calc(100vh - 60px - 44px);
+    height: calc(100dvh - 60px - 44px);
+  }
+
+  .vai-apps-header {
+    padding: 1rem 1rem 0;
+  }
+
+  .vai-apps-categories-inner {
+    padding: 0.5rem 1rem;
+  }
+
+  .vai-apps-content {
+    padding: 1rem;
+  }
+
+  .vai-apps-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .vai-apps-search-wrapper {
+    max-width: 100%;
+  }
+}
+
+/* ── Bootstrap btn-primary / btn-outline-primary → purple override (vAi pages only) ── */
+.vai-chat-page .btn-primary,
+.vai-chat-fullpage .btn-primary,
+.vai-sketch-page .btn-primary,
+.vai-video-page .btn-primary,
+.vai-docs-page .btn-primary,
+.vai-apps-page .btn-primary,
+body.vai-page .btn-primary {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  color: #fff !important;
+}
+
+.vai-chat-page .btn-primary:hover,
+.vai-chat-fullpage .btn-primary:hover,
+.vai-sketch-page .btn-primary:hover,
+.vai-video-page .btn-primary:hover,
+.vai-docs-page .btn-primary:hover,
+.vai-apps-page .btn-primary:hover,
+body.vai-page .btn-primary:hover {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #fff !important;
+}
+
+.vai-chat-page .btn-primary:focus,
+.vai-chat-fullpage .btn-primary:focus,
+.vai-sketch-page .btn-primary:focus,
+.vai-video-page .btn-primary:focus,
+.vai-docs-page .btn-primary:focus,
+.vai-apps-page .btn-primary:focus,
+body.vai-page .btn-primary:focus,
+.vai-chat-page .btn-primary:focus-visible,
+.vai-chat-fullpage .btn-primary:focus-visible,
+.vai-sketch-page .btn-primary:focus-visible,
+.vai-video-page .btn-primary:focus-visible,
+.vai-docs-page .btn-primary:focus-visible,
+.vai-apps-page .btn-primary:focus-visible,
+body.vai-page .btn-primary:focus-visible {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.5) !important;
+  color: #fff !important;
+}
+
+.vai-chat-page .btn-primary:active,
+.vai-chat-page .btn-primary.active,
+.vai-chat-fullpage .btn-primary:active,
+.vai-chat-fullpage .btn-primary.active,
+.vai-sketch-page .btn-primary:active,
+.vai-sketch-page .btn-primary.active,
+.vai-video-page .btn-primary:active,
+.vai-video-page .btn-primary.active,
+.vai-docs-page .btn-primary:active,
+.vai-docs-page .btn-primary.active,
+.vai-apps-page .btn-primary:active,
+.vai-apps-page .btn-primary.active,
+body.vai-page .btn-primary:active,
+body.vai-page .btn-primary.active {
+  background-color: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+  color: #fff !important;
+}
+
+.vai-chat-page .btn-primary.disabled,
+.vai-chat-page .btn-primary:disabled,
+.vai-chat-fullpage .btn-primary.disabled,
+.vai-chat-fullpage .btn-primary:disabled,
+.vai-sketch-page .btn-primary.disabled,
+.vai-sketch-page .btn-primary:disabled,
+.vai-video-page .btn-primary.disabled,
+.vai-video-page .btn-primary:disabled,
+.vai-docs-page .btn-primary.disabled,
+.vai-docs-page .btn-primary:disabled,
+.vai-apps-page .btn-primary.disabled,
+.vai-apps-page .btn-primary:disabled,
+body.vai-page .btn-primary.disabled,
+body.vai-page .btn-primary:disabled {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  opacity: 0.65;
+  color: #fff !important;
+}
+
+/* btn-outline-primary → purple */
+.vai-chat-page .btn-outline-primary,
+.vai-chat-fullpage .btn-outline-primary,
+.vai-sketch-page .btn-outline-primary,
+.vai-video-page .btn-outline-primary,
+.vai-docs-page .btn-outline-primary,
+.vai-apps-page .btn-outline-primary,
+body.vai-page .btn-outline-primary {
+  color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  background-color: transparent !important;
+}
+
+.vai-chat-page .btn-outline-primary:hover,
+.vai-chat-fullpage .btn-outline-primary:hover,
+.vai-sketch-page .btn-outline-primary:hover,
+.vai-video-page .btn-outline-primary:hover,
+.vai-docs-page .btn-outline-primary:hover,
+.vai-apps-page .btn-outline-primary:hover,
+body.vai-page .btn-outline-primary:hover {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  color: #fff !important;
+}
+
+.vai-chat-page .btn-outline-primary:focus,
+.vai-chat-fullpage .btn-outline-primary:focus,
+.vai-sketch-page .btn-outline-primary:focus,
+.vai-video-page .btn-outline-primary:focus,
+.vai-docs-page .btn-outline-primary:focus,
+.vai-apps-page .btn-outline-primary:focus,
+body.vai-page .btn-outline-primary:focus,
+.vai-chat-page .btn-outline-primary:focus-visible,
+.vai-chat-fullpage .btn-outline-primary:focus-visible,
+.vai-sketch-page .btn-outline-primary:focus-visible,
+.vai-video-page .btn-outline-primary:focus-visible,
+.vai-docs-page .btn-outline-primary:focus-visible,
+.vai-apps-page .btn-outline-primary:focus-visible,
+body.vai-page .btn-outline-primary:focus-visible {
+  box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.5) !important;
+}
+
+.vai-chat-page .btn-outline-primary:active,
+.vai-chat-page .btn-outline-primary.active,
+.vai-chat-fullpage .btn-outline-primary:active,
+.vai-chat-fullpage .btn-outline-primary.active,
+.vai-sketch-page .btn-outline-primary:active,
+.vai-sketch-page .btn-outline-primary.active,
+.vai-video-page .btn-outline-primary:active,
+.vai-video-page .btn-outline-primary.active,
+.vai-docs-page .btn-outline-primary:active,
+.vai-docs-page .btn-outline-primary.active,
+.vai-apps-page .btn-outline-primary:active,
+.vai-apps-page .btn-outline-primary.active,
+body.vai-page .btn-outline-primary:active,
+body.vai-page .btn-outline-primary.active {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #fff !important;
+}
+
+.vai-chat-page .btn-outline-primary.disabled,
+.vai-chat-page .btn-outline-primary:disabled,
+.vai-chat-fullpage .btn-outline-primary.disabled,
+.vai-chat-fullpage .btn-outline-primary:disabled,
+.vai-sketch-page .btn-outline-primary.disabled,
+.vai-sketch-page .btn-outline-primary:disabled,
+.vai-video-page .btn-outline-primary.disabled,
+.vai-video-page .btn-outline-primary:disabled,
+.vai-docs-page .btn-outline-primary.disabled,
+.vai-docs-page .btn-outline-primary:disabled,
+.vai-apps-page .btn-outline-primary.disabled,
+.vai-apps-page .btn-outline-primary:disabled,
+body.vai-page .btn-outline-primary.disabled,
+body.vai-page .btn-outline-primary:disabled {
+  color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  background-color: transparent !important;
+  opacity: 0.65;
+}
+
+/* ── Tenant switch modal (outside .vai-chat-page container on standalone chat page) ── */
+#tenantSwitchModal .btn-primary {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  color: #fff !important;
+}
+#tenantSwitchModal .btn-primary:hover {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+}
+#tenantSwitchModal .btn-primary:focus,
+#tenantSwitchModal .btn-primary:focus-visible {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.5) !important;
+}
+#tenantSwitchModal .btn-primary:active {
+  background-color: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+#tenantSwitchModal .btn-outline-primary {
+  color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  background-color: transparent !important;
+}
+#tenantSwitchModal .btn-outline-primary:hover {
+  background-color: #8b5cf6 !important;
+  border-color: #8b5cf6 !important;
+  color: #fff !important;
+}
+#tenantSwitchModal .btn-outline-primary:active {
+  background-color: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #fff !important;
+}

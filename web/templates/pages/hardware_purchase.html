@@ -1,0 +1,257 @@
+{{ define "pages/hardware_purchase" }}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4 class="mb-1" data-i18n="hardware.title">硬件</h4>
+      <div class="text-muted small" data-i18n="hardware.subtitle">可單獨選購元件，或一鍵選取套餐後結帳。</div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" id="checkoutBtn" type="button" data-i18n="hardware.checkout">前往結帳</button>
+    </div>
+  </div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <button class="btn btn-outline-primary btn-sm" id="posBundleBtn" type="button" onclick="selectBundle('pos')" data-i18n="hardware.posBundle">選取 POS 機套餐</button>
+      <button class="btn btn-outline-primary btn-sm" id="kioskBundleBtn" type="button" onclick="selectBundle('kiosk')" data-i18n="hardware.kioskBundle">選取自助機 Kiosk 套餐</button>
+      <button class="btn btn-outline-secondary btn-sm" type="button" onclick="clearSelection()" data-i18n="hardware.clearSelection">清除選擇</button>
+    </div>
+    <div id="hardwareCatalog" class="row g-3"></div>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header">
+    <h6 class="mb-0" data-i18n="hardware.purchaseRecords">購買記錄</h6>
+  </div>
+  <div class="card-body" id="purchaseRecords">
+    <div class="text-muted" data-i18n="common.loading">載入中...</div>
+  </div>
+</div>
+
+<script>
+  let hardwareCatalog = [];
+  let selectedItems = new Map();
+  let selectedBundle = '';
+
+  function getSelectedPayload() {
+    const items = [];
+    selectedItems.forEach((qty, id) => {
+      if (!id) return;
+      items.push({ id, quantity: qty || 1 });
+    });
+    return items;
+  }
+
+  function selectBundle(group) {
+    selectedItems.clear();
+    selectedBundle = group;
+    hardwareCatalog.filter(it => it.group === group || it.group === 'shared').forEach(it => {
+      selectedItems.set(it.id, 1);
+    });
+    renderCatalog();
+  }
+
+  function clearSelection() {
+    selectedItems.clear();
+    selectedBundle = '';
+    renderCatalog();
+  }
+
+  function updateSelected(id, checked) {
+    if (checked) {
+      const qty = Number(document.getElementById(`qty_${id}`)?.value || 1);
+      selectedItems.set(id, qty);
+    } else {
+      selectedItems.delete(id);
+    }
+  }
+
+  function updateQuantity(id, value) {
+    if (!selectedItems.has(id)) return;
+    const qty = Math.max(1, Number(value || 1));
+    selectedItems.set(id, qty);
+  }
+
+  function getLocalizedName(itemId) {
+    const translated = I18n.t('hardware.catalog.' + itemId);
+    // 如果翻譯結果等於 key 本身，表示沒找到翻譯，返回 itemId
+    return (translated && translated !== 'hardware.catalog.' + itemId) ? translated : itemId;
+  }
+
+  function getLocalizedDesc(itemId) {
+    const translated = I18n.t('hardware.catalogDesc.' + itemId);
+    return (translated && translated !== 'hardware.catalogDesc.' + itemId) ? translated : '';
+  }
+
+  function renderCatalog() {
+    const container = document.getElementById('hardwareCatalog');
+    if (!container) return;
+
+    if (!hardwareCatalog || hardwareCatalog.length === 0) {
+      container.innerHTML = '<div class="text-muted">' + I18n.t('hardware.noPurchaseRecords') + '</div>';
+      return;
+    }
+
+    const qtyLabel = I18n.t('hardware.quantity');
+
+    container.innerHTML = hardwareCatalog.map(item => {
+      const checked = selectedItems.has(item.id);
+      const qty = selectedItems.get(item.id) || 1;
+      const displayName = getLocalizedName(item.id);
+      const displayDesc = getLocalizedDesc(item.id);
+      return `
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="border rounded p-3 h-100">
+            <div class="d-flex align-items-start justify-content-between">
+              <div>
+                <div class="fw-semibold">${displayName}</div>
+                <div class="text-muted small">${displayDesc}</div>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="select_${item.id}" ${checked ? 'checked' : ''} onchange="updateSelected('${item.id}', this.checked)">
+              </div>
+            </div>
+            <div class="mt-3">
+              <label class="form-label small mb-1">${qtyLabel}</label>
+              <input type="number" min="1" class="form-control form-control-sm" id="qty_${item.id}" value="${qty}" onchange="updateQuantity('${item.id}', this.value)">
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const posBtn = document.getElementById('posBundleBtn');
+    const kioskBtn = document.getElementById('kioskBundleBtn');
+    if (posBtn) {
+      posBtn.classList.toggle('active', selectedBundle === 'pos');
+      posBtn.classList.toggle('btn-primary', selectedBundle === 'pos');
+      posBtn.classList.toggle('btn-outline-primary', selectedBundle !== 'pos');
+    }
+    if (kioskBtn) {
+      kioskBtn.classList.toggle('active', selectedBundle === 'kiosk');
+      kioskBtn.classList.toggle('btn-primary', selectedBundle === 'kiosk');
+      kioskBtn.classList.toggle('btn-outline-primary', selectedBundle !== 'kiosk');
+    }
+  }
+
+  async function loadCatalog() {
+    try {
+      const res = await App.apiRequest('/hardware-purchase/settings');
+      hardwareCatalog = res.catalog || [];
+      if (selectedItems.size === 0) {
+        selectBundle('pos');
+        return;
+      }
+      renderCatalog();
+    } catch (e) {
+      const msg = I18n.t('hardware.loadFailed');
+      App.showAlert(msg + ': ' + (e.message || ''), 'danger');
+    }
+  }
+
+  async function checkout() {
+    try {
+      const items = getSelectedPayload();
+      if (!items.length) {
+        App.showAlert(I18n.t('hardware.selectItems'), 'warning');
+        return;
+      }
+      const res = await App.apiRequest('/hardware-purchase/create-checkout-session', {
+        method: 'POST',
+        body: JSON.stringify({ items })
+      });
+      if (res.checkout_url && res.checkout_url.startsWith('http')) {
+        window.location.href = res.checkout_url;
+        return;
+      }
+      App.showAlert(I18n.t('hardware.noCheckoutUrl'), 'warning');
+    } catch (e) {
+      const msg = I18n.t('hardware.checkoutFailed');
+      App.showAlert(msg + ': ' + (e.message || ''), 'danger');
+    }
+  }
+
+  async function loadRecords() {
+    const container = document.getElementById('purchaseRecords');
+    if (!container) return;
+    try {
+      const res = await App.apiRequest('/hardware-purchase/records');
+      const list = res.data || [];
+      if (!list.length) {
+        container.innerHTML = '<div class="text-muted">' + I18n.t('hardware.noPurchaseRecords') + '</div>';
+        return;
+      }
+
+      const thTime = I18n.t('hardware.time');
+      const thStatus = I18n.t('hardware.status');
+      const thAmount = I18n.t('hardware.amount');
+      const thCurrency = I18n.t('hardware.currency');
+      const thItems = I18n.t('hardware.items');
+
+      const rows = list.map(p => {
+        const items = Array.isArray(p.items) ? p.items : [];
+        const itemsText = items.map(i => `${i.name || i.id || ''} x${i.quantity || 1}`).join(', ');
+        const amount = p.amount_total || 0;
+        const currency = (p.currency || '').toUpperCase();
+        const status = p.status || '-';
+        const createdAt = p.created_at ? new Date(p.created_at).toLocaleString() : '-';
+        return `
+          <tr>
+            <td>${createdAt}</td>
+            <td>${status}</td>
+            <td>${amount}</td>
+            <td>${currency}</td>
+            <td><div class="text-muted small" style="max-width:360px;white-space:pre-wrap;">${itemsText || '-'}</div></td>
+          </tr>
+        `;
+      }).join('');
+      container.innerHTML = `
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>${thTime}</th>
+                <th>${thStatus}</th>
+                <th>${thAmount}</th>
+                <th>${thCurrency}</th>
+                <th>${thItems}</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    } catch (e) {
+      const msg = I18n.t('hardware.loadRecordsFailed');
+      container.innerHTML = '<div class="text-danger">' + msg + '</div>';
+    }
+  }
+
+  async function handleCheckoutCallback() {
+    const params = new URLSearchParams(window.location.search || '');
+    const checkout = params.get('checkout');
+    const sessionId = params.get('session_id');
+    if (!checkout) return;
+
+    if (checkout === 'success' && sessionId) {
+      try {
+        await App.apiRequest(`/hardware-purchase/sync-checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+        App.showAlert(I18n.t('hardware.paymentSuccess'), 'success');
+      } catch (e) {
+        App.showAlert(I18n.t('hardware.paymentSyncFailed'), 'warning');
+      }
+    } else if (checkout === 'cancel') {
+      App.showAlert(I18n.t('hardware.paymentCancelled'), 'info');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('checkoutBtn')?.addEventListener('click', checkout);
+
+    loadCatalog();
+    loadRecords();
+    handleCheckoutCallback();
+  });
+</script>
+{{ end }}

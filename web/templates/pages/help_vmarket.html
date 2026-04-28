@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="helpVmarket.hub.title">支援中心 - vMarket - {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}</title>
+    <link rel="icon" type="image/png" href="/static/vmarketicon.png">
+    <link rel="apple-touch-icon" href="/static/vmarketicon.png">
+    <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/vsys.css">
+    <style>
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title] { visibility: hidden; }
+        @media (min-width: 992px) {
+            #mobileSidebar,
+            #sidebarOverlay {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        (function() {
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const cmsLang = localStorage.getItem('language');
+            const browserLang = navigator.language || navigator.userLanguage;
+            let currentLang = 'zh';
+            if (cmsLang === 'zh' || cmsLang === 'zh-CN' || cmsLang === 'en') {
+                currentLang = cmsLang;
+                if (savedLang !== currentLang) localStorage.setItem('u-nai_lang', currentLang);
+            } else if (savedLang) { currentLang = savedLang; }
+            else {
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) currentLang = 'zh-CN';
+                else if (browserLang.startsWith('zh')) currentLang = 'zh';
+                else currentLang = 'en';
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            window.__INITIAL_LANG__ = currentLang;
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    setTimeout(function() { if (document.body && document.body.classList.contains('i18n-loading')) document.body.classList.remove('i18n-loading'); }, 5000);
+                } else { requestAnimationFrame(checkBody); }
+            })();
+        })();
+    </script>
+</head>
+<body>
+    <!-- V-sys Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100 vsys-navbar" >
+        <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+            <a class="navbar-brand d-flex align-items-center" href="/" id="topnavLogoLink">
+                <img src="/static/vlogo.png" alt="V-sys" style="height: auto; max-height: 15px; display: block;">
+            </a>
+            <!-- Mobile: App Switcher, Menu Toggle -->
+            <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item dropdown" id="mobileAppSwitcherHelpVmarket">
+                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
+                        <div class="app-switcher-grid">
+                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                <span class="app-switcher-label">vAI</span>
+                            </a>
+                            <a href="/" class="app-switcher-item" data-app="vwork">
+                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                <span class="app-switcher-label">vWork</span>
+                            </a>
+                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                <span class="app-switcher-label">vMarket</span>
+                            </a>
+                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                <span class="app-switcher-label">vOffice</span>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <button class="navbar-toggler" type="button" id="mobileMenuToggle" aria-label="Toggle sidebar" style="border: none; outline: none; box-shadow: none; padding: 0px;">
+                        <i class="bi bi-list" style="font-size: 1.9rem; color: #adb5bd;"></i>
+                    </button>
+                </li>
+            </ul>
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav me-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="/" id="navHomeLink" data-i18n="nav.home">首頁</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about" id="navAboutLink" data-i18n="nav.about">關於</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/contact" data-i18n="nav.contact">聯絡我們</a></li>
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
+                            <div class="dropdown" style="position: relative;">
+                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
+                                    <i class="bi bi-grid-3x3-gap-fill"></i>
+                                </a>
+                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
+                                    <div class="app-switcher-grid">
+                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
+                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
+                                            <span class="app-switcher-label">vAI</span>
+                                        </a>
+                                        <a href="/" class="app-switcher-item" data-app="vwork">
+                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
+                                            <span class="app-switcher-label">vWork</span>
+                                        </a>
+                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
+                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
+                                            <span class="app-switcher-label">vMarket</span>
+                                        </a>
+                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
+                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
+                                            <span class="app-switcher-label">vOffice</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="supportInfoDropdown">
+                                    <li><a class="dropdown-item" href="/help/vmarket" target="_blank"><i class="bi bi-question-circle me-2"></i><span data-i18n="nav.supportCenter">支援中心</span></a></li>
+                                    <li><a class="dropdown-item" href="/contact?product=vmarket" target="_blank"><i class="bi bi-headset me-2"></i><span data-i18n="nav.contact">聯絡客服</span></a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="langDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                    <i class="bi bi-globe2 me-1"></i><span data-i18n="nav.language">語言</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langDropdown">
+                                    <li><a class="dropdown-item" href="#" data-lang="zh">繁體中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="zh-CN">简体中文</a></li>
+                                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                                </ul>
+                            </div>
+                            <a class="nav-link" href="/login" id="loginLink" style="padding: 0.25rem 0.5rem;">
+                                <i class="bi bi-box-arrow-in-right me-1"></i><span data-i18n="nav.login">登錄</span>
+                            </a>
+                            <div class="dropdown" style="position: relative;">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" style="padding: 0.25rem 0.5rem; display: none;">
+                                    <img id="publicUserAvatar" src="" alt="User" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid rgba(0,0,0,0.08);">
+                                    <i class="bi bi-person-circle" id="publicUserIcon"></i> <span id="userName">用戶</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="/personal-data"><i class="bi bi-gear"></i> <span data-i18n="nav.accountSettings">帳戶設置</span></a></li>
+                                    <li><a class="dropdown-item" href="/billing"><i class="bi bi-credit-card"></i> <span data-i18n="nav.billing">訂閱</span></a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">登出</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay d-lg-none" id="sidebarOverlay"></div>
+    <div class="sidebar d-lg-none" id="mobileSidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="/" id="sidebarHomeLink"><i class="bi bi-house"></i> <span data-i18n="nav.home">首頁</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="#about" id="sidebarAboutLink"><i class="bi bi-info-circle"></i> <span data-i18n="nav.about">關於</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="/contact"><i class="bi bi-envelope"></i> <span data-i18n="nav.contact">聯絡我們</span></a></li>
+                <li class="nav-item nav-group">
+                    <a class="nav-link nav-group-toggle" href="#" data-bs-toggle="collapse" data-bs-target="#mobileLanguageSubmenu" aria-expanded="false">
+                        <i class="bi bi-globe2"></i> <span data-i18n="nav.language">語言</span>
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse" id="mobileLanguageSubmenu">
+                        <ul class="nav flex-column submenu">
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh">繁體中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="zh-CN">简体中文</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#" data-lang="en">English</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid px-3 py-4" style="min-height: calc(100vh - 200px); padding-top: 80px !important;">
+    {{ if not .Category }}
+    <!-- Overview: category card grid -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="h3 mb-3"><i class="bi bi-shop me-2 text-success"></i><span data-i18n="helpVmarket.hub.title">vMarket 支援中心</span></h1>
+                    <p class="text-muted mb-0" data-i18n="helpVmarket.hub.description">vMarket 是 V-sys 旗下的企業展示與線上市集平台，讓您的公司、產品與服務在全球市場上獲得曝光，輕鬆連接買家與賣家，觸及更多潛在客戶。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Features -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h5 mb-3"><i class="bi bi-grid me-2"></i><span data-i18n="helpVmarket.hub.coreFeatures">核心功能</span></h2>
+            <div class="row g-3">
+                <!-- Browse -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/browse" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-grid-3x3-gap fs-2 text-success me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.browseTitle">瀏覽市集</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.browseItem1">瀏覽產品目錄</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.browseItem2">瀏覽服務目錄</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.browseItem3">瀏覽企業目錄</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.browseItem4">行業分類篩選</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Search -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/search" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-search fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.searchTitle">搜尋功能</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.searchItem1">關鍵字搜尋</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.searchItem2">搜尋產品與服務</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.searchItem3">搜尋企業</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Map -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/map" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-geo-alt fs-2 text-danger me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.mapTitle">地圖功能</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.mapItem1">地圖瀏覽企業位置</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.mapItem2">點擊標記查看詳情</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.mapItem3">快速導航至企業頁面</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Join -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/join" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-building-add fs-2 text-warning me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.joinTitle">加入 vMarket</h5>
+                                </div>
+                                <ul class="list-unstyled mb-0 small">
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.joinItem1">如何加入</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.joinItem2">上架條件與流程</span></li>
+                                    <li class="mb-2"><i class="bi bi-chevron-right me-2"></i><span data-i18n="helpVmarket.hub.joinItem3">與 vWork 的關係</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Topics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h5 mb-3"><i class="bi bi-book me-2"></i><span data-i18n="helpVmarket.hub.otherTopics">其他主題</span></h2>
+            <div class="row g-3">
+                <!-- Getting Started -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/getting-started" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-rocket-takeoff fs-2 text-primary me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.gettingStartedTitle">快速入門</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Manage Listings -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/manage" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-sliders fs-2 text-info me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.manageTitle">管理上架內容</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Account & Billing -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/account" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-person-circle fs-2 text-info me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.accountTitle">帳戶與訂閱</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- FAQ -->
+                <div class="col-md-6 col-lg-3">
+                    <a href="/help/vmarket/faq" class="text-decoration-none">
+                        <div class="card h-100 help-category-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="bi bi-question-circle fs-2 text-secondary me-3"></i>
+                                    <h5 class="card-title mb-0" data-i18n="helpVmarket.hub.faqTitle">常見問題</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Support -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-headset me-2"></i><span data-i18n="helpVmarket.contact.title">需要更多幫助？</span></h5>
+                    <p class="card-text" data-i18n="helpVmarket.contact.desc">如果您遇到問題或需要進一步的協助，請：</p>
+                    <ul>
+                        <li><span data-i18n="helpVmarket.contact.visitLabel">前往</span> <a href="/contact?product=vmarket" class="text-decoration-none" data-i18n="helpVmarket.contact.contactLink">聯絡客服</a> <span data-i18n="helpVmarket.contact.submitLabel">頁面提交問題</span></li>
+                        <li><span data-i18n="helpVmarket.contact.emailLabel">發送電子郵件至</span> <a href="mailto:info@vsysai.com">info@vsysai.com</a></li>
+                    </ul>
+                    <p class="text-muted small mt-3 mb-0"><i class="bi bi-info-circle me-1"></i><span data-i18n="helpVmarket.contact.note">我們會持續更新功能與文檔，為您提供更好的使用體驗。</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ else }}
+    <!-- Category detail page -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/help" data-i18n="helpVmarket.breadcrumb.supportCenter">支援中心</a></li>
+                    <li class="breadcrumb-item"><a href="/help/vmarket">vMarket</a></li>
+                    <li class="breadcrumb-item active">{{ .CategoryTitle }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    {{ if eq .Category "getting-started" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-rocket-takeoff me-2 text-primary"></i><span data-i18n="helpVmarket.gettingStarted.title">快速入門指南</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.gettingStarted.intro">歡迎使用 vMarket！以下指南將幫助您快速了解 vMarket 的功能和使用方式。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.gettingStarted.whatIsTitle">什麼是 vMarket？</h6>
+                    <p data-i18n="helpVmarket.gettingStarted.whatIsDesc">vMarket 是 V-sys 旗下的企業展示與線上市集平台。它讓企業的公司資訊、產品和服務在全球市場上獲得曝光，幫助買家輕鬆找到所需的產品和服務，同時讓賣家觸及更多潛在客戶。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.gettingStarted.vworkRelTitle">vMarket 與 vWork 的關係</h6>
+                    <p><span data-i18n="helpVmarket.gettingStarted.vworkRelDesc">vMarket 與</span> <strong>vWork</strong><span data-i18n="helpVmarket.gettingStarted.vworkRelDesc2">（V-sys 的企業管理系統）深度整合：</span></p>
+                    <div class="feature-highlight">
+                        <ul class="mb-0">
+                            <li class="mb-2"><strong data-i18n="helpVmarket.gettingStarted.vworkRel1Label">資料來源</strong> — <span data-i18n="helpVmarket.gettingStarted.vworkRel1">企業在 vWork 中管理公司資料、產品和服務</span></li>
+                            <li class="mb-2"><strong data-i18n="helpVmarket.gettingStarted.vworkRel2Label">自動同步</strong> — <span data-i18n="helpVmarket.gettingStarted.vworkRel2">vMarket 自動同步並公開展示 vWork 中的資料</span></li>
+                            <li class="mb-2"><strong data-i18n="helpVmarket.gettingStarted.vworkRel3Label">統一管理</strong> — <span data-i18n="helpVmarket.gettingStarted.vworkRel3">在 vWork 更新一次，vMarket 同步呈現，無需重複維護</span></li>
+                        </ul>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.gettingStarted.buyerTitle">我是買家（訪客）</h6>
+                    <p data-i18n="helpVmarket.gettingStarted.buyerDesc">作為買家，您可以直接在 vMarket 上：</p>
+                    <ol>
+                        <li data-i18n="helpVmarket.gettingStarted.buyerStep1">瀏覽所有已上架的 <strong>產品</strong>、<strong>服務</strong> 和 <strong>企業</strong></li>
+                        <li data-i18n="helpVmarket.gettingStarted.buyerStep2">使用 <strong>搜尋功能</strong> 快速找到您需要的產品或服務</li>
+                        <li data-i18n="helpVmarket.gettingStarted.buyerStep3">使用 <strong>行業分類篩選</strong> 縮小瀏覽範圍</li>
+                        <li data-i18n="helpVmarket.gettingStarted.buyerStep4">透過 <strong>地圖功能</strong> 查看企業的地理位置</li>
+                        <li data-i18n="helpVmarket.gettingStarted.buyerStep5">點擊企業卡片進入企業的官方頁面了解更多詳情</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.gettingStarted.sellerTitle">我是賣家（企業）</h6>
+                    <p data-i18n="helpVmarket.gettingStarted.sellerDesc">作為賣家，您可以將公司、產品和服務展示在 vMarket 上：</p>
+                    <ol>
+                        <li data-i18n="helpVmarket.gettingStarted.sellerStep1">首先在 <strong>vWork</strong> 中建立您的公司帳戶和資料</li>
+                        <li data-i18n="helpVmarket.gettingStarted.sellerStep2">在 vWork 中新增您的產品和服務</li>
+                        <li data-i18n="helpVmarket.gettingStarted.sellerStep3">前往 <strong>vMarket 設定</strong> 頁面，開啟「加入 vMarket」開關</li>
+                        <li data-i18n="helpVmarket.gettingStarted.sellerStep4">您的公司、產品和服務將自動在 vMarket 上公開展示</li>
+                    </ol>
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i><strong data-i18n="helpVmarket.gettingStarted.freeLabel">完全免費</strong> — <span data-i18n="helpVmarket.gettingStarted.freeDesc">加入 vMarket 不收取任何費用，您可以隨時加入或退出。</span>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.gettingStarted.nextStepsTitle">下一步</h6>
+                    <ul>
+                        <li><a href="/help/vmarket/browse" data-i18n="helpVmarket.gettingStarted.nextStep1">瀏覽市集</a> <span data-i18n="helpVmarket.gettingStarted.nextStep1Suffix">查看已上架的企業和產品</span></li>
+                        <li><span data-i18n="helpVmarket.gettingStarted.nextStep2Prefix">了解</span> <a href="/help/vmarket/join" data-i18n="helpVmarket.gettingStarted.nextStep2">如何加入 vMarket</a></li>
+                        <li><span data-i18n="helpVmarket.gettingStarted.nextStep3Prefix">查閱</span> <a href="/help/vmarket/faq" data-i18n="helpVmarket.gettingStarted.nextStep3">常見問題</a></li>
+                    </ul>
+
+                    {{ else if eq .Category "browse" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-grid-3x3-gap me-2 text-success"></i><span data-i18n="helpVmarket.browse.title">瀏覽市集</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.browse.intro">vMarket 提供產品、服務和企業三大目錄，讓您輕鬆找到所需的資源。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.browse.productsTitle">瀏覽產品</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.browse.productsStep1">進入 vMarket 首頁，點擊導航列中的 <strong>產品</strong></li>
+                        <li data-i18n="helpVmarket.browse.productsStep2">頁面會顯示所有已上架企業的產品列表</li>
+                        <li data-i18n="helpVmarket.browse.productsStep3">產品按企業分組展示，每個企業顯示其公司名稱、Logo 和產品數量</li>
+                        <li data-i18n="helpVmarket.browse.productsStep4">點擊任意產品可進入該企業的產品詳情頁面</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.browse.servicesTitle">瀏覽服務</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.browse.servicesStep1">進入 vMarket 首頁，點擊導航列中的 <strong>服務</strong></li>
+                        <li data-i18n="helpVmarket.browse.servicesStep2">頁面會顯示所有已上架企業的服務列表</li>
+                        <li data-i18n="helpVmarket.browse.servicesStep3">服務同樣按企業分組展示</li>
+                        <li data-i18n="helpVmarket.browse.servicesStep4">點擊任意服務可進入該企業的服務詳情頁面</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.browse.companiesTitle">瀏覽企業目錄</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.browse.companiesStep1">進入 vMarket 首頁，點擊導航列中的 <strong>企業</strong></li>
+                        <li data-i18n="helpVmarket.browse.companiesStep2">頁面會顯示所有已加入 vMarket 的企業卡片</li>
+                        <li data-i18n="helpVmarket.browse.companiesStep3">每張企業卡片包含：公司名稱、Logo、所屬行業、產品數量和服務數量</li>
+                        <li data-i18n="helpVmarket.browse.companiesStep4">點擊企業卡片可進入該企業的官方頁面</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.browse.filterTitle">行業分類篩選</h6>
+                    <p data-i18n="helpVmarket.browse.filterDesc">在產品、服務和企業頁面中，左側（桌面版）或頂部（手機版）會顯示 <strong>行業分類側欄</strong>：</p>
+                    <ul>
+                        <li data-i18n="helpVmarket.browse.filterItem1">點擊任意行業分類，頁面會自動篩選出該行業的企業、產品或服務</li>
+                        <li data-i18n="helpVmarket.browse.filterItem2">點擊 <strong>全部分類</strong> 可取消篩選，顯示所有內容</li>
+                        <li data-i18n="helpVmarket.browse.filterItem3">每個分類後方會顯示該分類下的企業數量</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.browse.cardNavTitle">企業頁面導航</h6>
+                    <p data-i18n="helpVmarket.browse.cardNavDesc">每張企業卡片提供多個快速導航按鈕：</p>
+                    <div class="feature-highlight">
+                        <ul class="mb-0">
+                            <li class="mb-2"><i class="bi bi-box-seam text-primary me-2"></i><strong data-i18n="helpVmarket.browse.cardNavProducts">產品</strong> — <span data-i18n="helpVmarket.browse.cardNavProductsDesc">查看該企業的所有產品</span></li>
+                            <li class="mb-2"><i class="bi bi-briefcase text-success me-2"></i><strong data-i18n="helpVmarket.browse.cardNavServices">服務</strong> — <span data-i18n="helpVmarket.browse.cardNavServicesDesc">查看該企業的所有服務</span></li>
+                            <li class="mb-2"><i class="bi bi-building text-info me-2"></i><strong data-i18n="helpVmarket.browse.cardNavCompany">公司</strong> — <span data-i18n="helpVmarket.browse.cardNavCompanyDesc">查看企業的詳細資訊頁面</span></li>
+                            <li class="mb-2"><i class="bi bi-geo-alt text-danger me-2"></i><strong data-i18n="helpVmarket.browse.cardNavMap">地圖</strong> — <span data-i18n="helpVmarket.browse.cardNavMapDesc">在地圖上查看企業的地理位置</span></li>
+                        </ul>
+                    </div>
+
+                    {{ else if eq .Category "search" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-search me-2 text-primary"></i><span data-i18n="helpVmarket.search.title">搜尋功能</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.search.intro">vMarket 提供統一的關鍵字搜尋功能，讓您快速找到所需的產品、服務或企業。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.search.howToTitle">使用搜尋</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.search.howToStep1">在 vMarket 首頁頂部可以看到 <strong>搜尋欄</strong></li>
+                        <li data-i18n="helpVmarket.search.howToStep2">輸入關鍵字，例如產品名稱、服務名稱或公司名稱</li>
+                        <li data-i18n="helpVmarket.search.howToStep3">系統會即時搜尋並顯示匹配的結果</li>
+                        <li data-i18n="helpVmarket.search.howToStep4">搜尋結果分為三類：<strong>產品</strong>、<strong>服務</strong> 和 <strong>企業</strong></li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.search.scopeTitle">搜尋範圍</h6>
+                    <p data-i18n="helpVmarket.search.scopeDesc">搜尋功能會同時在以下內容中查找匹配項：</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th data-i18n="helpVmarket.search.tableType">類型</th><th data-i18n="helpVmarket.search.tableField">搜尋欄位</th></tr></thead>
+                            <tbody>
+                                <tr><td><i class="bi bi-box-seam me-2 text-primary"></i><span data-i18n="helpVmarket.search.typeProduct">產品</span></td><td data-i18n="helpVmarket.search.fieldProduct">產品名稱</td></tr>
+                                <tr><td><i class="bi bi-briefcase me-2 text-success"></i><span data-i18n="helpVmarket.search.typeService">服務</span></td><td data-i18n="helpVmarket.search.fieldService">服務名稱</td></tr>
+                                <tr><td><i class="bi bi-building me-2 text-info"></i><span data-i18n="helpVmarket.search.typeCompany">企業</span></td><td data-i18n="helpVmarket.search.fieldCompany">公司名稱</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.search.resultsTitle">搜尋結果</h6>
+                    <ul>
+                        <li data-i18n="helpVmarket.search.resultsItem1">搜尋結果會即時顯示，無需按下搜尋按鈕</li>
+                        <li data-i18n="helpVmarket.search.resultsItem2">每次搜尋最多返回 <strong>20 筆</strong> 結果</li>
+                        <li data-i18n="helpVmarket.search.resultsItem3">點擊搜尋結果中的任意項目，可進入對應的企業頁面查看詳情</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.search.tipsTitle">搜尋提示</h6>
+                    <div class="feature-highlight">
+                        <ul class="mb-0">
+                            <li class="mb-2" data-i18n="helpVmarket.search.tip1">使用具體的關鍵字可以獲得更精確的結果</li>
+                            <li class="mb-2" data-i18n="helpVmarket.search.tip2">可以輸入部分名稱進行模糊搜尋</li>
+                            <li class="mb-2" data-i18n="helpVmarket.search.tip3">如果搜尋結果太多，可以結合行業分類篩選進一步縮小範圍</li>
+                        </ul>
+                    </div>
+
+                    {{ else if eq .Category "map" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-geo-alt me-2 text-danger"></i><span data-i18n="helpVmarket.map.title">地圖功能</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.map.intro">vMarket 整合了 Google 地圖，讓您直觀地查看所有已上架企業的地理位置。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.map.howToTitle">使用地圖</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.map.howToStep1">進入 vMarket 首頁，點擊導航列中的 <strong>地圖</strong></li>
+                        <li data-i18n="helpVmarket.map.howToStep2">地圖會顯示所有已加入 vMarket 且有提供地址的企業位置標記</li>
+                        <li data-i18n="helpVmarket.map.howToStep3">使用地圖的縮放和拖拽功能瀏覽不同區域</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.map.viewInfoTitle">查看企業資訊</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.map.viewInfoStep1">點擊地圖上的 <strong>位置標記</strong>（圖釘圖示）</li>
+                        <li data-i18n="helpVmarket.map.viewInfoStep2">彈出的資訊窗口會顯示企業名稱和基本資訊</li>
+                        <li data-i18n="helpVmarket.map.viewInfoStep3">點擊資訊窗口中的連結，可以直接前往該企業的頁面查看更多詳情</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.map.controlsTitle">地圖操作</h6>
+                    <div class="feature-highlight">
+                        <ul class="mb-0">
+                            <li class="mb-2"><i class="bi bi-zoom-in me-2"></i><strong data-i18n="helpVmarket.map.zoomLabel">放大/縮小</strong> — <span data-i18n="helpVmarket.map.zoomDesc">使用滑鼠滾輪或地圖上的 +/- 按鈕</span></li>
+                            <li class="mb-2"><i class="bi bi-arrows-move me-2"></i><strong data-i18n="helpVmarket.map.dragLabel">拖拽移動</strong> — <span data-i18n="helpVmarket.map.dragDesc">按住滑鼠左鍵拖拽地圖</span></li>
+                            <li class="mb-2"><i class="bi bi-pin-map me-2"></i><strong data-i18n="helpVmarket.map.markerLabel">位置標記</strong> — <span data-i18n="helpVmarket.map.markerDesc">每個標記代表一間企業的位置</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="bi bi-info-circle me-2"></i><span data-i18n="helpVmarket.map.addressNote">企業的地址資訊來自其在 vWork 中設定的公司地址。如果您是企業用戶，請確保在 vWork 中正確填寫公司地址以在地圖上正確顯示。</span>
+                    </div>
+
+                    {{ else if eq .Category "join" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-building-add me-2 text-warning"></i><span data-i18n="helpVmarket.join.title">加入 vMarket</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.join.intro">了解如何將您的企業、產品和服務在 vMarket 上公開展示，觸及更多潛在客戶。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.join.requirementsTitle">加入條件</h6>
+                    <p data-i18n="helpVmarket.join.requirementsDesc">要將您的企業展示在 vMarket 上，您需要：</p>
+                    <ol>
+                        <li data-i18n="helpVmarket.join.req1">擁有一個 <strong>vWork 帳戶</strong>（V-sys 的企業管理系統）</li>
+                        <li data-i18n="helpVmarket.join.req2">在 vWork 中建立您的 <strong>公司資料</strong></li>
+                        <li data-i18n="helpVmarket.join.req3">在 vWork 中新增至少一項 <strong>產品</strong> 或 <strong>服務</strong></li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.join.stepsTitle">加入步驟</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.join.step1">登入 <strong>vWork</strong> 管理後台</li>
+                        <li data-i18n="helpVmarket.join.step2">在左側導航選單中找到 <strong>vMarket 設定</strong>（或在網站初始設定流程中選擇加入）</li>
+                        <li data-i18n="helpVmarket.join.step3">將「<strong>加入 vMarket</strong>」開關切換為 <strong>開啟</strong></li>
+                        <li data-i18n="helpVmarket.join.step4">點擊 <strong>儲存</strong></li>
+                        <li data-i18n="helpVmarket.join.step5">系統會自動將您的公司資料、產品和服務同步到 vMarket</li>
+                    </ol>
+
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i><strong data-i18n="helpVmarket.join.freeLabel">完全免費</strong> — <span data-i18n="helpVmarket.join.freeDesc">加入 vMarket 不收取任何費用。您可以隨時關閉曝光，資料僅顯示您已設定為公開的內容。</span>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.join.benefitsTitle">加入後的好處</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="feature-highlight h-100">
+                                <i class="bi bi-megaphone text-primary fs-4"></i>
+                                <h6 class="mt-2 mb-1" data-i18n="helpVmarket.join.benefit1Title">免費曝光</h6>
+                                <p class="mb-0 small text-muted" data-i18n="helpVmarket.join.benefit1Desc">您的公司和產品展示在 vMarket 公開頁面，讓更多潛在客戶找到您。</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-highlight h-100">
+                                <i class="bi bi-arrow-repeat text-success fs-4"></i>
+                                <h6 class="mt-2 mb-1" data-i18n="helpVmarket.join.benefit2Title">統一管理</h6>
+                                <p class="mb-0 small text-muted" data-i18n="helpVmarket.join.benefit2Desc">在 vWork 更新一次，vMarket 同步呈現，無需重複維護資料。</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-highlight h-100">
+                                <i class="bi bi-patch-check text-info fs-4"></i>
+                                <h6 class="mt-2 mb-1" data-i18n="helpVmarket.join.benefit3Title">信任提升</h6>
+                                <p class="mb-0 small text-muted" data-i18n="helpVmarket.join.benefit3Desc">官方認證標誌讓客戶對您的企業更有信心。</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-highlight h-100">
+                                <i class="bi bi-graph-up-arrow text-warning fs-4"></i>
+                                <h6 class="mt-2 mb-1" data-i18n="helpVmarket.join.benefit4Title">業務拓展</h6>
+                                <p class="mb-0 small text-muted" data-i18n="helpVmarket.join.benefit4Desc">與其他企業連結，互相擴大客戶群。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.join.leaveTitle">退出 vMarket</h6>
+                    <p data-i18n="helpVmarket.join.leaveDesc">如果您不再希望在 vMarket 上展示您的企業，只需：</p>
+                    <ol>
+                        <li data-i18n="helpVmarket.join.leaveStep1">前往 vWork 管理後台的 <strong>vMarket 設定</strong></li>
+                        <li data-i18n="helpVmarket.join.leaveStep2">將「加入 vMarket」開關切換為 <strong>關閉</strong></li>
+                        <li data-i18n="helpVmarket.join.leaveStep3">點擊 <strong>儲存</strong></li>
+                    </ol>
+                    <p class="text-muted small" data-i18n="helpVmarket.join.leaveNote">退出後，您的公司、產品和服務將不再顯示在 vMarket 上。您隨時可以重新加入。</p>
+
+                    {{ else if eq .Category "manage" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-sliders me-2 text-info"></i><span data-i18n="helpVmarket.manage.title">管理上架內容</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.manage.intro">了解如何控制在 vMarket 上展示的產品和服務內容。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.manage.autoTitle">自動上架機制</h6>
+                    <p data-i18n="helpVmarket.manage.autoDesc">當您在 vWork 中加入 vMarket 後，以下內容會 <strong>自動</strong> 同步到 vMarket：</p>
+                    <ul>
+                        <li data-i18n="helpVmarket.manage.autoItem1"><strong>公司資訊</strong> — 公司名稱、Logo、行業類別、地址</li>
+                        <li data-i18n="helpVmarket.manage.autoItem2"><strong>產品列表</strong> — 所有設定為「在 vMarket 上顯示」的產品</li>
+                        <li data-i18n="helpVmarket.manage.autoItem3"><strong>服務列表</strong> — 所有設定為「在 vMarket 上顯示」的服務</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.manage.controlTitle">控制產品/服務的顯示</h6>
+                    <p data-i18n="helpVmarket.manage.controlDesc1">每個產品和服務都有一個「<strong>在 vMarket 上顯示</strong>」的設定。加入 vMarket 後，新建立的產品和服務會 <strong>自動開啟</strong> 此設定。</p>
+                    <p data-i18n="helpVmarket.manage.controlDesc2">如果您不希望某個產品或服務在 vMarket 上顯示：</p>
+                    <ol>
+                        <li data-i18n="helpVmarket.manage.controlStep1">前往 vWork 管理後台</li>
+                        <li data-i18n="helpVmarket.manage.controlStep2">打開該產品或服務的編輯頁面</li>
+                        <li data-i18n="helpVmarket.manage.controlStep3">找到「<strong>在 vMarket 上顯示</strong>」選項，將其關閉</li>
+                        <li data-i18n="helpVmarket.manage.controlStep4">儲存更改</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.manage.conditionsTitle">上架條件</h6>
+                    <p data-i18n="helpVmarket.manage.conditionsDesc">產品或服務要在 vMarket 上正確顯示，需滿足以下條件：</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th data-i18n="helpVmarket.manage.condColA">條件</th><th data-i18n="helpVmarket.manage.condColB">說明</th></tr></thead>
+                            <tbody>
+                                <tr><td data-i18n="helpVmarket.manage.cond1">企業已加入 vMarket</td><td data-i18n="helpVmarket.manage.cond1Desc">vMarket 設定中的「加入 vMarket」開關為開啟狀態</td></tr>
+                                <tr><td data-i18n="helpVmarket.manage.cond2">企業狀態為啟用</td><td data-i18n="helpVmarket.manage.cond2Desc">vWork 中的企業帳戶為正常啟用狀態</td></tr>
+                                <tr><td data-i18n="helpVmarket.manage.cond3">產品/服務狀態為啟用</td><td data-i18n="helpVmarket.manage.cond3Desc">產品或服務未被停用或刪除</td></tr>
+                                <tr><td data-i18n="helpVmarket.manage.cond4">已開啟 vMarket 顯示</td><td data-i18n="helpVmarket.manage.cond4Desc">產品或服務的「在 vMarket 上顯示」設定為開啟</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.manage.updateTitle">更新展示資料</h6>
+                    <p data-i18n="helpVmarket.manage.updateDesc">在 vWork 中所做的任何更新都會自動反映在 vMarket 上：</p>
+                    <div class="feature-highlight">
+                        <ul class="mb-0">
+                            <li class="mb-2" data-i18n="helpVmarket.manage.updateItem1">修改產品名稱、描述、圖片 — vMarket 自動更新</li>
+                            <li class="mb-2" data-i18n="helpVmarket.manage.updateItem2">修改服務名稱、描述、圖片 — vMarket 自動更新</li>
+                            <li class="mb-2" data-i18n="helpVmarket.manage.updateItem3">修改公司名稱、Logo、地址 — vMarket 自動更新</li>
+                            <li class="mb-2" data-i18n="helpVmarket.manage.updateItem4">新增或刪除產品/服務 — vMarket 自動同步</li>
+                        </ul>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.manage.previewTitle">預覽展示效果</h6>
+                    <p data-i18n="helpVmarket.manage.previewDesc">您可以隨時前往 <strong>vMarket</strong> 頁面查看您的企業在市集上的展示效果。在 vWork 後台的 vMarket 設定頁面中，點擊「<strong>預覽 vMarket</strong>」按鈕即可快速前往。</p>
+
+                    {{ else if eq .Category "account" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-person-circle me-2 text-info"></i><span data-i18n="helpVmarket.account.title">帳戶與訂閱</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.account.intro">管理您的 vMarket 帳戶設定和訂閱方案。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.account.settingsTitle">帳戶設定</h6>
+                    <p data-i18n="helpVmarket.account.settingsDesc">點擊右上角的用戶頭像，選擇 <strong>帳戶設置</strong>，您可以：</p>
+                    <ul>
+                        <li data-i18n="helpVmarket.account.settingsItem1">修改個人資料（姓名、電子郵件、電話等）</li>
+                        <li data-i18n="helpVmarket.account.settingsItem2">更改密碼</li>
+                        <li data-i18n="helpVmarket.account.settingsItem3">上傳或修改頭像</li>
+                        <li data-i18n="helpVmarket.account.settingsItem4">設定語言偏好</li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.account.plansTitle">訂閱方案</h6>
+                    <p data-i18n="helpVmarket.account.plansDesc">vMarket 的企業展示功能對所有 vWork 用戶 <strong>免費開放</strong>。不過，V-sys 提供訂閱方案以獲取更多進階功能：</p>
+                    <div class="table-responsive">
+                        <table style="display: none !important;" class="d-none"  class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th data-i18n="helpVmarket.account.planColPlan">方案</th><th data-i18n="helpVmarket.account.planColMonthly">月付</th><th data-i18n="helpVmarket.account.planColYearly">年付</th><th data-i18n="helpVmarket.account.planColFeatures">主要特色</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong data-i18n="helpVmarket.account.planFree">免費</strong></td><td data-i18n="helpVmarket.account.planFreeMonthly">免費</td><td data-i18n="helpVmarket.account.planFreeYearly">免費</td><td data-i18n="helpVmarket.account.planFreeFeatures">可加入 vMarket、基本功能、頁面包含廣告</td></tr>
+                                <tr><td><strong>vSuite</strong></td><td>HK$380/月</td><td>HK$250/月<br><small class="text-muted" data-i18n="helpVmarket.account.vsuiteYearlyNote">年付 HK$3,000</small></td><td data-i18n="helpVmarket.account.vsuiteFeatures">無廣告、所有功能、vOffice AI 智慧辦公、每月 1,000 vCoin</td></tr>
+                                <tr><td><strong>vSuite Pro</strong></td><td>HK$680/月</td><td>HK$500/月<br><small class="text-muted" data-i18n="helpVmarket.account.vsuiteProYearlyNote">年付 HK$6,000</small></td><td data-i18n="helpVmarket.account.vsuiteProFeatures">所有 vSuite 功能 + 企業支援服務、資料遺失防護、安全控管、每月 2,000 vCoin</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.account.manageSubTitle">管理訂閱</h6>
+                    <ol>
+                        <li data-i18n="helpVmarket.account.manageSubStep1">點擊右上角的用戶頭像，選擇 <strong>訂閱</strong></li>
+                        <li data-i18n="helpVmarket.account.manageSubStep2">查看當前訂閱方案和到期日期</li>
+                        <li data-i18n="helpVmarket.account.manageSubStep3">升級或降級訂閱方案</li>
+                        <li data-i18n="helpVmarket.account.manageSubStep4">管理付款方式</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3">vCoin</h6>
+                    <p data-i18n="helpVmarket.account.vcoinDesc">vCoin 是 V-sys 的虛擬代幣，用於支付 AI 相關功能的使用費用。您可以在帳戶中查看 vCoin 餘額和交易記錄。</p>
+                    <ul>
+                        <li data-i18n="helpVmarket.account.vcoinItem1">訂閱方案包含每月 vCoin 配額</li>
+                        <li data-i18n="helpVmarket.account.vcoinItem2">也可額外購買 vCoin</li>
+                        <li><span data-i18n="helpVmarket.account.vcoinItem3Prefix">更多 vCoin 資訊請參考</span> <a href="/help/vai/vcoins" data-i18n="helpVmarket.account.vcoinItem3Link">vCoin 虛擬代幣</a></li>
+                    </ul>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.account.logoutTitle">登出</h6>
+                    <p data-i18n="helpVmarket.account.logoutDesc">點擊右上角的用戶頭像，選擇 <strong>登出</strong> 即可安全登出帳戶。系統支援跨分頁同步登出，在任一分頁登出後，其他分頁也會自動登出。</p>
+
+                    {{ else if eq .Category "faq" }}
+                    <h1 class="h3 mb-4"><i class="bi bi-question-circle me-2 text-secondary"></i><span data-i18n="helpVmarket.faq.title">常見問題</span></h1>
+                    <p class="text-muted mb-4" data-i18n="helpVmarket.faq.intro">以下是 vMarket 用戶最常詢問的問題。</p>
+
+                    <h6 class="fw-bold mb-3" data-i18n="helpVmarket.faq.q1">vMarket 是什麼？</h6>
+                    <p data-i18n="helpVmarket.faq.a1">vMarket 是 V-sys 旗下的企業展示與線上市集平台。它讓企業可以將公司資訊、產品和服務公開展示，幫助買家和賣家建立連結。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q2">加入 vMarket 需要付費嗎？</h6>
+                    <p><strong data-i18n="helpVmarket.faq.a2Free">完全免費</strong><span data-i18n="helpVmarket.faq.a2">。加入 vMarket 不收取任何費用。您只需要擁有一個 vWork 帳戶，即可在 vMarket 設定中一鍵加入。</span></p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q3">我需要 vWork 帳戶才能在 vMarket 上展示嗎？</h6>
+                    <p data-i18n="helpVmarket.faq.a3">是的。vMarket 的資料來自 vWork 系統。您需要先在 vWork 中建立公司資料、產品和服務，然後透過 vMarket 設定將其公開展示。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q4">作為買家，我需要帳戶才能瀏覽 vMarket 嗎？</h6>
+                    <p><strong data-i18n="helpVmarket.faq.a4No">不需要</strong><span data-i18n="helpVmarket.faq.a4">。任何人都可以直接瀏覽 vMarket 上的產品、服務和企業目錄，無需登入或註冊。</span></p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q5">我可以控制哪些產品/服務在 vMarket 上顯示嗎？</h6>
+                    <p data-i18n="helpVmarket.faq.a5">可以。每個產品和服務都有一個「在 vMarket 上顯示」的設定。您可以在 vWork 中逐一控制哪些產品和服務要公開展示，哪些保持私有。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q6">我可以隨時退出 vMarket 嗎？</h6>
+                    <p data-i18n="helpVmarket.faq.a6">可以。您只需要在 vWork 的 vMarket 設定中關閉「加入 vMarket」開關即可。退出後，您的所有資料將不再在 vMarket 上顯示。您隨時可以重新加入。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q7">在 vWork 中更新資料後，vMarket 會自動更新嗎？</h6>
+                    <p><strong data-i18n="helpVmarket.faq.a7Yes">會</strong><span data-i18n="helpVmarket.faq.a7">。vMarket 與 vWork 自動同步。您在 vWork 中所做的任何修改（產品名稱、描述、圖片、公司資訊等）都會自動反映在 vMarket 上。</span></p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q8">免費用戶和付費用戶有什麼區別？</h6>
+                    <p data-i18n="helpVmarket.faq.a8">免費用戶可以使用 vMarket 的所有基本功能（企業展示、產品上架等），但頁面上會顯示廣告。訂閱 <strong>vSuite</strong> 或 <strong>vSuite Pro</strong> 方案後，將享有無廣告體驗以及更多進階功能。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q9">vMarket 上的企業地圖位置不正確怎麼辦？</h6>
+                    <p data-i18n="helpVmarket.faq.a9Desc">企業的地圖位置是根據其在 vWork 中填寫的公司地址自動生成的。如果位置不正確，請：</p>
+                    <ol>
+                        <li data-i18n="helpVmarket.faq.a9Step1">前往 vWork 管理後台</li>
+                        <li data-i18n="helpVmarket.faq.a9Step2">修改公司設定中的 <strong>地址</strong></li>
+                        <li data-i18n="helpVmarket.faq.a9Step3">確保地址填寫完整且準確</li>
+                    </ol>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q10">vMarket 支援哪些語言？</h6>
+                    <p data-i18n="helpVmarket.faq.a10Desc">vMarket 支援三種語言：</p>
+                    <ul>
+                        <li><strong data-i18n="helpVmarket.faq.langZh">繁體中文</strong><span data-i18n="helpVmarket.faq.langZhNote">（預設）</span></li>
+                        <li><strong data-i18n="helpVmarket.faq.langZhCN">简体中文</strong></li>
+                        <li><strong>English</strong></li>
+                    </ul>
+                    <p data-i18n="helpVmarket.faq.a10Switch">您可以透過頁面右上角的語言選擇器切換語言。</p>
+
+                    <h6 class="fw-bold mt-4 mb-3" data-i18n="helpVmarket.faq.q11">遇到其他問題怎麼辦？</h6>
+                    <p data-i18n="helpVmarket.faq.a11Desc">如果您的問題未在以上列出，歡迎透過以下方式聯繫我們：</p>
+                    <ul>
+                        <li><a href="/contact?product=vmarket" data-i18n="helpVmarket.faq.a11ContactLink">聯絡客服</a> <span data-i18n="helpVmarket.faq.a11ContactSuffix">提交問題</span></li>
+                        <li><span data-i18n="helpVmarket.faq.a11EmailPrefix">發送電子郵件至</span> <a href="mailto:info@vsysai.com">info@vsysai.com</a></li>
+                    </ul>
+
+                    {{ else }}
+                    <!-- Unknown category fallback -->
+                    <h1 class="h3 mb-4"><i class="bi bi-exclamation-circle me-2 text-muted"></i><span data-i18n="helpVmarket.unknown.title">找不到此分類</span></h1>
+                    <p class="text-muted" data-i18n="helpVmarket.unknown.desc">抱歉，找不到您請求的幫助分類。請返回 <a href="/help/vmarket">vMarket 支援中心</a> 瀏覽所有分類。</p>
+
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Support (detail view) -->
+    <div class="row mt-4 mb-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-headset me-2"></i><span data-i18n="helpVmarket.contact.title">需要更多幫助？</span></h5>
+                    <p class="mb-2"><span data-i18n="helpVmarket.contact.detailDesc">如果以上內容未能解答您的問題，歡迎</span> <a href="/contact?product=vmarket" data-i18n="helpVmarket.contact.contactLink">聯絡客服</a>。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ end }}
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer-light">
+        <div class="container-fluid px-4">
+            <div class="row g-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <a href="/" id="footerLogoLink" style="text-decoration: none;">
+                            <img src="/static/vlogo.png" alt="V-sys Logo" style="height: auto; max-height: 24px; display: block;">
+                        </a>
+                    </div>
+                    <p class="text-muted" data-i18n="footer.description">V-sys 以科技幫助人類，讓工作和生活更簡單高效。我們相信科技能夠幫助每個人提升效率，優化生活。</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.products">產品</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none" id="footerProductVAI">vAI</a></li>
+                        <li class="mb-2"><a href="/" class="text-muted text-decoration-none" id="footerProductVWork">vWork</a></li>
+                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" id="footerProductVMarket">vMarket</a></li>
+                        <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" id="footerProductVOffice">vOffice</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.info">資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/" id="footerInfoHome" class="text-muted text-decoration-none" data-i18n="nav.home">首頁</a></li>
+                        <li class="mb-2"><a href="/" id="footerInfoAbout" class="text-muted text-decoration-none" data-i18n="nav.about">關於</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="nav.contact">聯絡我們</a></li>
+                        <li class="mb-2"><a href="/sales-partner" class="text-muted text-decoration-none" data-i18n="footer.salesPartnerJoin">銷售商加盟</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.support">支援資訊</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="/help" class="text-muted text-decoration-none" data-i18n="footer.documentation">支援中心</a></li>
+                        <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none" data-i18n="footer.contactSupport">聯絡客服</a></li>
+                        <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none" data-i18n="footer.termsOfService">服務條款</a></li>
+                        <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none" data-i18n="footer.privacyPolicy">隱私政策</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="mb-3" data-i18n="footer.contactUs">聯繫我們</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2">
+                            <i class="bi bi-envelope me-2"></i>
+                            <a href="mailto:info@vsysai.com" class="text-muted text-decoration-none">info@vsysai.com</a>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <span data-i18n="footer.location">香港</span>
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span data-i18n="footer.hours">週一至週五 9:00 - 18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-12 text-center text-muted">
+                    <p class="mb-0" data-i18n="footer.copyright">&copy; 2025 {{if .CompanyName}}{{.CompanyName}}{{else}}V-sys Limited{{end}}. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof I18n !== 'undefined') I18n.init();
+
+            // Nav, footer & product links are managed by App.updateAppSwitcherLinks() in app.js
+
+            // Mobile sidebar
+            var toggle = document.getElementById('mobileMenuToggle');
+            var sidebar = document.getElementById('mobileSidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            function closeSidebar() { if (sidebar) sidebar.classList.remove('show'); if (overlay) overlay.classList.remove('show'); }
+            if (toggle) toggle.addEventListener('click', function(e) { e.preventDefault(); if (sidebar) sidebar.classList.toggle('show'); if (overlay) overlay.classList.toggle('show'); });
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            // Close sidebar on nav link click
+            document.querySelectorAll('#mobileSidebar .nav-link:not(.nav-group-toggle)').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (!this.hasAttribute('data-lang')) closeSidebar();
+                });
+            });
+
+            // Language
+            document.querySelectorAll('[data-lang]').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) I18n.switchLanguage(this.getAttribute('data-lang'));
+                    closeSidebar();
+                });
+            });
+
+            // Auth status
+            checkAuthAndUpdateNav();
+        });
+
+        async function checkAuthAndUpdateNav() {
+            const loginLink = document.getElementById('loginLink');
+            const userDropdownNav = document.getElementById('userDropdown');
+            const userNameSpan = document.getElementById('userName');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            async function fetchUser() {
+                try {
+                    const headers = { 'Accept': 'application/json' };
+                    const token = localStorage.getItem('auth_token');
+                    if (token) headers['Authorization'] = 'Bearer ' + token;
+                    const sub = localStorage.getItem('tenant_subdomain');
+                    if (sub) headers['X-Tenant-Subdomain'] = sub;
+                    const resp = await fetch('/api/v1/user/me', { headers });
+                    if (!resp.ok) return null;
+                    return await resp.json();
+                } catch (_) { return null; }
+            }
+
+            const user = await fetchUser();
+            const isLoggedIn = !!(user && user.name);
+
+            if (isLoggedIn) {
+                if (loginLink) loginLink.style.display = 'none';
+                if (userDropdownNav) userDropdownNav.style.display = '';
+                if (userNameSpan) userNameSpan.textContent = user.name;
+
+                const avatarImg = document.getElementById('publicUserAvatar');
+                const avatarIcon = document.getElementById('publicUserIcon');
+                if (avatarImg) {
+                    let url = (user.profile_pic) ? String(user.profile_pic) : '';
+                    if (url && !url.startsWith('http') && !url.startsWith('/')) url = '/' + url;
+                    if (url) {
+                        avatarImg.src = url;
+                        avatarImg.style.display = 'inline-block';
+                        if (avatarIcon) avatarIcon.style.display = 'none';
+                        avatarImg.onerror = function() {
+                            this.style.display = 'none';
+                            if (avatarIcon) avatarIcon.style.display = '';
+                        };
+                    }
+                }
+
+                if (logoutBtn && !logoutBtn.hasAttribute('data-bound')) {
+                    logoutBtn.setAttribute('data-bound', 'true');
+                    logoutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (typeof App !== 'undefined' && App.logout) {
+                            App.logout();
+                        } else {
+                            fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                              .finally(function() {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user');
+                                localStorage.removeItem('tenant_subdomain');
+                                window.location.replace(window.location.pathname + '?logged_out=1');
+                              });
+                        }
+                    });
+                }
+            } else {
+                if (loginLink) loginLink.style.display = '';
+                if (userDropdownNav) userDropdownNav.style.display = 'none';
+            }
+        }
+    </script>
+    <!-- Cross-tab logout detection -->
+    <script>
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'auth_token' && !e.newValue) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === null) {
+                fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' })
+                  .finally(function() { checkAuthAndUpdateNav(); });
+            } else if (e.key === 'auth_token') {
+                checkAuthAndUpdateNav();
+            }
+        });
+    </script>
+    <!-- Navbar scroll shadow -->
+    <script>
+        (function() {
+            var navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            function handleScroll() { if (window.scrollY > 60) navbar.classList.add('scrolled'); else navbar.classList.remove('scrolled'); }
+            handleScroll();
+            window.addEventListener('scroll', handleScroll, { passive: true });
+        })();
+    </script>
+    <!-- Help category card styles -->
+    <style>
+        .help-category-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid #e9ecef;
+        }
+        .help-category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .card-body h6.fw-bold {
+            border-left: 3px solid #0d6efd;
+            padding-left: 0.75rem;
+        }
+        .feature-highlight {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+
+</body>
+</html>

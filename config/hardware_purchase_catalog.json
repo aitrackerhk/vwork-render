@@ -1,0 +1,44 @@
+[
+  {
+    "id": "pos_screen",
+    "group": "pos",
+    "unit_amount": 0,
+    "currency": "HKD"
+  },
+  {
+    "id": "kiosk_screen",
+    "group": "kiosk",
+    "unit_amount": 0,
+    "currency": "HKD"
+  },
+  {
+    "id": "receipt_printer",
+    "group": "shared",
+    "unit_amount": 0,
+    "currency": "HKD"
+  },
+  {
+    "id": "pos_cash_drawer",
+    "group": "pos",
+    "unit_amount": 0,
+    "currency": "HKD"
+  },
+  {
+    "id": "scanner",
+    "group": "shared",
+    "unit_amount": 0,
+    "currency": "HKD"
+  },
+  {
+    "id": "card_reader",
+    "group": "shared",
+    "unit_amount": 0,
+    "currency": "HKD"
+  },
+  {
+    "id": "tailor_made_website",
+    "group": "service",
+    "unit_amount": 380000,
+    "currency": "HKD"
+  }
+]

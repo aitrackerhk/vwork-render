@@ -1,0 +1,2253 @@
+{{define "pages/messages"}}
+<div class="container-fluid h-100 p-0 chat-container">
+    <div class="row g-0 h-100">
+        <!-- Mobile: All Conversations 按鈕 -->
+        <button id="toggleConversationsBtn" class="btn btn-outline-primary d-md-none position-fixed" style="top: 70px; left: 10px; z-index: 997; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <i class="bi bi-list"></i>
+        </button>
+        
+        <!-- Mobile: 遮罩层 -->
+        <div id="conversationsOverlay"></div>
+        
+        <!-- 左側：對話列表 -->
+        <div id="conversationsSidebar" class="col-md-4 col-lg-4 col-xl-3 border-end bg-light d-md-block" style="height: calc(100vh - 60px); overflow-y: auto; position: fixed; left: -100%; z-index: 999; transition: left 0.3s ease;">
+            <div class="p-3 border-bottom bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-chat-dots"></i> <span data-i18n="messages.conversations">對話</span></h5>
+                    <div class="d-flex gap-2 align-items-center">
+                    <button class="btn btn-sm btn-primary" onclick="showNewConversationModal()">
+                        <i class="bi bi-plus-circle"></i> <span data-i18n="messages.newConversation">新對話</span>
+                    </button>
+                    <!-- Mobile: 關閉側邊欄按鈕 -->
+                    <button id="closeSidebarBtn" class="btn btn-sm btn-outline-secondary d-md-none" onclick="closeSidebar()" style="display: none;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    </div>
+                </div>
+            </div>
+            <!-- 分類標籤 -->
+            <div class="p-2 border-bottom bg-white">
+                <div class="btn-group w-100" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-primary active" onclick="filterConversations('all')" id="filterAll" data-i18n="calendars.filterAll">全部</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterConversations('user')" id="filterUser" data-i18n="messages.users">用戶</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterConversations('customer')" id="filterCustomer" data-i18n="messages.customers">客戶</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterConversations('visitor')" id="filterVisitor" data-i18n="messages.visitors">訪客</button>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="filterConversations('ai')" id="filterAI" data-i18n="messages.ai">AI</button>
+                </div>
+            </div>
+            <div id="conversationsList" class="list-group list-group-flush">
+                <div class="text-center p-4 text-muted">
+                    <i class="bi bi-chat-dots fs-1"></i>
+                    <p class="mt-2" data-i18n="messages.loadingConversations">載入對話列表中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：聊天窗口 -->
+        <div class="col-12 col-md-8 col-lg-8 col-xl-9 d-flex flex-column" style="height: calc(100vh - 60px);">
+            <!-- 聊天頭部 -->
+            <div id="chatHeader" class="border-bottom bg-white d-none">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-circle me-2" id="chatUserAvatar">
+                            <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0" id="chatUserName" data-i18n="messages.selectConversation">選擇對話</h6>
+                            <small class="text-muted" id="chatUserStatus" data-i18n="messages.offline">離線</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 消息區域 -->
+            <div id="chatMessages" class="flex-grow-1 overflow-auto p-3 bg-light">
+                <div class="text-center p-5 text-muted">
+                    <i class="bi bi-chat-left-text fs-1"></i>
+                    <p class="mt-2" data-i18n="messages.selectConversationToStart">選擇一個對話開始聊天</p>
+                </div>
+            </div>
+
+            <!-- 輸入區域 -->
+            <div id="chatInputArea" class="border-top p-3 bg-white d-none">
+                <form id="messageForm" onsubmit="sendMessage(event)">
+                    <div class="input-group">
+                        <button type="button" class="btn btn-outline-secondary mb-0" id="msgWebSearchToggle" onclick="toggleMsgWebSearch()" title="Web Search" style="cursor: pointer; display: none;">
+                            <i class="bi bi-globe2"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary mb-0" id="msgMicButton" onclick="toggleMsgVoiceInput()" title="Voice Input" style="cursor: pointer; display: none;">
+                            <i class="bi bi-mic"></i>
+                        </button>
+                        <textarea class="form-control" id="messageInput" rows="1" data-i18n-placeholder="messages.enterMessage" placeholder="輸入訊息..." style="resize: none; max-height: 120px;"></textarea>
+                        <button type="submit" class="btn btn-success" id="sendButton">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新對話模態框 -->
+<div class="modal fade" id="newConversationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="messages.startNewConversation">開始新對話</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-i18n-aria-label="common.close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs mb-3" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-pane" type="button" role="tab" data-i18n="messages.users">用戶</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="customer-tab" data-bs-toggle="tab" data-bs-target="#customer-pane" type="button" role="tab" data-i18n="messages.customers">客戶</button>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="user-pane" role="tabpanel">
+                        <label class="form-label" data-i18n="messages.selectUser">選擇用戶</label>
+                        <select class="form-select" id="newConversationUser" style="width: 100%;">
+                            <option value="" data-i18n="messages.pleaseSelectUser">請選擇用戶...</option>
+                        </select>
+                    </div>
+                    <div class="tab-pane fade" id="customer-pane" role="tabpanel">
+                        <label class="form-label" data-i18n="messages.selectCustomer">選擇客戶</label>
+                        <select class="form-select" id="newConversationCustomer" style="width: 100%;">
+                            <option value="" data-i18n="messages.pleaseSelectCustomer">請選擇客戶...</option>
+                        </select>
+                    </div>
+                    <div class="tab-pane fade" id="ai-pane" role="tabpanel">
+                        <div class="alert alert-info mb-0">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span data-i18n="messages.aiAssistantHelp">與 AI 助手對話，獲得業務相關的幫助</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+                <button type="button" class="btn btn-primary" onclick="startNewConversation()" data-i18n="messages.startConversation">開始對話</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 1px solid #dee2e6;
+        background: transparent;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .conversation-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-left: 3px solid transparent;
+    }
+
+    .conversation-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .conversation-item.active {
+        background-color: #6c757d;
+        border-left-color: #6c757d;
+        color: #fff;
+    }
+    
+    .conversation-item.active * {
+        color: #fff !important;
+    }
+    
+    .conversation-item.active i,
+    .conversation-item.active .bi {
+        color: #fff !important;
+    }
+
+    .message-bubble {
+        max-width: 70%;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        word-wrap: break-word;
+    }
+
+    .message-bubble.sent {
+        background: #0d6efd;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 0.25rem;
+    }
+
+    .message-bubble.received {
+        background: white;
+        color: #333;
+        border: 1px solid #e5e7eb;
+        margin-right: auto;
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        opacity: 0.7;
+        margin-top: 0.25rem;
+    }
+
+    .unread-badge {
+        background: #dc3545;
+        color: white;
+        border-radius: 10px;
+        padding: 0.15rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    #chatMessages {
+        scroll-behavior: smooth;
+    }
+
+    #chatHeader {
+        padding: 0.9rem !important; /* 与左侧 p-3 完全一致 */
+        min-height: auto;
+        display: flex;
+        align-items: center;
+    }
+
+    #chatHeader .avatar-circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        border: 1px solid #dee2e6;
+        background: transparent;
+        color: #6c757d;
+    }
+
+    #chatHeader h6 {
+        font-size: 1rem; /* 与左侧 h5 的默认大小接近 */
+        line-height: 1.2;
+        margin-bottom: 0;
+    }
+
+    #chatHeader small {
+        font-size: 0.75rem;
+        line-height: 1;
+        display: block;
+        margin-top: 0.125rem;
+    }
+
+    #messageInput {
+        border-radius: 0.375rem 0 0 0.375rem; /* 左边圆角，右边无圆角（连接 button） */
+        padding: 0.75rem 1rem;
+        border-right: none; /* 移除右边框，因为与 button 连接 */
+    }
+
+    #messageInput:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        border-right: none; /* 保持右边无边框 */
+    }
+
+    #sendButton {
+        border-radius: 0 0.375rem 0.375rem 0; /* 右边圆角，左边无圆角（连接 input） */
+        border-left: none; /* 移除左边框，因为与 input 连接 */
+    }
+
+    #msgWebSearchToggle,
+    #msgMicButton {
+        border-radius: 0;
+        border-right: none;
+    }
+
+    #msgMicButton.recording {
+        color: #dc3545;
+        background: #fdeaea;
+        border-color: #dc3545;
+        animation: ai-mic-pulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes ai-mic-pulse {
+        0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.35); }
+        70% { box-shadow: 0 0 0 8px rgba(220, 53, 69, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+
+    /* Mobile 遮罩层 */
+    #conversationsOverlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+    }
+    
+    #conversationsOverlay.show {
+        display: block;
+    }
+
+    /* Mobile 响应式样式 */
+    @media (max-width: 767.98px) {
+        #conversationsSidebar {
+            left: -100% !important;
+        }
+        
+        #conversationsSidebar.show {
+            left: 0 !important;
+        }
+        
+        /* 确保聊天窗口在 mobile 时占满全宽并独立一行 */
+        .chat-container .row > .col-12.col-md-8 {
+            margin-left: 0 !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    /* Desktop 样式 */
+    @media (min-width: 768px) {
+        #conversationsSidebar {
+            position: relative !important;
+            left: 0 !important;
+        }
+        
+        #conversationsOverlay {
+            display: none !important;
+        }
+        
+        #toggleConversationsBtn {
+            display: none !important;
+        }
+    }
+
+</style>
+
+<script>
+    let currentConversationUserId = null;
+    let currentConversationCustomerId = null;
+    let currentConversationVisitorId = null;
+    let currentConversationType = null; // 'user', 'customer', or 'ai'
+    let conversations = [];
+    let filteredConversations = [];
+    let currentFilter = 'all'; // 'all', 'user', 'customer', 'visitor', 'ai'
+    let allUsers = [];
+    let allCustomers = [];
+    let currentUserId = null;
+    let pollInterval = null;
+    let msgWebSearchEnabled = false; // Web Search toggle state for messages page
+    let msgSpeechRecognition = null;
+    let msgVoiceListening = false;
+    let msgVoiceRecording = false;
+    let msgMediaRecorder = null;
+    let msgRecordingStream = null;
+    let msgRecordedChunks = [];
+    let msgPendingAudioAttachment = null;
+
+    // 全局函数：关闭侧边栏（供 onclick 使用）
+    function closeSidebar() {
+        const sidebar = document.getElementById('conversationsSidebar');
+        const overlay = document.getElementById('conversationsOverlay');
+        const toggleBtn = document.getElementById('toggleConversationsBtn');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        
+        if (window.innerWidth < 768 && sidebar) {
+            sidebar.classList.remove('show');
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
+            // 侧边栏关闭时，显示按钮
+            if (toggleBtn) {
+                toggleBtn.style.display = 'flex';
+            }
+            // 侧边栏关闭时，隐藏关闭按钮
+            if (closeSidebarBtn) {
+                closeSidebarBtn.style.display = 'none';
+            }
+        }
+    }
+
+    function t(key, fallback) {
+        try {
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                const v = I18n.t(key);
+                if (v && v !== key) return v;
+            }
+        } catch {}
+        return fallback != null ? fallback : key;
+    }
+
+    function uiLocale() {
+        try {
+            if (typeof I18n !== 'undefined' && I18n.currentLang) {
+                if (I18n.currentLang === 'en') return 'en-US';
+                if (I18n.currentLang === 'zh-CN') return 'zh-CN';
+            }
+        } catch {}
+        return 'zh-TW';
+    }
+
+    // 從 URL 參數解析 conversation 信息
+    function parseConversationFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        
+        if (id) {
+            // 從 conversations 列表中查找對應的 conversation，自動判斷類型
+            const conv = conversations.find(c => 
+                (c.conversation_type === 'user' && c.other_user_id === id) ||
+                (c.conversation_type === 'customer' && c.other_customer_id === id) ||
+                (c.conversation_type === 'visitor' && c.visitor_id === id) ||
+                (c.conversation_type === 'ai' && id === 'ai')
+            );
+            
+            if (conv) {
+                return { id, type: conv.conversation_type };
+            }
+            // 如果找不到，嘗試判斷是否為 AI（id === 'ai'）
+            if (id === 'ai') {
+                return { id: null, type: 'ai' };
+            }
+        }
+        return null;
+    }
+    
+    // 更新 URL（不刷新頁面）
+    function updateURL(id, type) {
+        const url = new URL(window.location);
+        // 對於 AI，使用 'ai' 作為 id
+        const urlId = (type === 'ai') ? 'ai' : id;
+        if (urlId) {
+            url.searchParams.set('id', urlId);
+        } else {
+            url.searchParams.delete('id');
+        }
+        // 使用 pushState 以便支持瀏覽器前進/後退
+        // 但避免在初始化時創建重複的歷史記錄
+        const currentState = window.history.state;
+        if (currentState && currentState._initialized) {
+            window.history.pushState({ id: urlId, _initialized: true }, '', url);
+        } else {
+            window.history.replaceState({ id: urlId, _initialized: true }, '', url);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        if (!App.checkAuth()) return;
+
+        // Mobile: 切換對話列表顯示/隱藏
+        const toggleBtn = document.getElementById('toggleConversationsBtn');
+        const sidebar = document.getElementById('conversationsSidebar');
+        const overlay = document.getElementById('conversationsOverlay');
+        const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+        
+        function toggleSidebar() {
+            if (window.innerWidth < 768) {
+                sidebar.classList.toggle('show');
+                if (overlay) {
+                    overlay.classList.toggle('show');
+                }
+                // 当侧边栏显示时，隐藏按钮；隐藏时，显示按钮
+                if (toggleBtn) {
+                    if (sidebar.classList.contains('show')) {
+                        toggleBtn.style.display = 'none';
+                    } else {
+                        toggleBtn.style.display = 'flex';
+                    }
+                }
+                // 当侧边栏显示时，显示关闭按钮；隐藏时，隐藏关闭按钮
+                if (closeSidebarBtn) {
+                    if (sidebar.classList.contains('show')) {
+                        closeSidebarBtn.style.display = 'block';
+                    } else {
+                        closeSidebarBtn.style.display = 'none';
+                    }
+                }
+            }
+        }
+        
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleSidebar();
+            });
+            
+            // 點擊遮罩層關閉側邊欄
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebar);
+            }
+            
+            // 點擊對話項時在 mobile 上自動關閉側邊欄
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 768 && e.target.closest('.conversation-item')) {
+                    closeSidebar();
+                }
+            });
+            
+            // 初始化关闭按钮状态（mobile 时默认隐藏）
+            if (closeSidebarBtn && window.innerWidth < 768) {
+                closeSidebarBtn.style.display = 'none';
+            }
+            
+            // 监听窗口大小变化，确保按钮状态正确
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    // Desktop: 确保按钮隐藏
+                    if (toggleBtn) {
+                        toggleBtn.style.display = 'none';
+                    }
+                    if (closeSidebarBtn) {
+                        closeSidebarBtn.style.display = 'none';
+                    }
+                } else {
+                    // Mobile: 根据侧边栏状态显示/隐藏按钮
+                    if (toggleBtn && sidebar) {
+                        if (sidebar.classList.contains('show')) {
+                            toggleBtn.style.display = 'none';
+                        } else {
+                            toggleBtn.style.display = 'flex';
+                        }
+                    }
+                    if (closeSidebarBtn && sidebar) {
+                        if (sidebar.classList.contains('show')) {
+                            closeSidebarBtn.style.display = 'block';
+                        } else {
+                            closeSidebarBtn.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        }
+
+        // 獲取當前用戶ID
+        await loadCurrentUser();
+        await loadUsers();
+        await loadCustomers();
+        await loadConversations();
+        initNewConversationSelect2();
+        
+        // 檢查 URL 參數，如果有 conversation id，自動選擇
+        // loadConversations() 已 await 完成，conversations 陣列已就緒
+        {
+            const urlConversation = parseConversationFromURL();
+            if (urlConversation) {
+                const { id, type } = urlConversation;
+                let name = '';
+                
+                if (type === 'user') {
+                    const user = allUsers.find(u => u.id === id);
+                    name = user ? (user.name || user.email) : '未知用戶';
+                    await selectConversation(id, name, 'user');
+                } else if (type === 'customer') {
+                    const customer = allCustomers.find(c => c.id === id);
+                    name = customer ? (customer.name || customer.code || customer.email || '未知客戶') : '未知客戶';
+                    await selectConversation(id, name, 'customer');
+                } else if (type === 'visitor') {
+                    // 訪客對話需要從 conversations 列表中查找名稱
+                    const conv = conversations.find(c => c.conversation_type === 'visitor' && c.visitor_id === id);
+                    name = conv ? conv.other_user_name : '訪客';
+                    await selectConversation(id, name, 'visitor');
+                } else if (type === 'ai') {
+                    const aiName = t('messages.aiAssistant', 'AI Assistant');
+                    await selectConversation(null, aiName, 'ai');
+                }
+            } else {
+                // 移動端：如果沒有 URL 參數，自動打開 sidebar（直接顯示，不播放動畫）
+                if (window.innerWidth < 768) {
+                    if (sidebar && !sidebar.classList.contains('show')) {
+                        // 臨時移除 transition，直接設置位置，避免動畫
+                        const originalTransition = sidebar.style.transition;
+                        sidebar.style.transition = 'none';
+                        sidebar.style.left = '0';
+                        // 強制重排，確保樣式生效
+                        sidebar.offsetHeight;
+                        // 恢復 transition（用於之後的開關動畫）
+                        sidebar.style.transition = originalTransition || 'left 0.3s ease';
+                        sidebar.classList.add('show');
+                        
+                        if (overlay) {
+                            overlay.classList.add('show');
+                        }
+                        if (toggleBtn) {
+                            toggleBtn.style.display = 'none';
+                        }
+                        if (closeSidebarBtn) {
+                            closeSidebarBtn.style.display = 'block';
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 監聽瀏覽器前進/後退按鈕
+        window.addEventListener('popstate', async function(event) {
+            const urlConversation = parseConversationFromURL();
+            if (urlConversation) {
+                const { id, type } = urlConversation;
+                let name = '';
+                
+                if (type === 'user') {
+                    const user = allUsers.find(u => u.id === id);
+                    name = user ? (user.name || user.email) : '未知用戶';
+                    await selectConversationWithoutURLUpdate(id, name, 'user');
+                } else if (type === 'customer') {
+                    const customer = allCustomers.find(c => c.id === id);
+                    name = customer ? (customer.name || customer.code || customer.email || '未知客戶') : '未知客戶';
+                    await selectConversationWithoutURLUpdate(id, name, 'customer');
+                } else if (type === 'visitor') {
+                    const conv = conversations.find(c => c.conversation_type === 'visitor' && c.visitor_id === id);
+                    name = conv ? conv.other_user_name : '訪客';
+                    await selectConversationWithoutURLUpdate(id, name, 'visitor');
+                } else if (type === 'ai') {
+                    const aiName = t('messages.aiAssistant', 'AI Assistant');
+                    await selectConversationWithoutURLUpdate(null, aiName, 'ai');
+                }
+            } else {
+                // 如果 URL 沒有參數，清除當前選擇
+                currentConversationUserId = null;
+                currentConversationCustomerId = null;
+                currentConversationVisitorId = null;
+                currentConversationType = null;
+                renderConversations();
+                document.getElementById('chatHeader').classList.add('d-none');
+                document.getElementById('chatInputArea').classList.add('d-none');
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="text-center p-5 text-muted">
+                        <i class="bi bi-chat-left-text fs-1"></i>
+                        <p class="mt-2" data-i18n="messages.selectConversationToStart">選擇一個對話開始聊天</p>
+                    </div>
+                `;
+                
+                // 移動端：自動打開 sidebar（直接顯示，不播放動畫）
+                if (window.innerWidth < 768) {
+                    if (sidebar && !sidebar.classList.contains('show')) {
+                        // 臨時移除 transition，直接設置位置，避免動畫
+                        const originalTransition = sidebar.style.transition;
+                        sidebar.style.transition = 'none';
+                        sidebar.style.left = '0';
+                        // 強制重排，確保樣式生效
+                        sidebar.offsetHeight;
+                        // 恢復 transition（用於之後的開關動畫）
+                        sidebar.style.transition = originalTransition || 'left 0.3s ease';
+                        sidebar.classList.add('show');
+                        
+                        if (overlay) {
+                            overlay.classList.add('show');
+                        }
+                        if (toggleBtn) {
+                            toggleBtn.style.display = 'none';
+                        }
+                        if (closeSidebarBtn) {
+                            closeSidebarBtn.style.display = 'block';
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 監聽瀏覽器前進/後退按鈕
+        window.addEventListener('popstate', async function(event) {
+            const urlConversation = parseConversationFromURL();
+            if (urlConversation) {
+                const { id, type } = urlConversation;
+                let name = '';
+                
+                if (type === 'user') {
+                    const user = allUsers.find(u => u.id === id);
+                    name = user ? (user.name || user.email) : '未知用戶';
+                    await selectConversationWithoutURLUpdate(id, name, 'user');
+                } else if (type === 'customer') {
+                    const customer = allCustomers.find(c => c.id === id);
+                    name = customer ? (customer.name || customer.code || customer.email || '未知客戶') : '未知客戶';
+                    await selectConversationWithoutURLUpdate(id, name, 'customer');
+                } else if (type === 'visitor') {
+                    const conv = conversations.find(c => c.conversation_type === 'visitor' && c.visitor_id === id);
+                    name = conv ? conv.other_user_name : '訪客';
+                    await selectConversationWithoutURLUpdate(id, name, 'visitor');
+                } else if (type === 'ai') {
+                    const aiName = t('messages.aiAssistant', 'AI Assistant');
+                    await selectConversationWithoutURLUpdate(null, aiName, 'ai');
+                }
+            } else {
+                // 如果 URL 沒有參數，清除當前選擇
+                currentConversationUserId = null;
+                currentConversationCustomerId = null;
+                currentConversationVisitorId = null;
+                currentConversationType = null;
+                renderConversations();
+                document.getElementById('chatHeader').classList.add('d-none');
+                document.getElementById('chatInputArea').classList.add('d-none');
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="text-center p-5 text-muted">
+                        <i class="bi bi-chat-left-text fs-1"></i>
+                        <p class="mt-2" data-i18n="messages.selectConversationToStart">選擇一個對話開始聊天</p>
+                    </div>
+                `;
+                
+                // 移動端：自動打開 sidebar（直接顯示，不播放動畫）
+                if (window.innerWidth < 768) {
+                    if (sidebar && !sidebar.classList.contains('show')) {
+                        // 臨時移除 transition，直接設置位置，避免動畫
+                        const originalTransition = sidebar.style.transition;
+                        sidebar.style.transition = 'none';
+                        sidebar.style.left = '0';
+                        // 強制重排，確保樣式生效
+                        sidebar.offsetHeight;
+                        // 恢復 transition（用於之後的開關動畫）
+                        sidebar.style.transition = originalTransition || 'left 0.3s ease';
+                        sidebar.classList.add('show');
+                        
+                        if (overlay) {
+                            overlay.classList.add('show');
+                        }
+                        if (toggleBtn) {
+                            toggleBtn.style.display = 'none';
+                        }
+                        if (closeSidebarBtn) {
+                            closeSidebarBtn.style.display = 'block';
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 自動調整輸入框高度
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput) {
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+                
+                // 自動保存草稿
+                autoSaveMessageDraft();
+            });
+            
+            // 支持 Enter 發送，Shift+Enter 換行
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(e);
+                }
+            });
+        }
+        
+        // 更新草稿計數
+        updateMessageDraftCount();
+
+        // 開始輪詢新消息（暫時禁用自動更新消息）
+        // startPolling();
+    });
+
+    // 載入當前用戶信息
+    async function loadCurrentUser() {
+        try {
+            const response = await App.apiRequest('/user/me');
+            currentUserId = response.id;
+        } catch (error) {
+            console.error('Failed to load current user:', error);
+            // 如果失敗，嘗試從token解析（備用方案）
+            try {
+                const token = localStorage.getItem('auth_token');
+                if (token) {
+                    // 簡單解析JWT（僅用於獲取user_id，不驗證簽名）
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.user_id) {
+                        currentUserId = payload.user_id;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to parse token:', e);
+            }
+        }
+    }
+
+    // 載入用戶列表
+    async function loadUsers() {
+        try {
+            const response = await App.apiRequest('/users?status=active');
+            allUsers = response.data || [];
+        } catch (error) {
+            console.error('Failed to load users:', error);
+        }
+    }
+
+    // 載入客戶列表
+    async function loadCustomers() {
+        try {
+            const response = await App.apiRequest('/customers?status=active&limit=1000');
+            allCustomers = response.data || [];
+        } catch (error) {
+            console.error('Failed to load customers:', error);
+        }
+    }
+
+    // 載入對話列表
+    async function loadConversations() {
+        try {
+            const response = await App.apiRequest('/messages/conversations');
+            conversations = response.data || [];
+            filterConversations(currentFilter);
+        } catch (error) {
+            console.error('Failed to load conversations:', error);
+            document.getElementById('conversationsList').innerHTML =
+                `<div class="text-center p-4 text-danger">${t('messages.loadFailed', 'Load failed')}</div>`;
+        }
+    }
+
+    // 篩選對話
+    function filterConversations(type) {
+        currentFilter = type;
+        
+        // 更新按鈕狀態
+        document.querySelectorAll('.btn-group button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const filterId = 'filter' + type.charAt(0).toUpperCase() + type.slice(1);
+        const filterBtn = document.getElementById(filterId);
+        if (filterBtn) {
+            filterBtn.classList.add('active');
+        }
+        
+        // 篩選對話列表
+        if (type === 'all') {
+            filteredConversations = conversations;
+        } else {
+            filteredConversations = conversations.filter(conv => conv.conversation_type === type);
+        }
+        
+        renderConversations();
+    }
+
+    // 渲染對話列表
+    function renderConversations() {
+        const container = document.getElementById('conversationsList');
+        
+        const conversationsToRender = currentFilter === 'all' ? conversations : filteredConversations;
+        
+        if (conversationsToRender.length === 0) {
+            const noConversations = t('messages.noConversations', 'No conversations');
+            const startNew = t('messages.startNewConversationBtn', 'Start new conversation');
+            container.innerHTML = `
+                <div class="text-center p-4 text-muted">
+                    <i class="bi bi-chat-dots fs-1"></i>
+                    <p class="mt-2">${noConversations}</p>
+                    <button class="btn btn-sm btn-primary" onclick="showNewConversationModal()">
+                        ${startNew}
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = conversationsToRender.map(conv => {
+            const timeStr = new Date(conv.last_message_time).toLocaleString(uiLocale(), {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const unreadBadge = conv.unread_count > 0 
+                ? `<span class="unread-badge">${conv.unread_count}</span>` 
+                : '';
+            const isActive = (conv.conversation_type === 'user' && conv.other_user_id === currentConversationUserId && currentConversationType === 'user') ||
+                            (conv.conversation_type === 'customer' && conv.other_customer_id === currentConversationCustomerId && currentConversationType === 'customer') ||
+                            (conv.conversation_type === 'visitor' && conv.visitor_id === currentConversationVisitorId && currentConversationType === 'visitor') ||
+                            (conv.conversation_type === 'ai' && currentConversationType === 'ai');
+            let icon = 'bi-person';
+            if (conv.conversation_type === 'customer') {
+                icon = 'bi-person-badge';
+            } else if (conv.conversation_type === 'visitor') {
+                icon = 'bi-globe2';
+            } else if (conv.conversation_type === 'ai') {
+                icon = 'bi-robot';
+            }
+            let onClick = '';
+            if (conv.conversation_type === 'user') {
+                onClick = `selectConversation('${conv.other_user_id}', '${conv.other_user_name.replace(/'/g, "\\'")}', 'user')`;
+            } else if (conv.conversation_type === 'customer') {
+                onClick = `selectConversation('${conv.other_customer_id}', '${conv.other_user_name.replace(/'/g, "\\'")}', 'customer')`;
+            } else if (conv.conversation_type === 'visitor') {
+                onClick = `selectConversation('${(conv.visitor_id || '').replace(/'/g, "\\'")}', '${conv.other_user_name.replace(/'/g, "\\'")}', 'visitor')`;
+            } else if (conv.conversation_type === 'ai') {
+                const aiName = t('messages.aiAssistant', 'AI Assistant');
+                onClick = `selectConversation(null, '${aiName.replace(/'/g, "\\'")}', 'ai')`;
+            }
+            const customerTag = t('messages.tagCustomer', '(Customer)');
+            const aiTag = t('messages.tagAi', '(AI)');
+            const visitorTag = '（訪客）';
+            const noMessagePreview = t('messages.noMessage', '(No message)');
+            
+            // 处理访客名称：将"匿名訪客"替换为"訪客"，并移除"（訪客）"标签（因为名称本身已包含"訪客"）
+            let displayName = conv.other_user_name;
+            if (conv.conversation_type === 'visitor') {
+                // 替换"匿名訪客"为"訪客"
+                displayName = displayName.replace(/^匿名訪客\s*/, '訪客 ');
+                // visitor 类型不添加"（訪客）"标签，因为名称本身已包含"訪客"
+            }
+            
+            return `
+                <div class="conversation-item list-group-item list-group-item-action ${isActive ? 'active' : ''}" 
+                     onclick="${onClick}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="d-flex align-items-center flex-grow-1" style="min-width: 0;">
+                            <div class="avatar-circle me-2 flex-shrink-0">
+                                <i class="bi ${icon}"></i>
+                            </div>
+                            <div class="flex-grow-1" style="min-width: 0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0 text-truncate">${displayName} ${conv.conversation_type === 'customer' ? `<small class="text-muted">${customerTag}</small>` : conv.conversation_type === 'visitor' ? '' : conv.conversation_type === 'ai' ? `<small class="text-muted">${aiTag}</small>` : ''}</h6>
+                                    ${unreadBadge}
+                                </div>
+                                <p class="mb-0 text-muted text-truncate small">${conv.last_message || noMessagePreview}</p>
+                                <small class="text-muted">${timeStr}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 選擇對話（內部函數，不更新 URL）
+    async function selectConversationWithoutURLUpdate(id, name, type) {
+        currentConversationType = type;
+        if (type === 'user') {
+            currentConversationUserId = id;
+            currentConversationCustomerId = null;
+            currentConversationVisitorId = null;
+        } else if (type === 'customer') {
+            currentConversationCustomerId = id;
+            currentConversationUserId = null;
+            currentConversationVisitorId = null;
+        } else if (type === 'visitor') {
+            currentConversationVisitorId = id;
+            currentConversationUserId = null;
+            currentConversationCustomerId = null;
+        } else if (type === 'ai') {
+            currentConversationUserId = null;
+            currentConversationCustomerId = null;
+            currentConversationVisitorId = null;
+        }
+        
+        renderConversations();
+        
+        // 顯示聊天窗口
+        document.getElementById('chatHeader').classList.remove('d-none');
+        document.getElementById('chatInputArea').classList.remove('d-none');
+        // Show/hide web search toggle based on conversation type
+        const msgSearchToggle = document.getElementById('msgWebSearchToggle');
+        if (msgSearchToggle) {
+            msgSearchToggle.style.display = (type === 'ai') ? '' : 'none';
+        }
+        const msgMicButton = document.getElementById('msgMicButton');
+        if (msgMicButton) {
+            msgMicButton.style.display = (type === 'ai') ? '' : 'none';
+        }
+        const customerTag = t('messages.tagCustomer', '(Customer)');
+        const aiTag = t('messages.tagAi', '(AI)');
+        const visitorTag = '（訪客）';
+        // 处理访客名称：将"匿名訪客"替换为"訪客"，并移除"（訪客）"标签
+        let displayName = name;
+        if (type === 'visitor') {
+            displayName = displayName.replace(/^匿名訪客\s*/, '訪客 ');
+            // visitor 类型不添加"（訪客）"标签，因为名称本身已包含"訪客"
+        }
+        document.getElementById('chatUserName').textContent = displayName + (type === 'customer' ? ` ${customerTag}` : type === 'ai' ? ` ${aiTag}` : '');
+        
+        // 更新狀態
+        const statusElement = document.getElementById('chatUserStatus');
+        if (statusElement) {
+            if (type === 'ai') {
+                statusElement.textContent = t('messages.online', 'Online');
+                statusElement.className = 'text-success'; // 綠色表示在線
+            } else {
+                statusElement.textContent = t('messages.offline', 'Offline');
+                statusElement.className = 'text-muted'; // 灰色表示離線
+            }
+        }
+        
+        // 更新頭像
+        const avatar = document.getElementById('chatUserAvatar');
+        if (avatar) {
+            if (type === 'ai') {
+                avatar.innerHTML = '<i class="bi bi-robot"></i>';
+            } else if (type === 'visitor') {
+                avatar.innerHTML = '<i class="bi bi-globe2"></i>';
+            } else {
+                avatar.innerHTML = '<i class="bi bi-person"></i>';
+            }
+        }
+        
+        // 載入消息
+        await loadMessages(id, type);
+        
+        // 載入該對話的草稿（只支援 user/customer；AI/visitor 不保存草稿）
+        if (type === 'user' || type === 'customer') {
+            loadConversationDraft(id, type);
+        }
+    }
+    
+    // 選擇對話
+    async function selectConversation(id, name, type) {
+        // 更新 URL（不刷新頁面）
+        updateURL(id, type);
+        
+        // 調用內部函數執行選擇邏輯
+        await selectConversationWithoutURLUpdate(id, name, type);
+        
+        // 顯示聊天窗口
+        document.getElementById('chatHeader').classList.remove('d-none');
+        document.getElementById('chatInputArea').classList.remove('d-none');
+        const customerTag = t('messages.tagCustomer', '(Customer)');
+        const aiTag = t('messages.tagAi', '(AI)');
+        const visitorTag = '（訪客）';
+        // 处理访客名称：将"匿名訪客"替换为"訪客"，并移除"（訪客）"标签
+        let displayName = name;
+        if (type === 'visitor') {
+            displayName = displayName.replace(/^匿名訪客\s*/, '訪客 ');
+            // visitor 类型不添加"（訪客）"标签，因为名称本身已包含"訪客"
+        }
+        document.getElementById('chatUserName').textContent = displayName + (type === 'customer' ? ` ${customerTag}` : type === 'ai' ? ` ${aiTag}` : '');
+        
+        // 更新狀態
+        const statusElement = document.getElementById('chatUserStatus');
+        if (statusElement) {
+            if (type === 'ai') {
+                statusElement.textContent = t('messages.online', 'Online');
+                statusElement.className = 'text-success'; // 綠色表示在線
+            } else {
+                statusElement.textContent = t('messages.offline', 'Offline');
+                statusElement.className = 'text-muted'; // 灰色表示離線
+            }
+        }
+        
+        // 更新頭像
+        const avatar = document.getElementById('chatUserAvatar');
+        if (avatar) {
+            if (type === 'ai') {
+                avatar.innerHTML = '<i class="bi bi-robot"></i>';
+            } else if (type === 'visitor') {
+                avatar.innerHTML = '<i class="bi bi-globe2"></i>';
+            } else {
+                avatar.innerHTML = '<i class="bi bi-person"></i>';
+            }
+        }
+        
+        // 載入消息
+        await loadMessages(id, type);
+        
+        // 載入該對話的草稿（只支援 user/customer；AI/visitor 不保存草稿）
+        if (type === 'user' || type === 'customer') {
+            loadConversationDraft(id, type);
+        }
+    }
+
+    // 載入消息
+    async function loadMessages(otherId, type) {
+        try {
+            let url = '';
+            if (type === 'user') {
+                url = `/messages/conversation?other_user_id=${otherId}`;
+            } else if (type === 'customer') {
+                url = `/messages/conversation?other_customer_id=${otherId}`;
+            } else if (type === 'visitor') {
+                url = `/messages/conversation?visitor_id=${encodeURIComponent(otherId)}`;
+            } else if (type === 'ai') {
+                url = `/messages/conversation?ai_chat=true`;
+            }
+            const response = await App.apiRequest(url);
+            const messages = response.data || [];
+            renderMessages(messages, type);
+            
+            // 滾動到底部
+            setTimeout(() => {
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        } catch (error) {
+            console.error('Failed to load messages:', error);
+            App.showAlert(t('messages.loadMessagesFailed', 'Failed to load messages'), 'danger');
+        }
+    }
+
+    // HTML escape helper to prevent XSS and broken rendering
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // Sanitize HTML: use marked.js + DOMPurify when available, fallback to escape + restore
+    function sanitizeHtml(text) {
+        if (!text) return '';
+
+        // If marked.js + DOMPurify are available, render Markdown properly.
+        if (typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
+            // Backend convertLinksToHTML() may have already converted URLs to <a> tags.
+            // marked.js will pass them through as raw HTML, so they are preserved.
+            const html = marked.parse(text, { breaks: true, gfm: true });
+            return DOMPurify.sanitize(html, { ADD_ATTR: ['target'] });
+        }
+
+        // Fallback: no markdown library — escape HTML and restore <a> tags.
+        let escaped = escapeHtml(text);
+        // Restore <a href="..." ...>...</a> that were escaped.
+        escaped = escaped.replace(
+            /&lt;a\s+href=&quot;(https?:\/\/[\s\S]*?)&quot;[\s\S]*?&gt;([\s\S]*?)&lt;\/a&gt;/gi,
+            function(match, url, content) {
+                var cleanUrl = url.replace(/&amp;/g, '&');
+                return '<a href="' + cleanUrl + '" target="_blank" rel="noopener noreferrer">' + content + '</a>';
+            }
+        );
+        // Auto-linkify plain URLs that are not already inside an <a> tag
+        escaped = escaped.replace(
+            /(?<!href=")(https?:\/\/[^\s<&]+)/g,
+            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+        );
+        return escaped;
+    }
+
+    // 渲染消息
+    function renderMessages(messages, type) {
+        const container = document.getElementById('chatMessages');
+        
+        if (messages.length === 0) {
+            container.innerHTML = `<div class="text-center p-4 text-muted">${t('messages.noMessages', 'No messages')}</div>`;
+            return;
+        }
+
+        container.innerHTML = messages.map(msg => {
+            // 判斷是用戶消息還是 AI 消息
+            let isSent = false;
+            if (type === 'ai') {
+                // AI 對話：通過 extra_fields.role 判斷
+                if (msg.extra_fields && msg.extra_fields.role) {
+                    isSent = msg.extra_fields.role === 'user';
+                } else if (msg.from_user_id && currentUserId) {
+                    isSent = msg.from_user_id === currentUserId;
+                }
+            } else if (type === 'visitor') {
+                // 訪客對話：from_user_id 存在且等於 currentUserId 表示 staff 送出；訪客送出時 from_user_id 為空
+                isSent = msg.from_user_id && currentUserId && msg.from_user_id === currentUserId;
+            } else {
+                isSent = msg.from_user_id && currentUserId && msg.from_user_id === currentUserId;
+            }
+            
+            const timeStr = new Date(msg.created_at).toLocaleString(uiLocale(), {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const getTranslation = (key) => typeof I18n !== 'undefined' && I18n.t ? I18n.t(key) : key;
+            let senderName = getTranslation('messages.unknown');
+            if (type === 'ai') {
+            if (isSent) {
+                    senderName = getTranslation('messages.me');
+                } else {
+                    senderName = getTranslation('messages.aiAssistant');
+                }
+            } else if (type === 'visitor') {
+                if (isSent) {
+                    senderName = getTranslation('messages.me');
+                } else {
+                    senderName = (msg.extra_fields && (msg.extra_fields.visitor_name || msg.extra_fields.visitorName)) || '訪客';
+                }
+            } else if (isSent) {
+                senderName = getTranslation('messages.me');
+            } else if (msg.from_user) {
+                senderName = msg.from_user.name || getTranslation('messages.unknownUser');
+            } else if (msg.to_customer_id) {
+                // 客戶發送的消息
+                senderName = msg.to_customer ? (msg.to_customer.name || getTranslation('messages.unknownCustomer')) : getTranslation('messages.unknownCustomer');
+            }
+            
+            const avatarIcon = (type === 'ai' && !isSent) ? 'bi-robot' : (type === 'visitor' && !isSent) ? 'bi-globe2' : 'bi-person';
+
+            // Build generated image HTML if present (AI image generation)
+            let generatedImageHtml = '';
+            if (msg.extra_fields && msg.extra_fields.image_urls && msg.extra_fields.image_urls.length > 0) {
+                generatedImageHtml = '<div class="ai-generated-images">' +
+                    msg.extra_fields.image_urls.map((url, idx) => {
+                        return `<div class="ai-generated-image-item">
+                            <img src="${url}" alt="AI Generated Image ${idx + 1}" loading="lazy" onclick="openAiGeneratedImage(this.src)">
+                            <div class="ai-generated-image-actions">
+                                <a href="${url}" download="vai-image-${Date.now()}-${idx}.png" class="btn btn-sm btn-outline-secondary" title="下載">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </div>
+                        </div>`;
+                    }).join('') +
+                '</div>';
+            }
+
+            // Build attachment cards HTML if present
+            let attachmentHtml = '';
+            if (msg.extra_fields && msg.extra_fields.attachments && msg.extra_fields.attachments.length > 0) {
+                attachmentHtml = '<div class="ai-msg-attachments">' +
+                    msg.extra_fields.attachments.map(att => {
+                        const ext = (att.filename.split('.').pop() || '').toLowerCase();
+                        let iconClass = 'bi bi-file-earmark';
+                        if (['jpg', 'jpeg', 'png'].includes(ext)) iconClass = 'bi bi-file-image';
+                        else if (ext === 'pdf') iconClass = 'bi bi-file-pdf';
+                        else if (['doc', 'docx'].includes(ext)) iconClass = 'bi bi-file-word';
+                        else if (['xls', 'xlsx'].includes(ext)) iconClass = 'bi bi-file-excel';
+                        else if (['ppt', 'pptx'].includes(ext)) iconClass = 'bi bi-file-ppt';
+                        else if (ext === 'txt') iconClass = 'bi bi-file-text';
+                        const displayName = att.filename.length > 30 ? att.filename.substring(0, 27) + '...' : att.filename;
+                        const fileUrl = att.file_url || '';
+                        const isImage = ['jpg', 'jpeg', 'png'].includes(ext);
+                        if (fileUrl) {
+                            if (isImage) {
+                                return `<div class="ai-msg-attachment-card" title="${att.filename}" onclick="openAiGeneratedImage('${fileUrl}')" role="button">
+                                    <i class="${iconClass}"></i>
+                                    <span>${displayName}</span>
+                                </div>`;
+                            } else {
+                                return `<a href="${fileUrl}" download="${att.filename}" class="ai-msg-attachment-card" title="${att.filename}" style="text-decoration:none;color:inherit;">
+                                    <i class="${iconClass}"></i>
+                                    <span>${displayName}</span>
+                                </a>`;
+                            }
+                        }
+                        return `<div class="ai-msg-attachment-card" title="${att.filename}">
+                            <i class="${iconClass}"></i>
+                            <span>${displayName}</span>
+                        </div>`;
+                    }).join('') +
+                '</div>';
+            }
+
+            // Build generated document card HTML if present
+            let generatedDocHtml = '';
+            if (msg.extra_fields && msg.extra_fields.doc_info) {
+                const doc = msg.extra_fields.doc_info;
+                const docTypeIcons = {
+                    docx: { icon: 'bi-file-earmark-word', color: '#2b579a', label: 'Word' },
+                    xlsx: { icon: 'bi-file-earmark-excel', color: '#217346', label: 'Excel' },
+                    pptx: { icon: 'bi-file-earmark-ppt', color: '#d24726', label: 'PowerPoint' },
+                    pdf:  { icon: 'bi-file-earmark-pdf', color: '#dc3545', label: 'PDF' }
+                };
+                const typeInfo = docTypeIcons[doc.doc_type] || { icon: 'bi-file-earmark', color: '#6c757d', label: doc.doc_type };
+                const docTitle = doc.title || t('vai.chat.document', 'Document');
+                const _esc = typeof escapeHtml === 'function' ? escapeHtml : (s) => s;
+                const _fmtSize = typeof formatFileSize === 'function' ? formatFileSize : (b) => '';
+
+                if (doc.deleted) {
+                    generatedDocHtml = `
+                        <div class="ai-generated-doc-card" data-doc-id="${doc.id}" data-doc-status="deleted" style="opacity: 0.6;">
+                            <div class="ai-doc-card-icon" style="color: #adb5bd;">
+                                <i class="bi bi-file-earmark-x"></i>
+                            </div>
+                            <div class="ai-doc-card-info">
+                                <div class="ai-doc-card-title" style="text-decoration: line-through; color: #adb5bd;">${_esc(docTitle)}</div>
+                                <div class="ai-doc-card-meta">
+                                    <span class="ai-doc-card-type" style="color: #adb5bd;">${typeInfo.label} (.${doc.doc_type})</span>
+                                    <span class="ai-doc-card-size" style="color: #adb5bd;"><i class="bi bi-trash3 me-1"></i>${t('vai.chat.recordDeleted', 'Record deleted')}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                } else if (doc.status === 'generating') {
+                    generatedDocHtml = `
+                        <div class="ai-generated-doc-card" data-doc-id="${doc.id}" data-doc-status="generating">
+                            <div class="ai-doc-card-icon" style="color: ${typeInfo.color};">
+                                <i class="bi ${typeInfo.icon}"></i>
+                            </div>
+                            <div class="ai-doc-card-info">
+                                <div class="ai-doc-card-title">${_esc(docTitle)}</div>
+                                <div class="ai-doc-card-meta">
+                                    <span class="ai-doc-card-type">${typeInfo.label} (.${doc.doc_type})</span>
+                                    <span class="ai-doc-card-size" style="color: #f0ad4e;"><i class="bi bi-hourglass-split me-1"></i>${t('vai.chat.docGeneratingStatus', 'Generating...')}</span>
+                                </div>
+                            </div>
+                            <div class="spinner-border spinner-border-sm text-primary ai-doc-card-spinner" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>`;
+                } else if (doc.status === 'failed') {
+                    generatedDocHtml = `
+                        <div class="ai-generated-doc-card" data-doc-id="${doc.id}" data-doc-status="failed">
+                            <div class="ai-doc-card-icon" style="color: #dc3545;">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="ai-doc-card-info">
+                                <div class="ai-doc-card-title">${_esc(docTitle)}</div>
+                                <div class="ai-doc-card-meta">
+                                    <span class="ai-doc-card-type">${typeInfo.label} (.${doc.doc_type})</span>
+                                    <span class="ai-doc-card-size" style="color: #dc3545;">${t('vai.chat.generationFailed', 'Generation failed')}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    const fileSizeStr = doc.file_size ? _fmtSize(doc.file_size) : '';
+                    const downloadUrl = doc.file_url || `/api/v1/ai/documents/${doc.id}/download`;
+                    generatedDocHtml = `
+                        <div class="ai-generated-doc-card" data-doc-id="${doc.id}" data-doc-status="completed">
+                            <div class="ai-doc-card-icon" style="color: ${typeInfo.color};">
+                                <i class="bi ${typeInfo.icon}"></i>
+                            </div>
+                            <div class="ai-doc-card-info">
+                                <div class="ai-doc-card-title">${_esc(docTitle)}</div>
+                                <div class="ai-doc-card-meta">
+                                    <span class="ai-doc-card-type">${typeInfo.label} (.${doc.doc_type})</span>
+                                    ${fileSizeStr ? `<span class="ai-doc-card-size">${fileSizeStr}</span>` : ''}
+                                </div>
+                            </div>
+                            <a href="${downloadUrl}" class="btn btn-sm btn-primary ai-doc-card-download" title="${t('vai.chat.downloadDocument', 'Download')}" download>
+                                <i class="bi bi-download me-1"></i>${t('vai.common.download', 'Download')}
+                            </a>
+                        </div>`;
+                }
+            }
+
+            // Build generated video card HTML if present
+            let generatedVideoHtml = '';
+            if (msg.extra_fields && msg.extra_fields.video_info) {
+                const video = msg.extra_fields.video_info;
+                const videoPrompt = video.prompt || t('vai.chat.video', 'Video');
+                const truncatedPrompt = videoPrompt.length > 60 ? videoPrompt.substring(0, 60) + '...' : videoPrompt;
+                const _esc2 = typeof escapeHtml === 'function' ? escapeHtml : (s) => s;
+
+                if (video.deleted) {
+                    generatedVideoHtml = `
+                        <div class="ai-generated-video-card" data-video-status="deleted" style="opacity: 0.6;">
+                            <div class="ai-video-card-icon" style="color: #adb5bd;">
+                                <i class="bi bi-camera-video"></i>
+                            </div>
+                            <div class="ai-video-card-info">
+                                <div class="ai-video-card-title" style="text-decoration: line-through; color: #adb5bd;">${_esc2(truncatedPrompt)}</div>
+                                <div class="ai-video-card-meta">
+                                    <span class="ai-video-card-spec" style="color: #adb5bd;">${video.aspect_ratio || '16:9'} | ${video.duration || 8}s</span>
+                                    <span class="ai-video-card-status" style="color: #adb5bd;"><i class="bi bi-trash3 me-1"></i>${t('vai.chat.recordDeleted', 'Record deleted')}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                } else if (video.status === 'generating') {
+                    generatedVideoHtml = `
+                        <div class="ai-generated-video-card" data-operation-id="${video.operation_id}" data-video-status="generating">
+                            <div class="ai-video-card-icon">
+                                <i class="bi bi-camera-video"></i>
+                            </div>
+                            <div class="ai-video-card-info">
+                                <div class="ai-video-card-title">${_esc2(truncatedPrompt)}</div>
+                                <div class="ai-video-card-meta">
+                                    <span class="ai-video-card-spec">${video.aspect_ratio || '16:9'} | ${video.duration || 8}s</span>
+                                    <span class="ai-video-card-status" style="color: #f0ad4e;"><i class="bi bi-hourglass-split me-1"></i>${t('vai.chat.videoGeneratingStatus', 'Generating...')}</span>
+                                </div>
+                            </div>
+                            <div class="spinner-border spinner-border-sm text-primary ai-video-card-spinner" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>`;
+                } else if (video.status === 'error' || video.status === 'failed') {
+                    generatedVideoHtml = `
+                        <div class="ai-generated-video-card" data-operation-id="${video.operation_id}" data-video-status="error">
+                            <div class="ai-video-card-icon" style="color: #dc3545;">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="ai-video-card-info">
+                                <div class="ai-video-card-title">${_esc2(truncatedPrompt)}</div>
+                                <div class="ai-video-card-meta">
+                                    <span class="ai-video-card-spec">${video.aspect_ratio || '16:9'} | ${video.duration || 8}s</span>
+                                    <span class="ai-video-card-status" style="color: #dc3545;">${t('vai.chat.generationFailed', 'Generation failed')}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                } else if (video.status === 'done') {
+                    const videoUrl = video.video_url || '';
+                    generatedVideoHtml = `
+                        <div class="ai-generated-video-card" data-operation-id="${video.operation_id}" data-video-status="done">
+                            <div class="ai-video-card-player">
+                                <video controls preload="metadata" style="width: 100%; border-radius: 8px;">
+                                    <source src="${videoUrl}" type="video/mp4">
+                                    Your browser does not support video playback.
+                                </video>
+                            </div>
+                            <div class="ai-video-card-footer">
+                                <div class="ai-video-card-info">
+                                    <div class="ai-video-card-title">${_esc2(truncatedPrompt)}</div>
+                                    <div class="ai-video-card-meta">
+                                        <span class="ai-video-card-spec">${video.aspect_ratio || '16:9'} | ${video.duration || 8}s</span>
+                                    </div>
+                                </div>
+                                <a href="${videoUrl}" download="vai-video-${Date.now()}.mp4" class="btn btn-sm btn-primary ai-video-card-download" title="${t('vai.chat.downloadVideo', 'Download video')}">
+                                    <i class="bi bi-download me-1"></i>${t('vai.common.download', 'Download')}
+                                </a>
+                            </div>
+                        </div>`;
+                }
+            }
+
+            // Build grounding sources HTML if present (web search results persisted in extra_fields)
+            let groundingHtml = '';
+            if (!isSent && msg.extra_fields && msg.extra_fields.grounding &&
+                msg.extra_fields.grounding.sources && msg.extra_fields.grounding.sources.length > 0) {
+                const sourcesLabel = t('vai.chat.webSearchSources', 'Sources');
+                groundingHtml = '<div class="ai-grounding-sources mt-2">' +
+                    '<small class="text-muted d-block mb-1"><i class="bi bi-globe2 me-1"></i>' + sourcesLabel + '</small>' +
+                    msg.extra_fields.grounding.sources.map(function(src) {
+                        if (!src.url) return '';
+                        const title = src.title || (function() { try { return new URL(src.url).hostname; } catch(e) { return src.url; } })();
+                        const tooltip = src.text || src.title || src.url;
+                        return '<a href="' + escapeHtml(src.url) + '" target="_blank" rel="noopener noreferrer" ' +
+                            'class="badge bg-light text-dark text-decoration-none me-1 mb-1 d-inline-block" ' +
+                            'style="font-size:0.75rem;font-weight:normal;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" ' +
+                            'title="' + escapeHtml(tooltip) + '">' + escapeHtml(title) + '</a>';
+                    }).join('') +
+                    '</div>';
+            }
+
+            // Strip [附件: ...] suffix from display content (already shown as cards)
+            let displayContent = (msg.content || '');
+            if (attachmentHtml) {
+                displayContent = displayContent.replace(/\n?\n?\[附件: [^\]]*\]$/, '').trim();
+            }
+            const contentHtml = displayContent ? (
+                type === 'ai' && !isSent
+                    ? `<div class="ai-msg-content">${sanitizeHtml(displayContent)}</div>`
+                    : `<div style="white-space: pre-wrap; word-wrap: break-word;">${escapeHtml(displayContent)}</div>`
+            ) : '';
+            
+            return `
+                <div class="d-flex ${isSent ? 'justify-content-end' : 'justify-content-start'} mb-2" data-message-id="${msg.id}">
+                    ${!isSent ? `
+                        <div class="avatar-circle me-2 flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.9rem; border: 1px solid #dee2e6; background: transparent; color: #6c757d;">
+                            <i class="bi ${avatarIcon}"></i>
+                        </div>
+                    ` : ''}
+                    <div class="message-bubble ${isSent ? 'sent' : 'received'}" style="${(type === 'ai' || type === 'visitor') && !isSent ? 'background: #f0f4f8; color: #1a202c; border: 1px solid #cbd5e0;' : ''} position-relative">
+                        <div class="flex-grow-1">
+                            <div class="fw-bold mb-1">${escapeHtml(senderName)}</div>
+                            ${contentHtml}
+                            ${generatedDocHtml}
+                            ${generatedVideoHtml}
+                            ${generatedImageHtml}
+                            ${attachmentHtml}
+                            ${groundingHtml}
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <div class="message-time" style="font-size: 0.75rem; opacity: 0.7;">${timeStr}</div>
+                                <button class="btn btn-sm btn-link p-0 ms-2 delete-message-btn" onclick="deleteMessage('${msg.id}', this)" title="${t('messages.deleteMessage', 'Delete message')}" style="font-size: 0.75rem; text-decoration: none; opacity: 0.7; line-height: 1; ${isSent ? 'color: white;' : 'color: #666;'} flex-shrink: 0;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    ${isSent ? `
+                        <div class="avatar-circle ms-2 flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.9rem; border: 1px solid #dee2e6; background: transparent; color: #6c757d;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 發送消息
+    async function sendMessage(event) {
+        event.preventDefault();
+        
+        if (!currentConversationUserId && !currentConversationCustomerId && !currentConversationVisitorId && currentConversationType !== 'ai') {
+            App.showAlert(t('messages.pleaseSelectConversation', 'Please select a conversation first'), 'warning');
+            return;
+        }
+
+        const messageInput = document.getElementById('messageInput');
+        const content = messageInput.value.trim();
+        const hasPendingAudio = !!msgPendingAudioAttachment;
+        
+        if (!content && !hasPendingAudio) {
+            return;
+        }
+
+        const sendButton = document.getElementById('sendButton');
+        sendButton.disabled = true;
+        messageInput.disabled = true;
+
+        try {
+            const messageData = {
+                content: content,
+                subject: ''
+            };
+            
+            if (currentConversationType === 'ai') {
+                // AI 對話
+                messageData.message_type = 'ai_chat';
+                messageData.extra_fields = {
+                    ai_chat: true,
+                    role: 'user'
+                };
+                if (hasPendingAudio) {
+                    messageData.extra_fields.attachments = [{
+                        filename: msgPendingAudioAttachment.filename,
+                        mime_type: msgPendingAudioAttachment.mime_type,
+                        file_url: msgPendingAudioAttachment.file_url || null
+                    }];
+                    if (!messageData.content) {
+                        messageData.content = '[' + t('vai.chat.voiceInputAttached', 'Voice recording attached') + ']';
+                    }
+                }
+            } else if (currentConversationType === 'user' && currentConversationUserId) {
+                // 用戶對話：嚴格按照 currentConversationType 判斷
+                messageData.to_user_id = currentConversationUserId;
+            } else if (currentConversationType === 'visitor' && currentConversationVisitorId) {
+                // 訪客對話：嚴格按照 currentConversationType 判斷
+                messageData.message_type = 'public_chat';
+                messageData.extra_fields = {
+                    public_chat: true,
+                    visitor_id: currentConversationVisitorId
+                };
+            } else if (currentConversationType === 'customer' && currentConversationCustomerId) {
+                // 客戶對話：嚴格按照 currentConversationType 判斷
+                messageData.to_customer_id = currentConversationCustomerId;
+            } else {
+                // 備用邏輯（向後兼容）
+                if (currentConversationUserId) {
+                    messageData.to_user_id = currentConversationUserId;
+                } else if (currentConversationVisitorId) {
+                    messageData.message_type = 'public_chat';
+                    messageData.extra_fields = {
+                        public_chat: true,
+                        visitor_id: currentConversationVisitorId
+                    };
+                } else if (currentConversationCustomerId) {
+                    messageData.to_customer_id = currentConversationCustomerId;
+                } else {
+                    throw new Error('No conversation selected');
+                }
+            }
+
+            const response = await App.apiRequest('/messages', {
+                method: 'POST',
+                body: JSON.stringify(messageData)
+            });
+
+            // 清空輸入框
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+
+            // 如果是 AI 對話，調用 LLM API
+            if (currentConversationType === 'ai') {
+                // 顯示思考中的指示器
+                const chatMessages = document.getElementById('chatMessages');
+                const thinkingDiv = document.createElement('div');
+                thinkingDiv.className = 'd-flex justify-content-start mb-2';
+                thinkingDiv.innerHTML = `
+                    <div class="avatar-circle me-2 flex-shrink-0" style="width: 32px; height: 32px; font-size: 0.9rem; border: 1px solid #dee2e6; background: transparent; color: #6c757d;">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div class="message-bubble received" style="background: #f0f4f8; color: #1a202c; border: 1px solid #cbd5e0;">
+                        <div class="d-flex align-items-center">
+                            <span class="thinking-dots">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </span>
+                            <span class="ms-2" style="opacity: 0.7;">AI 正在思考...</span>
+                        </div>
+                    </div>
+                `;
+                chatMessages.appendChild(thinkingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                try {
+                    // 調用 LLM API
+                    const llmResult = await callLLMAPI(content, hasPendingAudio ? [msgPendingAudioAttachment] : null);
+                    
+                    // 移除思考指示器
+                    thinkingDiv.remove();
+                    
+                    // 保存 AI 回復
+                    const aiExtraFields = {
+                        ai_chat: true,
+                        role: 'assistant'
+                    };
+                    if (llmResult.grounding && llmResult.grounding.sources && llmResult.grounding.sources.length > 0) {
+                        aiExtraFields.grounding = llmResult.grounding;
+                    }
+                    const aiMessageData = {
+                        content: llmResult.content,
+                        subject: 'AI Chat',
+                        message_type: 'ai_chat',
+                        extra_fields: aiExtraFields
+                    };
+                    await App.apiRequest('/messages', {
+                        method: 'POST',
+                        body: JSON.stringify(aiMessageData)
+                    });
+                    msgPendingAudioAttachment = null;
+                } catch (llmError) {
+                    thinkingDiv.remove();
+                    console.error('LLM API error:', llmError);
+                    const tryLater = t('messages.tryAgainLater', 'Please try again later');
+                    App.showAlert(t('messages.aiReplyFailedPrefix', 'AI reply failed: ') + (llmError.message || llmError.error || tryLater), 'danger');
+                }
+            } else {
+                // 刪除該對話的草稿（因為已發送）—只支援 user/customer
+                const type = currentConversationUserId ? 'user' : (currentConversationCustomerId ? 'customer' : '');
+                const id = currentConversationUserId || currentConversationCustomerId;
+                if (type && id) {
+                    deleteConversationDraft(id, type);
+                }
+            }
+
+            // 重新載入消息和對話列表
+            const type = currentConversationType;
+            const id = currentConversationUserId || currentConversationCustomerId || currentConversationVisitorId;
+            await loadMessages(id, type);
+            await loadConversations();
+            
+            // 滾動到底部
+            setTimeout(() => {
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        } catch (error) {
+            console.error('Failed to send message:', error);
+            App.showAlert(t('messages.sendFailedPrefix', 'Send failed: ') + error.message, 'danger');
+            messageInput.disabled = false;
+            sendButton.disabled = false;
+        }
+    }
+    
+    // 調用 LLM API（與 ai-chat.js 中的函數類似）
+    async function callLLMAPI(userMessage, attachments) {
+        // 構建消息歷史
+        const messages = [];
+        const recentHistory = conversations
+            .filter(conv => conv.conversation_type === 'ai')
+            .flatMap(conv => {
+                // 這裡需要載入 AI 對話的歷史消息
+                return [];
+            });
+        
+        // 添加當前用戶消息
+        messages.push({
+            role: 'user',
+            content: userMessage
+        });
+
+        const requestBody = {
+            model: 'gemini-2.5-flash',
+            messages: messages,
+            temperature: 0.7,
+            max_tokens: 1000,
+            web_search: msgWebSearchEnabled
+        };
+        if (attachments && attachments.length > 0) {
+            requestBody.attachments = attachments;
+        }
+
+        const response = await App.apiRequest('/llm/chat', {
+            method: 'POST',
+            body: JSON.stringify(requestBody)
+        });
+
+        const grounding = response.grounding || null;
+        let content = null;
+        if (response.choices && response.choices.length > 0) {
+            content = response.choices[0].message?.content || response.choices[0].message?.text;
+        }
+        if (!content && response.content) {
+            content = response.content;
+        }
+        if (!content && response.text) {
+            content = response.text;
+        }
+        if (!content) {
+            if (response.error) {
+                throw new Error(response.error.message || response.error || 'LLM API 返回錯誤');
+            }
+            throw new Error('無法解析 LLM 響應');
+        }
+        return { content: content, grounding: grounding };
+    }
+
+    // Toggle Web Search on/off for messages page
+    function toggleMsgWebSearch() {
+        msgWebSearchEnabled = !msgWebSearchEnabled;
+        const btn = document.getElementById('msgWebSearchToggle');
+        if (btn) {
+            if (msgWebSearchEnabled) {
+                btn.classList.add('active');
+                btn.style.color = '#0d6efd';
+                btn.style.background = '#e7f0ff';
+                btn.style.borderColor = '#0d6efd';
+            } else {
+                btn.classList.remove('active');
+                btn.style.color = '';
+                btn.style.background = '';
+                btn.style.borderColor = '';
+            }
+        }
+    }
+
+    function toggleMsgVoiceInput() {
+        if (msgVoiceListening && msgSpeechRecognition) {
+            msgSpeechRecognition.stop();
+            return;
+        }
+        if (msgVoiceRecording && msgMediaRecorder) {
+            msgMediaRecorder.stop();
+            return;
+        }
+
+        const input = document.getElementById('messageInput');
+        if (!input) return;
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            startMsgAudioRecording();
+            return;
+        }
+
+        const htmlLang = (document.documentElement.getAttribute('lang') || '').toLowerCase();
+        const lang = htmlLang.startsWith('zh-cn') ? 'zh-CN' : (htmlLang.startsWith('zh') ? 'zh-TW' : 'en-US');
+        const baseText = input.value ? input.value.trim() : '';
+
+        msgSpeechRecognition = new SpeechRecognition();
+        msgSpeechRecognition.lang = lang;
+        msgSpeechRecognition.interimResults = true;
+        msgSpeechRecognition.continuous = true;
+
+        msgSpeechRecognition.onstart = function() {
+            msgVoiceListening = true;
+            updateMsgMicButtonState();
+        };
+
+        msgSpeechRecognition.onresult = function(event) {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            input.value = (baseText + ' ' + transcript).trim();
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+        };
+
+        msgSpeechRecognition.onerror = function(event) {
+            if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                App.showAlert(t('vai.chat.voiceInputPermissionDenied', 'Microphone permission denied'), 'warning');
+            } else if (event.error === 'no-speech') {
+                App.showAlert(t('vai.chat.voiceInputNoSpeech', 'No speech detected'), 'warning');
+            } else if (event.error !== 'aborted') {
+                App.showAlert(t('vai.chat.voiceInputFailed', 'Voice input failed: {error}').replace('{error}', event.error), 'warning');
+            }
+        };
+
+        msgSpeechRecognition.onend = function() {
+            msgVoiceListening = false;
+            msgSpeechRecognition = null;
+            updateMsgMicButtonState();
+        };
+
+        try {
+            msgSpeechRecognition.start();
+        } catch (e) {
+            msgSpeechRecognition = null;
+            msgVoiceListening = false;
+            updateMsgMicButtonState();
+            App.showAlert(t('vai.chat.voiceInputFailed', 'Voice input failed: {error}').replace('{error}', e.message || 'unknown'), 'warning');
+        }
+    }
+
+    function updateMsgMicButtonState() {
+        const btn = document.getElementById('msgMicButton');
+        if (!btn) return;
+        const icon = btn.querySelector('i');
+        if (msgVoiceListening || msgVoiceRecording) {
+            btn.classList.add('recording');
+            if (icon) {
+                icon.classList.remove('bi-mic');
+                icon.classList.add('bi-mic-fill');
+            }
+            btn.title = t('vai.chat.voiceInputRecording', 'Recording... click to stop');
+        } else {
+            btn.classList.remove('recording');
+            if (icon) {
+                icon.classList.remove('bi-mic-fill');
+                icon.classList.add('bi-mic');
+            }
+            btn.title = t('vai.chat.voiceInput', 'Voice Input');
+        }
+    }
+
+    async function startMsgAudioRecording() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            App.showAlert(t('vai.chat.voiceInputNotSupported', 'Voice input is not supported in this browser'), 'warning');
+            return;
+        }
+        try {
+            msgRecordingStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const preferredTypes = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+            let selectedMime = '';
+            for (const typ of preferredTypes) {
+                if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(typ)) {
+                    selectedMime = typ;
+                    break;
+                }
+            }
+
+            msgRecordedChunks = [];
+            msgPendingAudioAttachment = null;
+            msgMediaRecorder = selectedMime ? new MediaRecorder(msgRecordingStream, { mimeType: selectedMime }) : new MediaRecorder(msgRecordingStream);
+            msgMediaRecorder.ondataavailable = function(e) {
+                if (e.data && e.data.size > 0) {
+                    msgRecordedChunks.push(e.data);
+                }
+            };
+            msgMediaRecorder.onstart = function() {
+                msgVoiceRecording = true;
+                updateMsgMicButtonState();
+            };
+            msgMediaRecorder.onstop = async function() {
+                msgVoiceRecording = false;
+                updateMsgMicButtonState();
+                try {
+                    await saveMsgRecordedAudioAttachment();
+                } catch (e) {
+                    App.showAlert(t('vai.chat.voiceInputFailed', 'Voice input failed: {error}').replace('{error}', e.message || 'unknown'), 'warning');
+                }
+                cleanupMsgAudioRecorder();
+            };
+            msgMediaRecorder.onerror = function(e) {
+                msgVoiceRecording = false;
+                updateMsgMicButtonState();
+                App.showAlert(t('vai.chat.voiceInputFailed', 'Voice input failed: {error}').replace('{error}', e.error?.message || 'recording_error'), 'warning');
+                cleanupMsgAudioRecorder();
+            };
+
+            msgMediaRecorder.start();
+        } catch (e) {
+            if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
+                App.showAlert(t('vai.chat.voiceInputPermissionDenied', 'Microphone permission denied'), 'warning');
+            } else {
+                App.showAlert(t('vai.chat.voiceInputFailed', 'Voice input failed: {error}').replace('{error}', e.message || 'unknown'), 'warning');
+            }
+            cleanupMsgAudioRecorder();
+        }
+    }
+
+    async function saveMsgRecordedAudioAttachment() {
+        if (!msgRecordedChunks || msgRecordedChunks.length === 0) {
+            App.showAlert(t('vai.chat.voiceInputNoSpeech', 'No speech detected'), 'warning');
+            return;
+        }
+
+        const blobType = (msgMediaRecorder && msgMediaRecorder.mimeType) ? msgMediaRecorder.mimeType : (msgRecordedChunks[0].type || 'audio/webm');
+        const ext = blobType.includes('ogg') ? 'ogg' : (blobType.includes('mp4') ? 'm4a' : 'webm');
+        const filename = 'voice-' + Date.now() + '.' + ext;
+        const file = new File(msgRecordedChunks, filename, { type: blobType });
+
+        const formData = new FormData();
+        formData.append('file', file);
+        const token = localStorage.getItem('auth_token');
+        const headers = {};
+        if (token && token !== 'temp_token') {
+            headers['Authorization'] = 'Bearer ' + token;
+        }
+        const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+        if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+
+        const resp = await fetch('/api/v1/ai/upload-file', {
+            method: 'POST',
+            headers: headers,
+            body: formData
+        });
+        if (!resp.ok) {
+            const errData = await resp.json().catch(() => ({}));
+            throw new Error(errData.error || `Upload failed (${resp.status})`);
+        }
+
+        const data = await resp.json();
+        msgPendingAudioAttachment = {
+            filename: filename,
+            mime_type: data.mime_type,
+            data: data.data,
+            file_url: data.file_url || null
+        };
+
+        const input = document.getElementById('messageInput');
+        if (input) {
+            const hint = t('vai.chat.voiceInputAttached', 'Voice recording attached');
+            input.value = (input.value ? input.value + '\n' : '') + '[' + hint + ']';
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+        }
+        App.showAlert(t('vai.chat.voiceInputAttached', 'Voice recording attached'), 'success');
+    }
+
+    function cleanupMsgAudioRecorder() {
+        if (msgRecordingStream) {
+            msgRecordingStream.getTracks().forEach(function(track) { track.stop(); });
+        }
+        msgMediaRecorder = null;
+        msgRecordingStream = null;
+        msgRecordedChunks = [];
+    }
+
+    // 自動保存消息草稿
+    function autoSaveMessageDraft() {
+        if (messageDraftTimer) {
+            clearTimeout(messageDraftTimer);
+        }
+        
+        messageDraftTimer = setTimeout(() => {
+            const messageInput = document.getElementById('messageInput');
+            const content = messageInput.value.trim();
+            
+            if (!content) {
+                return; // 空內容不保存
+            }
+            
+            if (!currentConversationUserId && !currentConversationCustomerId) {
+                return; // 沒有選擇對話不保存
+            }
+            
+            const type = currentConversationUserId ? 'user' : 'customer';
+            const id = currentConversationUserId || currentConversationCustomerId;
+            const pageName = `messages_${type}_${id}`;
+            
+            const draftData = {
+                content: content,
+                conversation_type: type,
+                conversation_id: id
+            };
+            
+            draftManager.saveDraft(pageName, draftData, null);
+            updateMessageDraftCount();
+        }, 2000); // 2秒後保存
+    }
+
+    // 載入對話草稿
+    function loadConversationDraft(id, type) {
+        const pageName = `messages_${type}_${id}`;
+        const drafts = draftManager.getDraftsForPage(pageName);
+        
+        if (drafts.length > 0) {
+            const latestDraft = drafts[0]; // 最新的草稿
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput && latestDraft.data && latestDraft.data.content) {
+                messageInput.value = latestDraft.data.content;
+                messageInput.style.height = 'auto';
+                messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+            }
+        }
+    }
+
+    // 刪除對話草稿
+    function deleteConversationDraft(id, type) {
+        const pageName = `messages_${type}_${id}`;
+        const drafts = draftManager.getDraftsForPage(pageName);
+        drafts.forEach(draft => {
+            draftManager.deleteDraft(pageName, draft.id);
+        });
+        updateMessageDraftCount();
+    }
+
+    // 更新消息草稿計數
+    function updateMessageDraftCount() {
+        // 獲取所有消息相關的草稿
+        const allDrafts = draftManager.getAllDrafts();
+        let totalCount = 0;
+        
+        for (const pageName in allDrafts) {
+            if (pageName.startsWith('messages_')) {
+                totalCount += allDrafts[pageName].length;
+            }
+        }
+        
+        const badge = document.getElementById('messageDraftCount');
+        if (badge) {
+            if (totalCount > 0) {
+                badge.textContent = totalCount;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    }
+
+    // 顯示消息草稿列表
+    function showMessageDraftList() {
+        const allDrafts = draftManager.getAllDrafts();
+        const messageDrafts = [];
+        
+        // 收集所有消息草稿
+        for (const pageName in allDrafts) {
+            if (pageName.startsWith('messages_')) {
+                const parts = pageName.split('_');
+                if (parts.length >= 3) {
+                    const type = parts[1]; // 'user' 或 'customer'
+                    const id = parts.slice(2).join('_'); // 處理可能包含下劃線的ID
+                    
+                    allDrafts[pageName].forEach(draft => {
+                        messageDrafts.push({
+                            ...draft,
+                            conversationType: type,
+                            conversationId: id,
+                            pageName: pageName
+                        });
+                    });
+                }
+            }
+        }
+        
+        // 按時間排序
+        messageDrafts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        const listContent = messageDrafts.length > 0
+            ? messageDrafts.map(d => {
+                const content = d.data?.content || '';
+                const preview = content.length > 50 ? content.substring(0, 50) + '...' : content;
+                const createdAt = new Date(d.createdAt).toLocaleString(uiLocale());
+                
+                // 獲取對話對象名稱
+                let conversationName = '未知';
+                if (d.conversationType === 'user') {
+                    const user = allUsers.find(u => u.id === d.conversationId);
+                    conversationName = user ? (user.name || user.email) : '未知用戶';
+                } else {
+                    const customer = allCustomers.find(c => c.id === d.conversationId);
+                    conversationName = customer ? (customer.name || customer.code || customer.email || '未知客戶') : '未知客戶';
+                }
+                
+                return `
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="fw-bold">${conversationName} ${d.conversationType === 'customer' ? `<small class="text-muted">${t('messages.tagCustomer', '(Customer)')}</small>` : ''}</div>
+                            <p class="mb-0 text-muted small">${preview}</p>
+                            <small class="text-muted">${createdAt}</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-primary" onclick="loadMessageDraft('${String(d.conversationId || '').replace(/'/g, "\\'")}', '${String(d.conversationType || '').replace(/'/g, "\\'")}', '${String(d.id || '').replace(/'/g, "\\'")}')">載入</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteMessageDraft('${String(d.pageName || '').replace(/'/g, "\\'")}', '${String(d.id || '').replace(/'/g, "\\'")}', this)">刪除</button>
+                        </div>
+                    </div>
+                `;
+            }).join('')
+            : '<p class="text-muted mb-0">目前沒有草稿</p>';
+
+        const existingModal = document.getElementById('draftListModal');
+        if (existingModal) existingModal.remove();
+
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'draftListModal';
+        modal.setAttribute('tabindex', '-1');
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">消息草稿</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group">
+                            ${listContent}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+        modal.addEventListener('hidden.bs.modal', () => modal.remove());
+    }
+
+    // 載入消息草稿
+    async function loadMessageDraft(conversationId, conversationType, draftId) {
+        // 先打開對應的對話
+        let conversationName = '未知';
+        if (conversationType === 'user') {
+            const user = allUsers.find(u => u.id === conversationId);
+            conversationName = user ? (user.name || user.email) : '未知用戶';
+            await selectConversation(conversationId, conversationName, 'user');
+        } else {
+            const customer = allCustomers.find(c => c.id === conversationId);
+            conversationName = customer ? (customer.name || customer.code || customer.email || '未知客戶') : '未知客戶';
+            await selectConversation(conversationId, conversationName, 'customer');
+        }
+        
+        // 載入草稿內容
+        const pageName = `messages_${conversationType}_${conversationId}`;
+        const draft = draftManager.getDraft(pageName, draftId);
+        if (draft && draft.data && draft.data.content) {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.value = draft.data.content;
+                messageInput.style.height = 'auto';
+                messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+                messageInput.focus();
+            }
+        }
+        
+        // 關閉模態框
+        const modal = bootstrap.Modal.getInstance(document.getElementById('draftListModal'));
+        if (modal) modal.hide();
+    }
+
+    // 刪除消息草稿
+    function deleteMessageDraft(pageName, draftId, button) {
+        if (!confirm('確定要刪除此草稿嗎？')) return;
+        
+        draftManager.deleteDraft(pageName, draftId);
+        updateMessageDraftCount();
+        
+        if (button) {
+            button.closest('.list-group-item').remove();
+            const remainingItems = document.querySelectorAll('#draftListModal .list-group-item');
+            if (remainingItems.length === 0) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('draftListModal'));
+                if (modal) modal.hide();
+            }
+        }
+        
+        App.showAlert(t('messages.draftDeleted', 'Draft deleted'), 'success');
+    }
+
+    // 顯示新對話模態框
+    function showNewConversationModal() {
+        const modal = new bootstrap.Modal(document.getElementById('newConversationModal'));
+        modal.show();
+    }
+
+    // 初始化新對話用戶和客戶選擇器
+    function initNewConversationSelect2() {
+        $('#newConversationUser').select2({
+            theme: 'bootstrap-5',
+            placeholder: t('messages.pleaseSelectUser', 'Please select a user...'),
+            allowClear: true,
+            data: allUsers.map(u => ({ id: u.id, text: u.name || u.email }))
+        });
+        
+        $('#newConversationCustomer').select2({
+            theme: 'bootstrap-5',
+            placeholder: t('messages.pleaseSelectCustomer', 'Please select a customer...'),
+            allowClear: true,
+            data: allCustomers.map(c => ({ id: c.id, text: c.name || c.code || c.email || '未知客戶' }))
+        });
+    }
+
+    // 開始新對話
+    async function startNewConversation() {
+        const activeTab = document.querySelector('.nav-link.active');
+        const isCustomerTab = activeTab && activeTab.id === 'customer-tab';
+        const isAITab = activeTab && activeTab.id === 'ai-tab';
+        
+        if (isAITab) {
+            // AI 對話
+            bootstrap.Modal.getInstance(document.getElementById('newConversationModal')).hide();
+            await selectConversation(null, t('messages.aiAssistant', 'AI Assistant'), 'ai');
+        } else if (isCustomerTab) {
+            const customerId = $('#newConversationCustomer').val();
+            if (!customerId) {
+                App.showAlert(t('messages.pleaseSelectCustomerAlert', 'Please select a customer'), 'warning');
+                return;
+            }
+            const customer = allCustomers.find(c => c.id === customerId);
+            const customerName = customer ? (customer.name || customer.code || customer.email || '未知客戶') : '未知客戶';
+            bootstrap.Modal.getInstance(document.getElementById('newConversationModal')).hide();
+            await selectConversation(customerId, customerName, 'customer');
+        } else {
+            const userId = $('#newConversationUser').val();
+            if (!userId) {
+                App.showAlert(t('messages.pleaseSelectUserAlert', 'Please select a user'), 'warning');
+                return;
+            }
+            const user = allUsers.find(u => u.id === userId);
+            const userName = user ? (user.name || user.email) : '未知用戶';
+            bootstrap.Modal.getInstance(document.getElementById('newConversationModal')).hide();
+            await selectConversation(userId, userName, 'user');
+        }
+    }
+
+    // 開始輪詢新消息
+    function startPolling() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+        }
+        
+        // 暫時只更新對話列表，不自動加載消息（避免自動滾動）
+        pollInterval = setInterval(async () => {
+            await loadConversations();
+            // 暫時禁用自動加載消息，避免自動滾動
+            // if (currentConversationType === 'user' && currentConversationUserId) {
+            //     await loadMessages(currentConversationUserId, 'user');
+            // } else if (currentConversationType === 'customer' && currentConversationCustomerId) {
+            //     await loadMessages(currentConversationCustomerId, 'customer');
+            // } else if (currentConversationType === 'ai') {
+            //     await loadMessages(null, 'ai');
+            // }
+        }, 5000); // 每5秒輪詢一次
+    }
+
+    // 頁面卸載時停止輪詢
+    window.addEventListener('beforeunload', function() {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+        }
+    });
+    
+    // 刪除消息
+    async function deleteMessage(messageId, button) {
+        if (!confirm('確定要刪除此消息嗎？')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/v1/messages/${messageId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || t('messages.deleteFailed', 'Delete failed'));
+            }
+            
+            // 從 DOM 中移除消息
+            const messageElement = button.closest('[data-message-id]');
+            if (messageElement) {
+                messageElement.remove();
+            }
+            
+            App.showAlert(t('messages.messageDeleted', 'Message deleted'), 'success');
+            
+            // 重新載入消息列表（可選）
+            if (currentConversationType === 'user' && currentConversationUserId) {
+                await loadMessages(currentConversationUserId, 'user');
+            } else if (currentConversationType === 'customer' && currentConversationCustomerId) {
+                await loadMessages(currentConversationCustomerId, 'customer');
+            } else if (currentConversationType === 'ai') {
+                await loadMessages(null, 'ai');
+            }
+        } catch (error) {
+            console.error('Failed to delete message:', error);
+            App.showAlert(t('messages.deleteFailedPrefix', 'Delete failed: ') + error.message, 'danger');
+        }
+    }
+</script>
+{{end}}

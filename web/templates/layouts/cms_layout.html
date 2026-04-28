@@ -1,0 +1,4016 @@
+{{define "layouts/cms_layout"}}
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{if .PageName}}<meta name="page-name" content="{{.PageName}}">{{end}}
+    <title>{{if .Title}}{{.Title}} - {{end}}vWork</title>
+    <link rel="icon" type="image/png" href="/static/vworkicon.png">
+    <link rel="apple-touch-icon" href="/static/vworkicon.png">
+    <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/custom.css?v=20260316c">
+    <link rel="stylesheet" href="/static/css/vai.css">
+    <!-- Select2 CSS -->
+    <link href="/static/vendor/select2/select2.min.css" rel="stylesheet" />
+    <link href="/static/vendor/select2-bootstrap5/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <!-- Quill.js CSS for HTML Editor -->
+    <link href="/static/vendor/quill/quill.snow.css" rel="stylesheet">
+    <!-- Google AdSense -->
+    {{if .GoogleAdSensePublisherID}}
+    <meta name="google-adsense-account" content="{{.GoogleAdSensePublisherID}}">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{.GoogleAdSensePublisherID}}" crossorigin="anonymous"></script>
+    {{end}}
+    <!-- i18n 防闪烁样式 -->
+    <style>
+        /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
+        body.i18n-loading [data-i18n],
+        body.i18n-loading [data-i18n-placeholder],
+        body.i18n-loading [data-i18n-title],
+        body.i18n-loading [data-i18n-field] {
+            visibility: hidden;
+        }
+    </style>
+    <!-- i18n 初始化脚本 - 在页面渲染前执行，避免闪烁 -->
+    <script>
+        // Capture login flag IMMEDIATELY before any other JS can clear localStorage
+        window.__vaiJustLoggedIn = localStorage.getItem('vai_just_logged_in');
+        if (window.__vaiJustLoggedIn) {
+            localStorage.removeItem('vai_just_logged_in');
+            window.__vaiCachedUser = localStorage.getItem('user');
+        }
+        (function() {
+            // 立即读取语言设置（不等待 DOMContentLoaded）
+            // 唯一 source of truth: u-nai_lang（不再讀寫歷史遺留的 localStorage.language）
+            const savedLang = localStorage.getItem('u-nai_lang');
+            const browserLang = navigator.language || navigator.userLanguage;
+            
+            // 清除歷史遺留的 localStorage.language，避免殘留邏輯讀到舊值
+            try { localStorage.removeItem('language'); } catch(e) {}
+            
+            let currentLang = 'zh'; // 默认中文
+            
+            if (savedLang === 'zh' || savedLang === 'zh-CN' || savedLang === 'en') {
+                currentLang = savedLang;
+            } else if (savedLang) {
+                currentLang = savedLang;
+            } else {
+                // 检测浏览器语言
+                if (browserLang.startsWith('zh-CN') || browserLang.startsWith('zh-Hans')) {
+                    currentLang = 'zh-CN';
+                } else if (browserLang.startsWith('zh')) {
+                    currentLang = 'zh';
+                } else {
+                    currentLang = 'en';
+                }
+                localStorage.setItem('u-nai_lang', currentLang);
+            }
+            
+            // 将语言设置存储到全局变量，供 i18n.js 使用
+            window.__INITIAL_LANG__ = currentLang;
+            
+            // 无论什么语言，都在 body 渲染后立即添加 i18n-loading 类来隐藏内容
+            // 这样可以防止在翻译应用前显示原始内容（避免繁简切换时的闪烁）
+            (function checkBody() {
+                if (document.body) {
+                    document.body.classList.add('i18n-loading');
+                    
+                    // 添加超时保护：如果 5 秒后 i18n-loading 类还在，自动移除
+                    // 这样可以防止 i18n.js 加载失败时页面内容永远被隐藏
+                    setTimeout(function() {
+                        if (document.body && document.body.classList.contains('i18n-loading')) {
+                            console.warn('i18n-loading class still present after 5 seconds, removing it to prevent blank page');
+                            document.body.classList.remove('i18n-loading');
+                        }
+                    }, 5000);
+                } else {
+                    // 如果 body 还没渲染，使用 requestAnimationFrame 快速检查
+                    requestAnimationFrame(checkBody);
+                }
+            })();
+        })();
+    </script>
+</head>
+<body>
+    {{if not .HideTopnav}}
+    {{template "layouts/topnav.html" .}}
+    {{end}}
+
+    <!-- Mobile Banner Ad (shown for free/trial plan only, below topnav) -->
+    <div id="mobileBannerAd" class="mobile-banner-ad d-lg-none" style="display: none !important;">
+        <!-- vSuite Promo Banner -->
+        <div id="mobileBannerVsuite" class="mobile-banner-content" style="display: none;">
+            <div class="mobile-banner-text">
+                <i class="bi bi-rocket-takeoff"></i>
+                <span data-i18n="ad.mobileBanner">升級 vSuite — 解鎖所有功能</span>
+            </div>
+            <a href="/billing" class="mobile-banner-btn" data-i18n="ad.upgradeBtn">立即升級</a>
+        </div>
+        <!-- Google AdSense Banner -->
+        <div id="mobileBannerAdsense" class="mobile-banner-content" style="display: none;">
+            {{if .GoogleAdSensePublisherID}}
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:320px;height:60px"
+                 data-ad-client="{{.GoogleAdSensePublisherID}}"
+                 data-ad-slot="auto"
+                 data-ad-format="horizontal"></ins>
+            {{else}}
+            <div class="mobile-banner-adsense-placeholder">
+                <small class="text-muted">AD</small>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    {{if not .HideSidebar}}
+    {{template "layouts/sidemenu.html" .}}
+    {{end}}
+    
+    <!-- 將 TenantSubdomain 和 BaseDomain 存儲到 JavaScript 變量中，以便動態構建公司頁面鏈接 -->
+    {{if .TenantSubdomain}}
+    <script>
+        window.tenantSubdomain = "{{.TenantSubdomain}}";
+    </script>
+    {{end}}
+    {{if .BaseDomain}}
+    <script>
+        window.baseDomain = "{{.BaseDomain}}";
+    </script>
+    {{end}}
+    {{if .SalesPartnerCode}}
+    <script>
+        window.salesPartnerCode = "{{.SalesPartnerCode}}";
+    </script>
+    {{end}}
+    
+    <div class="main-content-wrapper{{if .HideSidebar}} no-sidebar{{end}}">
+        <div class="main-content">
+            <!-- Alert Container -->
+            <div id="alertContainer" class="position-fixed start-50 translate-middle-x" style="z-index: 9999; max-width: 500px; top: 60px; margin-top: 10px;"></div>
+            {{embed}}
+        </div>
+
+        <!-- Ad Sidebar (shown for free/trial plan only, single big ad) -->
+        <aside id="adSidebar" class="ad-sidebar" style="display: none;">
+            <div class="ad-sidebar-inner">
+                <!-- Single ad container: JS will pick either vSuite promo OR AdSense -->
+                <div id="adContent">
+                    <!-- vSuite Promo (hidden by default, shown by JS) -->
+                    <div id="adVsuitePromo" class="ad-promo-card ad-promo-big" style="display: none;">
+                        <div class="ad-promo-icon">
+                            <i class="bi bi-rocket-takeoff"></i>
+                        </div>
+                        <div class="ad-promo-title" data-i18n="ad.upgradeTitle">升級 vSuite</div>
+                        <div class="ad-promo-desc" data-i18n="ad.upgradeDesc">解鎖所有功能，無限記錄，無廣告體驗</div>
+                        <div class="ad-promo-divider"></div>
+                        <ul class="ad-promo-features">
+                            <li data-i18n="ad.feature1">所有功能</li>
+                            <li data-i18n="ad.feature2">無限記錄</li>
+                            <li data-i18n="ad.feature3">無廣告</li>
+                            <li data-i18n="ad.feature4">每月 1,000 vCoins</li>
+                            <li data-i18n="ad.feature5">vOffice - AI 智慧辦公</li>
+                            <li data-i18n="ad.feature6">vMarket - 商品市集</li>
+                            <li data-i18n="ad.feature7">支援服務</li>
+                        </ul>
+                        <div class="ad-promo-divider"></div>
+                        <div class="ad-promo-price" data-i18n="ad.priceFrom">低至 HK$250/月</div>
+                        <a href="/billing" class="ad-promo-btn" data-i18n="ad.upgradeBtn">立即升級</a>
+                    </div>
+
+                    <!-- Google AdSense (hidden by default, shown by JS) -->
+                    <div id="adAdsenseSlot" class="ad-adsense-slot" style="display: none;">
+                        {{if .GoogleAdSensePublisherID}}
+                        <ins class="adsbygoogle"
+                             style="display:inline-block;width:160px;height:600px"
+                             data-ad-client="{{.GoogleAdSensePublisherID}}"
+                             data-ad-slot="auto"></ins>
+                        {{else}}
+                        <div class="ad-adsense-placeholder">
+                            <small class="text-muted">AD</small>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- Footer -->
+    {{if not .HideSidebar}}
+    <footer class="cms-footer text-center text-muted py-2" style="background-color: #f8f9fa; border-top: 1px solid #dee2e6; margin-top: auto; position: relative; z-index: 1;">
+        <p class="mb-0 small">© 2025 V-sys Limited. All rights reserved.</p>
+    </footer>
+    {{end}}
+    <script>
+        // 在公開頁面（contact/help）隱藏 cms-footer
+        (function() {
+            const path = window.location.pathname;
+            const isPublicPage = path === '/help' || path === '/contact' || (path.startsWith && path.startsWith('/help/'));
+            if (isPublicPage) {
+                const cmsFooter = document.querySelector('.cms-footer');
+                if (cmsFooter) {
+                    cmsFooter.style.display = 'none';
+                }
+            }
+        })();
+    </script>
+    
+    <!-- vAi Chat 浮动按钮 -->
+    {{if not .HideSidebar}}
+    <button id="aiChatFloatingBtn" class="ai-chat-floating-btn" onclick="showAIChatModal()" data-bs-toggle="tooltip" data-bs-placement="left" data-i18n-title="aiAssistant.popupTitle" title="vAi 助手">
+        <img src="/static/vaiw.png" alt="vAi" style="width: 36px; height: 36px; object-fit: contain;">
+    </button>
+    <!-- vAi Greet Bubble (shows once after login) -->
+    <div id="vaiGreetBubble" class="vai-greet-bubble" aria-live="polite"></div>
+    <!-- vAi Floating Message Box (search quick-ask responses, auto-dismiss) -->
+    <div id="vaiFloatingMsg" class="vai-floating-msg" aria-live="polite"></div>
+    {{end}}
+    
+    <!-- vAi Chat 模態框 -->
+    <div class="modal fade" id="aiChatModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" data-i18n="aiAssistant.popupTitle">
+                        vAi 助手
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-i18n-aria-label="common.close"></button>
+                </div>
+                <div class="modal-body p-0 d-flex ai-chat-modal-body">
+                    <!-- AI Sidebar Overlay (mobile click-outside-to-close) -->
+                    <div id="aiChatSidebarOverlay" class="ai-chat-sidebar-overlay" onclick="closeMobileSidebar()"></div>
+                    <!-- AI 對話列表 Sidebar -->
+                    <div id="aiChatSidebar" class="ai-chat-sidebar">
+                        <div class="ai-chat-sidebar-header">
+                            <div class="d-flex align-items-center gap-2">
+                                <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="createNewAiConversation()">
+                                    <i class="bi bi-plus-lg me-1"></i><span data-i18n="aiAssistant.newChat">新對話</span>
+                                </button>
+                                <button class="btn btn-sm btn-link text-muted p-1 d-md-none" onclick="closeMobileSidebar()" data-i18n-title="aiAssistant.close" title="Close">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="aiConversationList" class="ai-conversation-list">
+                            <!-- 對話列表由 JS 動態渲染 -->
+                        </div>
+                    </div>
+                    <!-- AI 聊天主區域 -->
+                    <div class="ai-chat-main d-flex flex-column flex-grow-1" style="min-width: 0;">
+                        <!-- 當前對話標題列 -->
+                        <div id="aiChatConvHeader" class="ai-chat-conv-header d-none">
+                            <button class="btn btn-sm btn-link text-muted p-0 me-2 d-md-none" onclick="toggleAiSidebar()" data-i18n-title="aiAssistant.conversationList" title="Conversations">
+                                <i class="bi bi-list fs-5"></i>
+                            </button>
+                            <span id="aiChatConvTitle" class="ai-chat-conv-title flex-grow-1">新對話</span>
+                            <button class="btn btn-sm btn-link text-muted p-0 ms-1" onclick="renameCurrentConversation()" data-i18n-title="aiAssistant.rename" title="Rename">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-link text-danger p-0 ms-1" onclick="deleteCurrentConversation()" data-i18n-title="aiAssistant.delete" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <!-- AI 消息區域 -->
+                        <div id="aiChatMessages" class="flex-grow-1 overflow-auto p-3 bg-light" style="min-height: 0;">
+                        </div>
+                        <!-- AI 輸入區域 -->
+                        <div class="border-top p-3 bg-white" style="border-bottom-right-radius: 0.375rem;">
+                            <!-- Hidden file input -->
+                            <input type="file" id="aiFileInput" multiple accept=".xls,.xlsx,.doc,.docx,.ppt,.pptx,.pdf,.txt,.jpg,.jpeg,.png" style="display: none;">
+                            <!-- File preview area (shown when files are attached) -->
+                            <div id="aiFilePreviewArea" class="ai-file-preview-area" style="display: none;"></div>
+                            <form id="aiChatForm" onsubmit="sendAIMessage(event)">
+                                <div class="input-group">
+                                    <label for="aiFileInput" class="btn ai-upload-btn mb-0" data-i18n-title="aiAssistant.uploadFile" title="Upload File" style="cursor: pointer;">
+                                        <i class="bi bi-paperclip"></i>
+                                    </label>
+                                    <textarea class="form-control" id="aiMessageInput" rows="1" data-i18n-placeholder="aiAssistant.enterMessageToAI" placeholder="輸入訊息給 AI..." style="resize: none; max-height: 120px;"></textarea>
+                                    <button type="button" class="btn btn-success" id="aiMicButton" onclick="toggleAIVoiceInput()" data-i18n-title="vai.chat.voiceInput" title="Voice Input">
+                                        <i class="bi bi-mic"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-success" id="aiSendButton" style="display: none;">
+                                        <i class="bi bi-send"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- jQuery (Select2 依賴) -->
+    <script src="/static/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="/static/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="/static/vendor/select2/select2.min.js"></script>
+    <!-- Quill.js for HTML Editor -->
+    <script src="/static/vendor/quill/quill.js"></script>
+    <!-- Cropper.js for image cropping -->
+    <link rel="stylesheet" href="/static/vendor/cropperjs/cropper.min.css">
+    <script src="/static/vendor/cropperjs/cropper.min.js"></script>
+    <script src="/static/js/image-cropper.js"></script>
+    <!-- JsBarcode for barcode generation -->
+    <script src="/static/vendor/jsbarcode/JsBarcode.all.min.js"></script>
+    <!-- QRCode.js for QR code generation - 使用本地文件 -->
+    <script src="/static/js/qrcode.min.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sso.js"></script>
+    <!-- JavaScript 錯誤處理器 - 用於在手機上查看錯誤 -->
+    <!-- <script src="/static/js/error-handler.js"></script> -->
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/utils.js?v=20260316d"></script>
+    <script src="/static/js/draft-manager.js"></script>
+    <script src="/static/js/page-configs.js"></script>
+    <script src="/static/js/dynamic-list.js"></script>
+    <script src="/static/js/form-field-settings-handler.js?v=20260223b"></script>
+    <script src="/static/js/dynamic-form.js?v=20260223j"></script>
+    <script src="/static/js/page-field-settings.js"></script>
+    <script src="/static/vendor/marked.min.js"></script>
+    <script src="/static/vendor/purify.min.js"></script>
+    <script src="/static/js/ai-chat.js?v=20260318b"></script>
+    <script src="/static/js/ai-form-input.js"></script>
+    <script src="/static/js/form-constraints-logger.js"></script>
+    <script src="/static/js/router.js"></script>
+    <script>
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            // 檢查登錄狀態，如果未登錄則隱藏側邊欄
+            const token = localStorage.getItem('auth_token');
+            const path = window.location.pathname;
+            const isPublicPage = path === '/help' || path === '/contact' || (path.startsWith && path.startsWith('/help/'));
+            
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            // 在公開頁面或未登錄時隱藏側邊欄和 AI 按鈕
+            if ((!token || isPublicPage) && sidebar) {
+                // 未登錄時隱藏側邊欄
+                sidebar.style.display = 'none';
+                if (sidebarToggle) sidebarToggle.style.display = 'none';
+                if (mobileMenuToggle) mobileMenuToggle.style.display = 'none';
+                // 調整主內容區域，移除左側邊欄的 margin
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.marginLeft = '0';
+                }
+                const mainWrapper = document.querySelector('.main-content-wrapper');
+                if (mainWrapper) {
+                    mainWrapper.style.marginLeft = '0';
+                }
+                // Hide ad sidebar for non-logged-in users
+                const adSidebar = document.getElementById('adSidebar');
+                if (adSidebar) adSidebar.style.display = 'none';
+            }
+            
+            // 在公開頁面或未登錄時隱藏 AI 按鈕
+            if (!token || isPublicPage) {
+                const aiChatBtn = document.getElementById('aiChatFloatingBtn');
+                if (aiChatBtn) {
+                    aiChatBtn.style.display = 'none';
+                }
+            }
+
+            // Kiosk 模式：強制隱藏側邊欄與切換按鈕
+            const isKiosk = {{if .HideSidebar}}true{{else}}false{{end}};
+            if (isKiosk) {
+                if (sidebar) sidebar.style.display = 'none';
+                if (sidebarToggle) sidebarToggle.style.display = 'none';
+                if (mobileMenuToggle) mobileMenuToggle.style.display = 'none';
+                if (overlay) overlay.style.display = 'none';
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.marginLeft = '0';
+                }
+                const mainWrapper = document.querySelector('.main-content-wrapper');
+                if (mainWrapper) {
+                    mainWrapper.style.marginLeft = '0';
+                }
+                // Hide ad sidebar in kiosk mode
+                const adSidebar = document.getElementById('adSidebar');
+                if (adSidebar) adSidebar.style.display = 'none';
+            }
+            
+            function toggleSidebar() {
+                if (!token) return; // 未登錄時不允許切換
+                sidebar.classList.toggle('show');
+                overlay.classList.toggle('show');
+            }
+            
+            if (sidebarToggle && token && !isKiosk) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+            
+            // Mobile menu toggle button in topnav
+            if (mobileMenuToggle && token) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    toggleSidebar();
+                });
+            }
+            
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                });
+            }
+            
+            function getActiveSidebarNavId() {
+                const currentPath = window.location.pathname;
+                const normalizedPath = currentPath === '/' ? '/' : currentPath.replace(/\/+$/, '');
+                const queryParams = new URLSearchParams(window.location.search || '');
+                const sourceType = (queryParams.get('source_type') || '').toLowerCase();
+                const pageNameMeta = document.querySelector('meta[name="page-name"]');
+                const pageName = ((pageNameMeta && pageNameMeta.content) || '').toLowerCase();
+                const navItems = {
+                '/dashboard': 'nav-dashboard',
+                '/customers': 'nav-customers',
+                '/customer-labels': 'nav-customer-labels',
+                '/customer-analysis-report': 'nav-customer-analysis-report',
+                '/project-analysis-report': 'nav-project-analysis-report',
+                '/suppliers': 'nav-suppliers',
+                '/warehouses': 'nav-warehouses',
+                '/products': 'nav-products',
+                '/product-taxes': 'nav-product-taxes',
+                '/orders': 'nav-orders',
+                '/invoices': 'nav-invoices',
+                '/order-reports': 'nav-order-reports',
+                '/member-levels': 'nav-member-levels',
+                '/points': 'nav-points',
+                '/points-history': 'nav-points-history',
+                '/point-settings': 'nav-point-settings',
+                '/stamp-settings': 'nav-stamp-settings',
+                '/stamp-records': 'nav-stamp-records',
+                '/referrals': 'nav-referrals',
+                '/coupons': 'nav-coupons',
+                '/product-types': 'nav-product-types',
+                '/product-attributes': 'nav-product-attributes',
+                '/brands': 'nav-brands',
+                '/product-labels': 'nav-product-labels',
+                '/service-types': 'nav-service-types',
+                '/services': 'nav-services',
+                '/service-taxes': 'nav-service-taxes',
+                '/appointments': 'nav-appointments',
+                '/service-orders': 'nav-service-orders',
+                '/service-staffs': 'nav-service-staffs',
+                '/rooms': 'nav-rooms',
+                '/equipments': 'nav-equipments',
+                '/vehicles': 'nav-vehicles',
+                '/resource-usage-calendar': 'nav-resource-usage-calendar',
+                '/rental-orders': 'nav-rental-orders',
+                '/rental-order-labels': 'nav-rental-order-labels',
+                '/projects': 'nav-projects',
+                '/project-types': 'nav-project-types',
+                '/pages': 'nav-pages',
+                '/blogs': 'nav-blogs',
+                '/website-theme': 'nav-website-theme',
+                '/website-settings': 'nav-website-settings',
+                '/website-domains': 'nav-website-domains',
+                '/website-page-views': 'nav-website-page-views',
+                '/personal-data': 'nav-personal-data',
+                '/pos-settings': 'nav-pos-settings',
+                '/notification-settings': 'nav-notification-settings',
+                '/calendars': 'nav-calendars',
+                '/reminders': 'nav-reminders',
+                '/notifications': 'nav-notifications',
+                '/messages': 'nav-messages',
+                '/notes': 'nav-notes',
+                '/users': 'nav-users',
+                '/enterprises': 'nav-enterprises',
+                '/google-ads': 'nav-google-ads',
+                '/departments': 'nav-departments',
+                '/roles': 'nav-roles',
+                '/levels': 'nav-levels',
+                '/regions': 'nav-regions',
+                '/currencies': 'nav-currencies',
+                '/purchase-orders': 'nav-purchase-orders',
+                '/quotations': 'nav-quotations',
+                '/support-communications': 'nav-support-communications',
+                '/promotions': 'nav-promotions',
+                '/lead-finder': 'nav-lead-finder',
+                '/lead-finder/results': 'nav-lead-list',
+                '/auto-outreach': 'nav-auto-outreach',
+                '/ad-positions': 'nav-ad-positions',
+                '/pos': 'nav-pos',
+                '/order-reports': 'nav-order-reports',
+                '/order-labels': 'nav-order-labels',
+                '/service-order-labels': 'nav-service-order-labels',
+                '/purchase-order-labels': 'nav-purchase-order-labels',
+                '/payment-methods': 'nav-payment-methods',
+                '/stripe-connect': 'nav-stripe-connect',
+                '/shipping-methods': 'nav-shipping-methods',
+                '/logistics-companies': 'nav-logistics-companies',
+                '/shipments': 'nav-shipments',
+                '/shipping-integrations': 'nav-shipping-integrations',
+                '/document-settings': 'nav-document-settings',
+                '/document-auto-settings': 'nav-document-auto-settings',
+                '/product-sync-settings': 'nav-product-sync-settings',
+                '/accounting': 'nav-accounting',
+                '/accounting/reports': 'nav-accounting-reports',
+                '/accounts': 'nav-accounts',
+                '/journal-entries': 'nav-journal-entries',
+                '/tax-configs': 'nav-tax-configs',
+                '/posting-rules': 'nav-posting-rules',
+                '/accounting/posting-rules': 'nav-posting-rules',
+                '/incomes': 'nav-incomes',
+                '/expenses': 'nav-expenses',
+                '/expense-requests': 'nav-expense-requests',
+                '/bank-accounts': 'nav-bank-accounts',
+                '/inventory-movements': 'nav-inventory-movements',
+                '/inventory-processing': 'nav-inventory-processing',
+                '/inventory-adjustments': 'nav-inventory-adjustments',
+                '/inventory-counts': 'nav-inventory-counts',
+                '/inventory/low-stock': 'nav-low-stock',
+                '/inventory-settings': 'nav-inventory-settings',
+                '/attendance/clock': 'nav-attendance-clock',
+                '/attendances': 'nav-attendances',
+                '/attendance-reports': 'nav-attendance-reports',
+                '/leave-requests': 'nav-leave-requests',
+                '/holidays': 'nav-holidays',
+                '/shifts': 'nav-shifts',
+                '/payrolls': 'nav-payrolls',
+                '/payroll-adjustment-presets': 'nav-payroll-adjustment-presets',
+                '/job-vacancies': 'nav-job-vacancies',
+                '/job-applicants': 'nav-job-applicants',
+                '/job-hires': 'nav-job-hires',
+                '/points-history': 'nav-points-history',
+                '/phone-country-codes': 'nav-phone-country-codes',
+                '/stores': 'nav-stores',
+                '/dining-areas': 'nav-dining-areas',
+                '/dining-tables/board': 'nav-dining-tables-board',
+                '/dining-tables': 'nav-dining-tables',
+                '/dining-queue/board': 'nav-dining-queue-board',
+                '/dining-queues': 'nav-dining-queues',
+                '/delivery-integrations': 'nav-delivery-integrations',
+                '/delivery-orders': 'nav-delivery-orders',
+                '/dining-settings': 'nav-dining-settings',
+                '/dining-ticket-settings': 'nav-dining-ticket-settings',
+                '/diningorder-ticket-settings': 'nav-diningorder-ticket-settings',
+                '/guide/dining-flow': 'nav-guide-dining-flow',
+                '/guide/order-flow': 'nav-guide-order-flow',
+                '/printer-settings': 'nav-printer-settings',
+                '/pos-ticket-settings': 'nav-pos-ticket-settings',
+                '/card-terminal-settings': 'nav-card-terminal-settings',
+                '/vmarket-settings': 'nav-vmarket-settings',
+                '/api-tokens': 'nav-api-tokens',
+                '/api-tokens/create': 'nav-api-tokens',
+                '/billing': 'nav-billing',
+                '/vcoins': 'nav-ai-coins',
+                '/hardware-purchase': 'nav-hardware-purchase',
+                '/': 'nav-home'
+                };
+
+                const pageNameNavItems = {
+                    'auto-outreach': 'nav-auto-outreach',
+                    'lead-list': 'nav-lead-list',
+                    'lead-finder': 'nav-lead-finder'
+                };
+
+                // 設置活動導航項（只選最精準的路徑）
+                let matchedId = null;
+                let matchedPathLength = -1;
+                const serviceTypeCode = (queryParams.get('service_type_code') || '').toLowerCase();
+                if (normalizedPath === '/orders' && sourceType === 'dining') {
+                    matchedId = 'nav-dining-orders';
+                    matchedPathLength = normalizedPath.length;
+                } else if (serviceTypeCode === 'course') {
+                    // 課程管理：相同路由但帶 service_type_code=course，優先匹配課程子選單
+                    const courseNavMap = {
+                        '/service-orders': 'nav-course-orders',
+                        '/service-staffs': 'nav-course-instructors',
+                        '/appointment-calendar': 'nav-course-calendar',
+                        '/appointments': 'nav-course-appointments'
+                    };
+                    if (courseNavMap[normalizedPath]) {
+                        matchedId = courseNavMap[normalizedPath];
+                        matchedPathLength = normalizedPath.length;
+                    }
+                } else {
+                    if (navItems[normalizedPath]) {
+                        matchedId = navItems[normalizedPath];
+                        matchedPathLength = normalizedPath.length;
+                    } else {
+                        const paths = Object.keys(navItems).sort((a, b) => b.length - a.length);
+                        for (const path of paths) {
+                            if (normalizedPath.startsWith(path + '/')) {
+                                matchedPathLength = path.length;
+                                matchedId = navItems[path];
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!matchedId && pageNameNavItems[pageName]) {
+                    matchedId = pageNameNavItems[pageName];
+                }
+
+                return matchedId;
+            }
+
+            function applyActiveSidebarNav() {
+                const sidebar = document.getElementById('sidebar');
+                if (!sidebar) return null;
+
+                sidebar.querySelectorAll('.nav-link.active').forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                const matchedId = getActiveSidebarNavId();
+                if (!matchedId) return null;
+
+                const navItem = document.getElementById(matchedId);
+                if (!navItem) return null;
+
+                navItem.classList.add('active');
+
+                // 如果是在子菜單中，展開對應的父菜單
+                const submenu = navItem.closest('.collapse');
+                if (submenu) {
+                    const toggle = document.querySelector(`[data-bs-target="#${submenu.id}"]`);
+                    if (toggle) {
+                        const bsCollapse = new bootstrap.Collapse(submenu, { toggle: false });
+                        bsCollapse.show();
+                        toggle.setAttribute('aria-expanded', 'true');
+                    }
+                }
+
+                return navItem;
+            }
+
+            // Expose to global scope so the menu-edit IIFE (separate <script>) can call it
+            window.applyActiveSidebarNav = applyActiveSidebarNav;
+
+            applyActiveSidebarNav();
+
+            // 定義檢查並隱藏未啟用模塊菜單的函數
+            window.checkAndHideDisabledModules = async function() {
+                try {
+                    const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                    if (!tenantSubdomain) {
+                        console.warn('Tenant subdomain not found, cannot check modules.');
+                        return;
+                    }
+                    
+                    // 確保 App 已載入
+                    if (typeof App === 'undefined' || typeof App.apiRequest !== 'function') {
+                        console.warn('App not loaded yet, retrying...');
+                        setTimeout(() => window.checkAndHideDisabledModules(), 500);
+                        return;
+                    }
+                    
+                    const response = await App.apiRequest('/api/v1/tenant-modules');
+                    const enabledModulesRaw = response.data.filter(m => m.is_enabled).map(m => m.module_code);
+                    // 向後兼容：歷史上曾出現 project / projects 兩種代碼
+                    const enabledSet = new Set(enabledModulesRaw);
+                    if (enabledSet.has('project')) enabledSet.add('projects');
+                    if (enabledSet.has('projects')) enabledSet.add('project');
+                    const enabledModules = Array.from(enabledSet);
+                    
+                    // 檢查是否有任何模塊配置
+                    // 如果沒有配置，顯示所有菜單（向後兼容）
+                    if (response.data.length === 0) {
+                        // 顯示所有菜單項
+                        document.querySelectorAll('.nav-item[data-module], .nav-group[data-module]').forEach(item => {
+                            item.style.display = '';
+                        });
+                        return;
+                    }
+                    
+                    // 先顯示所有菜單項，然後隱藏未啟用的
+                    document.querySelectorAll('.nav-item[data-module], .nav-group[data-module]').forEach(item => {
+                        const moduleCode = item.getAttribute('data-module');
+                        if (moduleCode) {
+                            if (enabledModules.includes(moduleCode)) {
+                                item.style.display = '';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('Failed to check and hide disabled modules:', error);
+                    // 如果出錯，顯示所有菜單（默認行為）
+                    document.querySelectorAll('.nav-item[data-module], .nav-group[data-module]').forEach(item => {
+                        item.style.display = '';
+                    });
+                }
+            };
+
+            // 檢查並隱藏未啟用的模塊菜單（延遲執行，確保 DOM 和 App 都已載入）
+            setTimeout(() => {
+                checkAndHideDisabledModules();
+            }, 300);
+            
+            // 監聽 DOM 變化，當菜單被動態修改時重新檢查
+            const menuObserver = new MutationObserver(() => {
+                // 防抖：避免頻繁執行
+                clearTimeout(window.menuCheckTimeout);
+                window.menuCheckTimeout = setTimeout(() => {
+                    if (typeof window.checkAndHideDisabledModules === 'function') {
+                        window.checkAndHideDisabledModules();
+                    }
+                }, 200);
+            });
+            
+            // 觀察 sidebar 的變化
+            const sidebarForObserver = document.getElementById('sidebar');
+            if (sidebarForObserver) {
+                menuObserver.observe(sidebarForObserver, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['style', 'class']
+                });
+            }
+
+            // sidemenu 太長時：自動捲到目前 active 的位置
+            // - 如果在 submenu：捲到該 submenu title（nav-group-toggle）
+            // - 如果不在 submenu：直接捲到 active item（例如「費用中心」）
+            setTimeout(() => {
+                try {
+                    const sidebar = document.getElementById('sidebar');
+                    if (!sidebar) return;
+
+                    // 優先：已展開且內含 active item 的 group toggle
+                    let target = null;
+                    const activeLink = sidebar.querySelector('.nav-link.active');
+                    if (activeLink) {
+                        const collapse = activeLink.closest('.collapse');
+                        if (collapse && collapse.id) {
+                            target = sidebar.querySelector(`[data-bs-target="#${collapse.id}"]`);
+                        }
+                    }
+
+                    // 後備：任何 aria-expanded=true 的 toggle
+                    if (!target) target = sidebar.querySelector('.nav-group-toggle[aria-expanded="true"]');
+                    // 再後備：直接捲到 active item
+                    if (!target) target = activeLink;
+
+                    if (target && typeof target.scrollIntoView === 'function') {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                    }
+                } catch (e) {
+                    console.warn('sidemenu auto-scroll failed', e);
+                }
+            }, 250);
+            
+            // 處理子菜單展開/收合 - 使用 Bootstrap 的 collapse 功能
+            const groupToggles = document.querySelectorAll('.nav-group-toggle');
+            groupToggles.forEach(toggle => {
+                // 移除重複的事件監聽器，使用 Bootstrap 的原生功能
+                const targetId = toggle.getAttribute('data-bs-target');
+                const target = document.querySelector(targetId);
+                if (target) {
+                    // 監聽 Bootstrap collapse 事件來更新 aria-expanded
+                    target.addEventListener('show.bs.collapse', function() {
+                        toggle.setAttribute('aria-expanded', 'true');
+                    });
+                    target.addEventListener('hide.bs.collapse', function() {
+                        toggle.setAttribute('aria-expanded', 'false');
+                    });
+                }
+            });
+            
+            // Logout button - Topbar
+            const logoutBtnTopbar = document.getElementById('logoutBtnTopbar');
+            if (logoutBtnTopbar) {
+                logoutBtnTopbar.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof App !== 'undefined' && App.logout) {
+                        App.logout();
+                    }
+                });
+            }
+            
+            // Logout button - Sidemenu
+            const logoutBtnSidemenu = document.getElementById('logoutBtnSidemenu');
+            if (logoutBtnSidemenu) {
+                logoutBtnSidemenu.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof App !== 'undefined' && App.logout) {
+                        App.logout();
+                    }
+                });
+            }
+            
+            // Logout button - Topnav (from topnav.html template)
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof App !== 'undefined' && App.logout) {
+                        App.logout();
+                    }
+                });
+            }
+            
+            // Mobile language dropdown in sidemenu
+            const mobileLangLinks = document.querySelectorAll('#mobileLanguageSubmenu .nav-link[data-lang]');
+            mobileLangLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const lang = this.getAttribute('data-lang');
+                    if (typeof I18n !== 'undefined' && I18n.switchLanguage) {
+                        I18n.switchLanguage(lang);
+                    }
+                    // Close sidemenu after language change
+                    sidebar.classList.remove('show');
+                    overlay.classList.remove('show');
+                });
+            });
+            
+            // 載入用戶信息
+            async function loadUserInfo() {
+                try {
+                    const user = await App.apiRequest('/user/me');
+                    
+                    // 檢查用戶信息是否完整（必須有 id、email、name）
+                    if (!user || !user.id || !user.email || !user.name || 
+                        String(user.id).trim() === '' || 
+                        String(user.email).trim() === '' || 
+                        String(user.name).trim() === '') {
+                        console.warn('⚠️ 用戶信息不完整，跳轉到登錄頁面:', user);
+                        if (typeof App !== 'undefined' && App.clearSessionAndRedirect) {
+                            App.clearSessionAndRedirect();
+                        }
+                        return;
+                    }
+                    
+                    // 更新 localStorage 中的用戶信息
+                    try {
+                        localStorage.setItem('user', JSON.stringify(user));
+                    } catch (e) {
+                        console.warn('無法保存用戶信息到 localStorage:', e);
+                    }
+                    
+                    const userNameElement = document.getElementById('userName');
+                    const sidemenuUserNameElement = document.getElementById('sidemenuUserName');
+                    if (userNameElement && user.name) {
+                        userNameElement.textContent = user.name;
+                    }
+                    if (sidemenuUserNameElement && user.name) {
+                        sidemenuUserNameElement.textContent = user.name;
+                    }
+
+                    // 顯示用戶頭像（profile_pic），沒有則顯示 icon - Topbar
+                    const avatarImg = document.getElementById('topbarUserAvatar');
+                    const avatarIcon = document.getElementById('topbarUserIcon');
+                    if (avatarImg) {
+                        let url = (user && user.profile_pic) ? String(user.profile_pic) : '';
+                        if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                            url = '/' + url;
+                        }
+                        if (url) {
+                            avatarImg.src = url;
+                            avatarImg.style.display = 'inline-block';
+                            if (avatarIcon) avatarIcon.style.display = 'none';
+                            avatarImg.onerror = function() {
+                                this.style.display = 'none';
+                                this.setAttribute('data-error-handled', 'true');
+                                if (avatarIcon) avatarIcon.style.display = '';
+                                this.onerror = null; // 防止重複觸發
+                            };
+                        } else {
+                            avatarImg.style.display = 'none';
+                            if (avatarIcon) avatarIcon.style.display = '';
+                        }
+                    }
+                    
+                    // 顯示用戶頭像（profile_pic），沒有則顯示 icon - Sidemenu
+                    const sidemenuAvatarImg = document.getElementById('sidemenuUserAvatar');
+                    const sidemenuAvatarIcon = document.getElementById('sidemenuUserIcon');
+                    if (sidemenuAvatarImg) {
+                        let url = (user && user.profile_pic) ? String(user.profile_pic) : '';
+                        if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                            url = '/' + url;
+                        }
+                        if (url) {
+                            sidemenuAvatarImg.src = url;
+                            sidemenuAvatarImg.style.display = 'inline-block';
+                            if (sidemenuAvatarIcon) sidemenuAvatarIcon.style.display = 'none';
+                            sidemenuAvatarImg.onerror = function() {
+                                this.style.display = 'none';
+                                this.setAttribute('data-error-handled', 'true');
+                                if (sidemenuAvatarIcon) sidemenuAvatarIcon.style.display = '';
+                                this.onerror = null; // 防止重複觸發
+                            };
+                        } else {
+                            sidemenuAvatarImg.style.display = 'none';
+                            if (sidemenuAvatarIcon) sidemenuAvatarIcon.style.display = '';
+                        }
+                    }
+                    
+                    // 載入用戶權限並控制菜單顯示
+                    if (user.level && user.level.permissions) {
+                        applyMenuPermissions(user.level.permissions);
+                    } else {
+                        // 如果沒有級別或權限，顯示所有菜單（默認行為）
+                        showAllMenus();
+                    }
+                    
+                    // 載入未讀消息數
+                    loadUnreadMessageCount();
+                    
+                    // 載入 vCoin 餘額
+                    loadAICoinsBalance();
+                } catch (error) {
+                    console.error('載入用戶信息失敗:', error);
+                    // 如果是 401 錯誤或會話不完整，跳轉到登錄頁面
+                    if (error.status === 401 || error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+                        console.warn('⚠️ 會話已失效，跳轉到登錄頁面');
+                        if (typeof App !== 'undefined' && App.clearSessionAndRedirect) {
+                            App.clearSessionAndRedirect();
+                        }
+                        return;
+                    }
+                    // 其他錯誤，顯示所有菜單（默認行為）
+                    showAllMenus();
+                }
+            }
+            
+            // 載入 vCoin 餘額（使用原始 fetch 避免觸發 401 自動登出）
+            async function loadAICoinsBalance() {
+                try {
+                    const token = localStorage.getItem('auth_token');
+                    const tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                    if (!token || !tenantSubdomain) return; // 未登入則跳過
+                    
+                    const headers = {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'X-Tenant-Subdomain': tenantSubdomain
+                    };
+                    
+                    const resp = await fetch('/api/v1/ai-coins/balance', { headers });
+                    if (!resp.ok) return; // 靜默處理錯誤，不觸發登出
+                    
+                    const response = await resp.json();
+                    const balance = response.balance || 0;
+                    const dailyFreeRemaining = response.daily_free_remaining || 0;
+                    
+                    // 更新用戶下拉選單中的 vCoin 顯示
+                    const aiCoinsDisplay = document.getElementById('userAICoinsDisplay');
+                    const aiCoinsBalance = document.getElementById('userAICoinsBalance');
+                    const aiCoinsDivider = document.getElementById('aiCoinsDivider');
+                    
+                    if (aiCoinsDisplay && aiCoinsBalance) {
+                        // 只顯示真正的 coin 餘額（不含每日免費次數，因為那是次數不是 coin）
+                        aiCoinsBalance.textContent = balance;
+                        aiCoinsDisplay.style.display = 'block';
+                        if (aiCoinsDivider) aiCoinsDivider.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('載入 vCoin 餘額失敗:', error);
+                }
+            }
+            
+            // ─── vAi Greet Bubble (login welcome) ───
+            // Shows a tiny, lively speech bubble next to the vAi floating
+            // button the FIRST time the user lands on CMS after login.
+            // auth.js sets 'vai_just_logged_in' in localStorage on successful
+            // login; we consume it here (remove after reading) so it only
+            // fires once per login.
+            function showVaiGreetBubble(user) {
+                const bubble = document.getElementById('vaiGreetBubble');
+                const floatingBtn = document.getElementById('aiChatFloatingBtn');
+                if (!bubble || !floatingBtn) return;
+                
+                // Don't show if floating button is hidden (public page / not logged in)
+                if (floatingBtn.style.display === 'none') return;
+                
+                // Build greeting text
+                const firstName = (user && user.name) ? user.name.split(' ')[0] : '';
+                const hour = new Date().getHours();
+                
+                // i18n helper
+                const t = (key, fallback) => {
+                    try {
+                        if (typeof I18n !== 'undefined' && I18n.t) {
+                            const v = I18n.t(key);
+                            if (v && v !== key) return v;
+                        }
+                    } catch (_) {}
+                    return fallback != null ? fallback : key;
+                };
+                
+                // Pick time-based greeting
+                let greetKey, greetFallback;
+                if (hour >= 5 && hour < 12) {
+                    greetKey = 'aiAssistant.greet.morning';
+                    greetFallback = '早安';
+                } else if (hour >= 12 && hour < 18) {
+                    greetKey = 'aiAssistant.greet.afternoon';
+                    greetFallback = '午安';
+                } else {
+                    greetKey = 'aiAssistant.greet.evening';
+                    greetFallback = '晚安';
+                }
+                
+                const greeting = t(greetKey, greetFallback);
+                
+                // Random conversation starters to feel alive
+                const tipsKeys = [
+                    { key: 'aiAssistant.greet.tip1', fallback: '有什麼我可以幫你的嗎？' },
+                    { key: 'aiAssistant.greet.tip2', fallback: '今天想做些什麼？' },
+                    { key: 'aiAssistant.greet.tip3', fallback: '隨時找我聊聊吧！' },
+                    { key: 'aiAssistant.greet.tip4', fallback: '我在這裡，隨時為你效勞。' }
+                ];
+                const pick = tipsKeys[Math.floor(Math.random() * tipsKeys.length)];
+                const tip = t(pick.key, pick.fallback);
+                
+                // Compose: "早安，Ted！有什麼我可以幫你的嗎？"
+                const nameDisplay = firstName ? (firstName + '！') : '！';
+                bubble.textContent = greeting + '，' + nameDisplay + tip;
+                
+                // Animate in after a short delay (let the page settle)
+                setTimeout(() => {
+                    bubble.classList.add('show');
+                    
+                    // Auto-hide after 4.5 seconds
+                    setTimeout(() => {
+                        bubble.classList.remove('show');
+                        bubble.classList.add('hide');
+                        // Remove from DOM after animation completes
+                        setTimeout(() => {
+                            bubble.style.display = 'none';
+                        }, 700);
+                    }, 4500);
+                }, 1200);
+            }
+            
+            // 載入未讀消息數
+            async function loadUnreadMessageCount() {
+                try {
+                    const response = await App.apiRequest('/messages/unread-count');
+                    const messageCount = response.count || 0;
+                    
+                    // Desktop message badge
+                    const msgBadge = document.getElementById('unreadMsgBadge');
+                    if (msgBadge) {
+                        if (messageCount > 0) {
+                            msgBadge.textContent = messageCount > 99 ? '99+' : String(messageCount);
+                            msgBadge.style.display = 'block';
+                        } else {
+                            msgBadge.style.display = 'none';
+                        }
+                    }
+                    
+                    // Mobile message badge
+                    const msgBadgeMobile = document.getElementById('unreadMsgBadgeMobile');
+                    if (msgBadgeMobile) {
+                        if (messageCount > 0) {
+                            msgBadgeMobile.textContent = messageCount > 99 ? '99+' : String(messageCount);
+                            msgBadgeMobile.style.display = 'block';
+                        } else {
+                            msgBadgeMobile.style.display = 'none';
+                        }
+                    }
+                } catch (error) {
+                    console.error('載入未讀消息數失敗:', error);
+                }
+            }
+            
+            // 載入未讀提示資訊數
+            async function loadUnreadNotificationCount() {
+                try {
+                    const response = await App.apiRequest('/notifications/unread-count');
+                    const notificationCount = response.count || 0;
+                    
+                    // Desktop notification badge
+                    const notifBadge = document.getElementById('unreadNotificationBadge');
+                    if (notifBadge) {
+                        if (notificationCount > 0) {
+                            notifBadge.textContent = notificationCount > 99 ? '99+' : String(notificationCount);
+                            notifBadge.style.display = 'block';
+                        } else {
+                            notifBadge.style.display = 'none';
+                        }
+                    } else {
+                        console.warn('找不到 unreadNotificationBadge 元素');
+                    }
+                    
+                    // Mobile notification badge
+                    const notifBadgeMobile = document.getElementById('unreadNotificationBadgeMobile');
+                    if (notifBadgeMobile) {
+                        if (notificationCount > 0) {
+                            notifBadgeMobile.textContent = notificationCount > 99 ? '99+' : String(notificationCount);
+                            notifBadgeMobile.style.display = 'block';
+                        } else {
+                            notifBadgeMobile.style.display = 'none';
+                        }
+                    } else {
+                        console.warn('找不到 unreadNotificationBadgeMobile 元素');
+                    }
+                    
+                    // Sidemenu notification badge
+                    const sidemenuBadge = document.getElementById('sidemenuUnreadNotificationBadge');
+                    if (sidemenuBadge) {
+                        if (notificationCount > 0) {
+                            sidemenuBadge.textContent = notificationCount > 99 ? '99+' : String(notificationCount);
+                            sidemenuBadge.style.display = 'block';
+                        } else {
+                            sidemenuBadge.style.display = 'none';
+                        }
+                    }
+                } catch (error) {
+                    console.error('載入未讀提示資訊數失敗:', error);
+                }
+            }
+            
+            // 每30秒更新一次未讀消息數和提示資訊數
+            setInterval(() => {
+                loadUnreadMessageCount();
+                loadUnreadNotificationCount();
+            }, 30000);
+            
+            // 初始載入
+            loadUnreadMessageCount();
+            loadUnreadNotificationCount();
+
+            // Topnav 全站搜尋（客戶/項目/使用者/訂單/服務單/採購）
+            window.initCmsGlobalSearch = function() {
+                window.initCmsGlobalSearchByIds('cmsGlobalSearch', 'cmsGlobalSearchInput', 'cmsGlobalSearchDropdown');
+            };
+
+            window.initCmsGlobalSearchByIds = function(wrapId, inputId, dropdownId, options) {
+                const wrap = document.getElementById(wrapId);
+                const input = document.getElementById(inputId);
+                const dropdown = document.getElementById(dropdownId);
+                if (!wrap || !input || !dropdown) return;
+
+                const config = Object.assign({
+                    showPageLink: true,
+                    hideOnOutsideClick: true,
+                    hideOnEscape: true
+                }, options || {});
+
+                const t = (key, fallback) => {
+                    try {
+                        if (typeof I18n !== 'undefined' && I18n.t) {
+                            const v = I18n.t(key);
+                            if (v && v !== key) return v;
+                        }
+                    } catch {}
+                    return fallback != null ? fallback : key;
+                };
+
+                const getTypeLabel = (type) => {
+                    const map = {
+                        customer: 'cms.globalSearch.types.customer',
+                        project: 'cms.globalSearch.types.project',
+                        user: 'cms.globalSearch.types.user',
+                        order: 'cms.globalSearch.types.order',
+                        service_order: 'cms.globalSearch.types.service_order',
+                        purchase_order: 'cms.globalSearch.types.purchase_order'
+                    };
+                    const key = map[type];
+                    if (!key) return type || '';
+                    // fallback 走中文，避免語系檔尚未載入時空白
+                    const fallbackZh = {
+                        customer: '客戶',
+                        project: '項目',
+                        user: '用戶',
+                        order: '訂單',
+                        service_order: '服務單',
+                        purchase_order: '採購單'
+                    };
+                    return t(key, fallbackZh[type] || type || '');
+                };
+
+                let timer = null;
+                let lastQ = '';
+
+                // ─── Smart detection: is this a natural language query for AI? ───
+                function isNaturalLanguageQuery(text) {
+                    const trimmed = (text || '').trim();
+                    if (!trimmed || trimmed.length < 2) return false;
+                    // Chinese verb/question/navigation patterns
+                    const zhPatterns = /[查找搜問誰哪什麼幾多少列出顯示分析統計匯總報表幫我看看告訴最近上個下個本月本週今天昨天這週上週這個月上個月今年去年有沒有怎麼為什麼欠錢庫存營業額利潤收入支出到去開進往前跳轉回頁面導航打帶訂單客戶]/;
+                    // English question patterns
+                    const enPatterns = /^(who|what|when|where|how|why|show|list|find|get|tell|analyze|check|any|which|is there|are there|give me|help me|go to|open|navigate)/i;
+                    // Time-related patterns
+                    const timePatterns = /(today|yesterday|this week|last week|this month|last month|this year|Q[1-4]|今日|昨日)/i;
+                    return zhPatterns.test(trimmed) || enPatterns.test(trimmed) || timePatterns.test(trimmed);
+                }
+
+                // ─── AI Suggestion items (shown on focus with empty input) ───
+                function getAiSuggestions() {
+                    return [
+                        { text: t('cms.globalSearch.aiSuggest.whoOwes', '誰欠錢最多？'), icon: 'bi-cash-coin' },
+                        { text: t('cms.globalSearch.aiSuggest.weeklyStock', '分析本週庫存'), icon: 'bi-box-seam' },
+                        { text: t('cms.globalSearch.aiSuggest.topCustomers', '最近的大客戶是誰？'), icon: 'bi-people' },
+                        { text: t('cms.globalSearch.aiSuggest.monthlyRevenue', '本月營業額多少？'), icon: 'bi-graph-up' },
+                        { text: t('cms.globalSearch.aiSuggest.latestOrders', '最近的訂單'), icon: 'bi-receipt' },
+                    ];
+                }
+
+                function hide() {
+                    dropdown.style.display = 'none';
+                    dropdown.innerHTML = '';
+                }
+
+                function showLoading() {
+                    dropdown.innerHTML = `
+                        <div class="list-group-item text-muted small">
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                            <span data-i18n="cms.globalSearch.loading">${t('cms.globalSearch.loading', '搜尋中...')}</span>
+                        </div>
+                    `;
+                    appendSearchPageLink();
+                    dropdown.style.display = 'block';
+                }
+
+                function render(items) {
+                    if (!items || items.length === 0) {
+                        dropdown.innerHTML = `<div class="list-group-item text-muted small" data-i18n="cms.globalSearch.noResults">${t('cms.globalSearch.noResults', '沒有結果')}</div>`;
+                        appendSearchPageLink();
+                        dropdown.style.display = 'block';
+                        return;
+                    }
+
+                    dropdown.innerHTML = items.map(it => {
+                        const label = getTypeLabel(it.type);
+                        const title = (it.title || '').toString();
+                        const sub = (it.subtitle || '').toString();
+                        const url = (it.url || '').toString();
+                        return `
+                            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" href="${url}">
+                                <div class="me-2 flex-grow-1" style="min-width: 0;">
+                                    <div class="fw-semibold text-truncate">${escapeHtml(title)}</div>
+                                    ${sub ? `<div class="text-muted small text-truncate">${escapeHtml(sub)}</div>` : ``}
+                                </div>
+                                <span class="badge text-bg-light border flex-shrink-0 ms-2">${escapeHtml(label)}</span>
+                            </a>
+                        `;
+                    }).join('');
+                    appendSearchPageLink();
+                    dropdown.style.display = 'block';
+                }
+
+                // ─── Render "Ask vAi" prompt when natural language detected ───
+                function renderAskVaiPrompt(queryText) {
+                    const askLabel = t('cms.globalSearch.askVai', '點擊以問問 vAi');
+                    const promptHtml = `
+                        <div class="vai-search-ask-prompt list-group-item list-group-item-action" data-vai-query="${escapeHtml(queryText)}">
+                            <div class="d-flex align-items-center gap-2">
+                                <img src="/static/vaiw.png" alt="vAi" style="width: 22px; height: 22px; object-fit: contain;">
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold small" style="color: #0d6efd;">${escapeHtml(askLabel)}</div>
+                                    <div class="text-muted small text-truncate" style="max-width: 380px;">"${escapeHtml(queryText)}"</div>
+                                </div>
+                                <i class="bi bi-arrow-right-circle text-primary"></i>
+                            </div>
+                        </div>
+                    `;
+                    // Prepend to dropdown (before search results)
+                    dropdown.insertAdjacentHTML('afterbegin', promptHtml);
+                }
+
+                // ─── Render AI suggestions (on focus with empty input) ───
+                function renderAiSuggestions() {
+                    const suggestions = getAiSuggestions();
+                    const sectionTitle = t('cms.globalSearch.aiSuggestTitle', 'AI 助理建議');
+                    let html = `
+                        <div class="vai-search-suggestions-header list-group-item small fw-bold" style="background: #f8f9ff; color: #0d6efd; border-bottom: 1px solid #e8ecf4; pointer-events: none;">
+                            <i class="bi bi-stars me-1"></i>${escapeHtml(sectionTitle)}
+                        </div>
+                    `;
+                    suggestions.forEach(s => {
+                        html += `
+                            <div class="list-group-item list-group-item-action vai-search-suggestion-item" data-vai-query="${escapeHtml(s.text)}">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi ${s.icon} text-primary" style="font-size: 0.9rem;"></i>
+                                    <span class="small">${escapeHtml(s.text)}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    dropdown.innerHTML = html;
+                    appendSearchPageLink();
+                    dropdown.style.display = 'block';
+                }
+
+                function appendSearchPageLink() {
+                    if (!config.showPageLink) return;
+                    const linkLabel = t('cms.globalSearch.pageLink', '進入搜尋頁');
+                    dropdown.insertAdjacentHTML('beforeend', `
+                        <a href="/cms-search" class="list-group-item list-group-item-action text-end cms-global-search-link" data-i18n="cms.globalSearch.pageLink">${escapeHtml(linkLabel)}</a>
+                    `);
+                }
+
+                function escapeHtml(s) {
+                    return String(s || '').replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+                }
+
+                async function doSearch(q) {
+                    const trimmed = (q || '').trim();
+                    if (!trimmed) {
+                        hide();
+                        return;
+                    }
+                    lastQ = trimmed;
+
+                    // Always do keyword search first
+                    showLoading();
+                    try {
+                        const res = await App.apiRequest(`/search?q=${encodeURIComponent(trimmed)}&limit=20`);
+                        // 避免慢回應覆蓋最新輸入
+                        if (trimmed !== lastQ) return;
+                        // 過濾掉 page 類型的結果
+                        const filteredData = (res.data || []).filter(item => item.type !== 'page');
+                        render(filteredData);
+
+                        // If input looks like natural language, prepend "Ask vAi" prompt
+                        if (isNaturalLanguageQuery(trimmed)) {
+                            renderAskVaiPrompt(trimmed);
+                        }
+                    } catch (e) {
+                        console.error('global search failed', e);
+                        dropdown.innerHTML = `<div class="list-group-item text-danger small" data-i18n="cms.globalSearch.failed">${t('cms.globalSearch.failed', '搜尋失敗')}</div>`;
+                        appendSearchPageLink();
+                        dropdown.style.display = 'block';
+                    }
+                }
+
+                const searchBtn = wrap.querySelector('.cms-global-search-btn');
+                const triggerSearch = () => {
+                    const v = input.value || '';
+                    if (timer) {
+                        clearTimeout(timer);
+                        timer = null;
+                    }
+                    doSearch(v);
+                };
+
+                // 輸入時自動搜索（debounce 300ms）
+                input.addEventListener('input', () => {
+                    if (timer) clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        doSearch(input.value || '');
+                    }, 300);
+                });
+
+                // Focus on empty input: show AI suggestions
+                input.addEventListener('focus', () => {
+                    const v = (input.value || '').trim();
+                    if (!v) {
+                        renderAiSuggestions();
+                    }
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!config.hideOnOutsideClick) return;
+                    if (!wrap.contains(e.target)) hide();
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const v = (input.value || '').trim();
+                        // If natural language, send to vAi directly on Enter
+                        if (v && isNaturalLanguageQuery(v)) {
+                            window._vaiSearchAsk(v);
+                            hide();
+                            return;
+                        }
+                        triggerSearch();
+                        return;
+                    }
+                    if (config.hideOnEscape && e.key === 'Escape') {
+                        hide();
+                        input.blur();
+                    }
+                });
+
+                // Prevent mousedown on vAi items from blurring the input
+                // (which could trigger outside-click hide before click fires)
+                dropdown.addEventListener('mousedown', (e) => {
+                    const isVaiItem = e.target.closest('.vai-search-ask-prompt') || e.target.closest('.vai-search-suggestion-item');
+                    if (isVaiItem) {
+                        e.preventDefault(); // prevent input blur
+                    }
+                });
+
+                // 防止點擊結果時被外層 click handler 立刻 hide（交給瀏覽器跳轉）
+                // Also use event delegation for vAi prompt/suggestion clicks
+                dropdown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Delegate: "Ask vAi" prompt or AI suggestion item
+                    const askPrompt = e.target.closest('.vai-search-ask-prompt');
+                    const suggItem = e.target.closest('.vai-search-suggestion-item');
+                    const target = askPrompt || suggItem;
+                    if (target) {
+                        e.preventDefault();
+                        const query = target.getAttribute('data-vai-query');
+                        if (query && window._vaiSearchAsk) {
+                            hide();
+                            window._vaiSearchAsk(query);
+                        }
+                        return;
+                    }
+                    // For regular search result links (<a> tags), let the browser navigate
+                });
+            };
+
+            window.initCmsGlobalSearch();
+            
+            // ─── vAi Search Quick Ask: floating message box from searchbox ───
+            // When user clicks "Ask vAi" in the search dropdown, this sends the
+            // query to the LLM and displays the response in a floating message box.
+            window._vaiSearchAsk = async function(text) {
+                if (!text || !text.trim()) return;
+                const msgBox = document.getElementById('vaiFloatingMsg');
+                if (!msgBox) {
+                    // Fallback: open the modal and pre-fill
+                    if (typeof showAIChatModal === 'function') showAIChatModal();
+                    setTimeout(() => {
+                        if (typeof vaiQuickSend === 'function') vaiQuickSend(text);
+                    }, 600);
+                    return;
+                }
+                // Clear search input
+                const searchInput = document.getElementById('cmsGlobalSearchInput');
+                if (searchInput) searchInput.value = '';
+
+                // Show thinking state
+                msgBox.innerHTML = `
+                    <div class="vai-floating-msg-inner">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <img src="/static/vaiw.png" alt="vAi" style="width: 18px; height: 18px; object-fit: contain;">
+                            <span class="fw-bold small" style="color: #0d6efd;">vAi</span>
+                        </div>
+                        <div class="small text-muted">
+                            <span class="spinner-border spinner-border-sm me-1"></span>思考中...
+                        </div>
+                    </div>
+                `;
+                msgBox.style.display = '';
+                msgBox.classList.add('show');
+                msgBox.classList.remove('hide');
+
+                // Cancel any existing auto-hide timer
+                if (msgBox._hideTimer) clearTimeout(msgBox._hideTimer);
+
+                try {
+                    // Call LLM via the existing API
+                    const response = await App.apiRequest('/llm/chat', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            model: (typeof aiModel !== 'undefined') ? aiModel : 'gemini-2.5-flash',
+                            messages: [{ role: 'user', content: text }],
+                            temperature: 0.7,
+                            max_tokens: 500
+                        })
+                    });
+
+                    let reply = '';
+                    console.log('[vAi SearchAsk] Raw API response:', JSON.stringify(response));
+                    if (response.choices && response.choices.length > 0) {
+                        const msg = response.choices[0].message;
+                        reply = msg?.content ?? msg?.text ?? '';
+                    } else if (response.content != null) {
+                        reply = response.content;
+                    } else if (response.text != null) {
+                        reply = response.text;
+                    }
+
+                    // Check for navigate_url (goto page tool call)
+                    if (response.navigate_url) {
+                        console.log('[vAi SearchAsk] Navigate URL detected:', response.navigate_url);
+                        window._vaiHandleNavigate(response.navigate_url, reply || '正在前往頁面...');
+                        return;
+                    }
+
+                    // Display the reply
+                    if (!reply && !reply.length) reply = '暫時無法回答，請打開 vAi 助手試試。';
+                    // Truncate very long replies for the floating box
+                    const truncated = reply.length > 300 ? reply.substring(0, 300) + '...' : reply;
+
+                    msgBox.innerHTML = `
+                        <div class="vai-floating-msg-inner">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <img src="/static/vaiw.png" alt="vAi" style="width: 18px; height: 18px; object-fit: contain;">
+                                <span class="fw-bold small" style="color: #0d6efd;">vAi</span>
+                                <button class="btn btn-sm btn-link p-0 ms-auto text-muted" onclick="window._vaiFloatingMsgHide()" style="font-size: 0.75rem; line-height: 1;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <div class="small" style="white-space: pre-wrap; word-break: break-word;">${truncated.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                        </div>
+                    `;
+
+                    // Auto-hide after 5 seconds (pause on hover)
+                    window._vaiFloatingMsgAutoHide(msgBox);
+
+                } catch (err) {
+                    console.error('vAi search ask failed:', err);
+                    // Fallback: open modal
+                    msgBox.classList.remove('show');
+                    msgBox.classList.add('hide');
+                    if (typeof showAIChatModal === 'function') showAIChatModal();
+                    setTimeout(() => {
+                        if (typeof vaiQuickSend === 'function') vaiQuickSend(text);
+                    }, 600);
+                }
+            };
+
+            // Auto-hide floating message box with hover pause
+            window._vaiFloatingMsgAutoHide = function(msgBox) {
+                let remaining = 5000;
+                let startTime = Date.now();
+                let paused = false;
+
+                function startTimer() {
+                    startTime = Date.now();
+                    msgBox._hideTimer = setTimeout(() => {
+                        window._vaiFloatingMsgHide();
+                    }, remaining);
+                }
+
+                msgBox.onmouseenter = function() {
+                    paused = true;
+                    remaining -= (Date.now() - startTime);
+                    if (remaining < 500) remaining = 500;
+                    if (msgBox._hideTimer) clearTimeout(msgBox._hideTimer);
+                };
+                msgBox.onmouseleave = function() {
+                    paused = false;
+                    startTimer();
+                };
+
+                startTimer();
+            };
+
+            // Hide floating message box
+            window._vaiFloatingMsgHide = function() {
+                const msgBox = document.getElementById('vaiFloatingMsg');
+                if (!msgBox) return;
+                if (msgBox._hideTimer) clearTimeout(msgBox._hideTimer);
+                msgBox.onmouseenter = null;
+                msgBox.onmouseleave = null;
+                msgBox.classList.remove('show');
+                msgBox.classList.add('hide');
+                setTimeout(() => {
+                    msgBox.style.display = 'none';
+                    msgBox.classList.remove('hide');
+                }, 600);
+            };
+
+            // Handle navigate_to_page from vAi response
+            window._vaiHandleNavigate = function(url, message) {
+                const msgBox = document.getElementById('vaiFloatingMsg');
+                if (msgBox) {
+                    // Brief message before navigating
+                    const displayMsg = message || ('正在前往 ' + url + ' ...');
+                    const truncated = displayMsg.length > 200 ? displayMsg.substring(0, 200) + '...' : displayMsg;
+                    msgBox.innerHTML = `
+                        <div class="vai-floating-msg-inner">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <img src="/static/vaiw.png" alt="vAi" style="width: 18px; height: 18px; object-fit: contain;">
+                                <span class="fw-bold small" style="color: #0d6efd;">vAi</span>
+                            </div>
+                            <div class="small" style="white-space: pre-wrap; word-break: break-word;">${truncated.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                            <div class="small text-muted mt-1"><i class="bi bi-arrow-right-circle me-1"></i>正在跳轉...</div>
+                        </div>
+                    `;
+                    msgBox.style.display = '';
+                    msgBox.classList.add('show');
+                    msgBox.classList.remove('hide');
+
+                    // Auto-hide after navigation
+                    setTimeout(() => {
+                        window._vaiFloatingMsgHide();
+                    }, 2000);
+                }
+
+                // Close the AI chat modal if it's open
+                const modalEl = document.getElementById('aiChatModal');
+                if (modalEl) {
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+
+                // Navigate using SPA router if available
+                setTimeout(() => {
+                    if (typeof Router !== 'undefined' && Router.go) {
+                        Router.go(url);
+                    } else {
+                        window.location.href = url;
+                    }
+                }, 800);
+            };
+
+            // 應用菜單權限
+            function applyMenuPermissions(permissions) {
+                // 如果權限為空或 null，顯示所有菜單
+                if (!permissions || (Array.isArray(permissions) && permissions.length === 0)) {
+                    showAllMenus();
+                    return;
+                }
+                
+                // 將權限轉換為數組（兼容：[]string / JSON 字串 / 物件 map / 舊資料 { "0":"dashboard" }）
+                const normalizeKey = (k) => String(k || '').trim().replace(/_/g, '-');
+                let permissionArray = [];
+                const pushPerm = (v) => {
+                    const s = normalizeKey(v);
+                    if (!s) return;
+                    permissionArray.push(s);
+                };
+
+                if (Array.isArray(permissions)) {
+                    permissions.forEach(pushPerm);
+                } else if (typeof permissions === 'string') {
+                    try {
+                        const parsed = JSON.parse(permissions);
+                        if (Array.isArray(parsed)) {
+                            parsed.forEach(pushPerm);
+                        } else if (parsed && typeof parsed === 'object') {
+                            // { key: true } or { "0":"dashboard" }
+                            Object.keys(parsed).forEach((k) => {
+                                const val = parsed[k];
+                                if (val === true || val === 1 || val === '1') {
+                                    pushPerm(k);
+                                } else {
+                                    pushPerm(val);
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.error('解析權限失敗:', e);
+                        showAllMenus();
+                        return;
+                    }
+                } else if (permissions && typeof permissions === 'object') {
+                    Object.keys(permissions).forEach((k) => {
+                        const val = permissions[k];
+                        if (val === true || val === 1 || val === '1') {
+                            pushPerm(k);
+                        } else {
+                            pushPerm(val);
+                        }
+                    });
+                }
+
+                permissionArray = Array.from(new Set(permissionArray)).filter(Boolean);
+                if (permissionArray.length === 0) {
+                    // 若資料格式異常，避免把整個菜單清空
+                    showAllMenus();
+                    return;
+                }
+                
+                // 隱藏所有菜單項
+                const allMenuItems = document.querySelectorAll('[data-permission]');
+                allMenuItems.forEach(item => {
+                    item.style.display = 'none';
+                });
+                
+                // 顯示有權限的菜單項
+                permissionArray.forEach(permission => {
+                    // 同時嘗試原 key 與底線版本（避免後端/前端 key 命名不一致）
+                    const pDash = normalizeKey(permission);
+                    const pUnderscore = String(permission || '').trim().replace(/-/g, '_');
+                    const menuItems = document.querySelectorAll(`[data-permission="${pDash}"],[data-permission="${pUnderscore}"]`);
+                    menuItems.forEach(item => {
+                        item.style.display = '';
+                    });
+                });
+                
+                // 處理父菜單組的顯示（如果子菜單有可見項，顯示父菜單）
+                updateParentMenuGroups();
+            }
+            
+            // 顯示所有菜單
+            function showAllMenus() {
+                const allMenuItems = document.querySelectorAll('[data-permission]');
+                allMenuItems.forEach(item => {
+                    item.style.display = '';
+                });
+                updateParentMenuGroups();
+            }
+            
+            // 更新父菜單組的顯示狀態
+            function updateParentMenuGroups() {
+                const menuGroups = document.querySelectorAll('.nav-group');
+                menuGroups.forEach(group => {
+                    const submenu = group.querySelector('.collapse');
+                    if (submenu) {
+                        const visiblePermItems = submenu.querySelectorAll('[data-permission]:not([style*="display: none"])');
+                        const visibleFreeItems = submenu.querySelectorAll('.nav-item:not([data-permission]):not([style*="display: none"])');
+                        if (visiblePermItems.length > 0 || visibleFreeItems.length > 0) {
+                            group.style.display = '';
+                        } else {
+                            // 如果子菜單沒有可見項，隱藏整個組
+                            group.style.display = 'none';
+                        }
+                    }
+                });
+            }
+            
+            // 從 localStorage 預填充用戶名和頭像（避免等待 API 返回時顯示「用戶」）
+            function prefillUserFromCache() {
+                try {
+                    const cachedUser = localStorage.getItem('user');
+                    if (cachedUser) {
+                        const user = JSON.parse(cachedUser);
+                        if (user && user.name) {
+                            const userNameElement = document.getElementById('userName');
+                            const sidemenuUserNameElement = document.getElementById('sidemenuUserName');
+                            if (userNameElement) {
+                                userNameElement.textContent = user.name;
+                                // 移除 data-i18n 屬性，防止 i18n 初始化時覆蓋用戶名
+                                userNameElement.removeAttribute('data-i18n');
+                            }
+                            if (sidemenuUserNameElement) {
+                                sidemenuUserNameElement.textContent = user.name;
+                                sidemenuUserNameElement.removeAttribute('data-i18n');
+                            }
+                            
+                            // 也預填充頭像
+                            const avatarImg = document.getElementById('topbarUserAvatar');
+                            const avatarIcon = document.getElementById('topbarUserIcon');
+                            const sidemenuAvatarImg = document.getElementById('sidemenuUserAvatar');
+                            const sidemenuAvatarIcon = document.getElementById('sidemenuUserIcon');
+                            
+                            if (user.profile_pic) {
+                                let url = String(user.profile_pic);
+                                if (url && !url.startsWith('http') && !url.startsWith('/')) {
+                                    url = '/' + url;
+                                }
+                                if (url) {
+                                    if (avatarImg) {
+                                        avatarImg.src = url;
+                                        avatarImg.style.display = 'inline-block';
+                                        if (avatarIcon) avatarIcon.style.display = 'none';
+                                    }
+                                    if (sidemenuAvatarImg) {
+                                        sidemenuAvatarImg.src = url;
+                                        sidemenuAvatarImg.style.display = 'inline-block';
+                                        if (sidemenuAvatarIcon) sidemenuAvatarIcon.style.display = 'none';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // 忽略 localStorage 讀取錯誤，API 會刷新
+                }
+            }
+            
+            // 載入用戶信息（僅在已登錄時）
+            if (typeof App !== 'undefined') {
+                const token = localStorage.getItem('auth_token');
+                if (token) {
+                    // 立即從緩存預填充
+                    prefillUserFromCache();
+                    
+                    // 然後從 API 獲取最新數據
+                    loadUserInfo();
+
+                    // vAi greet bubble: trigger independently (don't wait for /user/me)
+                    // Flag was captured at page top (window.__vaiJustLoggedIn) before any JS could clear it
+                    try {
+                        if (window.__vaiJustLoggedIn) {
+                            const cachedUser = JSON.parse(window.__vaiCachedUser || localStorage.getItem('user') || '{}');
+                            showVaiGreetBubble(cachedUser);
+                        }
+                    } catch (_e) { /* ignore */ }
+
+                    // Ad sidebar: check plan and show for free/trial users
+                    initAdSidebar();
+                    // Mobile banner ad: check plan and show for free/trial users on mobile
+                    initMobileBannerAd();
+                }
+            }
+            
+            // 處理瀏覽器上一頁/下一頁 (bfcache) - re-verify auth state
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page restored from bfcache — re-verify auth via API
+                    if (typeof App !== 'undefined' && localStorage.getItem('auth_token')) {
+                        loadUserInfo();
+                    } else {
+                        prefillUserFromCache();
+                    }
+                }
+            });
+            
+            // 初始化 i18n 語言切換
+            if (typeof I18n !== 'undefined') {
+                I18n.init();
+                
+                // 綁定語言切換按鈕
+                document.querySelectorAll('[data-lang]').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const lang = this.getAttribute('data-lang');
+                        if (lang) {
+                            I18n.switchLanguage(lang);
+                        }
+                    });
+                });
+            }
+            
+            // 處理表單固定按鈕欄
+            setupFormButtonBar();
+            
+            // 設置公司頁面鏈接
+            setupCompanyPageLink();
+        });
+
+        // Ad Sidebar: fetch tenant plan + ad config, show single ad for free/trial users
+        // Only displayed on dashboard and settings pages
+        // Uses raw fetch (not App.apiRequest) to avoid global 401/403 redirect handlers
+        // Exposed as window.initAdSidebar so the SPA router can re-call it on navigation
+        window.initAdSidebar = async function initAdSidebar() {
+            var adSidebar = document.getElementById('adSidebar');
+            if (!adSidebar) return;
+
+            // Always hide first, then decide whether to show
+            adSidebar.style.display = 'none';
+            document.body.classList.remove('has-ad-sidebar');
+
+            // Only show on dashboard and settings pages
+            var path = window.location.pathname;
+            var adPages = [
+                '/dashboard',
+                '/enterprises',
+                '/document-settings',
+                '/document-auto-settings',
+                '/pos-settings',
+                '/notification-settings',
+                '/vmarket-settings',
+                '/printer-settings',
+                '/pos-ticket-settings',
+                '/card-terminal-settings',
+                '/departments',
+                '/roles',
+                '/currencies',
+                '/users',
+                '/activity-logs',
+                '/billing',
+                '/vcoins',
+                '/hardware-purchase',
+                '/website-settings',
+                '/point-settings',
+                '/stamp-settings',
+                '/product-sync-settings',
+                '/inventory-settings',
+                '/service-settings',
+                '/dining-settings',
+                '/dining-ticket-settings',
+                '/diningorder-ticket-settings',
+                '/personal-data'
+            ];
+            var showOnThisPage = adPages.some(function(p) {
+                return path === p || path.startsWith(p + '/');
+            });
+            if (!showOnThisPage) return;
+
+            // Skip in kiosk mode
+            var isKiosk = {{if .HideSidebar}}true{{else}}false{{end}};
+            if (isKiosk) return;
+
+            try {
+                var token = localStorage.getItem('auth_token');
+                var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                if (!token) return;
+
+                // Use cached billing/ad-config data if available (avoid repeated API calls on SPA nav)
+                var billingData, adConfig;
+                if (window._adDataCache) {
+                    billingData = window._adDataCache.billing;
+                    adConfig = window._adDataCache.adConfig;
+                } else {
+                    var authHeaders = {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    };
+                    if (tenantSubdomain) {
+                        authHeaders['X-Tenant-Subdomain'] = tenantSubdomain;
+                    }
+
+                    // Fetch billing subscription and ad config in parallel
+                    var results = await Promise.all([
+                        fetch('/api/v1/billing/subscription', { headers: authHeaders }).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; }),
+                        fetch('/api/v1/ad-config').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; })
+                    ]);
+                    billingData = results[0];
+                    adConfig = results[1];
+
+                    // Cache for subsequent SPA navigations
+                    window._adDataCache = { billing: billingData, adConfig: adConfig };
+                }
+
+                var plan = (billingData && billingData.tenant && billingData.tenant.plan) || '';
+
+                // Paid plans: hide ad sidebar
+                var paidPlans = ['vsuite_monthly', 'vsuite_yearly', 'vsuite_pro_monthly', 'vsuite_pro_yearly', 'monthly', 'yearly'];
+                if (paidPlans.indexOf(plan) !== -1) {
+                    return;
+                }
+
+                // Check if ads are enabled (default: true)
+                var enabled = !adConfig || adConfig.enabled === true || adConfig.enabled === 'true';
+                if (!enabled) {
+                    return;
+                }
+
+                // Determine which ad to show
+                var mode = (adConfig && adConfig.mode) || 'both';
+                var vsuiteWeight = parseInt((adConfig && adConfig.vsuite_weight) || '50') || 50;
+                var showVsuite = false;
+                var showAdsense = false;
+
+                if (mode === 'vsuite_only') {
+                    showVsuite = true;
+                } else if (mode === 'adsense_only') {
+                    showAdsense = true;
+                } else {
+                    // "both" mode: randomly pick based on weight
+                    var rand = Math.random() * 100;
+                    if (rand < vsuiteWeight) {
+                        showVsuite = true;
+                    } else {
+                        showAdsense = true;
+                    }
+                }
+
+                // Show the chosen ad
+                var vsuiteEl = document.getElementById('adVsuitePromo');
+                var adsenseEl = document.getElementById('adAdsenseSlot');
+
+                // Helper: show vSuite promo and hide AdSense
+                function showVsuitePromo() {
+                    if (vsuiteEl) vsuiteEl.style.display = '';
+                    if (adsenseEl) adsenseEl.style.display = 'none';
+                }
+
+                // Helper: check if AdSense actually rendered an ad
+                function checkAdsenseFilled(insEl, fallbackFn) {
+                    // If adsbygoogle script didn't load at all, fallback immediately
+                    if (typeof window.adsbygoogle === 'undefined' || !window.adsbygoogle) {
+                        fallbackFn();
+                        return;
+                    }
+                    // Check after a delay whether the ad actually filled
+                    setTimeout(function() {
+                        try {
+                            // AdSense sets data-ad-status="filled" on success, "unfilled" on failure
+                            var status = insEl && insEl.getAttribute('data-ad-status');
+                            if (status === 'unfilled' || status === '') {
+                                fallbackFn();
+                                return;
+                            }
+                            // Also check if the ins element has no visible content (height ~0)
+                            var rect = insEl ? insEl.getBoundingClientRect() : null;
+                            if (!rect || rect.height < 10) {
+                                fallbackFn();
+                            }
+                        } catch(e) {
+                            fallbackFn();
+                        }
+                    }, 3000);
+                }
+
+                // If AdSense was chosen but no <ins> tag exists (no publisher ID) or
+                // AdSense script not loaded, force fallback to vSuite promo
+                if (showAdsense) {
+                    var insCheck = adsenseEl && adsenseEl.querySelector('ins.adsbygoogle');
+                    if (!insCheck || typeof window.adsbygoogle === 'undefined') {
+                        showAdsense = false;
+                        showVsuite = true;
+                    }
+                }
+
+                if (showVsuite && vsuiteEl) {
+                    showVsuitePromo();
+                } else if (showAdsense && adsenseEl) {
+                    adsenseEl.style.display = '';
+                    if (vsuiteEl) vsuiteEl.style.display = 'none';
+                    // Push AdSense ad
+                    var insEl = adsenseEl.querySelector('ins.adsbygoogle');
+                    try {
+                        (window.adsbygoogle = window.adsbygoogle || []).push({});
+                    } catch(e) {
+                        // AdSense script failed to load, fallback to vSuite
+                        showVsuitePromo();
+                    }
+                    // Verify AdSense actually filled the ad slot; fallback to vSuite if not
+                    if (insEl) {
+                        checkAdsenseFilled(insEl, showVsuitePromo);
+                    } else {
+                        // No <ins> element found, fallback immediately
+                        showVsuitePromo();
+                    }
+                } else {
+                    // Fallback: show vSuite promo
+                    showVsuitePromo();
+                }
+
+                // Show the sidebar
+                adSidebar.style.display = 'flex';
+                adSidebar.style.flexDirection = 'column';
+                document.body.classList.add('has-ad-sidebar');
+
+                // Apply i18n translations to ad sidebar if I18n is available
+                if (typeof I18n !== 'undefined' && typeof I18n.applyTranslations === 'function') {
+                    I18n.applyTranslations(adSidebar);
+                }
+            } catch (err) {
+                // On error, keep ads hidden silently
+                adSidebar.style.display = 'none';
+            }
+        };
+
+        // Mobile Banner Ad: show horizontal banner below topnav for free/trial users on mobile
+        // Exposed as window.initMobileBannerAd so the SPA router can re-call it on navigation
+        window.initMobileBannerAd = async function initMobileBannerAd() {
+            var banner = document.getElementById('mobileBannerAd');
+            if (!banner) return;
+
+            // Always hide first, then decide whether to show
+            banner.style.display = 'none';
+            document.body.classList.remove('has-mobile-banner-ad');
+
+            // Only on mobile viewport
+            if (window.innerWidth >= 992) return;
+
+            // Only show on dashboard and settings pages (same as adSidebar)
+            var path = window.location.pathname;
+            var adPages = [
+                '/dashboard',
+                '/enterprises',
+                '/document-settings',
+                '/document-auto-settings',
+                '/pos-settings',
+                '/notification-settings',
+                '/vmarket-settings',
+                '/printer-settings',
+                '/pos-ticket-settings',
+                '/card-terminal-settings',
+                '/departments',
+                '/roles',
+                '/currencies',
+                '/users',
+                '/activity-logs',
+                '/billing',
+                '/vcoins',
+                '/hardware-purchase',
+                '/website-settings',
+                '/point-settings',
+                '/stamp-settings',
+                '/product-sync-settings',
+                '/inventory-settings',
+                '/service-settings',
+                '/dining-settings',
+                '/dining-ticket-settings',
+                '/diningorder-ticket-settings',
+                '/personal-data'
+            ];
+            var showOnThisPage = adPages.some(function(p) {
+                return path === p || path.startsWith(p + '/');
+            });
+            if (!showOnThisPage) return;
+
+            // Skip in kiosk mode
+            var isKiosk = {{if .HideSidebar}}true{{else}}false{{end}};
+            if (isKiosk) return;
+
+            try {
+                var token = localStorage.getItem('auth_token');
+                var tenantSubdomain = localStorage.getItem('tenant_subdomain');
+                if (!token) return;
+
+                // Use cached billing/ad-config data if available (avoid repeated API calls on SPA nav)
+                var billingData, adConfig;
+                if (window._adDataCache) {
+                    billingData = window._adDataCache.billing;
+                    adConfig = window._adDataCache.adConfig;
+                } else {
+                    var authHeaders = {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    };
+                    if (tenantSubdomain) {
+                        authHeaders['X-Tenant-Subdomain'] = tenantSubdomain;
+                    }
+
+                    // Fetch billing subscription and ad config in parallel
+                    var results = await Promise.all([
+                        fetch('/api/v1/billing/subscription', { headers: authHeaders }).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; }),
+                        fetch('/api/v1/ad-config').then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; })
+                    ]);
+                    billingData = results[0];
+                    adConfig = results[1];
+
+                    // Cache for subsequent SPA navigations
+                    window._adDataCache = { billing: billingData, adConfig: adConfig };
+                }
+
+                var plan = (billingData && billingData.tenant && billingData.tenant.plan) || '';
+
+                // Paid plans: hide mobile banner
+                var paidPlans = ['vsuite_monthly', 'vsuite_yearly', 'vsuite_pro_monthly', 'vsuite_pro_yearly', 'monthly', 'yearly'];
+                if (paidPlans.indexOf(plan) !== -1) {
+                    return;
+                }
+
+                // Check if ads are enabled (default: true)
+                var enabled = !adConfig || adConfig.enabled === true || adConfig.enabled === 'true';
+                if (!enabled) return;
+
+                // Determine which ad to show
+                var mode = (adConfig && adConfig.mode) || 'both';
+                var vsuiteWeight = parseInt((adConfig && adConfig.vsuite_weight) || '50') || 50;
+                var showVsuite = false;
+                var showAdsense = false;
+
+                if (mode === 'vsuite_only') {
+                    showVsuite = true;
+                } else if (mode === 'adsense_only') {
+                    showAdsense = true;
+                } else {
+                    var rand = Math.random() * 100;
+                    if (rand < vsuiteWeight) {
+                        showVsuite = true;
+                    } else {
+                        showAdsense = true;
+                    }
+                }
+
+                // Show the chosen ad
+                var vsuiteEl = document.getElementById('mobileBannerVsuite');
+                var adsenseEl = document.getElementById('mobileBannerAdsense');
+
+                // Helper: show vSuite promo and hide AdSense for mobile
+                function showMobileVsuitePromo() {
+                    if (vsuiteEl) vsuiteEl.style.display = '';
+                    if (adsenseEl) adsenseEl.style.display = 'none';
+                }
+
+                // Helper: check if mobile AdSense actually rendered an ad
+                function checkMobileAdsenseFilled(insEl, fallbackFn) {
+                    if (typeof window.adsbygoogle === 'undefined' || !window.adsbygoogle) {
+                        fallbackFn();
+                        return;
+                    }
+                    setTimeout(function() {
+                        try {
+                            var status = insEl && insEl.getAttribute('data-ad-status');
+                            if (status === 'unfilled' || status === '') {
+                                fallbackFn();
+                                return;
+                            }
+                            var rect = insEl ? insEl.getBoundingClientRect() : null;
+                            if (!rect || rect.height < 5) {
+                                fallbackFn();
+                            }
+                        } catch(e) {
+                            fallbackFn();
+                        }
+                    }, 3000);
+                }
+
+                // If AdSense was chosen but no <ins> tag exists (no publisher ID) or
+                // AdSense script not loaded, force fallback to vSuite promo
+                if (showAdsense) {
+                    var insCheck = adsenseEl && adsenseEl.querySelector('ins.adsbygoogle');
+                    if (!insCheck || typeof window.adsbygoogle === 'undefined') {
+                        showAdsense = false;
+                        showVsuite = true;
+                    }
+                }
+
+                if (showVsuite && vsuiteEl) {
+                    showMobileVsuitePromo();
+                } else if (showAdsense && adsenseEl) {
+                    adsenseEl.style.display = '';
+                    if (vsuiteEl) vsuiteEl.style.display = 'none';
+                    var insEl = adsenseEl.querySelector('ins.adsbygoogle');
+                    try {
+                        (window.adsbygoogle = window.adsbygoogle || []).push({});
+                    } catch(e) {
+                        showMobileVsuitePromo();
+                    }
+                    if (insEl) {
+                        checkMobileAdsenseFilled(insEl, showMobileVsuitePromo);
+                    } else {
+                        // No <ins> element found, fallback immediately
+                        showMobileVsuitePromo();
+                    }
+                } else {
+                    // Fallback: show vSuite promo
+                    showMobileVsuitePromo();
+                }
+
+                // Show the banner
+                banner.style.display = '';
+                banner.style.cssText = ''; // Remove inline display:none
+                document.body.classList.add('has-mobile-banner-ad');
+
+                // Apply i18n translations if available
+                if (typeof I18n !== 'undefined' && typeof I18n.applyTranslations === 'function') {
+                    I18n.applyTranslations(banner);
+                }
+            } catch (err) {
+                // On error, keep banner hidden silently
+            }
+        };
+        
+        // 設置公司頁面鏈接
+        function setupCompanyPageLink() {
+            const companyLink = document.getElementById('nav-company');
+            if (companyLink) {
+                // 如果沒有從模板獲取到 subdomain，嘗試從 API 獲取
+                if (typeof window.tenantSubdomain === 'undefined' || !window.tenantSubdomain) {
+                    // 嘗試從 API 獲取租戶信息
+                    if (typeof App !== 'undefined' && App.apiRequest) {
+                        App.apiRequest('/user/me').then(user => {
+                            if (user.tenant && user.tenant.subdomain) {
+                                window.tenantSubdomain = user.tenant.subdomain;
+                                updateCompanyPageLink();
+                            }
+                        }).catch(err => {
+                            console.error('Failed to load tenant subdomain:', err);
+                        });
+                    }
+                } else {
+                    updateCompanyPageLink();
+                }
+            }
+        }
+        
+        // 更新公司頁面鏈接
+        function updateCompanyPageLink() {
+            const companyLink = document.getElementById('nav-company');
+            if (companyLink && window.tenantSubdomain) {
+                companyLink.href = '/co/' + window.tenantSubdomain + '/';
+                companyLink.target = '_blank';
+            }
+        }
+        
+        // 打開公司頁面
+        function openCompanyPage(event) {
+            event.preventDefault();
+            if (window.tenantSubdomain) {
+                window.open('/co/' + window.tenantSubdomain + '/', '_blank');
+            } else {
+                // 如果還沒有 subdomain，嘗試獲取
+                if (typeof App !== 'undefined' && App.apiRequest) {
+                    App.apiRequest('/user/me').then(user => {
+                        if (user.tenant && user.tenant.subdomain) {
+                            window.tenantSubdomain = user.tenant.subdomain;
+                            window.open('/co/' + window.tenantSubdomain + '/', '_blank');
+                        } else {
+                            alert('無法獲取公司信息');
+                        }
+                    }).catch(err => {
+                        console.error('Failed to load tenant subdomain:', err);
+                        alert('無法獲取公司信息');
+                    });
+                } else {
+                    alert('無法獲取公司信息');
+                }
+            }
+        }
+        
+        // 設置表單固定按鈕欄
+        function setupFormButtonBar(forceShow) {
+            // 特定頁面使用內嵌按鈕，避免被固定按鈕欄覆蓋
+            if (window.location.pathname === '/personal-data' || window.location.pathname === '/business-goals') {
+                const existingBar = document.querySelector('.form-button-bar');
+                if (existingBar) {
+                    existingBar.remove();
+                }
+                return;
+            }
+            // 若頁面要求停用固定按鈕欄，則直接返回並移除既有欄位
+            const disableButtonBar = document.body && document.body.getAttribute('data-disable-form-button-bar') === 'true';
+            if (disableButtonBar) {
+                const existingBar = document.querySelector('.form-button-bar');
+                if (existingBar) {
+                    existingBar.remove();
+                }
+                return;
+            }
+            // 檢查是否正在 loading，如果是則不顯示 button bar（除非強制顯示）
+            const buttonBar = document.querySelector('.form-button-bar');
+            if (!forceShow && buttonBar && buttonBar.getAttribute('data-loading') === 'true') {
+                 // 如果正在 loading，我們可以暫時不處理，或者等待 loading 完成
+                 // 但是不要移除它，除非我們確定它是舊的
+                 // 這裡直接 return 可能會導致如果頁面長時間不 loading，按鈕欄永遠不出來
+                 // 讓我們放寬一點條件，只有在真的有 loading overlay 時才考慮
+                 // return; // 移除這個 strict check
+            }
+            
+            // 檢查是否有 loading overlay 正在顯示（除非強制顯示）
+            const loadingOverlay = document.getElementById('formLoadingOverlay');
+            if (!forceShow && loadingOverlay && loadingOverlay.style.display !== 'none' && window.getComputedStyle(loadingOverlay).display !== 'none') {
+                // 如果 loading overlay 顯示中，我們還是應該嘗試設置按鈕欄，因為它可能已經在 DOM 中了
+                // 如果我們 return 了，等 loading 消失後，我們需要一個觸發器來再次 setup
+                // 現在的 MutationObserver 可能不會再次觸發
+                // 所以，即使在 loading，我们也應該允許按鈕欄被設置（只是可能被遮擋）
+                // return; // 移除這個 strict check，讓按鈕欄生成，CSS z-index 會處理遮擋
+            }
+            
+            // 檢查按鈕欄是否已存在並顯示（避免重複處理）
+            const existingButtonBar = document.querySelector('.form-button-bar');
+            if (existingButtonBar && existingButtonBar.children.length > 0 && existingButtonBar.classList.contains('show')) {
+                if (existingButtonBar.isConnected && existingButtonBar.style.display !== 'none') {
+                    console.log('setupFormButtonBar: 按鈕欄已存在且已顯示，跳過處理');
+                    // 仍需隱藏可能因 render() 重新出現的原始按鈕容器
+                    document.querySelectorAll('.form-buttons-container:not(.form-buttons-container-hidden)').forEach(el => {
+                        el.style.display = 'none';
+                        el.classList.add('form-buttons-container-hidden');
+                    });
+                    return;
+                }
+            }
+            
+            // 查找所有表單
+            const forms = document.querySelectorAll('form');
+            let foundButtonContainer = false;
+            
+            console.log('setupFormButtonBar: 查找表單，找到', forms.length, '個表單');
+            
+            // 檢查當前頁面是否是 messages 頁面
+            const isMessagesPage = window.location.pathname === '/messages' || window.location.pathname.startsWith('/messages/');
+            if (isMessagesPage) {
+                console.log('setupFormButtonBar: 跳過 messages 頁面（使用專用的 messages-button-bar）');
+                return;
+            }
+            
+            // 檢查當前頁面是否是自動搵客（使用內嵌按鈕）
+            const isAutoOutreach = window.location.pathname.startsWith('/auto-outreach');
+            if (isAutoOutreach) {
+                const existingBar = document.querySelector('.form-button-bar');
+                if (existingBar) existingBar.remove();
+                return;
+            }
+            
+            // 檢查當前頁面是否是頁面編輯器
+            const isPageEditor = window.location.pathname.startsWith('/pages/') && window.location.pathname.endsWith('/edit');
+            if (isPageEditor) {
+                console.log('setupFormButtonBar: 跳過頁面編輯器（不需要 form-button-bar）');
+                return;
+            }
+            
+            // 使用 for...of 循環，這樣可以用 break 跳出
+            for (const form of forms) {
+                // 跳過非表單（例如 AI chat 的表單）
+                if (form.id === 'aiChatForm' || form.id === 'aiChatRenameForm' || form.closest('.modal')) {
+                    console.log('setupFormButtonBar: 跳過表單', form.id);
+                    continue;
+                }
+                
+                console.log('setupFormButtonBar: 處理表單 ID:', form.id);
+                
+                // 跳過 AI 聊天表單和 messages 頁面的表單
+                if (form.id === 'aiChatForm' || form.id === 'messageForm') {
+                    console.log('setupFormButtonBar: 跳過表單', form.id);
+                    continue;
+                }
+                
+                // 優先查找 form-buttons-container，然後查找其他按鈕容器
+                let buttonContainer = form.querySelector('.form-buttons-container');
+                console.log('setupFormButtonBar: 查找 .form-buttons-container，結果:', buttonContainer ? '找到' : '未找到');
+                
+                if (!buttonContainer) {
+                    // 直接找含 submit 按鈕的容器（避免抓到欄位排列用的 .d-flex.gap-2）
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn && submitBtn.parentElement) {
+                        buttonContainer = submitBtn.parentElement;
+                    }
+                    console.log('setupFormButtonBar: 使用備用選擇器查找，結果:', buttonContainer ? '找到' : '未找到');
+                }
+                
+                const hasButtons = buttonContainer && buttonContainer.querySelector('button[type="submit"], .btn-primary, .btn-secondary');
+                console.log('setupFormButtonBar: 按鈕容器是否有按鈕:', hasButtons ? '是' : '否');
+                
+                if (hasButtons) {
+                    foundButtonContainer = true;
+                    // 創建固定按鈕欄（如果不存在）
+                    let buttonBar = document.querySelector('.form-button-bar');
+                    if (!buttonBar) {
+                        buttonBar = document.createElement('div');
+                        buttonBar.className = 'form-button-bar';
+                        document.body.appendChild(buttonBar);
+                        console.log('setupFormButtonBar: 創建新的按鈕欄');
+                    }
+                    
+                    // 清空按鈕欄（避免重複添加）
+                    buttonBar.innerHTML = '';
+                    
+                    // 將按鈕移到固定欄
+                    const buttons = buttonContainer.querySelectorAll('button, a.btn');
+                    console.log('setupFormButtonBar: 找到', buttons.length, '個按鈕');
+                    
+                    if (buttons.length === 0) {
+                        console.log('setupFormButtonBar: 警告：按鈕容器中沒有按鈕');
+                        continue; // 繼續處理下一個表單
+                    }
+                    
+                    buttons.forEach(btn => {
+                        const clonedBtn = btn.cloneNode(true);
+                        
+                        // 保存原始的 onclick 屬性
+                        const originalOnclick = btn.getAttribute('onclick');
+                        const originalHref = btn.getAttribute('href');
+                        
+                        // 清除克隆按鈕的所有事件監聽器
+                        clonedBtn.onclick = null;
+                        clonedBtn.removeAttribute('onclick');
+                        
+                        // 重新綁定事件
+                        if (clonedBtn.type === 'submit') {
+                            // 提交按鈕：處理不同類型的表單
+                            clonedBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // console.log('保存按鈕被點擊'); // 調試用
+                                
+                                // 優先檢查是否有 dynamicForm 實例（動態表單）
+                                if (window.dynamicForm && typeof window.dynamicForm.submitForm === 'function') {
+                                    // console.log('調用 dynamicForm.submitForm'); // 調試用
+                                    window.dynamicForm.submitForm().catch(err => {
+                                        console.error('提交失敗:', err);
+                                    });
+                                } else {
+                                    // 對於自定義表單（如 orders_new），嘗試多種方式觸發提交
+                                    // console.log('觸發表單 submit 事件，表單 ID:', form.id); // 調試用
+                                    
+                                    // 方法1：檢查是否有全局提交函數
+                                    if (form.id === 'orderForm' && typeof submitOrderForm === 'function') {
+                                        // console.log('直接調用 submitOrderForm 函數'); // 調試用
+                                        submitOrderForm().catch(err => {
+                                            console.error('提交失敗:', err);
+                                        });
+                                    } else if (form.id === 'serviceOrderForm' && typeof saveServiceOrder === 'function') {
+                                        // console.log('直接調用 saveServiceOrder 函數'); // 調試用
+                                        saveServiceOrder().catch(err => {
+                                            console.error('提交失敗:', err);
+                                        });
+                                    } else if (form.id === 'purchaseOrderForm') {
+                                        // purchaseOrderForm 使用 addEventListener('submit', ...)，觸發 submit 事件
+                                        // console.log('觸發 purchaseOrderForm submit 事件'); // 調試用
+                                        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                                        form.dispatchEvent(submitEvent);
+                                    } else {
+                                        // 方法2：觸發自定義事件
+                                        const customEvent = new CustomEvent('form-submit', { detail: { form: form } });
+                                        document.dispatchEvent(customEvent);
+                                        
+                                        // 方法3：觸發 submit 事件（作為後備）
+                                        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                                        form.dispatchEvent(submitEvent);
+                                    }
+                                }
+                            });
+                        } else if (originalOnclick) {
+                            // 有 onclick 屬性的按鈕：恢復 onclick
+                            clonedBtn.setAttribute('onclick', originalOnclick);
+                        } else if (clonedBtn.tagName === 'A' && originalHref) {
+                            // 鏈接按鈕：保持原有 href
+                            clonedBtn.setAttribute('href', originalHref);
+                        } else if (clonedBtn.tagName === 'A') {
+                            // 鏈接按鈕但沒有 href：可能是返回按鈕，保持原有行為
+                            const originalClickHandler = btn.onclick;
+                            if (originalClickHandler) {
+                                clonedBtn.addEventListener('click', originalClickHandler);
+                            }
+                        }
+                        
+                        buttonBar.appendChild(clonedBtn);
+                    });
+                    
+                    // 隱藏原按鈕容器（不移除，避免 render() 重繪後找不到）
+                    buttonContainer.style.display = 'none';
+                    buttonContainer.classList.add('form-buttons-container-hidden');
+                    buttonBar.classList.add('show');
+                    console.log('setupFormButtonBar: 按鈕欄已設置並顯示，包含', buttonBar.children.length, '個按鈕');
+                    // 成功處理後，跳出循環
+                    break;
+                }
+            }
+            
+            // 如果沒有找到按鈕容器，但 forceShow 為 true，嘗試再次查找（可能表單還在渲染）
+            if (!foundButtonContainer && forceShow) {
+                console.log('setupFormButtonBar: 未找到按鈕容器，但 forceShow=true，將在 200ms 後重試');
+                setTimeout(() => {
+                    setupFormButtonBar(true);
+                }, 200);
+            } else if (foundButtonContainer) {
+                console.log('setupFormButtonBar: 成功設置按鈕欄');
+            } else {
+                console.log('setupFormButtonBar: 未找到按鈕容器');
+            }
+        }
+        
+        // 使用 MutationObserver 監聽表單動態添加（延遲執行，避免與 DOMContentLoaded 衝突）
+        setTimeout(function() {
+            const observer = new MutationObserver(function(mutations) {
+                // 檢查是否有新的表單被添加，或者現有表單的按鈕被修改
+                let shouldUpdate = false;
+                for (const mutation of mutations) {
+                    if (mutation.type === 'childList') {
+                        // 檢查添加的節點
+                        mutation.addedNodes.forEach(node => {
+                            if (node.nodeType === 1) { // 元素節點
+                                if (node.tagName === 'FORM' || node.querySelector('form') || 
+                                    node.classList.contains('form-buttons-container') || node.querySelector('.form-buttons-container')) {
+                                    shouldUpdate = true;
+                                }
+                            }
+                        });
+                        // 檢查移除的節點 (如果按鈕容器被移除了，可能需要重新檢查)
+                        mutation.removedNodes.forEach(node => {
+                             if (node.nodeType === 1) {
+                                if (node.classList.contains('form-button-bar')) {
+                                    // 如果按鈕欄被移除了，我們肯定要重新設置
+                                    shouldUpdate = true;
+                                }
+                             }
+                        });
+                    }
+                }
+                
+                if (shouldUpdate) {
+                    // console.log('MutationObserver: 檢測到表單或按鈕變更，更新按鈕欄');
+                    // 為了避免無限循環（因為 setupFormButtonBar 會修改 DOM），我們需要防抖動或者檢查是否是我們自己的修改
+                    // 但因為我們只監聽 childList，而 setupFormButtonBar 主要是 appendChild 到 body (如果不存在) 或者修改 innerHTML
+                    // 我們可以簡單地再次調用，因為 setupFormButtonBar 有內部檢查 existingButtonBar
+                    setupFormButtonBar();
+                }
+            });
+            
+            // 監聽 body 的子節點變化
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }, 500); // 增加延遲到 500ms
+        
+    </script>
+    
+    <!-- 條碼和 QR Code 預覽功能 -->
+    <script>
+        // 更新條碼預覽按鈕顯示狀態
+        function updateBarcodePreview(fieldId) {
+            const input = document.getElementById(fieldId);
+            const btn = document.getElementById(fieldId + '_preview_btn');
+            if (input && btn) {
+                if (input.value && input.value.trim() !== '') {
+                    btn.style.display = 'block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+        }
+        
+        // 顯示條碼預覽
+        function showBarcodePreview(fieldId) {
+            const input = document.getElementById(fieldId);
+            if (!input || !input.value || input.value.trim() === '') {
+                if (typeof App !== 'undefined' && App.showAlert) {
+                    App.showAlert('請先輸入條碼', 'warning');
+                } else {
+                    alert('請先輸入條碼');
+                }
+                return;
+            }
+            
+            const barcodeValue = input.value.trim();
+            const t = (key, fallback) => (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(key) : fallback;
+            
+            // 創建模態框
+            const modalHtml = `
+                <div class="modal fade" id="barcodePreviewModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${t('common.previewBarcode', '預覽條碼')}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs mb-3" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="barcodePreviewTab" data-bs-toggle="tab" data-bs-target="#barcodePreviewPane" type="button" role="tab">${t('common.preview', '預覽')}</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="barcodePrintTab" data-bs-toggle="tab" data-bs-target="#barcodePrintPane" type="button" role="tab">${t('common.printLabel', '列印標籤')}</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <!-- Preview Tab -->
+                                    <div class="tab-pane fade show active" id="barcodePreviewPane" role="tabpanel">
+                                        <div class="text-center">
+                                            <p class="mb-3"><strong>${t('common.barcodeValue', '條碼值')}：</strong>${escapeHtml(barcodeValue)}</p>
+                                            <div class="d-flex justify-content-center p-3 bg-light rounded">
+                                                <svg id="barcodeCanvas" style="max-width: 100%;"></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Print Tab -->
+                                    <div class="tab-pane fade" id="barcodePrintPane" role="tabpanel">
+                                        <div class="row mb-3 align-items-end">
+                                            <div class="col-auto">
+                                                <label class="form-label">${t('common.copies', '份數')}</label>
+                                                <input type="number" class="form-control" id="barcodePrintCopies" value="1" min="1" max="100" style="width: 100px;">
+                                            </div>
+                                            <div class="col-auto">
+                                                <label class="form-label">${t('common.labelSize', '標籤尺寸')}</label>
+                                                <select class="form-select" id="barcodeLabelSize" style="width: 160px;">
+                                                    <option value="small">50 x 30 mm</option>
+                                                    <option value="medium" selected>70 x 40 mm</option>
+                                                    <option value="large">100 x 50 mm</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button type="button" class="btn btn-primary" onclick="generateBarcodePrintPreview()">
+                                                    <i class="bi bi-arrow-repeat"></i> ${t('common.generatePreview', '產生預覽')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="barcodePrintPreviewArea" class="border rounded p-3 bg-light" style="max-height: 400px; overflow-y: auto;">
+                                            <p class="text-muted text-center">${t('common.clickGeneratePreview', '請設定份數後點擊「產生預覽」')}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary d-none" id="barcodePrintBtn" onclick="printBarcodeLabels()">
+                                    <i class="bi bi-printer"></i> ${t('common.print', '列印')}
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${t('common.close', '關閉')}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 移除舊的模態框（如果存在）
+            const oldModal = document.getElementById('barcodePreviewModal');
+            if (oldModal) {
+                oldModal.remove();
+            }
+            
+            // 添加新模態框
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // 顯示模態框
+            const modal = new bootstrap.Modal(document.getElementById('barcodePreviewModal'));
+            modal.show();
+            
+            // 切換到列印 tab 時顯示列印按鈕
+            document.getElementById('barcodePrintTab').addEventListener('shown.bs.tab', function() {
+                document.getElementById('barcodePrintBtn').classList.remove('d-none');
+            });
+            document.getElementById('barcodePreviewTab').addEventListener('shown.bs.tab', function() {
+                document.getElementById('barcodePrintBtn').classList.add('d-none');
+            });
+            
+            // 生成條碼
+            setTimeout(() => {
+                try {
+                    if (typeof JsBarcode !== 'undefined') {
+                        JsBarcode("#barcodeCanvas", barcodeValue, {
+                            format: "CODE128",
+                            width: 2,
+                            height: 80,
+                            displayValue: true,
+                            fontSize: 16,
+                            margin: 10
+                        });
+                    } else {
+                        document.getElementById('barcodeCanvas').innerHTML = '<p class="text-danger">條碼庫未載入</p>';
+                    }
+                } catch (error) {
+                    console.error('生成條碼失敗:', error);
+                    document.getElementById('barcodeCanvas').innerHTML = '<p class="text-danger">條碼生成失敗</p>';
+                }
+            }, 100);
+            
+            // 模態框關閉時移除
+            document.getElementById('barcodePreviewModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+        
+        // 生成條碼列印預覽（多份）
+        function generateBarcodePrintPreview() {
+            const copiesInput = document.getElementById('barcodePrintCopies');
+            const sizeSelect = document.getElementById('barcodeLabelSize');
+            const area = document.getElementById('barcodePrintPreviewArea');
+            if (!copiesInput || !area) return;
+            
+            const copies = Math.min(Math.max(parseInt(copiesInput.value) || 1, 1), 100);
+            copiesInput.value = copies;
+            const size = sizeSelect ? sizeSelect.value : 'medium';
+            
+            // Size mappings (in mm, converted to px for display, ~3.78 px/mm)
+            const sizeMap = {
+                small:  { w: '189px', h: '113px', bw: 1.2, bh: 40, fs: 10 },
+                medium: { w: '265px', h: '151px', bw: 1.8, bh: 60, fs: 13 },
+                large:  { w: '378px', h: '189px', bw: 2.2, bh: 80, fs: 16 }
+            };
+            const s = sizeMap[size] || sizeMap.medium;
+            
+            // Get the barcode value from the preview tab
+            const barcodeCanvas = document.getElementById('barcodeCanvas');
+            const barcodeValue = barcodeCanvas ? barcodeCanvas.getAttribute('jsbarcode-value') || '' : '';
+            if (!barcodeValue) {
+                area.innerHTML = '<p class="text-danger text-center">無法取得條碼值</p>';
+                return;
+            }
+            
+            // Build grid of labels
+            let html = '<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">';
+            for (let i = 0; i < copies; i++) {
+                html += `
+                    <div class="barcode-label-item" style="width: ${s.w}; height: ${s.h}; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; background: #fff; padding: 4px;">
+                        <svg id="barcodePrint_${i}"></svg>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            area.innerHTML = html;
+            
+            // Render each barcode
+            setTimeout(() => {
+                if (typeof JsBarcode === 'undefined') return;
+                for (let i = 0; i < copies; i++) {
+                    try {
+                        JsBarcode(`#barcodePrint_${i}`, barcodeValue, {
+                            format: "CODE128",
+                            width: s.bw,
+                            height: s.bh,
+                            displayValue: true,
+                            fontSize: s.fs,
+                            margin: 4
+                        });
+                    } catch (e) {
+                        console.error('生成條碼失敗:', e);
+                    }
+                }
+            }, 50);
+            
+            // Show print button
+            const printBtn = document.getElementById('barcodePrintBtn');
+            if (printBtn) printBtn.classList.remove('d-none');
+        }
+        
+        // 列印條碼標籤
+        function printBarcodeLabels() {
+            const area = document.getElementById('barcodePrintPreviewArea');
+            if (!area) return;
+            
+            const sizeSelect = document.getElementById('barcodeLabelSize');
+            const size = sizeSelect ? sizeSelect.value : 'medium';
+            const sizeMap = {
+                small:  { w: '50mm', h: '30mm' },
+                medium: { w: '70mm', h: '40mm' },
+                large:  { w: '100mm', h: '50mm' }
+            };
+            const s = sizeMap[size] || sizeMap.medium;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Print Barcode Labels</title>
+                    <style>
+                        @page { margin: 5mm; }
+                        body { margin: 0; padding: 0; }
+                        .print-grid {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 2mm;
+                        }
+                        .print-label {
+                            width: ${s.w};
+                            height: ${s.h};
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            page-break-inside: avoid;
+                            overflow: hidden;
+                        }
+                        .print-label svg {
+                            max-width: 100%;
+                            max-height: 100%;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-grid">
+            `);
+            
+            // Copy each label SVG
+            const labels = area.querySelectorAll('.barcode-label-item');
+            labels.forEach(label => {
+                const svg = label.querySelector('svg');
+                if (svg) {
+                    printWindow.document.write(`<div class="print-label">${svg.outerHTML}</div>`);
+                }
+            });
+            
+            printWindow.document.write(`
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); window.close(); };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        // 更新 QR Code 預覽按鈕顯示狀態
+        function updateQRCodePreview(fieldId) {
+            const input = document.getElementById(fieldId);
+            const btn = document.getElementById(fieldId + '_preview_btn');
+            if (input && btn) {
+                if (input.value && input.value.trim() !== '') {
+                    btn.style.display = 'block';
+                } else {
+                    btn.style.display = 'none';
+                }
+            }
+        }
+        
+        // 動態載入 QRCode 庫，確保存在 toCanvas
+        function ensureQRCodeLib(callback) {
+            if (typeof QRCode !== 'undefined' && typeof QRCode.toCanvas === 'function') {
+                callback();
+                return;
+            }
+
+            const existing = document.getElementById('qrcode-lib');
+            if (existing) {
+                existing.onload = () => callback();
+                existing.onerror = () => App.showAlert('QR Code 庫載入失敗', 'danger');
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.id = 'qrcode-lib';
+            script.src = '/static/js/qrcode.min.js';
+            script.onload = () => callback();
+            script.onerror = () => App.showAlert('QR Code 庫載入失敗', 'danger');
+            document.head.appendChild(script);
+        }
+        
+        // 顯示 QR Code 預覽
+        function showQRCodePreview(fieldId) {
+            const input = document.getElementById(fieldId);
+            if (!input || !input.value || input.value.trim() === '') {
+                const fieldName = fieldId === 'referralCode' || fieldId === 'referrerCodeInput' ? '推薦碼' : 'SKU';
+                if (typeof App !== 'undefined' && App.showAlert) {
+                    App.showAlert(`請先輸入 ${fieldName}`, 'warning');
+                } else {
+                    alert(`請先輸入 ${fieldName}`);
+                }
+                return;
+            }
+            
+            const qrValue = input.value.trim();
+            const t = (key, fallback) => (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(key) : fallback;
+            
+            // 創建模態框
+            const modalHtml = `
+                <div class="modal fade" id="qrcodePreviewModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${t('common.previewQrCode', 'QR Code 預覽')}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs mb-3" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="qrcodePreviewTab" data-bs-toggle="tab" data-bs-target="#qrcodePreviewPane" type="button" role="tab">${t('common.preview', '預覽')}</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="qrcodePrintTab" data-bs-toggle="tab" data-bs-target="#qrcodePrintPane" type="button" role="tab">${t('common.printLabel', '列印標籤')}</button>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <!-- Preview Tab -->
+                                    <div class="tab-pane fade show active" id="qrcodePreviewPane" role="tabpanel">
+                                        <div class="text-center">
+                                            <p class="mb-3"><strong>SKU：</strong>${escapeHtml(qrValue)}</p>
+                                            <div class="d-flex justify-content-center p-3 bg-light rounded" style="overflow: hidden;">
+                                                <div id="qrcodeContainer" style="width: 256px; height: 256px; display: flex; justify-content: center; align-items: center;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Print Tab -->
+                                    <div class="tab-pane fade" id="qrcodePrintPane" role="tabpanel">
+                                        <div class="row mb-3 align-items-end">
+                                            <div class="col-auto">
+                                                <label class="form-label">${t('common.copies', '份數')}</label>
+                                                <input type="number" class="form-control" id="qrcodePrintCopies" value="1" min="1" max="100" style="width: 100px;">
+                                            </div>
+                                            <div class="col-auto">
+                                                <label class="form-label">${t('common.labelSize', '標籤尺寸')}</label>
+                                                <select class="form-select" id="qrcodeLabelSize" style="width: 160px;">
+                                                    <option value="small">30 x 30 mm</option>
+                                                    <option value="medium" selected>40 x 40 mm</option>
+                                                    <option value="large">50 x 50 mm</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-auto">
+                                                <label class="form-label d-block">&nbsp;</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="qrcodeShowText" checked>
+                                                    <label class="form-check-label" for="qrcodeShowText">${t('common.showText', '顯示文字')}</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button type="button" class="btn btn-primary" onclick="generateQRCodePrintPreview()">
+                                                    <i class="bi bi-arrow-repeat"></i> ${t('common.generatePreview', '產生預覽')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="qrcodePrintPreviewArea" class="border rounded p-3 bg-light" style="max-height: 400px; overflow-y: auto;">
+                                            <p class="text-muted text-center">${t('common.clickGeneratePreview', '請設定份數後點擊「產生預覽」')}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary d-none" id="qrcodePrintBtn" onclick="printQRCodeLabels()">
+                                    <i class="bi bi-printer"></i> ${t('common.print', '列印')}
+                                </button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${t('common.close', '關閉')}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 移除舊的模態框（如果存在）
+            const oldModal = document.getElementById('qrcodePreviewModal');
+            if (oldModal) {
+                oldModal.remove();
+            }
+            
+            // 添加新模態框
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // 顯示模態框
+            const modal = new bootstrap.Modal(document.getElementById('qrcodePreviewModal'));
+            modal.show();
+            
+            // 切換到列印 tab 時顯示列印按鈕
+            document.getElementById('qrcodePrintTab').addEventListener('shown.bs.tab', function() {
+                document.getElementById('qrcodePrintBtn').classList.remove('d-none');
+            });
+            document.getElementById('qrcodePreviewTab').addEventListener('shown.bs.tab', function() {
+                document.getElementById('qrcodePrintBtn').classList.add('d-none');
+            });
+            
+            // Store QR value for print use
+            document.getElementById('qrcodePreviewModal').dataset.qrValue = qrValue;
+            
+            // 生成 QR Code
+            setTimeout(() => {
+                const container = document.getElementById('qrcodeContainer');
+                if (!container) {
+                    console.error('QR Code 容器元素未找到');
+                    return;
+                }
+                
+                const renderQRCode = () => {
+                    // 清空容器
+                    container.innerHTML = '';
+                    
+                    try {
+                        if (typeof QRCode !== 'undefined' && typeof QRCode.toCanvas === 'function') {
+                            // 使用 node-qrcode 的 toCanvas API
+                            const canvas = document.createElement('canvas');
+                            container.appendChild(canvas);
+                            QRCode.toCanvas(canvas, qrValue, {
+                                width: 256,
+                                margin: 2,
+                                color: { dark: "#000000", light: "#ffffff" }
+                            }, function (error) {
+                                if (error) {
+                                    console.error('生成 QR Code 失敗:', error);
+                                    container.innerHTML = '<p class="text-danger">QR Code 生成失敗: ' + error.message + '</p>';
+                                }
+                            });
+                        } else if (typeof QRCode !== 'undefined') {
+                            // 使用 qrcode.js 的 new QRCode() API
+                            new QRCode(container, {
+                                text: qrValue,
+                                width: 256,
+                                height: 256,
+                                colorDark: "#000000",
+                                colorLight: "#ffffff",
+                                correctLevel: QRCode.CorrectLevel.H
+                            });
+                        } else {
+                            container.innerHTML = '<p class="text-danger">QR Code 庫未載入</p>';
+                        }
+                    } catch (e) {
+                        console.error('QRCode 生成失敗:', e);
+                        container.innerHTML = '<p class="text-danger">QR Code 生成失敗: ' + e.message + '</p>';
+                    }
+                };
+
+                ensureQRCodeLib(renderQRCode);
+            }, 100);
+            
+            // 模態框關閉時移除
+            document.getElementById('qrcodePreviewModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+        
+        // 生成 QR Code 列印預覽（多份）
+        function generateQRCodePrintPreview() {
+            const copiesInput = document.getElementById('qrcodePrintCopies');
+            const sizeSelect = document.getElementById('qrcodeLabelSize');
+            const showTextChk = document.getElementById('qrcodeShowText');
+            const area = document.getElementById('qrcodePrintPreviewArea');
+            const modal = document.getElementById('qrcodePreviewModal');
+            if (!copiesInput || !area || !modal) return;
+            
+            const copies = Math.min(Math.max(parseInt(copiesInput.value) || 1, 1), 100);
+            copiesInput.value = copies;
+            const size = sizeSelect ? sizeSelect.value : 'medium';
+            const showText = showTextChk ? showTextChk.checked : true;
+            const qrValue = modal.dataset.qrValue || '';
+            
+            if (!qrValue) {
+                area.innerHTML = '<p class="text-danger text-center">無法取得 QR Code 值</p>';
+                return;
+            }
+            
+            // Size mappings (in mm -> px at ~3.78 px/mm)
+            const sizeMap = {
+                small:  { w: '113px', h: '113px', qrSize: 96  },
+                medium: { w: '151px', h: '151px', qrSize: 128 },
+                large:  { w: '189px', h: '189px', qrSize: 160 }
+            };
+            const s = sizeMap[size] || sizeMap.medium;
+            
+            // Build grid of labels
+            let html = '<div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">';
+            for (let i = 0; i < copies; i++) {
+                html += `
+                    <div class="qrcode-label-item" data-index="${i}" style="width: ${s.w}; min-height: ${s.h}; border: 1px dashed #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; padding: 4px;">
+                        <div id="qrcodePrint_${i}" style="display: flex; justify-content: center; align-items: center;"></div>
+                        ${showText ? `<div style="font-size: 10px; margin-top: 2px; word-break: break-all; text-align: center; max-width: 100%;">${escapeHtml(qrValue)}</div>` : ''}
+                    </div>
+                `;
+            }
+            html += '</div>';
+            area.innerHTML = html;
+            
+            // Render each QR code
+            setTimeout(() => {
+                ensureQRCodeLib(() => {
+                    for (let i = 0; i < copies; i++) {
+                        const container = document.getElementById(`qrcodePrint_${i}`);
+                        if (!container) continue;
+                        try {
+                            if (typeof QRCode !== 'undefined' && typeof QRCode.toCanvas === 'function') {
+                                const canvas = document.createElement('canvas');
+                                container.appendChild(canvas);
+                                QRCode.toCanvas(canvas, qrValue, {
+                                    width: s.qrSize,
+                                    margin: 1,
+                                    color: { dark: "#000000", light: "#ffffff" }
+                                }, function(err) {
+                                    if (err) console.error('QR Code 生成失敗:', err);
+                                });
+                            } else if (typeof QRCode !== 'undefined') {
+                                new QRCode(container, {
+                                    text: qrValue,
+                                    width: s.qrSize,
+                                    height: s.qrSize,
+                                    colorDark: "#000000",
+                                    colorLight: "#ffffff",
+                                    correctLevel: QRCode.CorrectLevel.H
+                                });
+                            }
+                        } catch (e) {
+                            console.error('QR Code 生成失敗:', e);
+                        }
+                    }
+                });
+            }, 50);
+            
+            // Show print button
+            const printBtn = document.getElementById('qrcodePrintBtn');
+            if (printBtn) printBtn.classList.remove('d-none');
+        }
+        
+        // 列印 QR Code 標籤
+        function printQRCodeLabels() {
+            const area = document.getElementById('qrcodePrintPreviewArea');
+            if (!area) return;
+            
+            const sizeSelect = document.getElementById('qrcodeLabelSize');
+            const size = sizeSelect ? sizeSelect.value : 'medium';
+            const sizeMap = {
+                small:  { w: '30mm', h: '30mm' },
+                medium: { w: '40mm', h: '40mm' },
+                large:  { w: '50mm', h: '50mm' }
+            };
+            const s = sizeMap[size] || sizeMap.medium;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Print QR Code Labels</title>
+                    <style>
+                        @page { margin: 5mm; }
+                        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+                        .print-grid {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 2mm;
+                        }
+                        .print-label {
+                            width: ${s.w};
+                            min-height: ${s.h};
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                            justify-content: center;
+                            page-break-inside: avoid;
+                            overflow: hidden;
+                            padding: 1mm;
+                        }
+                        .print-label canvas, .print-label img {
+                            max-width: 100%;
+                            max-height: calc(${s.h} - 6mm);
+                        }
+                        .print-label .qr-text {
+                            font-size: 7pt;
+                            margin-top: 1mm;
+                            word-break: break-all;
+                            text-align: center;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-grid">
+            `);
+            
+            // Copy each label
+            const labels = area.querySelectorAll('.qrcode-label-item');
+            labels.forEach(label => {
+                const canvas = label.querySelector('canvas');
+                const img = label.querySelector('img');
+                const textDiv = label.querySelector('div:last-child');
+                let imgHtml = '';
+                
+                if (canvas) {
+                    // Convert canvas to image for printing
+                    imgHtml = `<img src="${canvas.toDataURL()}" />`;
+                } else if (img) {
+                    imgHtml = img.outerHTML;
+                }
+                
+                const textHtml = (textDiv && !textDiv.querySelector('canvas') && !textDiv.querySelector('img')) 
+                    ? `<div class="qr-text">${textDiv.innerHTML}</div>` : '';
+                
+                printWindow.document.write(`<div class="print-label">${imgHtml}${textHtml}</div>`);
+            });
+            
+            printWindow.document.write(`
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); window.close(); };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        // HTML 轉義函數
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 當表單數據加載完成後，更新預覽按鈕狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            // 監聽表單字段變化
+            setTimeout(() => {
+                const barcodeInput = document.getElementById('field_barcode');
+                if (barcodeInput) {
+                    updateBarcodePreview('field_barcode');
+                    // 監聽輸入變化
+                    barcodeInput.addEventListener('input', () => {
+                        updateBarcodePreview('field_barcode');
+                    });
+                }
+                
+                const skuInput = document.getElementById('field_sku');
+                if (skuInput) {
+                    updateQRCodePreview('field_sku');
+                    // 監聽輸入變化
+                    skuInput.addEventListener('input', () => {
+                        updateQRCodePreview('field_sku');
+                    });
+                }
+            }, 500);
+        });
+
+        // POS 點擊前選擇店舖，附帶 store_id
+        document.addEventListener('DOMContentLoaded', () => {
+            const posLink = document.getElementById('nav-pos');
+            const modalEl = document.getElementById('selectStoreModal');
+            const selectEl = document.getElementById('selectStoreInput');
+            const confirmBtn = document.getElementById('selectStoreConfirmBtn');
+            if (!posLink || !modalEl || !selectEl || !confirmBtn) return;
+
+            const modal = new bootstrap.Modal(modalEl);
+            let activeStores = [];
+            let userStores = []; // {store_id, is_default, belongs_to_store}
+
+            const loadStores = async () => {
+                // 每次點擊都即時取得最新店舖，避免使用快取
+                try {
+                    const res = await App.apiRequest('/api/v1/stores?status=active&limit=1000');
+                    activeStores = (res && res.data) ? res.data : [];
+                } catch (err) {
+                    console.warn('載入店舖失敗', err);
+                    activeStores = [];
+                }
+                return activeStores;
+            };
+
+            const loadUserStores = async () => {
+                try {
+                    const me = await App.apiRequest('/user/me');
+                    const stores = (me && me.extra_fields && Array.isArray(me.extra_fields.stores)) ? me.extra_fields.stores : [];
+                    userStores = stores.filter(s => s && s.store_id && (s.belongs_to_store !== false));
+                } catch (err) {
+                    console.warn('載入使用者店舖失敗', err);
+                    userStores = [];
+                }
+            };
+
+            const initSelect2 = (list) => {
+                const data = list.map(s => {
+                    const id = s.id || s.store_id;
+                    const name = s.name || s.store_name || '';
+                    const code = s.code || '';
+                    const text = name ? (code ? `${name} (${code})` : name) : id;
+                    return { id, text };
+                });
+
+                // 重建 select2
+                if (typeof $ !== 'undefined') {
+                    if ($(selectEl).hasClass('select2-hidden-accessible')) {
+                        $(selectEl).off().select2('destroy');
+                    }
+                    $(selectEl).empty();
+                    $(selectEl).select2({
+                        data,
+                        placeholder: '請選擇店舖...',
+                        theme: 'bootstrap-5',
+                        dropdownParent: $('#selectStoreModal'),
+                        allowClear: true
+                    });
+                } else {
+                    selectEl.innerHTML = '<option value="">請選擇店舖</option>' + data.map(d => `<option value="${d.id}">${d.text}</option>`).join('');
+                }
+
+                // 預設選擇：優先使用使用者的 is_default；否則第一個
+                const defaultStore = userStores.find(s => s.is_default === true || s.is_default === 'true' || s.is_default === 1 || s.is_default === 'on');
+                const defaultId = defaultStore ? defaultStore.store_id : (list[0] ? list[0].id : '');
+                if (defaultId) {
+                    if (typeof $ !== 'undefined' && $(selectEl).hasClass('select2-hidden-accessible')) {
+                        $(selectEl).val(defaultId).trigger('change');
+                    } else {
+                        selectEl.value = defaultId;
+                    }
+                }
+            };
+
+            let storeSelectorTarget = 'pos';
+
+            // 全局方法，確保即便事件綁定失效也可調用
+            window.openPosStoreSelector = async function(event) {
+                if (event) event.preventDefault();
+                storeSelectorTarget = 'pos';
+                await loadStores();
+                await loadUserStores();
+
+                // 無所屬店舖：直接進 POS，不彈窗
+                if (!userStores.length) {
+                    window.location.href = '/pos';
+                    return false;
+                }
+
+                let available = [];
+                if (activeStores.length > 0) {
+                    available = activeStores.filter(s => userStores.some(us => us.store_id === s.id));
+                }
+                if (!available.length) {
+                    available = userStores.map(s => ({
+                        id: s.store_id,
+                        name: s.store_name || '',
+                        code: s.code || ''
+                    }));
+                }
+                // 顯示選店彈窗（即便只有一間店也彈）
+                initSelect2(available);
+                modal.show();
+                return false;
+            };
+
+            window.openDiningQueueBoardStoreSelector = async function(event) {
+                if (event) event.preventDefault();
+                storeSelectorTarget = 'dining-queue-board';
+                await loadStores();
+                await loadUserStores();
+
+                let available = [];
+                if (activeStores.length > 0) {
+                    available = activeStores.filter(s => userStores.some(us => us.store_id === s.id));
+                }
+                if (!available.length) {
+                    available = userStores.map(s => ({
+                        id: s.store_id,
+                        name: s.store_name || '',
+                        code: s.code || ''
+                    }));
+                }
+
+                if (available.length <= 1) {
+                    const sid = available[0] ? available[0].id : '';
+                    const qs = sid ? `?store_id=${encodeURIComponent(sid)}` : '';
+                    window.location.href = `/dining-queue/board${qs}`;
+                    return false;
+                }
+
+                initSelect2(available);
+                modal.show();
+                return false;
+            };
+
+            // 綁定點擊事件
+            posLink.addEventListener('click', window.openPosStoreSelector);
+
+            confirmBtn.addEventListener('click', () => {
+                let sid = '';
+                if (typeof $ !== 'undefined' && $(selectEl).hasClass('select2-hidden-accessible')) {
+                    sid = $(selectEl).val();
+                } else {
+                    sid = selectEl.value;
+                }
+                if (!sid) {
+                    App.showAlert('請先選擇店舖', 'warning');
+                    return;
+                }
+                modal.hide();
+                if (storeSelectorTarget === 'dining-queue-board') {
+                    window.location.href = `/dining-queue/board?store_id=${encodeURIComponent(sid)}`;
+                } else {
+                    window.location.href = `/pos?store_id=${encodeURIComponent(sid)}`;
+                }
+            });
+        });
+    </script>
+
+<!-- 選擇店舖（POS） -->
+<div class="modal fade" id="selectStoreModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">選擇店舖</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">店舖</label>
+                    <select id="selectStoreInput" class="form-select">
+                        <option value="">請選擇店舖</option>
+                    </select>
+                </div>
+                <div class="text-muted small">僅顯示您「屬於店舖」的店舖</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="selectStoreConfirmBtn">前往 POS</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 菜單編輯 Modal -->
+<div class="modal fade" id="menuEditModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" data-i18n="menu.editMenu">編輯菜單</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="p-3 bg-light border-bottom">
+                    <small class="text-muted" data-i18n="menu.editMenuHint">拖拽調整順序，點擊眼睛圖標顯示/隱藏菜單項</small>
+                </div>
+                <ul class="list-group list-group-flush" id="menuEditList">
+                    <!-- 菜單項將動態加載 -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" id="menuEditResetBtn" data-i18n="menu.resetToDefault">重置為預設</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.cancel">取消</button>
+                <button type="button" class="btn btn-primary" id="menuEditSaveBtn" data-i18n="common.save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 菜單編輯功能
+(function() {
+    let menuEditModal = null;
+    let menuSettings = [];
+    let hiddenSubkeys = new Set();
+    let originalMenuOrder = [];
+    const fixedTopKeys = ['cms-search-mobile'];
+    const fixedBottomKeys = ['mobile-contact', 'mobile-language', 'mobile-user'];
+    const fixedMenuKeySet = new Set([...fixedTopKeys, ...fixedBottomKeys]);
+
+    // All toggleable submenu guide items
+    const toggleableSubkeys = [
+        { key: 'guide-order-flow', parentKey: 'orderManagement', i18nKey: 'menu.orderFlowGuide', defaultLabel: '訂單流程指南', icon: 'bi bi-signpost-2' },
+        { key: 'guide-dining-flow', parentKey: 'dining', i18nKey: 'menu.diningFlowGuide', defaultLabel: '餐飲流程指南', icon: 'bi bi-signpost-2' },
+        { key: 'accounting-overview', parentKey: 'accounting', i18nKey: 'menu.accountingOverview', defaultLabel: '會計總覽', icon: 'bi bi-graph-up' },
+        { key: 'accounting-reports', parentKey: 'accounting', i18nKey: 'menu.accountingReports', defaultLabel: '專業報表', icon: 'bi bi-file-earmark-bar-graph' },
+        { key: 'accounting-accounts', parentKey: 'accounting', i18nKey: 'menu.chartOfAccounts', defaultLabel: '會計科目表', icon: 'bi bi-diagram-3' },
+        { key: 'accounting-journal-entries', parentKey: 'accounting', i18nKey: 'menu.journalEntries', defaultLabel: '日記帳', icon: 'bi bi-journal-text' },
+        { key: 'accounting-tax-configs', parentKey: 'accounting', i18nKey: 'menu.taxConfigs', defaultLabel: '稅務配置', icon: 'bi bi-receipt-cutoff' },
+        { key: 'accounting-posting-rules', parentKey: 'accounting', i18nKey: 'menu.postingRules', defaultLabel: '自動過帳規則', icon: 'bi bi-diagram-2' }
+    ];
+
+    function shouldIncludeMenuItem(menuItem) {
+        if (!menuItem) return false;
+        const moduleCode = menuItem.getAttribute('data-module');
+        if (!moduleCode) return true;
+        const isHiddenByUser = menuItem.getAttribute('data-menu-hidden') === 'true';
+        const isHidden = menuItem.style.display === 'none' || window.getComputedStyle(menuItem).display === 'none';
+        if (isHidden && !isHiddenByUser) return false;
+        return true;
+    }
+    
+    // 獲取菜單項的顯示名稱
+    function getMenuItemLabel(menuKey, menuItem) {
+        const span = menuItem.querySelector('.nav-link span[data-i18n]');
+        if (span) {
+            return span.textContent || span.innerText || menuKey;
+        }
+        return menuKey;
+    }
+    
+    // 獲取菜單項的圖標
+    function getMenuItemIcon(menuItem) {
+        const icon = menuItem.querySelector('.nav-link > i.bi');
+        if (icon) {
+            return icon.className;
+        }
+        return 'bi bi-list';
+    }
+    
+    // 初始化菜單編輯功能
+    function initMenuEdit() {
+        const editBtn = document.getElementById('sidebarMenuEditBtn');
+        const modalEl = document.getElementById('menuEditModal');
+        if (!editBtn || !modalEl) return;
+        
+        menuEditModal = new bootstrap.Modal(modalEl);
+        
+        // 點擊編輯按鈕
+        editBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            if (typeof window.checkAndHideDisabledModules === 'function') {
+                await window.checkAndHideDisabledModules();
+            }
+            await loadMenuSettings();
+            populateMenuEditList();
+            menuEditModal.show();
+        });
+        
+        // 保存按鈕
+        document.getElementById('menuEditSaveBtn').addEventListener('click', async function() {
+            await saveMenuSettings();
+        });
+        
+        // 重置按鈕
+        document.getElementById('menuEditResetBtn').addEventListener('click', async function() {
+            if (confirm((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('menu.confirmReset') : '確定要重置為預設菜單設定嗎？')) {
+                menuSettings = originalMenuOrder.map((key, index) => ({
+                    key: key,
+                    visible: true,
+                    order: index
+                }));
+                hiddenSubkeys = new Set();
+                populateMenuEditList();
+                await saveMenuSettings();
+            }
+        });
+        
+        // 初始化拖拽排序（使用原生 HTML5 拖放）
+        initDragAndDrop();
+    }
+    
+    // 載入菜單設定
+    async function loadMenuSettings() {
+        // 獲取原始菜單順序
+        const menuList = document.getElementById('sidebarMenuList');
+        if (!menuList) return;
+        
+        const menuItems = menuList.querySelectorAll(':scope > li.nav-item[data-menu-key]');
+        originalMenuOrder = Array.from(menuItems)
+            .filter(item => shouldIncludeMenuItem(item))
+            .map(item => item.getAttribute('data-menu-key'))
+            .filter(key => !fixedMenuKeySet.has(key));
+        
+        // 從 API 載入用戶設定
+        try {
+            const resp = await App.apiRequest('/api/v1/user/menu-settings');
+            if (resp && resp.menu_config) {
+                // menu_config 可能是 { items: [...] } 或直接是陣列
+                const items = resp.menu_config.items || resp.menu_config;
+                if (Array.isArray(items) && items.length > 0) {
+                    menuSettings = items.filter(item => !fixedMenuKeySet.has(item.key));
+                    normalizeMenuSettingsOrder();
+                }
+                // Load hidden subkeys
+                const savedSubkeys = resp.menu_config.hidden_subkeys;
+                if (Array.isArray(savedSubkeys)) {
+                    hiddenSubkeys = new Set(savedSubkeys);
+                } else {
+                    hiddenSubkeys = new Set();
+                }
+                if (Array.isArray(items) && items.length > 0) {
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('載入菜單設定失敗:', e);
+        }
+        
+        // 使用預設設定
+        menuSettings = originalMenuOrder.map((key, index) => ({
+            key: key,
+            visible: true,
+            order: index
+        }));
+        normalizeMenuSettingsOrder();
+    }
+
+    // 強制維持 採購管理/會計/HR 在資源管理後的順序
+    function normalizeMenuSettingsOrder() {
+        if (!Array.isArray(originalMenuOrder) || originalMenuOrder.length === 0) return;
+
+        const orderKeys = [...originalMenuOrder];
+        const moveAfter = (key, afterKey) => {
+            const fromIndex = orderKeys.indexOf(key);
+            if (fromIndex >= 0) orderKeys.splice(fromIndex, 1);
+            const targetIndex = orderKeys.indexOf(afterKey);
+            if (targetIndex >= 0) {
+                orderKeys.splice(targetIndex + 1, 0, key);
+            } else if (fromIndex >= 0) {
+                orderKeys.push(key);
+            }
+        };
+
+        moveAfter('procurementManagement', 'resourceManagement');
+        moveAfter('accounting', 'procurementManagement');
+        moveAfter('hrManagement', 'accounting');
+
+        const seen = new Set();
+        orderKeys.forEach((key, index) => {
+            const settingItem = menuSettings.find(s => s.key === key);
+            if (settingItem) {
+                settingItem.order = index;
+            } else {
+                menuSettings.push({ key, visible: true, order: index });
+            }
+            seen.add(key);
+        });
+
+        let nextOrder = orderKeys.length;
+        menuSettings.forEach(item => {
+            if (fixedMenuKeySet.has(item.key)) return;
+            if (!seen.has(item.key)) {
+                item.order = nextOrder++;
+                seen.add(item.key);
+            }
+        });
+    }
+    
+    // 填充菜單編輯列表
+    function populateMenuEditList() {
+        const editList = document.getElementById('menuEditList');
+        if (!editList) return;
+        
+        const menuList = document.getElementById('sidebarMenuList');
+        if (!menuList) return;
+        
+        // 根據設定排序
+        const sortedSettings = [...menuSettings]
+            .filter(setting => !fixedMenuKeySet.has(setting.key))
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+        
+        // 添加不在設定中的菜單項
+        originalMenuOrder.forEach((key, index) => {
+            if (!sortedSettings.find(s => s.key === key)) {
+                sortedSettings.push({ key: key, visible: true, order: sortedSettings.length });
+            }
+        });
+        
+        editList.innerHTML = '';
+        
+        sortedSettings.forEach((setting, index) => {
+            const menuItem = menuList.querySelector(`li.nav-item[data-menu-key="${setting.key}"]`);
+            if (!menuItem || !shouldIncludeMenuItem(menuItem)) return;
+            
+            const label = getMenuItemLabel(setting.key, menuItem);
+            const iconClass = getMenuItemIcon(menuItem);
+            
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex align-items-center';
+            li.setAttribute('data-menu-key', setting.key);
+            li.setAttribute('draggable', 'true');
+            li.style.cursor = 'grab';
+            
+            li.innerHTML = `
+                <span class="me-3 text-muted" style="cursor: grab;">
+                    <i class="bi bi-grip-vertical"></i>
+                </span>
+                <i class="${iconClass} me-2"></i>
+                <span class="flex-grow-1">${label}</span>
+                <button type="button" class="btn btn-sm btn-link text-decoration-none menu-visibility-toggle" data-visible="${setting.visible}">
+                    <i class="bi ${setting.visible ? 'bi-eye text-success' : 'bi-eye-slash text-muted'}"></i>
+                </button>
+            `;
+            
+            // 可見性切換
+            const toggleBtn = li.querySelector('.menu-visibility-toggle');
+            toggleBtn.addEventListener('click', function() {
+                const visible = this.getAttribute('data-visible') === 'true';
+                const newVisible = !visible;
+                this.setAttribute('data-visible', newVisible);
+                const icon = this.querySelector('i');
+                icon.className = `bi ${newVisible ? 'bi-eye text-success' : 'bi-eye-slash text-muted'}`;
+                
+                // 更新設定
+                const key = li.getAttribute('data-menu-key');
+                const settingItem = menuSettings.find(s => s.key === key);
+                if (settingItem) {
+                    settingItem.visible = newVisible;
+                }
+            });
+            
+            editList.appendChild(li);
+
+            // Add toggleable subkey items under their parent
+            const relatedSubs = toggleableSubkeys.filter(s => s.parentKey === setting.key);
+            relatedSubs.forEach(sub => {
+                // Only show if the parent menu item's module is enabled
+                const parentMenuItem = menuList.querySelector(`li.nav-item[data-menu-key="${setting.key}"]`);
+                if (parentMenuItem) {
+                    const subItem = parentMenuItem.querySelector(`li[data-menu-subkey="${sub.key}"]`);
+                    if (!subItem) return;
+                }
+
+                const subVisible = !hiddenSubkeys.has(sub.key);
+                const subLabel = (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(sub.i18nKey) : sub.defaultLabel;
+                const subLi = document.createElement('li');
+                subLi.className = 'list-group-item d-flex align-items-center';
+                subLi.setAttribute('data-subkey', sub.key);
+                subLi.style.paddingLeft = '48px';
+                subLi.style.background = '#f8f9fa';
+                subLi.innerHTML = `
+                    <i class="${sub.icon} me-2 text-muted"></i>
+                    <span class="flex-grow-1 text-muted" style="font-size: 0.9rem;">${subLabel}</span>
+                    <button type="button" class="btn btn-sm btn-link text-decoration-none subkey-visibility-toggle" data-visible="${subVisible}">
+                        <i class="bi ${subVisible ? 'bi-eye text-success' : 'bi-eye-slash text-muted'}"></i>
+                    </button>
+                `;
+                const subToggle = subLi.querySelector('.subkey-visibility-toggle');
+                subToggle.addEventListener('click', function() {
+                    const vis = this.getAttribute('data-visible') === 'true';
+                    const newVis = !vis;
+                    this.setAttribute('data-visible', newVis);
+                    const ico = this.querySelector('i');
+                    ico.className = `bi ${newVis ? 'bi-eye text-success' : 'bi-eye-slash text-muted'}`;
+                    if (newVis) {
+                        hiddenSubkeys.delete(sub.key);
+                    } else {
+                        hiddenSubkeys.add(sub.key);
+                    }
+                });
+                editList.appendChild(subLi);
+            });
+        });
+    }
+    
+    // 初始化拖放排序
+    function initDragAndDrop() {
+        const editList = document.getElementById('menuEditList');
+        if (!editList) return;
+        
+        let draggedItem = null;
+        
+        editList.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'LI') {
+                draggedItem = e.target;
+                e.target.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+            }
+        });
+        
+        editList.addEventListener('dragend', function(e) {
+            if (e.target.tagName === 'LI') {
+                e.target.style.opacity = '';
+                draggedItem = null;
+                
+                // 更新順序
+                updateMenuOrder();
+            }
+        });
+        
+        editList.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const afterElement = getDragAfterElement(editList, e.clientY);
+            if (draggedItem && afterElement) {
+                editList.insertBefore(draggedItem, afterElement);
+            } else if (draggedItem) {
+                editList.appendChild(draggedItem);
+            }
+        });
+    }
+    
+    // 獲取拖放後的位置
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('li:not([style*="opacity"])')];
+        
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    
+    // 更新菜單順序
+    function updateMenuOrder() {
+        const editList = document.getElementById('menuEditList');
+        if (!editList) return;
+        
+        const items = editList.querySelectorAll('li[data-menu-key]');
+        items.forEach((item, index) => {
+            const key = item.getAttribute('data-menu-key');
+            const settingItem = menuSettings.find(s => s.key === key);
+            if (settingItem) {
+                settingItem.order = index;
+            } else {
+                menuSettings.push({
+                    key: key,
+                    visible: true,
+                    order: index
+                });
+            }
+        });
+    }
+    
+    // 保存菜單設定
+    async function saveMenuSettings() {
+        // 先更新順序
+        updateMenuOrder();
+        
+        // 更新可見性
+        const editList = document.getElementById('menuEditList');
+        if (editList) {
+            const items = editList.querySelectorAll('li[data-menu-key]');
+            items.forEach(item => {
+                const key = item.getAttribute('data-menu-key');
+                const toggleBtn = item.querySelector('.menu-visibility-toggle');
+                const visible = toggleBtn ? toggleBtn.getAttribute('data-visible') === 'true' : true;
+                
+                const settingItem = menuSettings.find(s => s.key === key);
+                if (settingItem) {
+                    settingItem.visible = visible;
+                }
+            });
+        }
+        
+        try {
+            await App.apiRequest('/api/v1/user/menu-settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    menu_config: menuSettings,
+                    hidden_subkeys: Array.from(hiddenSubkeys)
+                })
+            });
+            
+            App.showSuccess((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.saveSuccess') : '保存成功');
+            menuEditModal.hide();
+            
+            // 應用設定到側邊欄
+            applyMenuSettings();
+        } catch (e) {
+            console.error('保存菜單設定失敗:', e);
+            App.showError((typeof I18n !== 'undefined' && I18n.t) ? I18n.t('common.saveFailed') : '保存失敗');
+        }
+    }
+    
+    // 應用菜單設定到側邊欄
+    function applyMenuSettings() {
+        const menuList = document.getElementById('sidebarMenuList');
+        if (!menuList) return;
+
+        const fixedTopItems = fixedTopKeys
+            .map(key => menuList.querySelector(`li.nav-item[data-menu-key="${key}"]`))
+            .filter(Boolean);
+        const fixedBottomItems = fixedBottomKeys
+            .map(key => menuList.querySelector(`li.nav-item[data-menu-key="${key}"]`))
+            .filter(Boolean);
+
+        // 固定項目強制顯示
+        [...fixedTopItems, ...fixedBottomItems].forEach(item => {
+            item.style.display = '';
+            item.removeAttribute('data-menu-hidden');
+        });
+        
+        // 排序設定（排除固定項）
+        const sortedSettings = [...menuSettings]
+            .filter(setting => !fixedMenuKeySet.has(setting.key))
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+        
+        // 重新排序菜單項
+        sortedSettings.forEach(setting => {
+            const menuItem = menuList.querySelector(`li.nav-item[data-menu-key="${setting.key}"]`);
+            if (menuItem) {
+                // 顯示/隱藏
+                if (!setting.visible) {
+                    menuItem.style.display = 'none';
+                    menuItem.setAttribute('data-menu-hidden', 'true');
+                } else {
+                    menuItem.style.display = '';
+                    menuItem.removeAttribute('data-menu-hidden');
+                }
+                
+                // 移動到末尾（按順序）
+                menuList.appendChild(menuItem);
+            }
+        });
+
+        // 處理不在設定中的菜單項（放到最後，排除固定項）
+        const allMenuItems = menuList.querySelectorAll(':scope > li.nav-item[data-menu-key]');
+        allMenuItems.forEach(item => {
+            const key = item.getAttribute('data-menu-key');
+            if (fixedMenuKeySet.has(key)) return;
+            if (!sortedSettings.find(s => s.key === key)) {
+                menuList.appendChild(item);
+            }
+        });
+
+        // 固定頂部
+        fixedTopItems.reverse().forEach(item => {
+            menuList.insertBefore(item, menuList.firstChild);
+        });
+
+        // 固定底部（依序追加）
+        fixedBottomItems.forEach(item => {
+            menuList.appendChild(item);
+        });
+
+        // 強制日曆緊跟在 POS 後
+        const posItem = menuList.querySelector('li.nav-item[data-menu-key="pos"]');
+        const calendarItem = menuList.querySelector('li.nav-item[data-menu-key="calendars"]');
+        if (posItem && calendarItem && posItem.parentNode === menuList) {
+            menuList.insertBefore(calendarItem, posItem.nextSibling);
+        }
+
+        // 強制宣傳在個人工具後
+        const personalToolsItem = menuList.querySelector('li.nav-item[data-menu-key="personalTools"]');
+        const otherFeaturesItem = menuList.querySelector('li.nav-item[data-menu-key="otherFeatures"]');
+        if (personalToolsItem && otherFeaturesItem && personalToolsItem.parentNode === menuList) {
+            menuList.insertBefore(otherFeaturesItem, personalToolsItem.nextSibling);
+        }
+
+        // Apply hidden subkeys to submenu items
+        applyHiddenSubkeys();
+    }
+
+    // Hide/show submenu items based on hiddenSubkeys
+    function applyHiddenSubkeys() {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+        toggleableSubkeys.forEach(sub => {
+            const subItem = sidebar.querySelector(`li[data-menu-subkey="${sub.key}"]`);
+            if (!subItem) return;
+            if (hiddenSubkeys.has(sub.key)) {
+                subItem.style.display = 'none';
+                subItem.setAttribute('data-menu-hidden', 'true');
+            } else {
+                subItem.style.display = '';
+                subItem.removeAttribute('data-menu-hidden');
+            }
+        });
+    }
+    
+    // 頁面載入時應用設定
+    async function initAndApplyMenuSettings() {
+        await loadMenuSettings();
+        applyMenuSettings();
+        if (typeof window.applyActiveSidebarNav === 'function') {
+            window.applyActiveSidebarNav();
+        }
+        // applyMenuSettings 會移動 DOM 元素，可能導致已展開的 submenu 折疊
+        // 重新展開包含 active nav item 的父 collapse
+        reExpandActiveSubmenu();
+    }
+
+    function reExpandActiveSubmenu() {
+        const activeLink = document.querySelector('#sidebar .nav-link.active');
+        if (!activeLink) return;
+        const submenu = activeLink.closest('.collapse');
+        if (!submenu) return;
+        const toggle = document.querySelector(`[data-bs-target="#${submenu.id}"]`);
+        if (!toggle) return;
+        const bsCollapse = new bootstrap.Collapse(submenu, { toggle: false });
+        bsCollapse.show();
+        toggle.setAttribute('aria-expanded', 'true');
+    }
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 只在已登錄時初始化
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+            initMenuEdit();
+            initAndApplyMenuSettings();
+        }
+    });
+
+    // Expose global function for guide pages to hide themselves from menu
+    window.hideGuideFromMenu = async function(subkey) {
+        // Ensure settings are loaded
+        if (menuSettings.length === 0) {
+            await loadMenuSettings();
+        }
+        hiddenSubkeys.add(subkey);
+        // Save to API
+        updateMenuOrder();
+        const editList = document.getElementById('menuEditList');
+        if (editList) {
+            const items = editList.querySelectorAll('li[data-menu-key]');
+            items.forEach(item => {
+                const key = item.getAttribute('data-menu-key');
+                const toggleBtn = item.querySelector('.menu-visibility-toggle');
+                const visible = toggleBtn ? toggleBtn.getAttribute('data-visible') === 'true' : true;
+                const settingItem = menuSettings.find(s => s.key === key);
+                if (settingItem) {
+                    settingItem.visible = visible;
+                }
+            });
+        }
+        await App.apiRequest('/api/v1/user/menu-settings', {
+            method: 'POST',
+            body: JSON.stringify({
+                menu_config: menuSettings,
+                hidden_subkeys: Array.from(hiddenSubkeys)
+            })
+        });
+        applyHiddenSubkeys();
+    };
+})();
+</script>
+</body>
+</html>
+{{end}}

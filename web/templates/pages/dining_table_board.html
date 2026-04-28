@@ -1,0 +1,731 @@
+{{define "pages/dining_table_board"}}
+<style>
+  .quick-seat-options { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .quick-seat-btn { flex: 0 0 auto; padding: 0.35rem 0.7rem; border-radius: 0.5rem; }
+</style>
+<div class="container-fluid py-3">
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3">
+    <div>
+      <h4 class="mb-1" data-i18n="pages.diningTableBoard.title">餐桌管理</h4>
+      <div class="text-muted" id="tableBoardUpdated" data-i18n="pages.diningTableBoard.updating">更新中...</div>
+    </div>
+    <div class="mt-2 mt-md-0 d-flex gap-2 align-items-end">
+      <div>
+        <label class="form-label mb-1" data-i18n="pages.diningTableBoard.store">店舖</label>
+        <select class="form-select" id="tableBoardStore"></select>
+      </div>
+      <button class="btn btn-outline-secondary" id="tableBoardRefresh" data-i18n="common.refresh">重新整理</button>
+      <button class="btn btn-outline-primary" id="tableBoardAutoGenerate" data-i18n="pages.diningTableBoard.autoGenerate">自動生成餐桌</button>
+    </div>
+  </div>
+
+  <div id="tableBoardError" class="alert alert-danger d-none"></div>
+
+  <div id="tableBoardContent"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="tableBoardModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tableBoardModalTitle" data-i18n="pages.diningTableBoard.table">餐桌</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <div class="mb-2 text-muted" data-i18n="pages.diningTableBoard.tableInfo">餐桌資訊</div>
+            <div><strong data-i18n="pages.diningTableBoard.tableCode">桌號：</strong><span id="modalTableCode">-</span></div>
+            <div><strong data-i18n="pages.diningTableBoard.tableArea">桌區：</strong><span id="modalTableArea">-</span></div>
+            <div><strong data-i18n="pages.diningTableBoard.tableSeats">人數：</strong><span id="modalTableSeats">-</span></div>
+            <div class="mt-2 text-muted" data-i18n="pages.diningTableBoard.tableStatus">餐桌狀態</div>
+            <select class="form-select mt-1" id="modalTableStatus">
+              <option value="available" data-i18n="pages.diningTableBoard.statusAvailable">空桌</option>
+              <option value="occupied" data-i18n="pages.diningTableBoard.statusOccupied">使用中</option>
+              <option value="cleaning" data-i18n="pages.diningTableBoard.statusCleaning">清潔中</option>
+              <option value="reserved" data-i18n="pages.diningTableBoard.statusReserved">已預約</option>
+            </select>
+          </div>
+          <div class="col-md-4" id="modalOrderSection" style="display:none;">
+            <div class="mb-2 text-muted" data-i18n="pages.diningTableBoard.orderQr">下單 QR</div>
+            <div id="modalOrderWrap">
+              <div id="modalOrderQr" style="width:110px; height:110px;"></div>
+              <a id="modalOrderLinkBtn" class="btn btn-outline-primary mt-2 w-100" href="#" target="_blank" data-i18n="pages.diningTableBoard.goToOrder">前往下單</a>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row g-3 align-items-end">
+          <div class="col-md-8">
+            <label class="form-label mb-1" data-i18n="pages.diningTableBoard.queueAssign">候位配對</label>
+            <select class="form-select" id="modalQueueSelect"></select>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary w-100" id="modalSeatBtn" data-i18n="pages.diningTableBoard.confirmSeat">確認入座</button>
+          </div>
+          <div class="col-12">
+            <div class="form-text" id="modalQueueHint"></div>
+          </div>
+        </div>
+
+        <div class="mt-3 p-3 border rounded" id="modalQuickSeatWrap">
+          <div class="fw-bold mb-2" data-i18n="pages.diningTableBoard.quickSeat">快速入座（Walk-in）</div>
+          <div class="row g-2">
+            <div class="col-12">
+              <label class="form-label" data-i18n="pages.diningQueue.partySize">人數</label>
+              <div id="modalQuickPartyOptions" class="quick-seat-options"></div>
+              <div class="form-text" data-i18n="pages.diningTableBoard.quickSeatHint">點選人數即可快速入座</div>
+            </div>
+            <div class="col-md-6" id="modalQuickPhoneWrap" style="display:none;">
+              <label class="form-label" data-i18n="pages.diningQueue.phone">電話</label>
+              <input type="text" class="form-control" id="modalQuickPhone" data-i18n-placeholder="common.required" placeholder="必填">
+            </div>
+            <div class="col-12">
+              <div class="form-text" id="modalQuickSeatHint"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3" id="modalReleaseWrap">
+          <button class="btn btn-outline-danger" id="modalReleaseBtn" data-i18n="pages.diningTableBoard.releaseTable">釋放餐桌</button>
+          <div class="form-text" id="modalReleaseHint"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.close">關閉</button>
+        <button type="button" class="btn btn-primary" id="modalSaveTableBtn" data-i18n="pages.diningTableBoard.saveTableStatus">儲存餐桌狀態</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Auto Generate Modal -->
+<div class="modal fade" id="autoGenerateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" data-i18n="pages.diningTableBoard.autoGenerate">自動生成餐桌</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.diningTableBoard.selectAreas">選擇桌區</label>
+          <div id="autoGenAreaList" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;"></div>
+          <div class="form-text text-muted" data-i18n="pages.diningTableBoard.areaSelectHint">若不選擇，將針對該店舖所有桌區生成</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" data-i18n="pages.diningTableBoard.tablesPerArea">每個桌區生成數量</label>
+          <input type="number" class="form-control" id="autoGenCount" value="10" min="1">
+        </div>
+        <div class="mb-3">
+            <label class="form-label" data-i18n="pages.diningTableBoard.startCode">起始桌號 (選填)</label>
+            <input type="number" class="form-control" id="autoGenStartCode" data-i18n-placeholder="pages.diningTableBoard.startCodePlaceholder" placeholder="預設接續最大號碼">
+        </div>
+        <div class="form-check mb-3" style="display:none;">
+          <input class="form-check-input" type="checkbox" id="autoGenOnlyEmpty">
+          <label class="form-check-label" for="autoGenOnlyEmpty" data-i18n="pages.diningTableBoard.onlyEmptyAreas">只針對沒有餐桌的桌區</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="common.close">取消</button>
+        <button type="button" class="btn btn-primary" id="submitAutoGenerateBtn" data-i18n="common.confirm">生成</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    function wdT(key, fallback) { return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback; }
+    function initDiningTableBoard() {
+    const storeSelect = document.getElementById('tableBoardStore');
+    const refreshBtn = document.getElementById('tableBoardRefresh');
+    const autoGenerateBtn = document.getElementById('tableBoardAutoGenerate');
+    const updatedEl = document.getElementById('tableBoardUpdated');
+    const contentEl = document.getElementById('tableBoardContent');
+    const errorEl = document.getElementById('tableBoardError');
+
+    const modalEl = document.getElementById('tableBoardModal');
+    const modalTitle = document.getElementById('tableBoardModalTitle');
+    const modalCode = document.getElementById('modalTableCode');
+    const modalArea = document.getElementById('modalTableArea');
+    const modalSeats = document.getElementById('modalTableSeats');
+    const modalStatus = document.getElementById('modalTableStatus');
+    const modalQueue = document.getElementById('modalQueueSelect');
+    const modalQueueHint = document.getElementById('modalQueueHint');
+    const modalSeatBtn = document.getElementById('modalSeatBtn');
+    const modalQuickPartyOptions = document.getElementById('modalQuickPartyOptions');
+    const modalQuickPhone = document.getElementById('modalQuickPhone');
+    const modalQuickPhoneWrap = document.getElementById('modalQuickPhoneWrap');
+    const modalQuickSeatHint = document.getElementById('modalQuickSeatHint');
+    const modalReleaseWrap = document.getElementById('modalReleaseWrap');
+    const modalReleaseBtn = document.getElementById('modalReleaseBtn');
+    const modalReleaseHint = document.getElementById('modalReleaseHint');
+    const modalSaveBtn = document.getElementById('modalSaveTableBtn');
+    const modalOrderSection = document.getElementById('modalOrderSection');
+    const modalOrderWrap = document.getElementById('modalOrderWrap');
+    const modalOrderQr = document.getElementById('modalOrderQr');
+    const modalOrderLinkBtn = document.getElementById('modalOrderLinkBtn');
+
+    // Auto Gen Modal Elements
+    const autoGenModalEl = document.getElementById('autoGenerateModal');
+    const autoGenAreaList = document.getElementById('autoGenAreaList');
+    const autoGenCount = document.getElementById('autoGenCount');
+    const autoGenStartCode = document.getElementById('autoGenStartCode');
+    const autoGenOnlyEmpty = document.getElementById('autoGenOnlyEmpty');
+    const submitAutoGenBtn = document.getElementById('submitAutoGenerateBtn');
+    let autoGenModal;
+
+    let settings = { table_assign_mode: 'auto', table_release_mode: 'manual', table_release_delay_minutes: 10, queue_require_phone: false };
+    let stores = [];
+    let areas = [];
+    let tables = [];
+    let waitingQueues = [];
+    let seatedQueues = [];
+    let currentTable = null;
+    let modal;
+
+    function statusColor(status) {
+      switch (status) {
+        case 'available': return 'bg-success';
+        case 'occupied': return 'bg-danger';
+        case 'cleaning': return 'bg-warning';
+        case 'reserved': return 'bg-info';
+        default: return 'bg-secondary';
+      }
+    }
+
+    function statusLabel(status) {
+      switch (status) {
+        case 'available': return wdT('pages.diningTableBoard.statusAvailable', '空桌');
+        case 'occupied': return wdT('pages.diningTableBoard.statusOccupied', '使用中');
+        case 'cleaning': return wdT('pages.diningTableBoard.statusCleaning', '清潔中');
+        case 'reserved': return wdT('pages.diningTableBoard.statusReserved', '已預約');
+        default: return status || '-';
+      }
+    }
+
+    function renderBoard() {
+      if (!contentEl) return;
+      const areaMap = new Map();
+      areas.forEach(a => areaMap.set(a.id, { area: a, tables: [] }));
+      const unassigned = { area: { id: 'none', name: wdT('pages.diningTableBoard.unassignedArea', '未分區') }, tables: [] };
+
+      tables.forEach(t => {
+        if (t.area_id && areaMap.has(t.area_id)) {
+          areaMap.get(t.area_id).tables.push(t);
+        } else {
+          unassigned.tables.push(t);
+        }
+      });
+
+      const blocks = [];
+      areaMap.forEach(group => blocks.push(group));
+      if (unassigned.tables.length) blocks.push(unassigned);
+
+      // Sort blocks by area sorting if needed, usually map iteration order is insertion order
+      // Sort tables within each block
+      blocks.forEach(block => {
+        block.tables.sort((a, b) => {
+            const nA = parseInt(a.code);
+            const nB = parseInt(b.code);
+            if (!isNaN(nA) && !isNaN(nB) && String(nA) === a.code && String(nB) === b.code) {
+                return nA - nB;
+            }
+            return (a.code || '').localeCompare(b.code || '', undefined, { numeric: true, sensitivity: 'base' });
+        });
+      });
+
+      if (blocks.length === 0) {
+        contentEl.innerHTML = '<div class="alert alert-light border">' + wdT('pages.diningTableBoard.noTables', '尚未建立餐桌') + '</div>';
+        return;
+      }
+
+      contentEl.innerHTML = blocks.map(group => {
+        const cards = group.tables.map(t => {
+          const color = statusColor(t.status);
+          return `
+            <div class="col-6 col-md-4 col-lg-3">
+              <div class="card shadow-sm table-card" data-table-id="${t.id}" style="cursor:pointer;">
+                <div class="card-body">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="fw-bold">${t.code || '-'}</div>
+                    <span class="badge ${color}">${statusLabel(t.status)}</span>
+                  </div>
+                  <div class="text-muted small mt-1">${wdT('pages.diningTableBoard.seats', '人數')} ${t.seats || 1}</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="mb-4">
+            <h6 class="fw-bold mb-2">${group.area.name}</h6>
+            <div class="row g-2">
+              ${cards || '<div class="col-12 text-muted">' + wdT('pages.diningTableBoard.noTablesInArea', '暫無餐桌') + '</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.table-card').forEach(el => {
+        el.addEventListener('click', () => {
+          const id = el.getAttribute('data-table-id');
+          openTableModal(id);
+        });
+      });
+    }
+
+    function fillStoreOptions() {
+      if (!storeSelect) return;
+      if (stores.length === 0) {
+        storeSelect.innerHTML = '<option value="">' + wdT('pages.diningTableBoard.noStore', '無店舖') + '</option>';
+        return;
+      }
+      storeSelect.innerHTML = stores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    function buildHeaders() {
+      const headers = { 'Content-Type': 'application/json' };
+      try {
+        let tenantSubdomain = localStorage.getItem('tenant_subdomain');
+        if (!tenantSubdomain && typeof window !== 'undefined' && window.tenantSubdomain) {
+          tenantSubdomain = window.tenantSubdomain;
+          try { localStorage.setItem('tenant_subdomain', tenantSubdomain); } catch (_e) {}
+        }
+        if (tenantSubdomain) headers['X-Tenant-Subdomain'] = tenantSubdomain;
+      } catch (_e) {
+        // ignore
+      }
+      try {
+        const token = localStorage.getItem('auth_token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      } catch (_e) {
+        // ignore
+      }
+      return headers;
+    }
+
+    async function apiRequestWrapper(url, options = {}) {
+      if (window.App && typeof window.App.apiRequest === 'function') {
+        return App.apiRequest(url, options);
+      }
+      let requestUrl = url;
+      if (!/^https?:\/\//.test(url)) {
+        if (!url.startsWith('/api/')) {
+          requestUrl = '/api/v1' + (url.startsWith('/') ? url : '/' + url);
+        }
+      }
+      const finalOptions = {
+        method: options.method || 'GET',
+        credentials: 'include',
+        headers: {
+          ...buildHeaders(),
+          ...(options.headers || {})
+        },
+        body: options.body
+      };
+      const resp = await fetch(requestUrl, finalOptions);
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        if (resp.status === 401) throw new Error(wdT('common.loginRequired', '請先登入後台'));
+        throw new Error(data.error || data.message || `Request failed (${resp.status})`);
+      }
+      return data;
+    }
+
+    async function loadSettings() {
+      try {
+        const data = await apiRequestWrapper('/dining-settings');
+        settings = { ...settings, ...data };
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    async function loadStores() {
+      const resp = await apiRequestWrapper('/stores?page=1&limit=200');
+      stores = resp.data || [];
+      fillStoreOptions();
+    }
+
+    async function loadData() {
+      const storeId = storeSelect ? storeSelect.value : '';
+      const qs = storeId ? `&store_id=${encodeURIComponent(storeId)}` : '';
+
+      try {
+        const [areaResp, tableResp, waitingResp, seatedResp] = await Promise.all([
+          apiRequestWrapper(`/dining-areas?page=1&limit=200${qs}`),
+          apiRequestWrapper(`/dining-tables?page=1&limit=500${qs}`),
+          apiRequestWrapper(`/dining-queues?page=1&limit=500&status=waiting${qs}`),
+          apiRequestWrapper(`/dining-queues?page=1&limit=500&status=seated${qs}`)
+        ]);
+
+        areas = areaResp.data || [];
+        tables = tableResp.data || [];
+        waitingQueues = waitingResp.data || [];
+        seatedQueues = seatedResp.data || [];
+
+        if (errorEl) {
+          errorEl.classList.add('d-none');
+          errorEl.textContent = '';
+        }
+
+        renderBoard();
+        if (updatedEl) updatedEl.textContent = wdT('pages.diningTableBoard.updateTime', '更新時間') + ' ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        if (errorEl) {
+          errorEl.textContent = e?.message || wdT('pages.diningTableBoard.loadFailed', '載入資料失敗');
+          errorEl.classList.remove('d-none');
+        }
+        if (updatedEl) updatedEl.textContent = wdT('pages.diningTableBoard.updateFailed', '更新失敗');
+      }
+    }
+
+    function getAreaName(areaId) {
+      const area = areas.find(a => a.id === areaId);
+      return area ? area.name : '-';
+    }
+
+    function filterQueuesForTable(table) {
+      const area = areas.find(a => a.id === table.area_id);
+      const minSeats = Number(area?.min_seats || 1);
+      const maxSeats = Number(area?.max_seats || minSeats);
+      return waitingQueues.filter(q => {
+        const partySize = Number(q.party_size || 1);
+        if (table.seats && partySize > Number(table.seats)) return false;
+        if (table.area_id && q.area_id && q.area_id !== table.area_id) return false;
+        if (table.area_id && !q.area_id) {
+          // 可匹配無桌區候位
+        }
+        if (area) {
+          if (partySize < minSeats || partySize > maxSeats) return false;
+        }
+        return true;
+      });
+    }
+
+    function pickAutoQueue(table) {
+      const candidates = filterQueuesForTable(table);
+      if (candidates.length === 0) return null;
+      candidates.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+      return candidates[0];
+    }
+
+    function ensureQueueSelect2() {
+      if (!modalQueue) return;
+      if (typeof $ === 'undefined' || !$.fn || !$.fn.select2) return;
+      if ($(modalQueue).hasClass('select2-hidden-accessible')) return;
+      $(modalQueue).select2({
+        theme: 'bootstrap-5',
+        placeholder: wdT('pages.diningTableBoard.noQueueSelect', '不選擇候位'),
+        allowClear: true,
+        width: '100%'
+      });
+    }
+
+    function renderQueueOptions(list, selectedId) {
+      if (!modalQueue) return;
+      const optionsHtml = ['<option value=""></option>'].concat(list.map(q => {
+        const label = `${q.ticket_number || '-'}${q.name ? ` (${q.name})` : ''}`;
+        return `<option value="${q.id}">${label}</option>`;
+      })).join('');
+      modalQueue.innerHTML = optionsHtml;
+      if (typeof $ !== 'undefined' && $.fn && $.fn.select2 && $(modalQueue).hasClass('select2-hidden-accessible')) {
+        $(modalQueue).trigger('change.select2');
+      }
+      if (selectedId) {
+        modalQueue.value = selectedId;
+        if (typeof $ !== 'undefined' && $.fn && $.fn.select2 && $(modalQueue).hasClass('select2-hidden-accessible')) {
+          $(modalQueue).val(String(selectedId)).trigger('change');
+        }
+      }
+    }
+
+    function fillQueueOptions(table) {
+      if (!modalQueue) return;
+      const list = filterQueuesForTable(table);
+
+      ensureQueueSelect2();
+
+      let selectedId = '';
+      if (settings.table_assign_mode === 'auto') {
+        const auto = pickAutoQueue(table);
+        selectedId = auto ? auto.id : '';
+        modalQueueHint.textContent = auto ? wdT('pages.diningTableBoard.autoMatchedHint', '已自動配對可修改後確認') : wdT('pages.diningTableBoard.noWaitingQueue', '目前沒有等待中的候位');
+      } else {
+        modalQueueHint.textContent = wdT('pages.diningTableBoard.manualSelectHint', '請手動選擇候位再確認入座');
+      }
+
+      renderQueueOptions(list, selectedId);
+    }
+
+    function updateSeatAvailability(table) {
+      if (!modalSeatBtn || !modalQueue || !modalQueueHint) return;
+      const status = (table && table.status) ? String(table.status).toLowerCase() : '';
+      const canSeat = status === 'available';
+      modalSeatBtn.disabled = !canSeat;
+      modalQueue.disabled = !canSeat;
+      if (typeof $ !== 'undefined' && $.fn && $.fn.select2 && $(modalQueue).hasClass('select2-hidden-accessible')) {
+        $(modalQueue).prop('disabled', !canSeat);
+      }
+      if (!canSeat) {
+        modalQueueHint.textContent = wdT('pages.diningTableBoard.releaseBeforeSeat', '請先釋放餐桌，才可配對候位入座');
+      }
+    }
+
+    function openTableModal(tableId) {
+      currentTable = tables.find(t => t.id === tableId);
+      if (!currentTable) return;
+      if (!modal) modal = new bootstrap.Modal(modalEl);
+      modalTitle.textContent = wdT('pages.diningTableBoard.tableTitle', '餐桌') + ' ' + (currentTable.code || '');
+      modalCode.textContent = currentTable.code || '-';
+      modalArea.textContent = getAreaName(currentTable.area_id);
+      modalSeats.textContent = currentTable.seats || 1;
+      modalStatus.value = currentTable.status || 'available';
+
+      const pairedQueue = seatedQueues.find(q => String(q.table_id) === String(currentTable.id));
+      // 如果沒有下單 QR code，則整個區塊（包含標籤）都不顯示
+      if (modalOrderSection) modalOrderSection.style.display = pairedQueue ? '' : 'none';
+      if (modalOrderQr && pairedQueue) {
+        const subdomain = (window.tenantSubdomain || '').trim();
+        const params = new URLSearchParams();
+        if (currentTable.id) params.set('dining_table_id', currentTable.id);
+        if (currentTable.code) params.set('dining_table_code', currentTable.code);
+        if (currentTable.store_id) params.set('store_id', currentTable.store_id);
+        const link = subdomain ? `/co/${subdomain}/dining/order/?${params.toString()}` : '';
+        modalOrderQr.innerHTML = '';
+        if (modalOrderLinkBtn) modalOrderLinkBtn.href = link || '#';
+        if (link && typeof QRCode !== 'undefined') {
+          try {
+            new QRCode(modalOrderQr, {
+              text: link,
+              width: 110,
+              height: 110,
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          } catch (_e) {}
+        }
+      } else if (modalOrderLinkBtn) {
+        modalOrderLinkBtn.href = '#';
+      }
+
+      renderQuickSeatOptions(currentTable?.seats || 1);
+      if (modalQuickPhoneWrap) {
+        modalQuickPhoneWrap.style.display = settings.queue_require_phone ? '' : 'none';
+      }
+      if (modalQuickSeatHint) modalQuickSeatHint.textContent = '';
+
+      fillQueueOptions(currentTable);
+      updateSeatAvailability(currentTable);
+
+      if (settings.table_release_mode === 'manual') {
+        modalReleaseWrap.style.display = '';
+        modalReleaseHint.textContent = wdT('pages.diningTableBoard.manualReleaseHint', '手動釋放將立即把餐桌設為可用');
+      } else if (settings.table_release_mode === 'delay') {
+        modalReleaseWrap.style.display = '';
+        modalReleaseHint.textContent = wdT('pages.diningTableBoard.delayReleaseHint', '依設定於結帳後 {min} 分鐘釋放（可手動覆蓋）').replace('{min}', settings.table_release_delay_minutes || 0);
+      } else {
+        modalReleaseWrap.style.display = '';
+        modalReleaseHint.textContent = wdT('pages.diningTableBoard.autoReleaseHint', '結帳自動釋放（可手動覆蓋）');
+      }
+
+      modal.show();
+    }
+
+    async function seatQueue() {
+      if (!currentTable) return;
+      const queueId = modalQueue ? modalQueue.value : '';
+      if (!queueId) {
+        alert(wdT('pages.diningTableBoard.selectQueue', '請選擇候位'));
+        return;
+      }
+      await apiRequestWrapper(`/dining-queues/${queueId}/seat`, {
+        method: 'POST',
+        body: JSON.stringify({ table_id: currentTable.id })
+      });
+      await loadData();
+      modal.hide();
+    }
+
+    async function saveTableStatus() {
+      if (!currentTable) return;
+      await apiRequestWrapper(`/dining-tables/${currentTable.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: modalStatus.value })
+      });
+      await loadData();
+      modal.hide();
+    }
+
+    async function releaseTable() {
+      if (!currentTable) return;
+      await apiRequestWrapper(`/dining-tables/${currentTable.id}/release`, {
+        method: 'POST'
+      });
+      await loadData();
+      modal.hide();
+    }
+
+    function getQuickSeatSizes() {
+      const sizeSet = new Set();
+      (areas || []).forEach(area => {
+        const minSeats = Number(area.min_seats || 1);
+        const maxSeats = Number(area.max_seats || minSeats);
+        for (let i = minSeats; i <= maxSeats; i++) sizeSet.add(i);
+      });
+      const sizes = Array.from(sizeSet).sort((a, b) => a - b);
+      return sizes.length ? sizes : Array.from({ length: 10 }, (_, i) => i + 1);
+    }
+
+    function renderQuickSeatOptions(defaultSize) {
+      if (!modalQuickPartyOptions) return;
+      const sizes = getQuickSeatSizes();
+      const html = sizes.map(size => {
+        const isActive = Number(defaultSize) === size;
+        const cls = isActive ? 'btn btn-primary quick-seat-btn' : 'btn btn-outline-primary quick-seat-btn';
+        return `<button type="button" class="${cls}" data-party-size="${size}">${size} ${wdT('pages.diningTableBoard.persons', '人')}</button>`;
+      }).join('');
+      modalQuickPartyOptions.innerHTML = html;
+      modalQuickPartyOptions.querySelectorAll('[data-party-size]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const size = Number(btn.getAttribute('data-party-size')) || 1;
+          quickSeat(size).catch(e => {
+            if (modalQuickSeatHint) modalQuickSeatHint.textContent = e.message || wdT('pages.diningTableBoard.quickSeatFailed', '快速入座失敗');
+          });
+        });
+      });
+    }
+
+    async function quickSeat(partySize) {
+      if (!currentTable) return;
+      const size = Number(partySize || currentTable.seats || 1);
+      const phone = modalQuickPhone?.value || '';
+      if (settings.queue_require_phone && !String(phone).trim()) {
+        if (modalQuickSeatHint) {
+          modalQuickSeatHint.textContent = wdT('pages.diningTableBoard.enterPhone', '請輸入電話');
+        }
+        if (modalQuickPhone) modalQuickPhone.focus();
+        return;
+      }
+      const payload = {
+        store_id: currentTable.store_id || null,
+        area_id: currentTable.area_id || null,
+        phone: phone,
+        party_size: size,
+        table_id: currentTable.id,
+        status: 'waiting'
+      };
+      await apiRequestWrapper('/dining-queues', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      await loadData();
+      modal.hide();
+    }
+
+    function openAutoGenerateModal() {
+        if (!autoGenModal) autoGenModal = new bootstrap.Modal(autoGenModalEl);
+        
+        // Populate areas
+        if (areas.length === 0) {
+            autoGenAreaList.innerHTML = '<div class="text-muted">' + wdT('pages.diningTableBoard.noAreas', '尚無桌區') + '</div>';
+        } else {
+            autoGenAreaList.innerHTML = areas.map(a => `
+                <div class="form-check">
+                    <input class="form-check-input area-checkbox" type="checkbox" value="${a.id}" id="area_${a.id}">
+                    <label class="form-check-label" for="area_${a.id}">
+                        ${a.name}
+                    </label>
+                </div>
+            `).join('');
+        }
+
+        // Reset fields
+        autoGenCount.value = 10;
+        autoGenStartCode.value = '';
+        autoGenOnlyEmpty.checked = false;
+
+        autoGenModal.show();
+    }
+
+    async function submitAutoGenerate() {
+        const storeId = storeSelect ? storeSelect.value : '';
+        const tablesPerArea = Number(autoGenCount.value || 0);
+        if (!tablesPerArea || tablesPerArea <= 0) {
+            alert(wdT('pages.diningTableBoard.enterValidCount', '請輸入有效數量'));
+            return;
+        }
+
+        const selectedAreaIds = [];
+        autoGenAreaList.querySelectorAll('.area-checkbox:checked').forEach(cb => {
+            selectedAreaIds.push(cb.value);
+        });
+
+        const startCode = autoGenStartCode.value ? Number(autoGenStartCode.value) : 0;
+        const onlyEmpty = autoGenOnlyEmpty.checked;
+
+        try {
+            await apiRequestWrapper('/dining-tables/auto-generate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    store_id: storeId || null,
+                    tables_per_area: tablesPerArea,
+                    start_code: startCode,
+                    only_empty: onlyEmpty,
+                    area_ids: selectedAreaIds
+                })
+            });
+            autoGenModal.hide();
+            await loadData();
+            alert(wdT('pages.diningTableBoard.generateComplete', '生成完成'));
+        } catch (e) {
+            alert(e.message || wdT('pages.diningTableBoard.generateFailed', '生成失敗'));
+        }
+    }
+
+    if (modalSeatBtn) modalSeatBtn.addEventListener('click', () => seatQueue().catch(e => alert(e.message || wdT('pages.diningTableBoard.seatFailed', '入座失敗'))));
+    if (modalSaveBtn) modalSaveBtn.addEventListener('click', () => saveTableStatus().catch(e => alert(e.message || wdT('pages.diningTableBoard.saveFailed', '儲存失敗'))));
+    if (modalReleaseBtn) modalReleaseBtn.addEventListener('click', () => releaseTable().catch(e => alert(e.message || wdT('pages.diningTableBoard.releaseFailed', '釋放失敗'))));
+    if (autoGenerateBtn) autoGenerateBtn.addEventListener('click', openAutoGenerateModal);
+    if (submitAutoGenBtn) submitAutoGenBtn.addEventListener('click', () => submitAutoGenerate());
+    if (modalStatus) {
+      modalStatus.addEventListener('change', () => {
+        if (!currentTable) return;
+        const nextStatus = modalStatus.value || currentTable.status || '';
+        updateSeatAvailability({ ...currentTable, status: nextStatus });
+      });
+    }
+
+    if (refreshBtn) refreshBtn.addEventListener('click', () => loadData().catch(() => {}));
+    if (storeSelect) storeSelect.addEventListener('change', () => loadData().catch(() => {}));
+
+    (async () => {
+      try {
+        await loadSettings();
+        await loadStores();
+        if (stores.length > 0 && storeSelect && !storeSelect.value) {
+          storeSelect.value = stores[0].id;
+        }
+        await loadData();
+      } catch (e) {
+        if (errorEl) {
+          errorEl.textContent = e?.message || wdT('pages.diningTableBoard.loadFailed', '載入資料失敗');
+          errorEl.classList.remove('d-none');
+        }
+      }
+    })();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initDiningTableBoard);
+    } else {
+      initDiningTableBoard();
+    }
+  })();
+</script>
+{{end}}

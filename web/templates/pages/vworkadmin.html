@@ -1,0 +1,3410 @@
+{{ define "Title" }}vWork Admin{{ end }}
+
+{{ define "content" }}
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <h3 class="mb-1">vWork Admin</h3>
+            <small class="text-muted">超簡約後台 · 查看租戶 / 訂閱 / Email</small>
+        </div>
+        {{ if .Authed }}
+        <div>
+            <a class="btn btn-outline-danger btn-sm" href="/vworkadmin/logout">登出</a>
+        </div>
+        {{ end }}
+    </div>
+</div>
+
+{{ if not .Authed }}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="mb-3">
+            <label class="form-label">帳號</label>
+            <input type="text" id="adminUser" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">密碼</label>
+            <input type="password" id="adminPass" class="form-control">
+        </div>
+        <button class="btn btn-primary w-100" onclick="doLogin()">登入</button>
+        <div id="loginMsg" class="mt-3 text-danger small"></div>
+    </div>
+</div>
+{{ else }}
+<!-- 主選單 Tabs -->
+<ul class="nav nav-tabs mb-3" id="mainTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tenants-tab" data-bs-toggle="tab" data-bs-target="#tenants-pane" type="button" role="tab" aria-controls="tenants-pane" aria-selected="true">
+            租戶 / 訂閱
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-pane" type="button" role="tab" aria-controls="users-pane" aria-selected="false">
+            用戶
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#email-pane" type="button" role="tab" aria-controls="email-pane" aria-selected="false">
+            Email 任務
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="templates-tab" data-bs-toggle="tab" data-bs-target="#templates-pane" type="button" role="tab" aria-controls="templates-pane" aria-selected="false">
+            Email 模板
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai-pane" type="button" role="tab" aria-controls="ai-pane" aria-selected="false">
+            AI 設定
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo-pane" type="button" role="tab" aria-controls="seo-pane" aria-selected="false">
+            SEO 設定
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="hardware-tab" data-bs-toggle="tab" data-bs-target="#hardware-pane" type="button" role="tab" aria-controls="hardware-pane" aria-selected="false">
+            硬件購買
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sales-partner-tab" data-bs-toggle="tab" data-bs-target="#sales-partner-pane" type="button" role="tab" aria-controls="sales-partner-pane" aria-selected="false">
+            銷售商加盟
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ad-config-tab" data-bs-toggle="tab" data-bs-target="#ad-config-pane" type="button" role="tab" aria-controls="ad-config-pane" aria-selected="false">
+            廣告設定
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="voffice-tab" data-bs-toggle="tab" data-bs-target="#voffice-pane" type="button" role="tab" aria-controls="voffice-pane" aria-selected="false">
+            vOffice
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="platform-blog-tab" data-bs-toggle="tab" data-bs-target="#platform-blog-pane" type="button" role="tab" aria-controls="platform-blog-pane" aria-selected="false">
+            官網 Blog
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="platform-event-tab" data-bs-toggle="tab" data-bs-target="#platform-event-pane" type="button" role="tab" aria-controls="platform-event-pane" aria-selected="false">
+            官網活動
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="admin-email-tab" data-bs-toggle="tab" data-bs-target="#admin-email-pane" type="button" role="tab" aria-controls="admin-email-pane" aria-selected="false">
+            Email 配額
+        </button>
+    </li>
+</ul>
+
+<!-- Tab 內容 -->
+<div class="tab-content" id="mainTabContent">
+    <!-- 租戶 / 訂閱 Tab -->
+    <div class="tab-pane fade show active" id="tenants-pane" role="tabpanel" aria-labelledby="tenants-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">重新整理</button>
+            </div>
+        </div>
+        <div id="tenantsArea" data-authed="{{ if .Authed }}true{{ else }}false{{ end }}">
+            <div class="alert alert-info">載入中...</div>
+        </div>
+    </div>
+
+    <!-- 用戶 Tab -->
+    <div class="tab-pane fade" id="users-pane" role="tabpanel" aria-labelledby="users-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">重新整理</button>
+            </div>
+        </div>
+        <div id="usersArea" data-authed="{{ if .Authed }}true{{ else }}false{{ end }}">
+            <div class="alert alert-info">載入中...</div>
+        </div>
+    </div>
+
+    <!-- Email 任務 Tab -->
+    <div class="tab-pane fade" id="email-pane" role="tabpanel" aria-labelledby="email-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">重新整理</button>
+            </div>
+        </div>
+        <div id="emailArea" data-authed="{{ if .Authed }}true{{ else }}false{{ end }}">
+            <div class="alert alert-info">載入中...</div>
+        </div>
+    </div>
+
+    <!-- Email 模板 Tab -->
+    <div class="tab-pane fade" id="templates-pane" role="tabpanel" aria-labelledby="templates-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">重新整理</button>
+            </div>
+        </div>
+        <div id="templatesArea" data-authed="{{ if .Authed }}true{{ else }}false{{ end }}">
+            <div class="alert alert-info">載入中...</div>
+        </div>
+    </div>
+
+    <!-- AI 設定 Tab -->
+    <div class="tab-pane fade" id="ai-pane" role="tabpanel" aria-labelledby="ai-tab">
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                <h6 class="mb-0">vAi 助手 Prompt 設定</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">系統提示詞</label>
+                    <textarea id="aiPrompt" class="form-control" rows="4" style="font-family: monospace; font-size: 0.9em;" readonly></textarea>
+                    <small class="text-muted">此提示詞將用於所有 vAi 助手的對話（唯讀）</small>
+                </div>
+                <button class="btn btn-secondary btn-sm" disabled>Prompt 為唯讀</button>
+                <span id="promptMsg" class="ms-2 text-success small"></span>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h6 class="mb-0">AI 字段匹配 Prompt 設定</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">字段匹配提示詞</label>
+                    <textarea id="fieldMatchPrompt" class="form-control" rows="8" style="font-family: monospace; font-size: 0.9em;" readonly></textarea>
+                    <small class="text-muted">此提示詞用於 AI 表單輸入功能（OCR/STT）的字段匹配。<br>
+                    提示詞中可以使用 <code>%s</code> 占位符，第一個 <code>%s</code> 會被替換為文字內容，第二個 <code>%s</code> 會被替換為可用字段列表。</small>
+                </div>
+                <button class="btn btn-secondary btn-sm" disabled>字段匹配 Prompt 為唯讀</button>
+                <span id="fieldMatchPromptMsg" class="ms-2 text-success small"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEO 設定 Tab -->
+    <div class="tab-pane fade" id="seo-pane" role="tabpanel" aria-labelledby="seo-tab">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">主要頁面 SEO 設定（多語言）</h6>
+                <button class="btn btn-outline-secondary btn-sm" onclick="loadSEOSettings()">重新載入</button>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">可在此覆蓋 landing / vMarket 主要頁面的 title、description、keywords、og image。</p>
+                <div id="seoSettingsArea" class="mb-3">
+                    <div class="alert alert-info">載入中...</div>
+                </div>
+                <button class="btn btn-primary btn-sm" id="seoSaveBtn" onclick="saveSEOSettings()">儲存 SEO 設定</button>
+                <span id="seoSettingsMsg" class="ms-2 small"></span>
+            </div>
+        </div>
+        <!-- Sitemap 管理 -->
+        <div class="card shadow-sm mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Sitemap 管理</h6>
+                <a href="/sitemap.xml" target="_blank" class="btn btn-outline-secondary btn-sm">查看 sitemap.xml</a>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">
+                    Sitemap 會自動快取 1 小時。當租戶公開頁面、部落格文章有更新時，可手動清除快取以立即重新產生。
+                    <br>Sitemap 包含：靜態頁面（多語言）、租戶公開頁面（僅 active + website_enabled）、租戶部落格文章、<strong>官網 Blog（多語言 hreflang）</strong>。
+                </p>
+                <button class="btn btn-warning btn-sm" id="sitemapRegenBtn" onclick="regenerateSitemap()">
+                    <i class="bi bi-arrow-clockwise"></i> 重新產生 Sitemap
+                </button>
+                <span id="sitemapMsg" class="ms-2 small"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 硬件購買 Tab -->
+    <div class="tab-pane fade" id="hardware-pane" role="tabpanel" aria-labelledby="hardware-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">重新整理</button>
+            </div>
+        </div>
+        <div id="hardwareArea" data-authed="{{ if .Authed }}true{{ else }}false{{ end }}">
+            <div class="alert alert-info">載入中...</div>
+        </div>
+    </div>
+
+    <!-- 銷售商加盟 Tab -->
+    <div class="tab-pane fade" id="sales-partner-pane" role="tabpanel" aria-labelledby="sales-partner-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">重新整理</button>
+            </div>
+        </div>
+        <div id="salesPartnerArea" data-authed="{{ if .Authed }}true{{ else }}false{{ end }}">
+            <div class="alert alert-info">載入中...</div>
+        </div>
+    </div>
+
+    <!-- 廣告設定 Tab -->
+    <div class="tab-pane fade" id="ad-config-pane" role="tabpanel" aria-labelledby="ad-config-tab">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h6 class="mb-0">Ad Sidebar 設定</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small mb-3">控制免費/試用用戶看到的廣告 sidebar。廣告只顯示在 Dashboard 和設定頁面。</p>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">啟用廣告 Sidebar</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="adEnabled" checked>
+                        <label class="form-check-label" for="adEnabled">開啟（免費/試用用戶可見）</label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">廣告模式</label>
+                    <select id="adMode" class="form-select" style="max-width: 300px;">
+                        <option value="both">混合 — vSuite 推廣 + Google AdSense（隨機）</option>
+                        <option value="vsuite_only">僅 vSuite 推廣</option>
+                        <option value="adsense_only">僅 Google AdSense</option>
+                    </select>
+                    <small class="text-muted">「混合」模式下，每次頁面載入會按權重隨機選擇顯示哪一種廣告。</small>
+                </div>
+
+                <div class="mb-3" id="adWeightGroup">
+                    <label class="form-label fw-bold">vSuite 推廣權重</label>
+                    <div class="d-flex align-items-center gap-2" style="max-width: 300px;">
+                        <input type="range" class="form-range" id="adVsuiteWeight" min="0" max="100" step="10" value="50">
+                        <span id="adVsuiteWeightLabel" class="badge bg-primary" style="min-width: 45px;">50%</span>
+                    </div>
+                    <small class="text-muted">vSuite 推廣佔 <span id="adVsuiteWeightText">50</span>%，AdSense 佔 <span id="adAdsenseWeightText">50</span>%</small>
+                </div>
+
+                <button class="btn btn-primary btn-sm" onclick="saveAdConfig()">儲存廣告設定</button>
+                <span id="adConfigMsg" class="ms-2 small"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- vOffice Tab -->
+    <div class="tab-pane fade" id="voffice-pane" role="tabpanel" aria-labelledby="voffice-tab">
+        <!-- Stats Dashboard -->
+        <div id="vofficeStatsArea" class="mb-4">
+            <div class="alert alert-info">載入中...</div>
+        </div>
+
+        <!-- Sub-tabs: Installations / Releases -->
+        <ul class="nav nav-pills mb-3" id="vofficeSubTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="vo-installs-tab" data-bs-toggle="pill" data-bs-target="#vo-installs-pane" type="button" role="tab">安裝清單</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="vo-releases-tab" data-bs-toggle="pill" data-bs-target="#vo-releases-pane" type="button" role="tab">版本管理</button>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="vo-installs-pane" role="tabpanel">
+                <div id="vofficeInstallsArea">
+                    <div class="alert alert-info">載入中...</div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="vo-releases-pane" role="tabpanel">
+                <div class="mb-3">
+                    <button class="btn btn-success btn-sm" onclick="openCreateReleaseModal()">新增版本</button>
+                </div>
+                <div id="vofficeReleasesArea">
+                    <div class="alert alert-info">載入中...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 官網 Blog Tab -->
+    <div class="tab-pane fade" id="platform-blog-pane" role="tabpanel" aria-labelledby="platform-blog-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" onclick="loadPlatformBlogs()">重新整理</button>
+                <button class="btn btn-success btn-sm" onclick="openBlogModal()">新增文章</button>
+            </div>
+            <div class="d-flex gap-2">
+                <select id="blogFilterStatus" class="form-select form-select-sm" style="width:auto;" onchange="loadPlatformBlogs()">
+                    <option value="">全部狀態</option>
+                    <option value="draft">草稿</option>
+                    <option value="published">已發布</option>
+                    <option value="archived">已歸檔</option>
+                </select>
+                <input type="text" id="blogSearchInput" class="form-control form-control-sm" placeholder="搜尋標題..." style="width:180px;" onkeydown="if(event.key==='Enter')loadPlatformBlogs()">
+            </div>
+        </div>
+        <div id="platformBlogArea">
+            <div class="alert alert-info">點擊「官網 Blog」tab 載入...</div>
+        </div>
+    </div>
+
+    <!-- 官網活動 Tab -->
+    <div class="tab-pane fade" id="platform-event-pane" role="tabpanel" aria-labelledby="platform-event-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" onclick="loadPlatformEvents()">重新整理</button>
+                <button class="btn btn-success btn-sm" onclick="openEventModal()">新增活動</button>
+            </div>
+            <div class="d-flex gap-2">
+                <select id="eventFilterStatus" class="form-select form-select-sm" style="width:auto;" onchange="loadPlatformEvents()">
+                    <option value="">全部狀態</option>
+                    <option value="draft">草稿</option>
+                    <option value="published">已發布</option>
+                    <option value="archived">已歸檔</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+                <input type="text" id="eventSearchInput" class="form-control form-control-sm" placeholder="搜尋活動名稱..." style="width:180px;" onkeydown="if(event.key==='Enter')loadPlatformEvents()">
+            </div>
+        </div>
+        <div id="platformEventArea">
+            <div class="alert alert-info">點擊「官網活動」tab 載入...</div>
+        </div>
+    </div>
+
+    <!-- Email 配額 / 通知 Tab -->
+    <div class="tab-pane fade" id="admin-email-pane" role="tabpanel" aria-labelledby="admin-email-tab">
+        <div class="row g-3 mb-4">
+            <!-- Email 配額卡片 -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">Brevo 每日 Email 配額</h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="emailQuotaArea">
+                            <div class="text-center py-3">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                <span class="ms-2 text-muted">載入中...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 管理員通知 Email 配置 -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">管理員通知 Email</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-2">收到以下事件時將發送通知：新租戶註冊、新訂閱、vCoin 購買</p>
+                        <div class="mb-3">
+                            <label class="form-label">通知 Email（多個以逗號分隔）</label>
+                            <textarea id="adminEmailsInput" class="form-control" rows="3" placeholder="admin1@example.com, admin2@example.com"></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm" onclick="saveAdminEmails()">儲存</button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="loadAdminEmails()">重新載入</button>
+                        </div>
+                        <div id="adminEmailMsg" class="mt-2 small"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <pre id="dataDebug" class="d-none"></pre>
+</div>
+{{ end }}
+
+<script>
+async function doLogin() {
+    const username = document.getElementById('adminUser').value.trim();
+    const password = document.getElementById('adminPass').value.trim();
+    const msg = document.getElementById('loginMsg');
+    msg.textContent = '';
+    try {
+        const res = await fetch('/vworkadmin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msg.textContent = err.error || '登入失敗';
+            return;
+        }
+        location.reload();
+    } catch (e) {
+        msg.textContent = '登入失敗: ' + e.message;
+    }
+}
+
+// 分页状态
+let paginationState = {
+    tenants: { page: 1, perPage: 20 },
+    users: { page: 1, perPage: 20 },
+    pending: { page: 1, perPage: 20 },
+    recent: { page: 1, perPage: 20 },
+    templates: { page: 1, perPage: 20 },
+    salesPartners: { page: 1, perPage: 20 }
+};
+
+// 分页辅助函数
+function paginate(array, page, perPage) {
+    const start = (page - 1) * perPage;
+    const end = start + perPage;
+    return {
+        items: array.slice(start, end),
+        total: array.length,
+        page: page,
+        perPage: perPage,
+        totalPages: Math.ceil(array.length / perPage)
+    };
+}
+
+// 渲染分页控件
+function renderPagination(prefix, state, onPageChange) {
+    if (state.totalPages <= 1) return '';
+    let html = `<nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm justify-content-center mb-0">`;
+    
+    // 上一页
+    html += `<li class="page-item ${state.page === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); ${onPageChange}(${state.page - 1}); return false;">上一頁</a>
+    </li>`;
+    
+    // 页码
+    const maxVisible = 5;
+    let startPage = Math.max(1, state.page - Math.floor(maxVisible / 2));
+    let endPage = Math.min(state.totalPages, startPage + maxVisible - 1);
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+    
+    if (startPage > 1) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); ${onPageChange}(1); return false;">1</a></li>`;
+        if (startPage > 2) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<li class="page-item ${i === state.page ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="event.preventDefault(); ${onPageChange}(${i}); return false;">${i}</a>
+        </li>`;
+    }
+    
+    if (endPage < state.totalPages) {
+        if (endPage < state.totalPages - 1) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); ${onPageChange}(${state.totalPages}); return false;">${state.totalPages}</a></li>`;
+    }
+    
+    // 下一页
+    html += `<li class="page-item ${state.page === state.totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); ${onPageChange}(${state.page + 1}); return false;">下一頁</a>
+    </li>`;
+    
+    html += `</ul></nav>`;
+    html += `<div class="text-center text-muted small mt-2">第 ${state.page} 頁，共 ${state.totalPages} 頁（總共 ${state.total} 筆）</div>`;
+    return html;
+}
+
+function renderData(data) {
+    const tenants = data.tenants || [];
+    const users = data.users || [];
+    const jobs = data.email_jobs || [];
+    const templates = data.email_templates || [];
+    const salesPartners = data.sales_partners || [];
+
+    // Cache approved partners for tenant assignment dropdown
+    __approvedPartners = salesPartners.filter(sp => sp.status === 'approved' && sp.code);
+
+    // 渲染租戶列表
+    renderTenants(tenants);
+
+    // 渲染用戶列表
+    renderUsers(users);
+    
+    // 渲染 Email 任務
+    renderEmailJobs(data);
+    
+    // 渲染 Email 模板
+    renderEmailTemplates(data);
+
+    // 渲染 銷售商加盟
+    renderSalesPartners(salesPartners);
+}
+
+function renderUsers(users) {
+    const area = document.getElementById('usersArea');
+    if (!area) return;
+
+    const paged = paginate(users || [], paginationState.users.page, paginationState.users.perPage);
+    let html = `<div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>用戶列表</span>
+            <span class="badge bg-secondary">共 ${(users || []).length}</span>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>姓名</th>
+                    <th>Email</th>
+                    <th>電話</th>
+                    <th>角色</th>
+                    <th>狀態</th>
+                    <th>預設租戶</th>
+                    <th>最後登入</th>
+                    <th>建立時間</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    if (paged.items.length === 0) {
+        html += `<tr><td colspan="9" class="text-center text-muted">無資料</td></tr>`;
+    } else {
+        paged.items.forEach(u => {
+            const lastLogin = u.last_login_at ? new Date(u.last_login_at).toLocaleString() : '';
+            const createdAt = u.created_at ? new Date(u.created_at).toLocaleString() : '';
+            const role = u.role_name || u.user_role || '';
+            const tenantName = u.tenant_name || '';
+            const tenantId = u.tenant_id || '';
+            html += `<tr>
+                <td>${u.name || ''}</td>
+                <td>${u.email || ''}</td>
+                <td>${u.phone || ''}</td>
+                <td>${role}</td>
+                <td>${u.status || ''}</td>
+                <td>${tenantName || tenantId || ''}</td>
+                <td>${lastLogin}</td>
+                <td>${createdAt}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary mb-1" onclick="loginAsUser('${u.id}', '${tenantId}')">登入</button>
+                    <button class="btn btn-sm btn-outline-info mb-1" onclick="openEditEmailModal('${u.id}', '${(u.name||'').replace(/'/g, "\\'")}', '${(u.email||'').replace(/'/g, "\\'")}')">改 Email</button>
+                    <button class="btn btn-sm btn-outline-warning mb-1" onclick="openConvertPasswordModal('${u.id}', '${(u.name||'').replace(/'/g, "\\'")}', '${(u.email||'').replace(/'/g, "\\'")}')">轉 password</button>
+                    <button class="btn btn-sm btn-outline-danger mb-1" onclick="deleteUser('${u.id}', '${u.name}')">刪除</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    html += `</tbody></table></div>`;
+    html += `<div class="card-footer">${renderPagination('users', paged, 'changeUsersPage')}</div>`;
+    html += `</div>`;
+    area.innerHTML = html;
+}
+
+function renderTenants(tenants) {
+    const area = document.getElementById('tenantsArea');
+    const tenantsPaged = paginate(tenants, paginationState.tenants.page, paginationState.tenants.perPage);
+    
+    let html = `<div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>租戶 / 訂閱</span>
+            <span class="badge bg-secondary">共 ${tenants.length}</span>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>名稱</th>
+                    <th>子網域</th>
+                    <th>方案</th>
+                    <th>狀態</th>
+                    <th>試用到期</th>
+                    <th>當期方案</th>
+                    <th>Period</th>
+                    <th>當期金額</th>
+                    <th>建立者</th>
+                    <th>加盟商</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>`;
+    if (tenantsPaged.items.length === 0) {
+        html += `<tr><td colspan="11" class="text-center text-muted">無資料</td></tr>`;
+    } else {
+        tenantsPaged.items.forEach(t => {
+            const trial = t.trial_expires_at ? new Date(t.trial_expires_at).toISOString().slice(0,10) : '';
+            const cps = t.current_period_start ? new Date(t.current_period_start).toISOString().slice(0,10) : '';
+            const cpe = t.current_period_end ? new Date(t.current_period_end).toISOString().slice(0,10) : '';
+            const spCode = t.sales_partner_code || '';
+            const spTrial = t.sales_partner_trial || false;
+
+            // Build created by column
+            let createdByCol = '';
+            if (t.created_by_name || t.created_by_email) {
+                createdByCol = `<div>${t.created_by_name || ''}</div><div class="text-muted small">${t.created_by_email || ''}</div>`;
+            } else {
+                createdByCol = `<span class="text-muted">-</span>`;
+            }
+
+            // Build sales partner column content
+            let spCol = '';
+            if (spCode) {
+                spCol += `<span class="badge bg-info me-1">${spCode}</span>`;
+                if (spTrial) {
+                    spCol += `<span class="badge bg-warning text-dark me-1">試用</span>`;
+                }
+                spCol += `<button class="btn btn-sm btn-outline-danger" onclick="unassignTenantFromPartner('${t.id}')" title="移除加盟商">移除</button>`;
+            } else {
+                // Show assign dropdown if there are approved partners
+                if (__approvedPartners.length > 0) {
+                    spCol += `<select class="form-select form-select-sm d-inline-block" id="spSelect-${t.id}" style="width:100px;display:inline-block;">`;
+                    spCol += `<option value="">-- 選擇 --</option>`;
+                    __approvedPartners.forEach(sp => {
+                        spCol += `<option value="${sp.id}">${sp.code} (${sp.name || ''})</option>`;
+                    });
+                    spCol += `</select> `;
+                    spCol += `<button class="btn btn-sm btn-outline-success" onclick="assignTenantToPartner('${t.id}')" title="指派加盟商">指派</button>`;
+                } else {
+                    spCol += `<span class="text-muted">-</span>`;
+                }
+            }
+
+            html += `<tr>
+                <td>${t.name}</td>
+                <td>${t.subdomain}</td>
+                <td>${t.plan || ''}</td>
+                <td>${t.status || ''}</td>
+                <td>${trial}</td>
+                <td>${t.current_plan || ''}</td>
+                <td>${cps} ~ ${cpe}</td>
+                <td>$${(t.current_period_amount||0).toFixed(2)}</td>
+                <td>${createdByCol}</td>
+                <td>${spCol}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-warning mb-1" onclick="openAddCoinsModal('${t.id}', '${(t.name||'').replace(/'/g, "\\'")}')">加幣</button>
+                    <button class="btn btn-sm btn-outline-primary mb-1" onclick="openAddSubModal('${t.id}', '${(t.name||'').replace(/'/g, "\\'")}', '${t.plan || ''}')">加訂閱</button>
+                </td>
+            </tr>`;
+        });
+    }
+    html += `</tbody></table></div>`;
+    html += `<div class="card-footer">${renderPagination('tenants', tenantsPaged, 'changeTenantsPage')}</div>`;
+    html += `</div>`;
+    
+    area.innerHTML = html;
+}
+
+function renderEmailJobs(data) {
+    const area = document.getElementById('emailArea');
+    const pending = data.pending_jobs || [];
+    const jobs = data.email_jobs || [];
+    const pendingPaged = paginate(pending, paginationState.pending.page, paginationState.pending.perPage);
+    const jobsPaged = paginate(jobs, paginationState.recent.page, paginationState.recent.perPage);
+    
+    let html = `<div class="card shadow-sm">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="emailTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-pane" type="button" role="tab">待發送 <span class="badge bg-secondary">${pending.length}</span></button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="recent-tab" data-bs-toggle="tab" data-bs-target="#recent-pane" type="button" role="tab">最近記錄 <span class="badge bg-secondary">${jobs.length}</span></button>
+                </li>
+            </ul>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="pending-pane" role="tabpanel" aria-labelledby="pending-tab">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th><th>Tenant</th><th>Kind</th><th>收件者</th><th>主旨</th><th>狀態</th><th>Run At</th><th>錯誤</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+    if (pendingPaged.items.length === 0) {
+        html += `<tr><td colspan="8" class="text-center text-muted">無待發送</td></tr>`;
+    } else {
+        pendingPaged.items.forEach(j => {
+            const runAt = j.run_at ? new Date(j.run_at).toISOString() : '';
+            html += `<tr>
+                <td>${j.id}</td>
+                <td>${j.tenant_id || ''}</td>
+                <td>${j.kind}</td>
+                <td>${j.to_email}</td>
+                <td>${j.subject}</td>
+                <td>${j.status}</td>
+                <td>${runAt}</td>
+                <td>${j.last_error || ''}</td>
+            </tr>`;
+        });
+    }
+    html += `</tbody></table></div>
+                <div class="card-footer">${renderPagination('pending', pendingPaged, 'changePendingPage')}</div>
+            </div>
+            <div class="tab-pane fade" id="recent-pane" role="tabpanel" aria-labelledby="recent-tab">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th><th>Tenant</th><th>Kind</th><th>收件者</th><th>主旨</th><th>狀態</th><th>Run At</th><th>錯誤</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+    if (jobsPaged.items.length === 0) {
+        html += `<tr><td colspan="8" class="text-center text-muted">無記錄</td></tr>`;
+    } else {
+        jobsPaged.items.forEach(j => {
+            const runAt = j.run_at ? new Date(j.run_at).toISOString() : '';
+            html += `<tr>
+                <td>${j.id}</td>
+                <td>${j.tenant_id || ''}</td>
+                <td>${j.kind}</td>
+                <td>${j.to_email}</td>
+                <td>${j.subject}</td>
+                <td>${j.status}</td>
+                <td>${runAt}</td>
+                <td>${j.last_error || ''}</td>
+            </tr>`;
+        });
+    }
+    html += `</tbody></table></div>
+                <div class="card-footer">${renderPagination('recent', jobsPaged, 'changeRecentPage')}</div>
+            </div>
+        </div>
+    </div>`;
+    
+    area.innerHTML = html;
+}
+
+function renderEmailTemplates(data) {
+    const area = document.getElementById('templatesArea');
+    const previews = data.email_previews || [];
+    // build kind->lang->preview map
+    const previewMap = {};
+    previews.forEach(p => {
+        const k = p.kind || '';
+        const l = (p.lang || '').toLowerCase();
+        if (!k) return;
+        if (!previewMap[k]) previewMap[k] = {};
+        previewMap[k][l] = p;
+    });
+    window.__emailPreviewMap = previewMap; // 暴露給預覽按鈕
+    const kinds = Array.from(new Set(previews.map(p => p.kind).filter(Boolean))).sort();
+    // ---- Email templates (system vs website vs admin vs other) ----
+    const SYSTEM_KINDS = new Set(['welcome', 'password_reset', 'contact_form', 'trial_limit_exceeded']);
+    const WEBSITE_KINDS = new Set(['customer_invite', 'order_confirmation', 'member_level_upgrade', 'user_invite', 'invoice', 'promotion']);
+    const isAdminKind = (k) => k.startsWith('admin_notification');
+
+    const systemKinds = kinds.filter(k => SYSTEM_KINDS.has(k));
+    const websiteKinds = kinds.filter(k => WEBSITE_KINDS.has(k));
+    const adminKinds = kinds.filter(k => isAdminKind(k));
+    const otherKinds = kinds.filter(k => !SYSTEM_KINDS.has(k) && !WEBSITE_KINDS.has(k) && !isAdminKind(k));
+
+    const renderTplTable = (kindsList) => {
+        if (!kindsList || kindsList.length === 0) {
+            return `<div class="p-3 text-muted small">無模板</div>`;
+        }
+        let out = `<div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Kind</th><th>主旨</th><th>Text Preview</th><th>語言</th><th>操作</th>
+                </tr>
+              </thead>
+              <tbody>`;
+        kindsList.forEach((kind) => {
+            const m = window.__emailPreviewMap?.[kind] || {};
+            const pick = m['zh-hant'] || m['zh-hans'] || m['en'] || null;
+            const subject = pick?.subject || '';
+            const text = pick?.text || '';
+            const langBtns = (() => {
+                const mkBtn = (label, lang) => {
+                    const has = !!m[lang];
+                    const cls = has ? 'btn-outline-secondary' : 'btn-outline-secondary disabled';
+                    return `<button class="btn btn-sm ${cls}" ${has ? `onclick="showTemplatePreviewBy('${kind}','${lang}','html')"` : ''}>${label}</button>`;
+                };
+                return `<div class="btn-group btn-group-sm" role="group">
+                    ${mkBtn('繁', 'zh-hant')}
+                    ${mkBtn('簡', 'zh-hans')}
+                    ${mkBtn('EN', 'en')}
+                </div>`;
+            })();
+            out += `<tr>
+                <td><code>${kind}</code></td>
+                <td>${subject}</td>
+                <td><div class="text-muted small" style="max-width:360px;white-space:pre-wrap;">${text.slice(0,160)}${text.length>160?'…':''}</div></td>
+                <td>${langBtns}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="showTemplatePreviewBy('${kind}','zh-hant','text')">文字</button>
+                    <button class="btn btn-sm btn-outline-primary" onclick="showTemplatePreviewBy('${kind}','zh-hant','html')">HTML</button>
+                </td>
+            </tr>`;
+        });
+        out += `</tbody></table></div>`;
+        return out;
+    };
+
+    let html = `<div class="card shadow-sm">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" id="tplTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tpl-system-tab" data-bs-toggle="tab" data-bs-target="#tpl-system-pane" type="button" role="tab">系統電郵</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tpl-website-tab" data-bs-toggle="tab" data-bs-target="#tpl-website-pane" type="button" role="tab">網站電郵</button>
+                </li>
+                ${adminKinds.length ? `<li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tpl-admin-tab" data-bs-toggle="tab" data-bs-target="#tpl-admin-pane" type="button" role="tab">管理通知</button>
+                </li>` : ''}
+                ${otherKinds.length ? `<li class="nav-item" role="presentation">
+                    <button class="nav-link" id="tpl-other-tab" data-bs-toggle="tab" data-bs-target="#tpl-other-pane" type="button" role="tab">其他</button>
+                </li>` : ''}
+            </ul>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="tpl-system-pane" role="tabpanel" aria-labelledby="tpl-system-tab">
+              ${renderTplTable(systemKinds)}
+            </div>
+            <div class="tab-pane fade" id="tpl-website-pane" role="tabpanel" aria-labelledby="tpl-website-tab">
+              ${renderTplTable(websiteKinds)}
+            </div>
+            ${adminKinds.length ? `<div class="tab-pane fade" id="tpl-admin-pane" role="tabpanel" aria-labelledby="tpl-admin-tab">
+              ${renderTplTable(adminKinds)}
+            </div>` : ''}
+            ${otherKinds.length ? `<div class="tab-pane fade" id="tpl-other-pane" role="tabpanel" aria-labelledby="tpl-other-tab">
+              ${renderTplTable(otherKinds)}
+            </div>` : ''}
+        </div>
+    </div>`;
+
+    area.innerHTML = html;
+}
+
+function renderSalesPartners(apps) {
+    const area = document.getElementById('salesPartnerArea');
+    if (!area) return;
+
+    const paged = paginate(apps || [], paginationState.salesPartners.page, paginationState.salesPartners.perPage);
+    let html = `<div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>銷售商加盟申請</span>
+            <span class="badge bg-secondary">共 ${(apps || []).length}</span>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>姓名</th>
+                    <th>聯絡人</th>
+                    <th>公司</th>
+                    <th>Email</th>
+                    <th>電話</th>
+                    <th>地區</th>
+                    <th>狀態</th>
+                    <th>Code</th>
+                    <th>試用月數</th>
+                    <th>vCoin</th>
+                    <th>月價</th>
+                    <th>年價</th>
+                    <th>幣別</th>
+                    <th>申請時間</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    if (paged.items.length === 0) {
+        html += `<tr><td colspan="15" class="text-center text-muted">無資料</td></tr>`;
+    } else {
+        paged.items.forEach(sp => {
+            const createdAt = sp.created_at ? new Date(sp.created_at).toLocaleString() : '';
+            const status = sp.status || 'pending';
+            const code = sp.code || '';
+            const region = sp.region || '';
+            const trialMonths = (sp.trial_months != null) ? sp.trial_months : '';
+            const monthlyAICoins = (sp.monthly_ai_coins != null) ? sp.monthly_ai_coins : '';
+            const monthlyPrice = (sp.monthly_price != null) ? sp.monthly_price : '';
+            const yearlyPrice = (sp.yearly_price != null) ? sp.yearly_price : '';
+            const currency = (sp.currency || 'hkd').toLowerCase();
+            const approveBtn = status === 'pending'
+                ? `<button class="btn btn-sm btn-success me-1" onclick="approveSalesPartner('${sp.id}')">批准</button>`
+                : '';
+            const rejectBtn = status === 'pending'
+                ? `<button class="btn btn-sm btn-outline-danger me-1" onclick="rejectSalesPartner('${sp.id}')">拒絕</button>`
+                : '';
+            const linkBtn = (status === 'approved' && code)
+                ? `<button class="btn btn-sm btn-outline-info me-1" onclick="copySalesPartnerLink('${code}')" title="${window.location.origin}/${code}">加盟商 Link</button>`
+                : '';
+            const pricingBtn = `<button class="btn btn-sm btn-outline-primary" onclick="saveSalesPartnerPricing('${sp.id}')">儲存設定</button>`;
+            html += `<tr>
+                <td>${sp.name || ''}</td>
+                <td>${sp.contact_name || ''}</td>
+                <td>${sp.company || ''}</td>
+                <td>${sp.email || ''}</td>
+                <td>${sp.phone || ''}</td>
+                <td>${region}</td>
+                <td>${status}</td>
+                <td><code>${code}</code></td>
+                <td><input type="number" class="form-control form-control-sm" min="0" max="2" id="spTrialMonths-${sp.id}" value="${trialMonths}" placeholder="0-2" title="試用月數（最多2個月，0或空白=系統預設）" style="width:60px;"></td>
+                <td><input type="number" class="form-control form-control-sm" min="2000" max="2200" id="spAICoins-${sp.id}" value="${monthlyAICoins}" placeholder="2000" title="vCoin 月配額（2000-2200，預設2000）" style="width:70px;"></td>
+                <td><input type="number" class="form-control form-control-sm" step="0.01" id="spMonthly-${sp.id}" value="${monthlyPrice}"></td>
+                <td><input type="number" class="form-control form-control-sm" step="0.01" id="spYearly-${sp.id}" value="${yearlyPrice}"></td>
+                <td><input type="text" class="form-control form-control-sm" id="spCurrency-${sp.id}" value="${currency}" placeholder="hkd"></td>
+                <td>${createdAt}</td>
+                <td>${approveBtn}${rejectBtn}${linkBtn}${pricingBtn}</td>
+            </tr>`;
+        });
+    }
+
+    html += `</tbody></table></div>`;
+    html += `<div class="card-footer">${renderPagination('salesPartners', paged, 'changeSalesPartnersPage')}</div>`;
+    html += `</div>`;
+
+    area.innerHTML = html;
+}
+
+async function copySalesPartnerLink(code) {
+    const url = window.location.origin + '/' + code;
+    try {
+        await navigator.clipboard.writeText(url);
+        alert('已複製加盟商連結:\n' + url);
+    } catch (e) {
+        prompt('請複製以下連結:', url);
+    }
+}
+
+async function approveSalesPartner(id) {
+    if (!confirm('確定批准此申請並生成代碼？')) return;
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/sales-partners/${id}/approve`, { method: 'POST' });
+        if (!res.ok) {
+            alert('批准失敗');
+            return;
+        }
+        refreshData();
+    } catch (e) {
+        alert('批准失敗: ' + e.message);
+    }
+}
+
+async function rejectSalesPartner(id) {
+    if (!confirm('確定拒絕此申請？')) return;
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/sales-partners/${id}/reject`, { method: 'POST' });
+        if (!res.ok) {
+            alert('拒絕失敗');
+            return;
+        }
+        refreshData();
+    } catch (e) {
+        alert('拒絕失敗: ' + e.message);
+    }
+}
+
+async function saveSalesPartnerPricing(id) {
+    const trialMonthsEl = document.getElementById(`spTrialMonths-${id}`);
+    const aiCoinsEl = document.getElementById(`spAICoins-${id}`);
+    const monthlyEl = document.getElementById(`spMonthly-${id}`);
+    const yearlyEl = document.getElementById(`spYearly-${id}`);
+    const currencyEl = document.getElementById(`spCurrency-${id}`);
+
+    const trialMonths = trialMonthsEl ? parseInt(trialMonthsEl.value) : NaN;
+    const aiCoins = aiCoinsEl ? parseInt(aiCoinsEl.value) : NaN;
+    const monthly = monthlyEl ? parseFloat(monthlyEl.value) : NaN;
+    const yearly = yearlyEl ? parseFloat(yearlyEl.value) : NaN;
+    const currency = currencyEl ? currencyEl.value.trim() : '';
+
+    // 驗證試用月數
+    if (!isNaN(trialMonths) && (trialMonths < 0 || trialMonths > 2)) {
+        alert('試用月數必須在 0-2 之間');
+        return;
+    }
+
+    // 驗證 vCoin 範圍
+    if (!isNaN(aiCoins) && (aiCoins < 2000 || aiCoins > 2200)) {
+        alert('vCoin 必須在 2000-2200 之間');
+        return;
+    }
+
+    const payload = {};
+    // 試用月數：0 或空白表示沿用系統預設，1-2 表示自訂試用期（無配額限制）
+    if (!isNaN(trialMonths)) payload.trial_months = trialMonths;
+    // vCoin：2000-2200 範圍，空白表示使用預設值 2000
+    if (!isNaN(aiCoins)) payload.monthly_ai_coins = aiCoins;
+    if (!isNaN(monthly)) payload.monthly_price = monthly;
+    if (!isNaN(yearly)) payload.yearly_price = yearly;
+    if (currency) payload.currency = currency;
+
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/sales-partners/${id}/pricing`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.error || '儲存失敗');
+            return;
+        }
+        alert('儲存成功');
+        refreshData();
+    } catch (e) {
+        alert('儲存失敗: ' + e.message);
+    }
+}
+
+// ── 租戶加盟商指派 / 移除 ──────────────────────────────────────────
+
+async function assignTenantToPartner(tenantId) {
+    const sel = document.getElementById('spSelect-' + tenantId);
+    if (!sel || !sel.value) {
+        alert('請先選擇加盟商');
+        return;
+    }
+    const partnerId = sel.value;
+    const partnerLabel = sel.options[sel.selectedIndex].text;
+    if (!confirm(`確定將此租戶指派到加盟商 ${partnerLabel}？\n（若租戶尚未訂閱，將自動啟用加盟商試用方案並贈送 vCoin）`)) return;
+
+    try {
+        const res = await fetch('/api/v1/vworkadmin/assign-tenant-partner', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tenant_id: tenantId, sales_partner_id: partnerId })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            alert(data.error || '指派失敗');
+            return;
+        }
+        let msg = `指派成功！加盟商: ${data.partner} (${data.partner_code})`;
+        if (data.bonus_coins) msg += `\n贈送 vCoin: ${data.bonus_coins}`;
+        if (data.trial_active) msg += `\n已自動啟用加盟商試用方案`;
+        alert(msg);
+        refreshData();
+    } catch (e) {
+        alert('指派失敗: ' + e.message);
+    }
+}
+
+async function unassignTenantFromPartner(tenantId) {
+    if (!confirm('確定移除此租戶的加盟商關聯？\n（已贈送的 vCoin 不會被收回）')) return;
+
+    try {
+        const res = await fetch('/api/v1/vworkadmin/unassign-tenant-partner', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tenant_id: tenantId })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            alert(data.error || '移除失敗');
+            return;
+        }
+        alert('已移除加盟商關聯');
+        refreshData();
+    } catch (e) {
+        alert('移除失敗: ' + e.message);
+    }
+}
+
+// 分页切换函数
+function changeTenantsPage(page) {
+    paginationState.tenants.page = page;
+    refreshData(true); // 使用缓存数据重新渲染
+}
+
+function changeUsersPage(page) {
+    paginationState.users.page = page;
+    refreshData(true); // 使用缓存数据重新渲染
+}
+
+function changePendingPage(page) {
+    paginationState.pending.page = page;
+    refreshData(true); // 使用缓存数据重新渲染
+}
+
+function changeRecentPage(page) {
+    paginationState.recent.page = page;
+    refreshData(true); // 使用缓存数据重新渲染
+}
+
+function changeSalesPartnersPage(page) {
+    paginationState.salesPartners.page = page;
+    refreshData(true); // 使用缓存数据重新渲染
+}
+
+// 存储原始数据以便重新渲染
+let __cachedData = null;
+let __cachedHardware = null;
+// 已批准的加盟商列表（供租戶指派下拉選單使用）
+let __approvedPartners = [];
+
+async function refreshData(useCache = false) {
+    // 如果使用缓存且缓存存在，直接重新渲染
+    if (useCache && __cachedData) {
+        renderData(__cachedData);
+        if (__cachedHardware) {
+            renderHardwarePurchases(__cachedHardware);
+        }
+        return;
+    }
+    
+    // 更新所有区域的加载状态
+    const tenantsArea = document.getElementById('tenantsArea');
+    const usersArea = document.getElementById('usersArea');
+    const emailArea = document.getElementById('emailArea');
+    const templatesArea = document.getElementById('templatesArea');
+    const hardwareArea = document.getElementById('hardwareArea');
+    const salesPartnerArea = document.getElementById('salesPartnerArea');
+    
+    if (tenantsArea) tenantsArea.innerHTML = '<div class="alert alert-info">載入中...</div>';
+    if (usersArea) usersArea.innerHTML = '<div class="alert alert-info">載入中...</div>';
+    if (emailArea) emailArea.innerHTML = '<div class="alert alert-info">載入中...</div>';
+    if (templatesArea) templatesArea.innerHTML = '<div class="alert alert-info">載入中...</div>';
+    if (hardwareArea) hardwareArea.innerHTML = '<div class="alert alert-info">載入中...</div>';
+    if (salesPartnerArea) salesPartnerArea.innerHTML = '<div class="alert alert-info">載入中...</div>';
+    
+    try {
+        const res = await fetch('/api/v1/vworkadmin/overview');
+        if (!res.ok) {
+            const errorMsg = '<div class="alert alert-danger">無權限或讀取失敗</div>';
+            if (tenantsArea) tenantsArea.innerHTML = errorMsg;
+            if (usersArea) usersArea.innerHTML = errorMsg;
+            if (emailArea) emailArea.innerHTML = errorMsg;
+            if (templatesArea) templatesArea.innerHTML = errorMsg;
+            if (salesPartnerArea) salesPartnerArea.innerHTML = errorMsg;
+            return;
+        }
+        const data = await res.json();
+        __cachedData = data; // 缓存数据
+        renderData(data);
+
+        const hwRes = await fetch('/api/v1/vworkadmin/hardware-purchases');
+        if (!hwRes.ok) {
+            if (hardwareArea) hardwareArea.innerHTML = '<div class="alert alert-danger">無權限或讀取失敗</div>';
+        } else {
+            const hwData = await hwRes.json();
+            __cachedHardware = hwData;
+            renderHardwarePurchases(hwData);
+        }
+    } catch (e) {
+        const errorMsg = '<div class="alert alert-danger">錯誤: '+e.message+'</div>';
+        if (tenantsArea) tenantsArea.innerHTML = errorMsg;
+        if (usersArea) usersArea.innerHTML = errorMsg;
+        if (emailArea) emailArea.innerHTML = errorMsg;
+        if (templatesArea) templatesArea.innerHTML = errorMsg;
+        if (hardwareArea) hardwareArea.innerHTML = errorMsg;
+        if (salesPartnerArea) salesPartnerArea.innerHTML = errorMsg;
+    }
+}
+
+const authed = (document.getElementById('tenantsArea')?.dataset?.authed === 'true' || 
+                document.getElementById('usersArea')?.dataset?.authed === 'true' ||
+                document.getElementById('emailArea')?.dataset?.authed === 'true' ||
+                document.getElementById('templatesArea')?.dataset?.authed === 'true');
+if (authed) {
+    refreshData();
+    loadPrompt();
+    loadFieldMatchPrompt();
+    loadAdConfig();
+    loadSEOSettings();
+}
+
+let __seoSections = [];
+
+function escapeHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+async function loadSEOSettings() {
+    const area = document.getElementById('seoSettingsArea');
+    if (!area) return;
+    area.innerHTML = '<div class="alert alert-info">載入中...</div>';
+    try {
+        const res = await fetch('/api/v1/vworkadmin/seo-settings');
+        if (!res.ok) {
+            area.innerHTML = '<div class="alert alert-danger">載入失敗</div>';
+            return;
+        }
+        const data = await res.json();
+        __seoSections = data.sections || [];
+        renderSEOSettings();
+    } catch (e) {
+        area.innerHTML = '<div class="alert alert-danger">錯誤: ' + e.message + '</div>';
+    }
+}
+
+function renderSEOSettings() {
+    const area = document.getElementById('seoSettingsArea');
+    if (!area) return;
+    if (!__seoSections.length) {
+        area.innerHTML = '<div class="alert alert-secondary">無可用設定</div>';
+        return;
+    }
+
+    let html = '<div class="accordion" id="seoAccordion">';
+    __seoSections.forEach((sec, idx) => {
+        const collapseId = 'seo-collapse-' + idx;
+        const headingId = 'seo-heading-' + idx;
+        html += `<div class="accordion-item">
+            <h2 class="accordion-header" id="${headingId}">
+                <button class="accordion-button ${idx === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#${collapseId}" aria-expanded="${idx === 0 ? 'true' : 'false'}" aria-controls="${collapseId}">
+                    ${escapeHtml(sec.label)}
+                </button>
+            </h2>
+            <div id="${collapseId}" class="accordion-collapse collapse ${idx === 0 ? 'show' : ''}" aria-labelledby="${headingId}" data-bs-parent="#seoAccordion">
+                <div class="accordion-body">
+                    <div class="row g-3">`;
+
+        (sec.settings || []).forEach((item) => {
+            const id = 'seo_' + item.key.replace(/[^a-zA-Z0-9_\-]/g, '_');
+            const isDesc = item.key.endsWith('.description');
+            const placeholder = item.default_value ? escapeHtml(item.default_value) : '';
+            html += `<div class="col-12">
+                <label class="form-label small fw-bold" for="${id}">${escapeHtml(item.description)}</label>
+                ${isDesc
+                    ? `<textarea class="form-control form-control-sm" id="${id}" data-seo-key="${escapeHtml(item.key)}" rows="2" placeholder="${placeholder}">${escapeHtml(item.value || '')}</textarea>`
+                    : `<input type="text" class="form-control form-control-sm" id="${id}" data-seo-key="${escapeHtml(item.key)}" value="${escapeHtml(item.value || '')}" placeholder="${placeholder}">`
+                }
+                <div class="form-text"><code>${escapeHtml(item.key)}</code>${item.default_value && !item.value ? ` <span class="text-muted">（使用預設值）</span>` : ''}</div>
+            </div>`;
+        });
+
+        html += `       </div>
+                </div>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    area.innerHTML = html;
+}
+
+async function saveSEOSettings() {
+    const msg = document.getElementById('seoSettingsMsg');
+    const btn = document.getElementById('seoSaveBtn');
+    msg.textContent = '';
+
+    const nodes = document.querySelectorAll('[data-seo-key]');
+    if (!nodes.length) {
+        msg.textContent = '沒有可儲存的設定';
+        msg.className = 'ms-2 text-danger small';
+        return;
+    }
+
+    const settings = {};
+    nodes.forEach((n) => {
+        settings[n.getAttribute('data-seo-key')] = n.value || '';
+    });
+
+    btn.disabled = true;
+    btn.textContent = '儲存中...';
+    try {
+        const res = await fetch('/api/v1/vworkadmin/seo-settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ settings })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            msg.textContent = data.error || '儲存失敗';
+            msg.className = 'ms-2 text-danger small';
+            return;
+        }
+        msg.textContent = '已儲存';
+        msg.className = 'ms-2 text-success small';
+        setTimeout(() => { msg.textContent = ''; }, 2500);
+    } catch (e) {
+        msg.textContent = '儲存失敗: ' + e.message;
+        msg.className = 'ms-2 text-danger small';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '儲存 SEO 設定';
+    }
+}
+
+// --- Sitemap ---
+async function regenerateSitemap() {
+    const btn = document.getElementById('sitemapRegenBtn');
+    const msg = document.getElementById('sitemapMsg');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> 處理中...';
+    msg.textContent = '';
+    try {
+        const res = await fetch('/api/v1/vworkadmin/regenerate-sitemap', {
+            method: 'POST'
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+            msg.textContent = data.error || '操作失敗';
+            msg.className = 'ms-2 text-danger small';
+            return;
+        }
+        msg.textContent = data.message || '已清除快取';
+        msg.className = 'ms-2 text-success small';
+        setTimeout(() => { msg.textContent = ''; }, 5000);
+    } catch (e) {
+        msg.textContent = '操作失敗: ' + e.message;
+        msg.className = 'ms-2 text-danger small';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> 重新產生 Sitemap';
+    }
+}
+
+// --- Ad Config ---
+async function loadAdConfig() {
+    try {
+        const res = await fetch('/api/v1/vworkadmin/ad-config');
+        if (!res.ok) {
+            console.error('Failed to load ad config');
+            return;
+        }
+        const data = await res.json();
+        document.getElementById('adEnabled').checked = (data.enabled === true || data.enabled === 'true');
+        document.getElementById('adMode').value = data.mode || 'both';
+        const weight = parseInt(data.vsuite_weight) || 50;
+        document.getElementById('adVsuiteWeight').value = weight;
+        updateWeightLabels(weight);
+        toggleWeightGroup();
+    } catch (e) {
+        console.error('Error loading ad config:', e);
+    }
+}
+
+async function saveAdConfig() {
+    const msg = document.getElementById('adConfigMsg');
+    msg.textContent = '';
+
+    const enabled = document.getElementById('adEnabled').checked;
+    const mode = document.getElementById('adMode').value;
+    const vsuiteWeight = parseInt(document.getElementById('adVsuiteWeight').value) || 50;
+
+    try {
+        const res = await fetch('/api/v1/vworkadmin/ad-config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled: enabled, mode: mode, vsuite_weight: vsuiteWeight })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msg.textContent = err.error || '儲存失敗';
+            msg.className = 'ms-2 text-danger small';
+            return;
+        }
+        msg.textContent = '已儲存';
+        msg.className = 'ms-2 text-success small';
+        setTimeout(() => { msg.textContent = ''; }, 2000);
+    } catch (e) {
+        msg.textContent = '儲存失敗: ' + e.message;
+        msg.className = 'ms-2 text-danger small';
+    }
+}
+
+function updateWeightLabels(val) {
+    document.getElementById('adVsuiteWeightLabel').textContent = val + '%';
+    document.getElementById('adVsuiteWeightText').textContent = val;
+    document.getElementById('adAdsenseWeightText').textContent = (100 - val);
+}
+
+function toggleWeightGroup() {
+    const mode = document.getElementById('adMode').value;
+    document.getElementById('adWeightGroup').style.display = (mode === 'both') ? '' : 'none';
+}
+
+// Weight slider live update
+(function() {
+    const slider = document.getElementById('adVsuiteWeight');
+    if (slider) {
+        slider.addEventListener('input', function() { updateWeightLabels(this.value); });
+    }
+    const modeSelect = document.getElementById('adMode');
+    if (modeSelect) {
+        modeSelect.addEventListener('change', toggleWeightGroup);
+    }
+})();
+
+async function loginAsUser(userId, tenantId) {
+    if (!confirm('確定以此用戶登入？')) return;
+    const payload = { user_id: userId };
+    if (tenantId) payload.tenant_id = tenantId;
+    try {
+        const res = await fetch('/api/v1/vworkadmin/login-as-user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.error || '登入失敗');
+            return;
+        }
+        window.open('/', '_blank');
+    } catch (e) {
+        alert('登入失敗: ' + e.message);
+    }
+}
+
+async function deleteUser(userId, userName) {
+    if (!confirm(`確定要刪除用戶 ${userName} 嗎？\n注意：如果該用戶是租戶的唯一成員，相關租戶也會被刪除！`)) return;
+
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/users/${userId}`, {
+            method: 'DELETE'
+        });
+
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            alert(err.error || '刪除失敗');
+            return;
+        }
+
+        const data = await res.json();
+        let msg = '刪除成功';
+        if (data.deleted_tenants && data.deleted_tenants.length > 0) {
+            msg += `\n已連帶刪除 ${data.deleted_tenants.length} 個租戶`;
+        }
+        alert(msg);
+        refreshData();
+    } catch (e) {
+        alert('刪除失敗: ' + e.message);
+    }
+}
+
+// Password conversion functions
+function openConvertPasswordModal(userId, userName, userEmail) {
+    document.getElementById('convertUserId').value = userId;
+    document.getElementById('convertUserInfo').innerHTML = `<div>${userName}</div><div class="small">${userEmail}</div>`;
+    document.getElementById('convertPassword').value = '';
+    document.getElementById('convertPasswordConfirm').value = '';
+    document.getElementById('convertPasswordMsg').innerHTML = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('convertPasswordModal'));
+    modal.show();
+}
+
+async function submitConvertPassword() {
+    const userId = document.getElementById('convertUserId').value;
+    const password = document.getElementById('convertPassword').value.trim();
+    const passwordConfirm = document.getElementById('convertPasswordConfirm').value.trim();
+    const msgDiv = document.getElementById('convertPasswordMsg');
+    const submitBtn = document.getElementById('convertPasswordSubmitBtn');
+    
+    // Clear previous messages
+    msgDiv.innerHTML = '';
+    
+    // Validation
+    if (!password) {
+        msgDiv.innerHTML = '<div class="alert alert-danger py-2">請輸入新密碼</div>';
+        return;
+    }
+    
+    if (password.length < 6 || password.length > 20) {
+        msgDiv.innerHTML = '<div class="alert alert-danger py-2">密碼長度必須在 6-20 個字符之間</div>';
+        return;
+    }
+    
+    if (password !== passwordConfirm) {
+        msgDiv.innerHTML = '<div class="alert alert-danger py-2">兩次輸入的密碼不一致</div>';
+        return;
+    }
+    
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.textContent = '轉換中...';
+    
+    try {
+        const res = await fetch('/api/v1/vworkadmin/convert-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                password: password
+            })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2">${data.error || '轉換失敗'}</div>`;
+            return;
+        }
+        
+        // Success
+        msgDiv.innerHTML = `<div class="alert alert-success py-2">${data.message || '密碼轉換成功'}</div>`;
+        
+        // Close modal after success
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('convertPasswordModal')).hide();
+            refreshData();
+        }, 1500);
+        
+    } catch (e) {
+        msgDiv.innerHTML = `<div class="alert alert-danger py-2">轉換失敗: ${e.message}</div>`;
+    } finally {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.textContent = '確認轉換';
+    }
+}
+
+// Edit email functions
+function openEditEmailModal(userId, userName, userEmail) {
+    document.getElementById('editEmailUserId').value = userId;
+    document.getElementById('editEmailUserInfo').innerHTML = `<div>${userName}</div><div class="small">${userEmail}</div>`;
+    document.getElementById('editEmailInput').value = userEmail;
+    document.getElementById('editEmailMsg').innerHTML = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('editEmailModal'));
+    modal.show();
+}
+
+async function submitEditEmail() {
+    const userId = document.getElementById('editEmailUserId').value;
+    const email = document.getElementById('editEmailInput').value.trim();
+    const msgDiv = document.getElementById('editEmailMsg');
+    const submitBtn = document.getElementById('editEmailSubmitBtn');
+    
+    msgDiv.innerHTML = '';
+    
+    if (!email) {
+        msgDiv.innerHTML = '<div class="alert alert-danger py-2">請輸入新 Email</div>';
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = '更新中...';
+    
+    try {
+        const res = await fetch('/api/v1/vworkadmin/update-user-email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                email: email
+            })
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+            msgDiv.innerHTML = `<div class="alert alert-danger py-2">${data.error || '更新失敗'}</div>`;
+            return;
+        }
+        
+        msgDiv.innerHTML = `<div class="alert alert-success py-2">${data.message || 'Email 更新成功'}</div>`;
+        
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('editEmailModal')).hide();
+            refreshData();
+        }, 1500);
+        
+    } catch (e) {
+        msgDiv.innerHTML = `<div class="alert alert-danger py-2">更新失敗: ${e.message}</div>`;
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '確認修改';
+    }
+}
+
+function renderHardwarePurchases(data) {
+    const area = document.getElementById('hardwareArea');
+    if (!area) return;
+    const list = (data && data.data) ? data.data : [];
+
+    if (!list || list.length === 0) {
+        area.innerHTML = '<div class="alert alert-secondary">暫無硬件購買記錄</div>';
+        return;
+    }
+
+    let html = `<div class="card shadow-sm">
+        <div class="card-header">
+            <h6 class="mb-0">硬件購買記錄</h6>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>租戶</th>
+                    <th>Subdomain</th>
+                    <th>狀態</th>
+                    <th>金額</th>
+                    <th>幣別</th>
+                    <th>Items</th>
+                    <th>公司資料</th>
+                    <th>Checkout</th>
+                    <th>建立時間</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    list.forEach(p => {
+        const tenantName = p.tenant_name || '-';
+        const subdomain = p.tenant_subdomain || '-';
+        const status = p.status || '-';
+        const amount = (p.amount_total != null) ? p.amount_total : 0;
+        const currency = (p.currency || '').toUpperCase();
+        const checkoutId = p.checkout_session_id || '-';
+        const createdAt = p.created_at ? new Date(p.created_at).toLocaleString() : '-';
+        const items = Array.isArray(p.items) ? p.items : [];
+        const itemsText = items.map(it => `${it.name || it.id || ''} x${it.quantity || 1}`).join(', ');
+
+        // Company info display
+        let companyInfoHtml = '-';
+        if (p.company_info && typeof p.company_info === 'object') {
+            const parts = [];
+            if (p.company_info.company_link) {
+                parts.push(`<a href="${p.company_info.company_link}" target="_blank" rel="noopener">🔗 ${p.company_info.company_link}</a>`);
+            }
+            if (Array.isArray(p.company_info.files) && p.company_info.files.length > 0) {
+                p.company_info.files.forEach((f, i) => {
+                    parts.push(`<a href="${f}" target="_blank" rel="noopener">📎 檔案${i+1}</a>`);
+                });
+            }
+            if (p.company_info.submitted_at) {
+                parts.push(`<span class="text-muted">${new Date(p.company_info.submitted_at).toLocaleString()}</span>`);
+            }
+            if (parts.length > 0) companyInfoHtml = parts.join('<br>');
+        }
+
+        html += `<tr>
+            <td>${tenantName}</td>
+            <td>${subdomain}</td>
+            <td>${status}</td>
+            <td>${amount}</td>
+            <td>${currency}</td>
+            <td><div class="text-muted small" style="max-width:280px;white-space:pre-wrap;">${itemsText || '-'}</div></td>
+            <td><div class="small" style="max-width:300px;word-break:break-all;">${companyInfoHtml}</div></td>
+            <td><div class="text-muted small" style="max-width:240px;white-space:pre-wrap;">${checkoutId}</div></td>
+            <td>${createdAt}</td>
+        </tr>`;
+    });
+
+    html += `</tbody></table></div></div>`;
+    area.innerHTML = html;
+}
+
+async function loadPrompt() {
+    try {
+        const res = await fetch('/api/v1/vworkadmin/prompt');
+        if (!res.ok) {
+            console.error('Failed to load prompt');
+            return;
+        }
+        const data = await res.json();
+        document.getElementById('aiPrompt').value = data.prompt || '';
+    } catch (e) {
+        console.error('Error loading prompt:', e);
+    }
+}
+
+async function loadFieldMatchPrompt() {
+    try {
+        const res = await fetch('/api/v1/vworkadmin/field-match-prompt');
+        if (!res.ok) {
+            console.error('Failed to load field match prompt');
+            return;
+        }
+        const data = await res.json();
+        document.getElementById('fieldMatchPrompt').value = data.prompt || '';
+    } catch (e) {
+        console.error('Error loading field match prompt:', e);
+    }
+}
+
+async function savePrompt() {
+    const prompt = document.getElementById('aiPrompt').value.trim();
+    const msg = document.getElementById('promptMsg');
+    msg.textContent = '';
+    
+    if (!prompt) {
+        msg.textContent = '提示詞不能為空';
+        msg.className = 'ms-2 text-danger small';
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/v1/vworkadmin/prompt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msg.textContent = err.error || '儲存失敗';
+            msg.className = 'ms-2 text-danger small';
+            return;
+        }
+        msg.textContent = '已儲存';
+        msg.className = 'ms-2 text-success small';
+        setTimeout(() => {
+            msg.textContent = '';
+        }, 2000);
+    } catch (e) {
+        msg.textContent = '儲存失敗: ' + e.message;
+        msg.className = 'ms-2 text-danger small';
+    }
+}
+
+async function saveFieldMatchPrompt() {
+    const prompt = document.getElementById('fieldMatchPrompt').value.trim();
+    const msg = document.getElementById('fieldMatchPromptMsg');
+    msg.textContent = '';
+    
+    if (!prompt) {
+        msg.textContent = '提示詞不能為空';
+        msg.className = 'ms-2 text-danger small';
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/v1/vworkadmin/field-match-prompt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msg.textContent = err.error || '儲存失敗';
+            msg.className = 'ms-2 text-danger small';
+            return;
+        }
+        msg.textContent = '已儲存';
+        msg.className = 'ms-2 text-success small';
+        setTimeout(() => {
+            msg.textContent = '';
+        }, 2000);
+    } catch (e) {
+        msg.textContent = '儲存失敗: ' + e.message;
+        msg.className = 'ms-2 text-danger small';
+    }
+}
+
+function langLabel(lang) {
+    const l = (lang || '').toLowerCase();
+    if (l === 'en' || l.startsWith('en')) return 'EN';
+    if (l.includes('hans')) return '簡';
+    return '繁';
+}
+
+function showTemplatePreviewBy(kind, lang, mode) {
+    const m = window.__emailPreviewMap || {};
+    const item = (m[kind] || {})[(lang||'').toLowerCase()];
+    if (!item) {
+        alert(`找不到模板預覽：${kind} / ${lang}`);
+        return;
+    }
+    const modalEl = document.getElementById('tplPreviewModal');
+    const titleEl = document.getElementById('tplPreviewTitle');
+    const bodyEl = document.getElementById('tplPreviewBody');
+    const btnToggle = document.getElementById('tplToggleBtn');
+    const isHtml = mode === 'html';
+    titleEl.textContent = `${item.kind} · ${langLabel(item.lang)} · ${isHtml ? 'HTML' : '文字'} · ${item.subject || ''}`;
+    if (isHtml) {
+        const src = item.html || '<div class="text-muted">無 HTML 內容</div>';
+        bodyEl.innerHTML = `<iframe class="w-100 border-0" style="min-height:360px;" srcdoc="${src.replace(/"/g,'&quot;')}"></iframe>`;
+    } else {
+        bodyEl.textContent = item.text || '（空白）';
+    }
+    btnToggle.onclick = () => showTemplatePreviewBy(kind, lang, isHtml ? 'text' : 'html');
+    btnToggle.textContent = isHtml ? '切換文字' : '切換 HTML';
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+}
+
+// ===== vCoin 加幣功能 =====
+function openAddCoinsModal(tenantId, tenantName) {
+    document.getElementById('coinsTenantId').value = tenantId;
+    document.getElementById('coinsTenantName').textContent = tenantName;
+    document.getElementById('coinsAmount').value = '';
+    document.getElementById('coinsDescription').value = '';
+    document.getElementById('coinsMsg').textContent = '';
+    document.getElementById('coinsBalance').textContent = '載入中...';
+
+    // Fetch current balance
+    fetch('/api/v1/vworkadmin/tenant-coins/' + tenantId)
+        .then(r => r.json())
+        .then(data => {
+            let info = `可用: ${data.balance || 0}`;
+            info += ` (月配額: ${data.monthly_allotment || 0}, 已用: ${data.monthly_used || 0}, 已購買: ${data.purchased_balance || 0})`;
+            document.getElementById('coinsBalance').textContent = info;
+        })
+        .catch(() => {
+            document.getElementById('coinsBalance').textContent = '無法載入';
+        });
+
+    const modal = new bootstrap.Modal(document.getElementById('addCoinsModal'));
+    modal.show();
+}
+
+function submitAddCoins() {
+    const tenantId = document.getElementById('coinsTenantId').value;
+    const amount = parseInt(document.getElementById('coinsAmount').value, 10);
+    const description = document.getElementById('coinsDescription').value.trim();
+    const msgEl = document.getElementById('coinsMsg');
+
+    if (!amount || amount <= 0) {
+        msgEl.textContent = '請輸入有效的數量（大於 0）';
+        msgEl.className = 'mt-2 text-danger small';
+        return;
+    }
+
+    const btn = document.getElementById('coinsSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '處理中...';
+
+    fetch('/api/v1/vworkadmin/add-bonus-coins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenant_id: tenantId, amount, description })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            msgEl.textContent = data.message || '成功';
+            msgEl.className = 'mt-2 text-success small';
+            // Refresh balance display
+            fetch('/api/v1/vworkadmin/tenant-coins/' + tenantId)
+                .then(r => r.json())
+                .then(d => {
+                    let info = `可用: ${d.balance || 0}`;
+                    info += ` (月配額: ${d.monthly_allotment || 0}, 已用: ${d.monthly_used || 0}, 已購買: ${d.purchased_balance || 0})`;
+                    document.getElementById('coinsBalance').textContent = info;
+                });
+        } else {
+            msgEl.textContent = data.error || '操作失敗';
+            msgEl.className = 'mt-2 text-danger small';
+        }
+    })
+    .catch(err => {
+        msgEl.textContent = '請求失敗: ' + err.message;
+        msgEl.className = 'mt-2 text-danger small';
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.textContent = '確認加幣';
+    });
+}
+
+// ── Subscription Management ────────────────────────────────
+let __subPlansLoaded = false;
+let __subPlansCache = [];
+
+async function loadSubscriptionPlans() {
+    if (__subPlansLoaded) return __subPlansCache;
+    try {
+        const res = await fetch('/api/v1/vworkadmin/subscription-plans');
+        if (!res.ok) return [];
+        const data = await res.json();
+        __subPlansCache = data.plans || [];
+        __subPlansLoaded = true;
+        return __subPlansCache;
+    } catch (e) {
+        return [];
+    }
+}
+
+async function openAddSubModal(tenantId, tenantName, currentPlan) {
+    document.getElementById('subTenantId').value = tenantId;
+    document.getElementById('subTenantName').textContent = tenantName;
+    document.getElementById('subCurrentPlan').textContent = currentPlan || '-';
+    document.getElementById('subMonths').value = '';
+    document.getElementById('subMsg').textContent = '';
+
+    // Load plans into select
+    const select = document.getElementById('subPlan');
+    select.innerHTML = '<option value="">載入中...</option>';
+
+    const plans = await loadSubscriptionPlans();
+    select.innerHTML = '<option value="">-- 選擇方案 --</option>';
+    plans.forEach(p => {
+        const priceLabel = p.interval === 'year'
+            ? `$${p.yearly_price || p.price}/年`
+            : `$${p.price}/月`;
+        select.innerHTML += `<option value="${p.name}">${p.display_name} (${p.name}) — ${priceLabel}</option>`;
+    });
+
+    const modal = new bootstrap.Modal(document.getElementById('addSubModal'));
+    modal.show();
+}
+
+async function submitAddSubscription() {
+    const tenantId = document.getElementById('subTenantId').value;
+    const plan = document.getElementById('subPlan').value;
+    const months = parseInt(document.getElementById('subMonths').value, 10);
+    const msgEl = document.getElementById('subMsg');
+
+    if (!plan) {
+        msgEl.textContent = '請選擇方案';
+        msgEl.className = 'mt-2 text-danger small';
+        return;
+    }
+
+    if (!confirm(`確定為此租戶新增 ${plan} 訂閱？\n（現有的活躍訂閱將被取消）`)) return;
+
+    const btn = document.getElementById('subSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '處理中...';
+
+    const payload = { tenant_id: tenantId, plan: plan };
+    if (months > 0) payload.months = months;
+
+    try {
+        const res = await fetch('/api/v1/vworkadmin/add-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            msgEl.textContent = data.message || '訂閱新增成功';
+            msgEl.className = 'mt-2 text-success small';
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(document.getElementById('addSubModal'))?.hide();
+                refreshData();
+            }, 1500);
+        } else {
+            msgEl.textContent = data.error || '操作失敗';
+            msgEl.className = 'mt-2 text-danger small';
+        }
+    } catch (err) {
+        msgEl.textContent = '請求失敗: ' + err.message;
+        msgEl.className = 'mt-2 text-danger small';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '確認加訂閱';
+    }
+}
+// ===== vOffice 管理 =====
+let __vofficeStatsCache = null;
+let __vofficeInstallsCache = null;
+let __vofficeReleasesCache = null;
+let __voInstallPage = 1;
+const __voInstallLimit = 50;
+
+// Listen for vOffice tab activation to load data
+(function() {
+    const voTab = document.getElementById('voffice-tab');
+    if (voTab) {
+        voTab.addEventListener('shown.bs.tab', function() {
+            if (!__vofficeStatsCache) loadVOfficeData();
+        });
+    }
+})();
+
+async function loadVOfficeData() {
+    loadVOfficeStats();
+    loadVOfficeInstallations();
+    loadVOfficeReleases();
+}
+
+async function loadVOfficeStats() {
+    const area = document.getElementById('vofficeStatsArea');
+    if (!area) return;
+    area.innerHTML = '<div class="alert alert-info">載入統計中...</div>';
+    try {
+        const res = await fetch('/api/v1/vworkadmin/voffice-stats');
+        if (!res.ok) { area.innerHTML = '<div class="alert alert-danger">載入失敗</div>'; return; }
+        const data = await res.json();
+        __vofficeStatsCache = data;
+        renderVOfficeStats(data);
+    } catch (e) {
+        area.innerHTML = '<div class="alert alert-danger">錯誤: ' + e.message + '</div>';
+    }
+}
+
+function renderVOfficeStats(data) {
+    const area = document.getElementById('vofficeStatsArea');
+    if (!area) return;
+    const s = data.stats || {};
+    const osList = data.os || [];
+    const verList = data.versions || [];
+    const countryList = data.countries || [];
+
+    let html = `<div class="row g-3 mb-3">
+        <div class="col-sm-6 col-md-3"><div class="card text-center shadow-sm"><div class="card-body py-3">
+            <div class="text-muted small">總安裝數</div><div class="fs-3 fw-bold">${s.total_installs || 0}</div>
+        </div></div></div>
+        <div class="col-sm-6 col-md-3"><div class="card text-center shadow-sm"><div class="card-body py-3">
+            <div class="text-muted small">活躍安裝</div><div class="fs-3 fw-bold text-success">${s.active_installs || 0}</div>
+        </div></div></div>
+        <div class="col-sm-6 col-md-3"><div class="card text-center shadow-sm"><div class="card-body py-3">
+            <div class="text-muted small">今日新增</div><div class="fs-3 fw-bold text-primary">${s.today_new || 0}</div>
+        </div></div></div>
+        <div class="col-sm-6 col-md-3"><div class="card text-center shadow-sm"><div class="card-body py-3">
+            <div class="text-muted small">本週新增</div><div class="fs-3 fw-bold text-info">${s.week_new || 0}</div>
+        </div></div></div>
+    </div>
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6 col-md-3"><div class="card text-center shadow-sm"><div class="card-body py-3">
+            <div class="text-muted small">已登入安裝</div><div class="fs-3 fw-bold text-warning">${s.logged_in_installs || 0}</div>
+        </div></div></div>
+    </div>`;
+
+    // OS breakdown
+    if (osList.length > 0) {
+        html += `<div class="row g-3 mb-3"><div class="col-md-4"><div class="card shadow-sm"><div class="card-header py-2"><small class="fw-bold">OS 分佈</small></div><ul class="list-group list-group-flush">`;
+        osList.forEach(o => { html += `<li class="list-group-item d-flex justify-content-between py-1"><span>${o.os_type || '未知'}</span><span class="badge bg-secondary">${o.count}</span></li>`; });
+        html += `</ul></div></div>`;
+
+        // Version breakdown
+        html += `<div class="col-md-4"><div class="card shadow-sm"><div class="card-header py-2"><small class="fw-bold">版本分佈</small></div><ul class="list-group list-group-flush">`;
+        if (verList.length > 0) {
+            verList.forEach(v => { html += `<li class="list-group-item d-flex justify-content-between py-1"><span>${v.app_version || '未知'}</span><span class="badge bg-secondary">${v.count}</span></li>`; });
+        } else { html += `<li class="list-group-item text-muted py-1">無資料</li>`; }
+        html += `</ul></div></div>`;
+
+        // Country breakdown
+        html += `<div class="col-md-4"><div class="card shadow-sm"><div class="card-header py-2"><small class="fw-bold">地區分佈</small></div><ul class="list-group list-group-flush">`;
+        if (countryList.length > 0) {
+            countryList.forEach(c => { html += `<li class="list-group-item d-flex justify-content-between py-1"><span>${c.country || '未知'}</span><span class="badge bg-secondary">${c.count}</span></li>`; });
+        } else { html += `<li class="list-group-item text-muted py-1">無資料</li>`; }
+        html += `</ul></div></div></div>`;
+    }
+
+    html += `<div class="mb-2"><button class="btn btn-outline-secondary btn-sm" onclick="loadVOfficeData()">重新整理</button></div>`;
+    area.innerHTML = html;
+}
+
+async function loadVOfficeInstallations(page) {
+    if (page) __voInstallPage = page;
+    const area = document.getElementById('vofficeInstallsArea');
+    if (!area) return;
+    area.innerHTML = '<div class="alert alert-info">載入安裝清單中...</div>';
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/voffice-installations?page=${__voInstallPage}&limit=${__voInstallLimit}`);
+        if (!res.ok) { area.innerHTML = '<div class="alert alert-danger">載入失敗</div>'; return; }
+        const data = await res.json();
+        __vofficeInstallsCache = data;
+        renderVOfficeInstallations(data);
+    } catch (e) {
+        area.innerHTML = '<div class="alert alert-danger">錯誤: ' + e.message + '</div>';
+    }
+}
+
+function renderVOfficeInstallations(data) {
+    const area = document.getElementById('vofficeInstallsArea');
+    if (!area) return;
+    const list = data.installations || [];
+    const total = data.total || 0;
+    const page = data.page || 1;
+    const limit = data.limit || __voInstallLimit;
+    const totalPages = Math.ceil(total / limit);
+
+    let html = `<div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>安裝清單</span>
+            <span class="badge bg-secondary">共 ${total}</span>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Machine ID</th>
+                    <th>版本</th>
+                    <th>OS</th>
+                    <th>架構</th>
+                    <th>CPU</th>
+                    <th>RAM</th>
+                    <th>螢幕</th>
+                    <th>語言</th>
+                    <th>IP</th>
+                    <th>使用者</th>
+                    <th>首次上線</th>
+                    <th>最後上線</th>
+                    <th>活躍</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    if (list.length === 0) {
+        html += `<tr><td colspan="13" class="text-center text-muted">無安裝資料</td></tr>`;
+    } else {
+        list.forEach(i => {
+            const mid = (i.machine_id || '').substring(0, 12) + '...';
+            const firstSeen = i.first_seen_at ? new Date(i.first_seen_at).toLocaleString() : '';
+            const lastSeen = i.last_seen_at ? new Date(i.last_seen_at).toLocaleString() : '';
+            const active = i.is_active ? '<span class="badge bg-success">Yes</span>' : '<span class="badge bg-secondary">No</span>';
+            const userInfo = i.user_id ? '<span class="badge bg-info">已登入</span>' : '<span class="text-muted">-</span>';
+            html += `<tr>
+                <td><code title="${i.machine_id || ''}">${mid}</code></td>
+                <td>${i.app_version || ''}</td>
+                <td>${i.os_type || ''} ${i.os_version || ''}</td>
+                <td>${i.os_arch || ''}</td>
+                <td><small>${i.cpu_model || ''}</small></td>
+                <td>${i.ram_gb ? i.ram_gb + 'GB' : ''}</td>
+                <td>${i.screen_resolution || ''}</td>
+                <td>${i.language || ''}</td>
+                <td><small>${i.ip_address || ''}</small></td>
+                <td>${userInfo}</td>
+                <td><small>${firstSeen}</small></td>
+                <td><small>${lastSeen}</small></td>
+                <td>${active}</td>
+            </tr>`;
+        });
+    }
+
+    html += `</tbody></table></div>`;
+
+    // Pagination
+    if (totalPages > 1) {
+        html += `<div class="card-footer"><nav><ul class="pagination pagination-sm justify-content-center mb-0">`;
+        html += `<li class="page-item ${page <= 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="event.preventDefault();loadVOfficeInstallations(${page - 1})">上一頁</a></li>`;
+        for (let p = 1; p <= Math.min(totalPages, 10); p++) {
+            html += `<li class="page-item ${p === page ? 'active' : ''}"><a class="page-link" href="#" onclick="event.preventDefault();loadVOfficeInstallations(${p})">${p}</a></li>`;
+        }
+        if (totalPages > 10) html += `<li class="page-item disabled"><span class="page-link">... (${totalPages})</span></li>`;
+        html += `<li class="page-item ${page >= totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="event.preventDefault();loadVOfficeInstallations(${page + 1})">下一頁</a></li>`;
+        html += `</ul></nav><div class="text-center text-muted small mt-1">第 ${page} 頁，共 ${totalPages} 頁</div></div>`;
+    }
+
+    html += `</div>`;
+    area.innerHTML = html;
+}
+
+async function loadVOfficeReleases() {
+    const area = document.getElementById('vofficeReleasesArea');
+    if (!area) return;
+    area.innerHTML = '<div class="alert alert-info">載入版本清單中...</div>';
+    try {
+        const res = await fetch('/api/v1/vworkadmin/voffice-releases');
+        if (!res.ok) { area.innerHTML = '<div class="alert alert-danger">載入失敗</div>'; return; }
+        const data = await res.json();
+        __vofficeReleasesCache = data;
+        renderVOfficeReleases(data);
+    } catch (e) {
+        area.innerHTML = '<div class="alert alert-danger">錯誤: ' + e.message + '</div>';
+    }
+}
+
+function renderVOfficeReleases(data) {
+    const area = document.getElementById('vofficeReleasesArea');
+    if (!area) return;
+    const list = data.releases || [];
+
+    let html = `<div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>版本列表</span>
+            <span class="badge bg-secondary">共 ${list.length}</span>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>版本</th>
+                    <th>平台</th>
+                    <th>頻道</th>
+                    <th>下載</th>
+                    <th>大小</th>
+                    <th>最新</th>
+                    <th>強制</th>
+                    <th>發佈時間</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    if (list.length === 0) {
+        html += `<tr><td colspan="9" class="text-center text-muted">無版本資料</td></tr>`;
+    } else {
+        list.forEach(r => {
+            const pubAt = r.published_at ? new Date(r.published_at).toLocaleString() : '';
+            const latest = r.is_latest ? '<span class="badge bg-success">Latest</span>' : '';
+            const mandatory = r.is_mandatory ? '<span class="badge bg-danger">Yes</span>' : '';
+            const sizeStr = r.file_size ? (r.file_size / 1048576).toFixed(1) + ' MB' : '';
+            const dlUrl = r.download_url || '';
+            const shortUrl = dlUrl.length > 40 ? dlUrl.substring(0, 40) + '...' : dlUrl;
+            html += `<tr>
+                <td><strong>${r.version || ''}</strong></td>
+                <td>${r.platform || ''}</td>
+                <td>${r.channel || ''}</td>
+                <td><a href="${dlUrl}" target="_blank" title="${dlUrl}"><small>${shortUrl}</small></a></td>
+                <td>${sizeStr}</td>
+                <td>${latest}</td>
+                <td>${mandatory}</td>
+                <td><small>${pubAt}</small></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditReleaseModal('${r.ID || r.id}')">編輯</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRelease('${r.ID || r.id}')">刪除</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    html += `</tbody></table></div></div>`;
+    area.innerHTML = html;
+}
+
+function switchReleaseSource(mode) {
+    document.getElementById('releaseSourceMode').value = mode;
+}
+
+function openCreateReleaseModal() {
+    document.getElementById('releaseModalTitle').textContent = '新增版本';
+    document.getElementById('releaseId').value = '';
+    document.getElementById('releaseVersion').value = '';
+    document.getElementById('releaseVersion').readOnly = false;
+    document.getElementById('releasePlatform').disabled = false;
+    document.getElementById('releaseChannel').disabled = false;
+    document.getElementById('releaseDownloadURL').value = '';
+    document.getElementById('releaseDownloadURLInput').value = '';
+    document.getElementById('releaseFile').value = '';
+    document.getElementById('releaseUploadProgress').classList.add('d-none');
+    document.getElementById('releaseUploadResult').classList.add('d-none');
+    document.getElementById('releaseUploadResult').textContent = '';
+    document.getElementById('releaseSourceMode').value = 'upload';
+    // Reset tab to "上傳檔案"
+    const uploadTab = document.getElementById('releaseSourceUpload-tab');
+    if (uploadTab) new bootstrap.Tab(uploadTab).show();
+    document.getElementById('releaseFileSize').value = '';
+    document.getElementById('releaseChecksum').value = '';
+    document.getElementById('releaseNotes').value = '';
+    document.getElementById('releaseIsLatest').checked = true;
+    document.getElementById('releaseIsMandatory').checked = false;
+    document.getElementById('releaseMsg').textContent = '';
+    const modal = new bootstrap.Modal(document.getElementById('releaseModal'));
+    modal.show();
+}
+
+function openEditReleaseModal(id) {
+    const list = (__vofficeReleasesCache && __vofficeReleasesCache.releases) || [];
+    const r = list.find(x => (x.ID || x.id) === id);
+    if (!r) { alert('找不到版本資料'); return; }
+
+    document.getElementById('releaseModalTitle').textContent = '編輯版本';
+    document.getElementById('releaseId').value = id;
+    document.getElementById('releaseVersion').value = r.version || '';
+    document.getElementById('releaseVersion').readOnly = true;
+    document.getElementById('releasePlatform').value = r.platform || 'windows';
+    document.getElementById('releasePlatform').disabled = true;
+    document.getElementById('releaseChannel').value = r.channel || 'stable';
+    document.getElementById('releaseChannel').disabled = true;
+    document.getElementById('releaseDownloadURL').value = r.download_url || '';
+    document.getElementById('releaseDownloadURLInput').value = '';
+    document.getElementById('releaseFile').value = '';
+    document.getElementById('releaseUploadProgress').classList.add('d-none');
+
+    // Detect if existing download_url is an uploaded file or external URL
+    const dlUrl = r.download_url || '';
+    const isUploadedFile = dlUrl.startsWith('/uploads/voffice-releases/');
+    const resultEl = document.getElementById('releaseUploadResult');
+
+    if (isUploadedFile) {
+        // Show upload tab active, display current file info
+        document.getElementById('releaseSourceMode').value = 'upload';
+        const uploadTab = document.getElementById('releaseSourceUpload-tab');
+        if (uploadTab) new bootstrap.Tab(uploadTab).show();
+        resultEl.classList.remove('d-none');
+        resultEl.innerHTML = '目前檔案: <a href="' + dlUrl + '" target="_blank">' + dlUrl.split('/').pop() + '</a>（重新上傳會覆蓋）';
+    } else if (dlUrl) {
+        // External URL — show URL tab active, populate URL input
+        document.getElementById('releaseSourceMode').value = 'url';
+        document.getElementById('releaseDownloadURLInput').value = dlUrl;
+        const urlTab = document.getElementById('releaseSourceURL-tab');
+        if (urlTab) new bootstrap.Tab(urlTab).show();
+        resultEl.classList.remove('d-none');
+        resultEl.innerHTML = '目前網址: <a href="' + dlUrl + '" target="_blank">' + dlUrl + '</a>';
+    } else {
+        // No existing URL — default to upload tab
+        document.getElementById('releaseSourceMode').value = 'upload';
+        const uploadTab = document.getElementById('releaseSourceUpload-tab');
+        if (uploadTab) new bootstrap.Tab(uploadTab).show();
+        resultEl.classList.add('d-none');
+        resultEl.textContent = '';
+    }
+
+    document.getElementById('releaseFileSize').value = r.file_size || '';
+    document.getElementById('releaseChecksum').value = r.checksum || '';
+    document.getElementById('releaseNotes').value = r.release_notes || '';
+    document.getElementById('releaseIsLatest').checked = !!r.is_latest;
+    document.getElementById('releaseIsMandatory').checked = !!r.is_mandatory;
+    document.getElementById('releaseMsg').textContent = '';
+    const modal = new bootstrap.Modal(document.getElementById('releaseModal'));
+    modal.show();
+}
+
+async function submitRelease() {
+    const id = document.getElementById('releaseId').value;
+    const isEdit = !!id;
+    const msgEl = document.getElementById('releaseMsg');
+    msgEl.textContent = '';
+
+    const version = document.getElementById('releaseVersion').value.trim();
+    const platform = document.getElementById('releasePlatform').value;
+    const channel = document.getElementById('releaseChannel').value;
+    let downloadURL = document.getElementById('releaseDownloadURL').value.trim();
+    let fileSize = parseInt(document.getElementById('releaseFileSize').value) || 0;
+    let checksum = document.getElementById('releaseChecksum').value.trim();
+    const releaseNotes = document.getElementById('releaseNotes').value.trim();
+    const isLatest = document.getElementById('releaseIsLatest').checked;
+    const isMandatory = document.getElementById('releaseIsMandatory').checked;
+
+    const sourceMode = document.getElementById('releaseSourceMode').value; // 'upload' or 'url'
+    const fileInput = document.getElementById('releaseFile');
+    const hasNewFile = fileInput.files && fileInput.files.length > 0;
+    const manualURL = document.getElementById('releaseDownloadURLInput').value.trim();
+
+    if (!version) {
+        msgEl.textContent = '版本號為必填';
+        msgEl.className = 'mt-2 text-danger small';
+        return;
+    }
+
+    // Validate based on active source mode
+    if (sourceMode === 'upload') {
+        // Upload mode: need either a new file or an existing download_url (edit case)
+        if (!hasNewFile && !downloadURL) {
+            msgEl.textContent = '請上傳安裝檔案';
+            msgEl.className = 'mt-2 text-danger small';
+            return;
+        }
+    } else {
+        // URL mode: need either a manual URL or an existing download_url (edit case)
+        if (!manualURL && !downloadURL) {
+            msgEl.textContent = '請輸入下載網址';
+            msgEl.className = 'mt-2 text-danger small';
+            return;
+        }
+        // If user typed a new URL, use it
+        if (manualURL) {
+            downloadURL = manualURL;
+        }
+    }
+
+    const btn = document.getElementById('releaseSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '處理中...';
+
+    try {
+        // Step 1: Upload file if in upload mode and a new file is selected
+        if (sourceMode === 'upload' && hasNewFile) {
+            btn.textContent = '上傳檔案中...';
+            const progressEl = document.getElementById('releaseUploadProgress');
+            const barEl = document.getElementById('releaseUploadBar');
+            progressEl.classList.remove('d-none');
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('platform', platform);
+
+            const uploadRes = await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/v1/vworkadmin/voffice-releases/upload');
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        const pct = Math.round((e.loaded / e.total) * 100);
+                        barEl.style.width = pct + '%';
+                        barEl.textContent = pct + '%';
+                    }
+                };
+                xhr.onload = function() {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(JSON.parse(xhr.responseText));
+                    } else {
+                        try { reject(JSON.parse(xhr.responseText)); }
+                        catch { reject({ error: '上傳失敗 (' + xhr.status + ')' }); }
+                    }
+                };
+                xhr.onerror = function() { reject({ error: '上傳請求失敗，檔案可能過大或網路連線中斷' }); };
+                xhr.ontimeout = function() { reject({ error: '上傳逾時，請檢查網路連線後重試' }); };
+                xhr.timeout = 30 * 60 * 1000; // 30 minutes for large installer files
+                xhr.send(formData);
+            });
+
+            downloadURL = uploadRes.download_url;
+            fileSize = uploadRes.file_size || fileSize;
+            checksum = uploadRes.checksum || checksum;
+
+            // Update hidden field and result display
+            document.getElementById('releaseDownloadURL').value = downloadURL;
+            document.getElementById('releaseFileSize').value = fileSize;
+            document.getElementById('releaseChecksum').value = checksum;
+
+            const resultEl = document.getElementById('releaseUploadResult');
+            resultEl.classList.remove('d-none');
+            resultEl.innerHTML = '已上傳: <a href="' + downloadURL + '" target="_blank">' + uploadRes.filename + '</a> (' + (fileSize / 1048576).toFixed(1) + ' MB)';
+
+            btn.textContent = '儲存版本中...';
+        }
+
+        // Step 2: Create or update the release record
+        const payload = {
+            version, platform, channel, download_url: downloadURL,
+            file_size: fileSize, checksum, release_notes: releaseNotes,
+            is_latest: isLatest, is_mandatory: isMandatory
+        };
+
+        const url = isEdit ? `/api/v1/vworkadmin/voffice-releases/${id}` : '/api/v1/vworkadmin/voffice-releases';
+        const method = isEdit ? 'PUT' : 'POST';
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msgEl.textContent = err.error || '操作失敗';
+            msgEl.className = 'mt-2 text-danger small';
+            return;
+        }
+        msgEl.textContent = isEdit ? '更新成功' : '新增成功';
+        msgEl.className = 'mt-2 text-success small';
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('releaseModal'))?.hide();
+            loadVOfficeReleases();
+        }, 800);
+    } catch (e) {
+        msgEl.textContent = (e.error || e.message || '請求失敗');
+        msgEl.className = 'mt-2 text-danger small';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '確認';
+    }
+}
+
+async function deleteRelease(id) {
+    if (!confirm('確定刪除此版本？')) return;
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/voffice-releases/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert('刪除失敗'); return; }
+        loadVOfficeReleases();
+    } catch (e) { alert('刪除失敗: ' + e.message); }
+}
+
+// ────────────────────────────────────────
+// 官網 Blog 管理
+// ────────────────────────────────────────
+let __platformBlogs = [];
+let __platformBlogPage = 1;
+
+// Lazy-load: only fetch on first tab click
+document.getElementById('platform-blog-tab')?.addEventListener('shown.bs.tab', function () {
+    if (__platformBlogs.length === 0) loadPlatformBlogs();
+});
+
+async function loadPlatformBlogs() {
+    const area = document.getElementById('platformBlogArea');
+    if (!area) return;
+    area.innerHTML = '<div class="alert alert-info">載入中...</div>';
+
+    const status = document.getElementById('blogFilterStatus')?.value || '';
+    const search = document.getElementById('blogSearchInput')?.value || '';
+    let url = `/api/v1/vworkadmin/platform-blogs?page=${__platformBlogPage}&limit=50`;
+    if (status) url += `&status=${encodeURIComponent(status)}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) { area.innerHTML = '<div class="alert alert-danger">讀取失敗</div>'; return; }
+        const json = await res.json();
+        __platformBlogs = json.data || [];
+        renderPlatformBlogs(__platformBlogs, json.total || 0);
+    } catch (e) {
+        area.innerHTML = '<div class="alert alert-danger">錯誤: ' + e.message + '</div>';
+    }
+}
+
+function renderPlatformBlogs(blogs, total) {
+    const area = document.getElementById('platformBlogArea');
+    if (!area) return;
+
+    const statusBadge = { draft: 'secondary', published: 'success', archived: 'dark' };
+    const statusLabel = { draft: '草稿', published: '已發布', archived: '已歸檔' };
+
+    let html = `<div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>官網 Blog 文章</span>
+            <span class="badge bg-secondary">共 ${total}</span>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>標題</th><th>Slug</th><th>分類</th><th>語言</th>
+                    <th>狀態</th><th>發布時間</th><th>瀏覽</th><th>操作</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    if (!blogs || blogs.length === 0) {
+        html += `<tr><td colspan="8" class="text-center text-muted py-3">尚無文章</td></tr>`;
+    } else {
+        blogs.forEach(b => {
+            const st = b.status || 'draft';
+            const pub = b.published_at ? new Date(b.published_at).toLocaleString('zh-Hant') : '-';
+            html += `<tr>
+                <td><strong>${esc(b.title)}</strong></td>
+                <td><code>${esc(b.slug)}</code></td>
+                <td>${esc(b.category || '-')}</td>
+                <td>${esc(b.lang || 'zh')}</td>
+                <td><span class="badge bg-${statusBadge[st] || 'secondary'}">${statusLabel[st] || st}</span></td>
+                <td>${pub}</td>
+                <td>${b.view_count || 0}</td>
+                <td class="text-nowrap">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editBlog('${b.id}')">編輯</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteBlog('${b.id}')">刪除</button>
+                    ${st === 'published' ? `<a class="btn btn-sm btn-outline-info ms-1" href="/vwork-blog/${encodeURIComponent(b.slug)}" target="_blank">查看</a>` : ''}
+                </td>
+            </tr>`;
+        });
+    }
+
+    html += `</tbody></table></div></div>`;
+    area.innerHTML = html;
+}
+
+function esc(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function openBlogModal(blog) {
+    const isEdit = !!blog;
+    document.getElementById('blogModalTitle').textContent = isEdit ? '編輯文章' : '新增文章';
+    document.getElementById('blogId').value = blog?.id || '';
+    document.getElementById('blogTitle').value = blog?.title || '';
+    document.getElementById('blogSlug').value = blog?.slug || '';
+    document.getElementById('blogAuthor').value = blog?.author || 'V-sys';
+    document.getElementById('blogCategory').value = blog?.category || '';
+    document.getElementById('blogLang').value = blog?.lang || 'zh';
+    document.getElementById('blogStatus').value = blog?.status || 'draft';
+    document.getElementById('blogFeaturedImage').value = blog?.featured_image || '';
+    document.getElementById('blogExcerpt').value = blog?.excerpt || '';
+    document.getElementById('blogContent').value = blog?.content || '';
+    document.getElementById('blogSeoTitle').value = blog?.seo_title || '';
+    document.getElementById('blogSeoDesc').value = blog?.seo_description || '';
+    document.getElementById('blogSeoKeywords').value = blog?.seo_keywords || '';
+    document.getElementById('blogSortOrder').value = blog?.sort_order || 0;
+    document.getElementById('blogMsg').textContent = '';
+    new bootstrap.Modal(document.getElementById('blogModal')).show();
+}
+
+async function editBlog(id) {
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/platform-blogs/${id}`);
+        if (!res.ok) { alert('讀取失敗'); return; }
+        const blog = await res.json();
+        openBlogModal(blog);
+    } catch (e) { alert('錯誤: ' + e.message); }
+}
+
+async function submitBlog() {
+    const id = document.getElementById('blogId').value;
+    const isEdit = !!id;
+    const msgEl = document.getElementById('blogMsg');
+    msgEl.textContent = '';
+
+    const payload = {
+        title: document.getElementById('blogTitle').value.trim(),
+        slug: document.getElementById('blogSlug').value.trim(),
+        author: document.getElementById('blogAuthor').value.trim(),
+        category: document.getElementById('blogCategory').value.trim() || null,
+        lang: document.getElementById('blogLang').value,
+        status: document.getElementById('blogStatus').value,
+        featured_image: document.getElementById('blogFeaturedImage').value.trim() || null,
+        excerpt: document.getElementById('blogExcerpt').value.trim() || null,
+        content: document.getElementById('blogContent').value || null,
+        seo_title: document.getElementById('blogSeoTitle').value.trim() || null,
+        seo_description: document.getElementById('blogSeoDesc').value.trim() || null,
+        seo_keywords: document.getElementById('blogSeoKeywords').value.trim() || null,
+        sort_order: parseInt(document.getElementById('blogSortOrder').value) || 0
+    };
+
+    if (!payload.title) { msgEl.textContent = '標題為必填'; msgEl.className = 'mt-2 text-danger small'; return; }
+
+    const btn = document.getElementById('blogSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '處理中...';
+
+    try {
+        const url = isEdit ? `/api/v1/vworkadmin/platform-blogs/${id}` : '/api/v1/vworkadmin/platform-blogs';
+        const method = isEdit ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msgEl.textContent = err.error || '操作失敗';
+            msgEl.className = 'mt-2 text-danger small';
+            return;
+        }
+        msgEl.textContent = isEdit ? '更新成功' : '新增成功';
+        msgEl.className = 'mt-2 text-success small';
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('blogModal'))?.hide();
+            loadPlatformBlogs();
+        }, 600);
+    } catch (e) {
+        msgEl.textContent = e.message || '請求失敗';
+        msgEl.className = 'mt-2 text-danger small';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '確認';
+    }
+}
+
+async function deleteBlog(id) {
+    if (!confirm('確定刪除此文章？')) return;
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/platform-blogs/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert('刪除失敗'); return; }
+        loadPlatformBlogs();
+    } catch (e) { alert('刪除失敗: ' + e.message); }
+}
+
+// ────────────────────────────────────────
+// 官網活動管理
+// ────────────────────────────────────────
+let __platformEvents = [];
+let __platformEventPage = 1;
+
+// Lazy-load: only fetch on first tab click
+document.getElementById('platform-event-tab')?.addEventListener('shown.bs.tab', function () {
+    if (__platformEvents.length === 0) loadPlatformEvents();
+});
+
+async function loadPlatformEvents() {
+    const area = document.getElementById('platformEventArea');
+    if (!area) return;
+    area.innerHTML = '<div class="alert alert-info">載入中...</div>';
+
+    const status = document.getElementById('eventFilterStatus')?.value || '';
+    const search = document.getElementById('eventSearchInput')?.value || '';
+    let url = `/api/v1/vworkadmin/platform-events?page=${__platformEventPage}&limit=50`;
+    if (status) url += `&status=${encodeURIComponent(status)}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) { area.innerHTML = '<div class="alert alert-danger">讀取失敗</div>'; return; }
+        const json = await res.json();
+        __platformEvents = json.data || [];
+        renderPlatformEvents(__platformEvents, json.total || 0);
+    } catch (e) {
+        area.innerHTML = '<div class="alert alert-danger">錯誤: ' + e.message + '</div>';
+    }
+}
+
+function renderPlatformEvents(events, total) {
+    const area = document.getElementById('platformEventArea');
+    if (!area) return;
+
+    const statusBadge = { draft: 'secondary', published: 'success', archived: 'dark', cancelled: 'danger' };
+    const statusLabel = { draft: '草稿', published: '已發布', archived: '已歸檔', cancelled: '已取消' };
+
+    let html = `<div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>官網活動</span>
+            <span class="badge bg-secondary">共 ${total}</span>
+        </div>
+        <div class="table-responsive">
+        <table class="table table-sm table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>活動名稱</th><th>Slug</th><th>活動日期</th><th>地點</th>
+                    <th>狀態</th><th>報名人數</th><th>瀏覽</th><th>操作</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    if (!events || events.length === 0) {
+        html += `<tr><td colspan="8" class="text-center text-muted py-3">尚無活動</td></tr>`;
+    } else {
+        events.forEach(ev => {
+            const st = ev.status || 'draft';
+            const evDate = ev.event_date ? new Date(ev.event_date).toLocaleDateString('zh-Hant') : '-';
+            const maxLabel = ev.max_attendees > 0 ? ` / ${ev.max_attendees}` : '';
+            html += `<tr>
+                <td><strong>${esc(ev.title)}</strong></td>
+                <td><code>${esc(ev.slug)}</code></td>
+                <td>${evDate}</td>
+                <td>${esc(ev.location || '-')}</td>
+                <td><span class="badge bg-${statusBadge[st] || 'secondary'}">${statusLabel[st] || st}</span></td>
+                <td>${ev.registration_count || 0}${maxLabel}</td>
+                <td>${ev.view_count || 0}</td>
+                <td class="text-nowrap">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editEvent('${ev.id}')">編輯</button>
+                    <button class="btn btn-sm btn-outline-info me-1" onclick="viewEventRegistrations('${ev.id}', '${esc(ev.title)}')">報名</button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteEvent('${ev.id}')">刪除</button>
+                    ${st === 'published' ? `<a class="btn btn-sm btn-outline-success ms-1" href="/vwork-events/${encodeURIComponent(ev.slug)}" target="_blank">查看</a>` : ''}
+                </td>
+            </tr>`;
+        });
+    }
+
+    html += `</tbody></table></div></div>`;
+    area.innerHTML = html;
+}
+
+function openEventModal(ev) {
+    const isEdit = !!ev;
+    document.getElementById('eventModalTitle').textContent = isEdit ? '編輯活動' : '新增活動';
+    document.getElementById('eventId').value = ev?.id || '';
+    document.getElementById('eventTitle').value = ev?.title || '';
+    document.getElementById('eventSlug').value = ev?.slug || '';
+    document.getElementById('eventCategory').value = ev?.category || '';
+    document.getElementById('eventLang').value = ev?.lang || 'zh';
+    document.getElementById('eventStatus').value = ev?.status || 'draft';
+    document.getElementById('eventFeaturedImage').value = ev?.featured_image || '';
+    document.getElementById('eventExcerpt').value = ev?.excerpt || '';
+    document.getElementById('eventContent').value = ev?.content || '';
+    document.getElementById('eventLocation').value = ev?.location || '';
+    document.getElementById('eventMaxAttendees').value = ev?.max_attendees || 0;
+    document.getElementById('eventSortOrder').value = ev?.sort_order || 0;
+    // Date fields
+    document.getElementById('eventDate').value = ev?.event_date ? ev.event_date.substring(0, 16) : '';
+    document.getElementById('eventEndDate').value = ev?.event_end_date ? ev.event_end_date.substring(0, 16) : '';
+    document.getElementById('eventMsg').textContent = '';
+    new bootstrap.Modal(document.getElementById('eventModal')).show();
+}
+
+async function editEvent(id) {
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/platform-events/${id}`);
+        if (!res.ok) { alert('讀取失敗'); return; }
+        const ev = await res.json();
+        openEventModal(ev);
+    } catch (e) { alert('錯誤: ' + e.message); }
+}
+
+async function submitEvent() {
+    const id = document.getElementById('eventId').value;
+    const isEdit = !!id;
+    const msgEl = document.getElementById('eventMsg');
+    msgEl.textContent = '';
+
+    const payload = {
+        title: document.getElementById('eventTitle').value.trim(),
+        slug: document.getElementById('eventSlug').value.trim(),
+        category: document.getElementById('eventCategory').value.trim() || null,
+        lang: document.getElementById('eventLang').value,
+        status: document.getElementById('eventStatus').value,
+        featured_image: document.getElementById('eventFeaturedImage').value.trim() || null,
+        excerpt: document.getElementById('eventExcerpt').value.trim() || null,
+        content: document.getElementById('eventContent').value || null,
+        location: document.getElementById('eventLocation').value.trim() || null,
+        max_attendees: parseInt(document.getElementById('eventMaxAttendees').value) || 0,
+        sort_order: parseInt(document.getElementById('eventSortOrder').value) || 0
+    };
+
+    // Date fields
+    const evDateVal = document.getElementById('eventDate').value;
+    if (evDateVal) payload.event_date = new Date(evDateVal).toISOString();
+    const evEndDateVal = document.getElementById('eventEndDate').value;
+    if (evEndDateVal) payload.event_end_date = new Date(evEndDateVal).toISOString();
+
+    if (!payload.title) { msgEl.textContent = '活動名稱為必填'; msgEl.className = 'mt-2 text-danger small'; return; }
+
+    const btn = document.getElementById('eventSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = '處理中...';
+
+    try {
+        const url = isEdit ? `/api/v1/vworkadmin/platform-events/${id}` : '/api/v1/vworkadmin/platform-events';
+        const method = isEdit ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msgEl.textContent = err.error || '操作失敗';
+            msgEl.className = 'mt-2 text-danger small';
+            return;
+        }
+        msgEl.textContent = isEdit ? '更新成功' : '新增成功';
+        msgEl.className = 'mt-2 text-success small';
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('eventModal'))?.hide();
+            loadPlatformEvents();
+        }, 600);
+    } catch (e) {
+        msgEl.textContent = e.message || '請求失敗';
+        msgEl.className = 'mt-2 text-danger small';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '確認';
+    }
+}
+
+async function deleteEvent(id) {
+    if (!confirm('確定刪除此活動？所有報名紀錄也會一併刪除。')) return;
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/platform-events/${id}`, { method: 'DELETE' });
+        if (!res.ok) { alert('刪除失敗'); return; }
+        loadPlatformEvents();
+    } catch (e) { alert('刪除失敗: ' + e.message); }
+}
+
+async function viewEventRegistrations(eventId, eventTitle) {
+    try {
+        const res = await fetch(`/api/v1/vworkadmin/platform-events/${eventId}/registrations`);
+        if (!res.ok) { alert('讀取報名紀錄失敗'); return; }
+        const json = await res.json();
+        const regs = json.data || [];
+
+        let html = `<h6>${esc(eventTitle)} — 報名紀錄 (${regs.length})</h6>`;
+        if (regs.length === 0) {
+            html += '<p class="text-muted">尚無報名</p>';
+        } else {
+            html += `<div class="table-responsive"><table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr><th>姓名</th><th>電話</th><th>電郵</th><th>報名時間</th></tr>
+                </thead><tbody>`;
+            regs.forEach(r => {
+                html += `<tr>
+                    <td>${esc(r.name)}</td>
+                    <td>${esc(r.phone)}</td>
+                    <td>${esc(r.email || '-')}</td>
+                    <td>${new Date(r.created_at).toLocaleString('zh-Hant')}</td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+        }
+
+        document.getElementById('eventRegModalTitle').textContent = '報名紀錄';
+        document.getElementById('eventRegModalBody').innerHTML = html;
+        new bootstrap.Modal(document.getElementById('eventRegModal')).show();
+    } catch (e) { alert('錯誤: ' + e.message); }
+}
+
+// ────────────────────────────────────────
+// Email 配額 / 管理員通知 Tab
+// ────────────────────────────────────────
+let __emailQuotaLoaded = false;
+
+document.getElementById('admin-email-tab')?.addEventListener('shown.bs.tab', function () {
+    if (!__emailQuotaLoaded) {
+        loadEmailQuota();
+        loadAdminEmails();
+        __emailQuotaLoaded = true;
+    }
+});
+
+async function loadEmailQuota() {
+    const area = document.getElementById('emailQuotaArea');
+    if (!area) return;
+    area.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div><span class="ms-2 text-muted">載入中...</span></div>';
+
+    try {
+        const res = await fetch('/api/v1/vworkadmin/email-quota');
+        if (!res.ok) { area.innerHTML = '<div class="alert alert-danger">讀取失敗</div>'; return; }
+        const data = await res.json();
+
+        const usage = data.daily_usage || 0;
+        const limit = data.daily_limit || 300;
+        const remaining = data.remaining ?? (limit - usage);
+        const exceeded = data.exceeded || false;
+        const pct = limit > 0 ? Math.min(Math.round((usage / limit) * 100), 100) : 0;
+
+        let barClass = 'bg-success';
+        if (pct >= 90) barClass = 'bg-danger';
+        else if (pct >= 70) barClass = 'bg-warning';
+
+        let html = `
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="fw-bold">今日已發送</span>
+                    <span class="${exceeded ? 'text-danger fw-bold' : ''}">${usage} / ${limit}</span>
+                </div>
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar ${barClass}" role="progressbar" style="width: ${pct}%" aria-valuenow="${usage}" aria-valuemin="0" aria-valuemax="${limit}">${pct}%</div>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="text-muted small">已發送</div>
+                    <div class="fw-bold fs-5">${usage}</div>
+                </div>
+                <div class="col-4">
+                    <div class="text-muted small">剩餘</div>
+                    <div class="fw-bold fs-5 ${remaining <= 0 ? 'text-danger' : ''}">${remaining}</div>
+                </div>
+                <div class="col-4">
+                    <div class="text-muted small">每日限額</div>
+                    <div class="fw-bold fs-5">${limit}</div>
+                </div>
+            </div>`;
+
+        if (exceeded) {
+            html += `<div class="alert alert-danger mt-3 mb-0 small"><strong>已超出每日免費配額！</strong> 新 email 將排隊等待明日發送，或升級 Brevo 付費方案以增加配額。</div>`;
+        }
+
+        area.innerHTML = html;
+    } catch (e) {
+        area.innerHTML = '<div class="alert alert-danger">錯誤: ' + esc(e.message) + '</div>';
+    }
+}
+
+async function loadAdminEmails() {
+    const input = document.getElementById('adminEmailsInput');
+    if (!input) return;
+
+    try {
+        const res = await fetch('/api/v1/vworkadmin/admin-emails');
+        if (!res.ok) return;
+        const data = await res.json();
+        input.value = data.admin_emails || '';
+    } catch (e) {
+        console.error('loadAdminEmails error:', e);
+    }
+}
+
+async function saveAdminEmails() {
+    const input = document.getElementById('adminEmailsInput');
+    const msg = document.getElementById('adminEmailMsg');
+    if (!input || !msg) return;
+    msg.textContent = '';
+
+    const emails = input.value.trim();
+
+    try {
+        const res = await fetch('/api/v1/vworkadmin/admin-emails', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin_emails: emails })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            msg.textContent = err.error || '儲存失敗';
+            msg.className = 'mt-2 small text-danger';
+            return;
+        }
+        msg.textContent = '已儲存';
+        msg.className = 'mt-2 small text-success';
+        setTimeout(() => { msg.textContent = ''; }, 2000);
+    } catch (e) {
+        msg.textContent = '儲存失敗: ' + e.message;
+        msg.className = 'mt-2 small text-danger';
+    }
+}
+</script>
+<!-- Template Preview Modal -->
+<div class="modal fade" id="tplPreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tplPreviewTitle">Template Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="tplPreviewBody" style="white-space:pre-wrap;"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" id="tplToggleBtn">切換</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- vOffice Release Modal -->
+<div class="modal fade" id="releaseModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="releaseModalTitle">新增版本</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="releaseId">
+        <div class="mb-3">
+          <label class="form-label" for="releaseVersion">版本號 <span class="text-danger">*</span></label>
+          <input type="text" id="releaseVersion" class="form-control" placeholder="例: 1.2.0">
+        </div>
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label" for="releasePlatform">平台 <span class="text-danger">*</span></label>
+            <select id="releasePlatform" class="form-select">
+              <option value="windows">Windows</option>
+              <option value="macos">macOS</option>
+              <option value="linux">Linux</option>
+            </select>
+          </div>
+          <div class="col">
+            <label class="form-label" for="releaseChannel">頻道</label>
+            <select id="releaseChannel" class="form-select">
+              <option value="stable">Stable</option>
+              <option value="beta">Beta</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">下載來源 <span class="text-danger">*</span></label>
+          <ul class="nav nav-tabs nav-tabs-sm mb-2" id="releaseSourceTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="releaseSourceUpload-tab" data-bs-toggle="tab" data-bs-target="#releaseSourceUpload" type="button" role="tab" onclick="switchReleaseSource('upload')">上傳檔案</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="releaseSourceURL-tab" data-bs-toggle="tab" data-bs-target="#releaseSourceURL" type="button" role="tab" onclick="switchReleaseSource('url')">輸入網址</button>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="releaseSourceUpload" role="tabpanel">
+              <input type="file" id="releaseFile" class="form-control" accept=".exe,.msi,.dmg,.pkg,.deb,.rpm,.AppImage,.zip,.tar.gz">
+              <small class="text-muted">上傳安裝檔案（會自動計算檔案大小和 checksum）</small>
+              <div id="releaseUploadProgress" class="progress mt-2 d-none" style="height: 20px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" id="releaseUploadBar">0%</div>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="releaseSourceURL" role="tabpanel">
+              <input type="url" id="releaseDownloadURLInput" class="form-control" placeholder="https://...">
+              <small class="text-muted">直接輸入外部下載網址</small>
+            </div>
+          </div>
+          <div id="releaseUploadResult" class="small text-success mt-2 d-none"></div>
+          <input type="hidden" id="releaseDownloadURL" value="">
+          <input type="hidden" id="releaseSourceMode" value="upload">
+        </div>
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label" for="releaseFileSize">檔案大小 (bytes)</label>
+            <input type="number" id="releaseFileSize" class="form-control" placeholder="選填">
+          </div>
+          <div class="col">
+            <label class="form-label" for="releaseChecksum">Checksum (SHA256)</label>
+            <input type="text" id="releaseChecksum" class="form-control" placeholder="選填">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="releaseNotes">更新說明</label>
+          <textarea id="releaseNotes" class="form-control" rows="3" placeholder="選填"></textarea>
+        </div>
+        <div class="row mb-3">
+          <div class="col">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="releaseIsLatest" checked>
+              <label class="form-check-label" for="releaseIsLatest">設為最新版本</label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="releaseIsMandatory">
+              <label class="form-check-label" for="releaseIsMandatory">強制更新</label>
+            </div>
+          </div>
+        </div>
+        <div id="releaseMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="releaseSubmitBtn" onclick="submitRelease()">確認</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Password Conversion Modal -->
+<div class="modal fade" id="convertPasswordModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">轉換用戶密碼</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="convertUserId">
+        <div class="mb-3">
+          <label class="form-label fw-bold">用戶</label>
+          <div id="convertUserInfo" class="text-muted"></div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="convertPassword">新密碼</label>
+          <input type="password" id="convertPassword" class="form-control" placeholder="輸入新密碼 (6-20字符)">
+          <small class="text-muted">密碼長度必須在 6-20 個字符之間</small>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="convertPasswordConfirm">確認密碼</label>
+          <input type="password" id="convertPasswordConfirm" class="form-control" placeholder="再次輸入新密碼">
+        </div>
+        <div id="convertPasswordMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-warning" id="convertPasswordSubmitBtn" onclick="submitConvertPassword()">確認轉換</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Edit Email Modal -->
+<div class="modal fade" id="editEmailModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">修改用戶 Email</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editEmailUserId">
+        <div class="mb-3">
+          <label class="form-label fw-bold">用戶</label>
+          <div id="editEmailUserInfo" class="text-muted"></div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="editEmailInput">新 Email</label>
+          <input type="email" id="editEmailInput" class="form-control" placeholder="輸入新 Email">
+        </div>
+        <div id="editEmailMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="editEmailSubmitBtn" onclick="submitEditEmail()">確認修改</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add Coins Modal -->
+<div class="modal fade" id="addCoinsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">加幣（vCoin）</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="coinsTenantId">
+        <div class="mb-3">
+          <label class="form-label fw-bold">租戶</label>
+          <div id="coinsTenantName" class="text-muted"></div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">目前餘額</label>
+          <div id="coinsBalance" class="text-muted">載入中...</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="coinsAmount">加幣數量 <span class="text-danger">*</span></label>
+          <input type="number" id="coinsAmount" class="form-control" min="1" placeholder="輸入數量">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="coinsDescription">說明（選填）</label>
+          <input type="text" id="coinsDescription" class="form-control" placeholder="例: 補償、促銷贈送">
+        </div>
+        <div id="coinsMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-warning" id="coinsSubmitBtn" onclick="submitAddCoins()">確認加幣</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add Subscription Modal -->
+<div class="modal fade" id="addSubModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">新增訂閱</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="subTenantId">
+        <div class="mb-3">
+          <label class="form-label fw-bold">租戶</label>
+          <div id="subTenantName" class="text-muted"></div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">目前方案</label>
+          <div id="subCurrentPlan" class="text-muted">-</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="subPlan">選擇方案 <span class="text-danger">*</span></label>
+          <select id="subPlan" class="form-select">
+            <option value="">-- 選擇方案 --</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="subMonths">訂閱月數（選填，預設依方案週期）</label>
+          <input type="number" id="subMonths" class="form-control" min="1" placeholder="例: 12">
+        </div>
+        <div id="subMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="subSubmitBtn" onclick="submitAddSubscription()">確認加訂閱</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Platform Blog Modal -->
+<div class="modal fade" id="blogModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="blogModalTitle">新增文章</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="blogId">
+        <div class="row mb-3">
+          <div class="col-md-8">
+            <label class="form-label">標題 <span class="text-danger">*</span></label>
+            <input type="text" id="blogTitle" class="form-control" placeholder="文章標題">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Slug（留空自動生成）</label>
+            <input type="text" id="blogSlug" class="form-control" placeholder="url-slug">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <label class="form-label">作者</label>
+            <input type="text" id="blogAuthor" class="form-control" value="V-sys">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">分類</label>
+            <input type="text" id="blogCategory" class="form-control" placeholder="e.g. 產品更新">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">語言</label>
+            <select id="blogLang" class="form-select">
+              <option value="zh">繁體中文</option>
+              <option value="zh-CN">简体中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">狀態</label>
+            <select id="blogStatus" class="form-select">
+              <option value="draft">草稿</option>
+              <option value="published">已發布</option>
+              <option value="archived">已歸檔</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">排序</label>
+            <input type="number" id="blogSortOrder" class="form-control" value="0">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">特色圖片 URL</label>
+          <input type="url" id="blogFeaturedImage" class="form-control" placeholder="https://...">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">摘要</label>
+          <textarea id="blogExcerpt" class="form-control" rows="2" placeholder="文章摘要（列表頁顯示）"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">內容（HTML）</label>
+          <textarea id="blogContent" class="form-control" rows="15" placeholder="<h2>...</h2><p>...</p>" style="font-family: monospace; font-size: 13px;"></textarea>
+        </div>
+        <details class="mb-3">
+          <summary class="text-muted small">SEO 設定（選填）</summary>
+          <div class="mt-2">
+            <div class="mb-2">
+              <label class="form-label small">SEO 標題</label>
+              <input type="text" id="blogSeoTitle" class="form-control form-control-sm">
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">SEO 描述</label>
+              <textarea id="blogSeoDesc" class="form-control form-control-sm" rows="2"></textarea>
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">SEO 關鍵字</label>
+              <input type="text" id="blogSeoKeywords" class="form-control form-control-sm" placeholder="keyword1, keyword2">
+            </div>
+          </div>
+        </details>
+        <div id="blogMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="blogSubmitBtn" onclick="submitBlog()">確認</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Platform Event Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalTitle">新增活動</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="eventId">
+        <div class="row mb-3">
+          <div class="col-md-8">
+            <label class="form-label">活動名稱 <span class="text-danger">*</span></label>
+            <input type="text" id="eventTitle" class="form-control" placeholder="活動名稱">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Slug（留空自動生成）</label>
+            <input type="text" id="eventSlug" class="form-control" placeholder="url-slug">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <label class="form-label">分類</label>
+            <input type="text" id="eventCategory" class="form-control" placeholder="e.g. 講座">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">語言</label>
+            <select id="eventLang" class="form-select">
+              <option value="zh">繁體中文</option>
+              <option value="zh-CN">简体中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">狀態</label>
+            <select id="eventStatus" class="form-select">
+              <option value="draft">草稿</option>
+              <option value="published">已發布</option>
+              <option value="archived">已歸檔</option>
+              <option value="cancelled">已取消</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">地點</label>
+            <input type="text" id="eventLocation" class="form-control" placeholder="活動地點">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">排序</label>
+            <input type="number" id="eventSortOrder" class="form-control" value="0">
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">活動開始日期</label>
+            <input type="datetime-local" id="eventDate" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">活動結束日期</label>
+            <input type="datetime-local" id="eventEndDate" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">人數上限（0 = 無限制）</label>
+            <input type="number" id="eventMaxAttendees" class="form-control" value="0" min="0">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">特色圖片 URL</label>
+          <input type="url" id="eventFeaturedImage" class="form-control" placeholder="https://...">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">摘要</label>
+          <textarea id="eventExcerpt" class="form-control" rows="2" placeholder="活動摘要（列表頁顯示）"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">內容（HTML）</label>
+          <textarea id="eventContent" class="form-control" rows="12" placeholder="<h2>...</h2><p>...</p>" style="font-family: monospace; font-size: 13px;"></textarea>
+        </div>
+        <div id="eventMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" id="eventSubmitBtn" onclick="submitEvent()">確認</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Event Registrations View Modal -->
+<div class="modal fade" id="eventRegModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventRegModalTitle">報名紀錄</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="eventRegModalBody"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{ end }}

@@ -1,0 +1,109 @@
+{{ define "pages/pos_settings" }}
+{{if not .Embed}}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="bi bi-gear me-2"></i><span data-i18n="pages.posSettings.title">POS Settings</span></h2>
+    <a href="/system-settings" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> <span data-i18n="pages.posSettings.back">Back</span></a>
+</div>
+{{end}}
+
+<div class="card">
+    <div class="card-body">
+        <form id="posSettingsForm">
+        <div class="mb-3">
+            <label class="form-label" data-i18n="pages.posSettings.depositPercent">Deposit (Percentage %, calculated first)</label>
+            <input type="number" class="form-control" id="depositPercent" min="0" max="100" step="0.01" data-i18n-placeholder="pages.posSettings.depositPercentPlaceholder" placeholder="e.g., 20 means 20%">
+            <div class="form-text" data-i18n="pages.posSettings.depositPercentHint">If both percentage and fixed amount are set, the system will use the larger value</div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" data-i18n="pages.posSettings.depositFixed">Deposit (Fixed Amount)</label>
+            <input type="number" class="form-control" id="depositFixed" min="0" step="0.01" data-i18n-placeholder="pages.posSettings.depositFixedPlaceholder" placeholder="e.g., 200 means minimum $200">
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="allowGuestCheckout" style="width: 3em; height: 1.5em;">
+                <label class="form-check-label fw-semibold" for="allowGuestCheckout" data-i18n="pages.posSettings.allowGuestCheckout">允許訪客結帳</label>
+            </div>
+            <div class="form-text" data-i18n="pages.posSettings.allowGuestCheckoutHint">啟用後，POS 結帳時若未選擇客戶，會提示是否以「訪客」名義結帳；自助模式下會顯示「訪客購買」按鈕</div>
+        </div>
+            <div class="d-flex gap-2 mt-4 form-buttons-container">
+                <button type="button" class="btn btn-primary" onclick="savePosSettings()"><i class="bi bi-save"></i> <span data-i18n="pages.posSettings.save">Save</span></button>
+                <button type="button" class="btn btn-secondary" onclick="resetPosSettings()"><i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="pages.posSettings.reset">Reset</span></button>
+        </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    // 確保 i18n 已初始化後更新文本
+    if (typeof I18n !== 'undefined' && I18n.updatePage) {
+        I18n.updatePage();
+    }
+    await loadPosSettings();
+});
+
+async function loadPosSettings() {
+    try {
+        const settings = await App.apiRequest('/api/v1/pos-settings');
+        document.getElementById('depositPercent').value = settings.deposit_percent || '';
+        document.getElementById('depositFixed').value = settings.deposit_fixed || '';
+        document.getElementById('allowGuestCheckout').checked = !!settings.allow_guest_checkout;
+    } catch (error) {
+        console.error(I18n.t('pages.posSettings.loadingError') + ':', error);
+        // 如果載入失敗，顯示默認值
+        document.getElementById('depositPercent').value = '';
+        document.getElementById('depositFixed').value = '';
+        document.getElementById('allowGuestCheckout').checked = false;
+}
+}
+
+async function savePosSettings() {
+    const percent = parseFloat(document.getElementById('depositPercent').value) || 0;
+    const fixed = parseFloat(document.getElementById('depositFixed').value) || 0;
+    const allowGuest = document.getElementById('allowGuestCheckout').checked;
+    if (percent < 0 || percent > 100) {
+        App.showAlert(I18n.t('pages.posSettings.percentRangeError'), 'danger');
+        return;
+    }
+    
+    try {
+        App.showLoading();
+        await App.apiRequest('/api/v1/pos-settings', {
+            method: 'POST',
+            body: JSON.stringify({
+                deposit_percent: percent,
+                deposit_fixed: fixed,
+                allow_guest_checkout: allowGuest
+            })
+        });
+        App.hideLoading();
+    App.showAlert(I18n.t('pages.posSettings.saveSuccess'), 'success');
+    } catch (error) {
+        App.hideLoading();
+        App.showAlert(I18n.t('pages.posSettings.saveError') + ': ' + (error.message || I18n.t('common.loadError')), 'danger');
+    }
+}
+
+async function resetPosSettings() {
+    try {
+        App.showLoading();
+        await App.apiRequest('/api/v1/pos-settings', {
+            method: 'POST',
+            body: JSON.stringify({
+                deposit_percent: 0,
+                deposit_fixed: 0,
+                allow_guest_checkout: false
+            })
+        });
+        App.hideLoading();
+        await loadPosSettings();
+    App.showAlert(I18n.t('pages.posSettings.resetSuccess'), 'info');
+    } catch (error) {
+        App.hideLoading();
+        App.showAlert(I18n.t('pages.posSettings.resetError') + ': ' + (error.message || I18n.t('common.loadError')), 'danger');
+    }
+}
+</script>
+{{ end }}
+

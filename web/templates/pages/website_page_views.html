@@ -1,0 +1,128 @@
+{{ define "pages/website_page_views" }}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0" data-i18n="pages.websitePageViews.title">瀏覽報告</h3>
+  <div class="d-flex gap-2">
+    <a href="/pages" class="btn btn-outline-secondary"><i class="bi bi-file-earmark-text"></i> <span data-i18n="pages.websitePageViews.pageManagement">頁面管理</span></a>
+    <a href="#" class="btn btn-outline-secondary" onclick="window.openCompanyPage && openCompanyPage(event); return false;"><i class="bi bi-globe"></i> <span data-i18n="pages.websitePageViews.companyPage">公司頁面</span></a>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label" data-i18n="pages.websitePageViews.period">統計期間</label>
+        <select class="form-select" id="wpvDays">
+          <option value="7" data-i18n="pages.websitePageViews.last7Days">近 7 天</option>
+          <option value="30" selected data-i18n="pages.websitePageViews.last30Days">近 30 天</option>
+          <option value="90" data-i18n="pages.websitePageViews.last90Days">近 90 天</option>
+          <option value="365" data-i18n="pages.websitePageViews.last365Days">近 365 天</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" data-i18n="pages.websitePageViews.status">狀態</label>
+        <select class="form-select" id="wpvStatus">
+          <option value="" data-i18n="pages.websitePageViews.all">全部</option>
+          <option value="published" data-i18n="pages.websitePageViews.published">已發佈</option>
+          <option value="draft" data-i18n="pages.websitePageViews.draft">草稿</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100" type="button" onclick="WebsitePageViews.load()"><i class="bi bi-search"></i> <span data-i18n="pages.websitePageViews.search">查詢</span></button>
+      </div>
+      <div class="col-md-3 text-md-end text-muted small" id="wpvRangeText"></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header bg-white">
+    <div class="fw-semibold" data-i18n="pages.websitePageViews.viewsPerPage">每頁瀏覽量</div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead class="text-muted small">
+          <tr>
+            <th data-i18n="pages.websitePageViews.page">頁面</th>
+            <th style="width: 220px;">Slug</th>
+            <th style="width: 120px;" class="text-end" data-i18n="pages.websitePageViews.periodViews">期間瀏覽</th>
+            <th style="width: 120px;" class="text-end" data-i18n="pages.websitePageViews.totalViews">總瀏覽</th>
+            <th style="width: 110px;" data-i18n="pages.websitePageViews.status">狀態</th>
+            <th style="width: 90px;"></th>
+          </tr>
+        </thead>
+        <tbody id="wpvTbody">
+          <tr class="text-muted"><td colspan="6" class="text-center py-3" data-i18n="common.loading">載入中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const WebsitePageViews = (() => {
+  function qs(id){ return document.getElementById(id); }
+  function nfmt(n){ return Number(n || 0).toLocaleString(); }
+  function wdT(key, fallback) { return (window.I18n && I18n.t) ? I18n.t(key) || fallback : fallback; }
+
+  function buildPublicUrl(row) {
+    const sub = window.tenantSubdomain || localStorage.getItem('tenant_subdomain') || '';
+    if (!sub) return '';
+    if (row.is_homepage) return `/co/${encodeURIComponent(sub)}/`;
+    const slug = (row.slug || '').trim();
+    if (!slug) return `/co/${encodeURIComponent(sub)}/`;
+    return `/co/${encodeURIComponent(sub)}/${encodeURIComponent(slug)}/`;
+  }
+
+  async function load() {
+    const days = qs('wpvDays').value || '30';
+    const status = qs('wpvStatus').value || '';
+    const tbody = qs('wpvTbody');
+    const rangeText = qs('wpvRangeText');
+    if (tbody) tbody.innerHTML = `<tr class="text-muted"><td colspan="6" class="text-center py-3">${wdT('common.loading', '載入中...')}</td></tr>`;
+    if (rangeText) rangeText.textContent = '';
+    try {
+      const url = `/api/v1/website/page-views?days=${encodeURIComponent(days)}${status ? `&status=${encodeURIComponent(status)}` : ''}`;
+      const res = await App.apiRequest(url);
+      if (rangeText) rangeText.textContent = `${res.from_date} ～ ${res.to_date}`;
+      const rows = res.data || [];
+      if (!rows.length) {
+        tbody.innerHTML = `<tr class="text-muted"><td colspan="6" class="text-center py-3">${wdT('common.noData', '沒有資料')}</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = rows.map(r => {
+        const url = buildPublicUrl(r);
+        const statusLabel = r.status === 'published' ? wdT('pages.websitePageViews.published', '已發佈') : wdT('pages.websitePageViews.draft', '草稿');
+        const slugText = (r.slug || '').trim();
+        return `
+          <tr>
+            <td>
+              <div class="fw-semibold">${(r.name || '').trim() || r.page_id}</div>
+            </td>
+            <td class="text-muted small">${slugText}</td>
+            <td class="text-end">${nfmt(r.views)}</td>
+            <td class="text-end">${nfmt(r.total_views)}</td>
+            <td><span class="badge ${r.status === 'published' ? 'text-bg-success' : 'text-bg-secondary'}">${statusLabel}</span></td>
+            <td class="text-end">
+              ${url ? `<a class="btn btn-sm btn-outline-primary" href="${url}" target="_blank" title="${wdT('pages.websitePageViews.openPage', '開啟頁面')}"><i class="bi bi-box-arrow-up-right"></i></a>` : ``}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } catch (e) {
+      console.error(e);
+      if (tbody) tbody.innerHTML = `<tr class="text-danger"><td colspan="6" class="text-center py-3">${wdT('pages.websitePageViews.loadFailed', '載入失敗')}</td></tr>`;
+      App.showAlert(e.message || wdT('pages.websitePageViews.loadFailed', '載入失敗'), 'danger');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!App.checkAuth()) return;
+    load();
+  });
+
+  return { load };
+})();
+</script>
+{{ end }}
