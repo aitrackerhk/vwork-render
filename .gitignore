@@ -4,11 +4,12 @@
 *.dll
 *.so
 *.dylib
-nwork
-api
-cronjob
-main
-temp
+/nwork
+/api
+/cronjob
+/main
+/temp
+/binvwork-api
 
 # Test binary
 *.test
