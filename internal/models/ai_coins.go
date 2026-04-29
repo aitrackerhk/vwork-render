@@ -361,7 +361,7 @@ func PlanHasLeadFinder(plan string) bool {
 
 // RequiredPlanForVideo 返回使用 vAi Video 所需的最低方案名稱
 func RequiredPlanForVideo() string {
-	return "vSuite Pro"
+	return "vSuite Pro+"
 }
 
 // RequiredPlanForLeadFinder 返回使用自動搵客所需的最低方案名稱
