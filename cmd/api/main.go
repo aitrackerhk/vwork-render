@@ -474,7 +474,7 @@ func main() {
 			return c.Render("index_vsys", fiber.Map{"SEO": handlers.NewLandingSEO(c, "vsys", forcedLang)})
 		}
 		if domainParam == "vmarket" || domainParam == "vmarketai" {
-			return handlers.RenderVMarketHome(c)
+			return c.Redirect("/", fiber.StatusMovedPermanently)
 		}
 		if domainParam == "vwork" || domainParam == "vworkai" {
 			return c.Render("index", fiber.Map{
@@ -526,7 +526,7 @@ func main() {
 		case "www.vsysai.com", "vsysai.com":
 			return c.Render("index_vsys", fiber.Map{"SEO": handlers.NewLandingSEO(c, "vsys", forcedLang)})
 		case "www.vmarketai.com", "vmarketai.com":
-			return handlers.RenderVMarketHome(c)
+			return c.Redirect("https://www.vworkai.com/", fiber.StatusMovedPermanently)
 		case "voffice.vsysai.com", "www.voffice.vsysai.com":
 			return c.Render("index_voffice", fiber.Map{"SEO": handlers.NewLandingSEO(c, "voffice", forcedLang)})
 		case "vai.vsysai.com", "www.vai.vsysai.com":
@@ -584,7 +584,7 @@ func main() {
 			return c.Render("index_vsys", fiber.Map{"SEO": handlers.NewLandingSEO(c, "vsys", handlers.DetectPathLang(c.Path()))})
 		}
 		if domainParam == "vmarket" || domainParam == "vmarketai" {
-			return handlers.RenderVMarketHome(c)
+			return c.Redirect("/", fiber.StatusMovedPermanently)
 		}
 		if domainParam == "vwork" || domainParam == "vworkai" {
 			return c.Render("index", fiber.Map{
@@ -678,8 +678,7 @@ func main() {
 			// vsysai.com 使用專屬的 vSys 首頁
 			return c.Render("index_vsys", fiber.Map{"SEO": handlers.NewLandingSEO(c, "vsys", handlers.DetectPathLang(c.Path()))})
 		case "www.vmarketai.com", "vmarketai.com":
-			// vmarketai.com 使用 VMarket 首頁
-			return handlers.RenderVMarketHome(c)
+			return c.Redirect("https://www.vworkai.com/", fiber.StatusMovedPermanently)
 		case "voffice.vsysai.com", "www.voffice.vsysai.com":
 			// voffice.vsysai.com 使用 vOffice 首頁
 			return c.Render("index_voffice", fiber.Map{"SEO": handlers.NewLandingSEO(c, "voffice", handlers.DetectPathLang(c.Path()))})
@@ -768,26 +767,29 @@ func main() {
 	app.Get("/industry/:industry", handlers.RenderIndustryPage)
 	app.Get("/custom/:page", handlers.RenderCustomPage)
 
-	// VMarket 公開頁面
-	app.Get("/vmarket", handlers.RenderVMarketHome)
-	app.Get("/vmarket/products", handlers.RenderVMarketProducts)
-	app.Get("/vmarket/services", handlers.RenderVMarketServices)
-	app.Get("/vmarket/companies", handlers.RenderVMarketCompanies)
-	app.Get("/vmarket/map", handlers.RenderVMarketMap)
-	app.Get("/vmarket/join", handlers.RenderVMarketJoin)
-	app.Get("/en/vmarket", handlers.RenderVMarketHome)
-	app.Get("/en/vmarket/products", handlers.RenderVMarketProducts)
-	app.Get("/en/vmarket/services", handlers.RenderVMarketServices)
-	app.Get("/en/vmarket/companies", handlers.RenderVMarketCompanies)
-	app.Get("/en/vmarket/map", handlers.RenderVMarketMap)
-	app.Get("/en/vmarket/join", handlers.RenderVMarketJoin)
-	app.Get("/zh-cn/vmarket", handlers.RenderVMarketHome)
-	app.Get("/zh-cn/vmarket/products", handlers.RenderVMarketProducts)
-	app.Get("/zh-cn/vmarket/services", handlers.RenderVMarketServices)
-	app.Get("/zh-cn/vmarket/companies", handlers.RenderVMarketCompanies)
-	app.Get("/zh-cn/vmarket/map", handlers.RenderVMarketMap)
-	app.Get("/zh-cn/vmarket/join", handlers.RenderVMarketJoin)
-	app.Get("/vmarket/api/search", handlers.VMarketSearch)
+	// VMarket 已停用：所有公開頁面導回 vWork 首頁
+	vmarketDisabled := func(c *fiber.Ctx) error {
+		return c.Redirect("/", fiber.StatusMovedPermanently)
+	}
+	app.Get("/vmarket", vmarketDisabled)
+	app.Get("/vmarket/products", vmarketDisabled)
+	app.Get("/vmarket/services", vmarketDisabled)
+	app.Get("/vmarket/companies", vmarketDisabled)
+	app.Get("/vmarket/map", vmarketDisabled)
+	app.Get("/vmarket/join", vmarketDisabled)
+	app.Get("/en/vmarket", vmarketDisabled)
+	app.Get("/en/vmarket/products", vmarketDisabled)
+	app.Get("/en/vmarket/services", vmarketDisabled)
+	app.Get("/en/vmarket/companies", vmarketDisabled)
+	app.Get("/en/vmarket/map", vmarketDisabled)
+	app.Get("/en/vmarket/join", vmarketDisabled)
+	app.Get("/zh-cn/vmarket", vmarketDisabled)
+	app.Get("/zh-cn/vmarket/products", vmarketDisabled)
+	app.Get("/zh-cn/vmarket/services", vmarketDisabled)
+	app.Get("/zh-cn/vmarket/companies", vmarketDisabled)
+	app.Get("/zh-cn/vmarket/map", vmarketDisabled)
+	app.Get("/zh-cn/vmarket/join", vmarketDisabled)
+	app.Get("/vmarket/api/search", vmarketDisabled)
 
 	// VMarket routes without /vmarket prefix (for vmarketai.com production domain ONLY).
 	// NOTE: /products and /services are NOT registered here — they conflict with
@@ -800,7 +802,7 @@ func main() {
 	vmarketDomainOnly := func(handler fiber.Handler) fiber.Handler {
 		return func(c *fiber.Ctx) error {
 			if handlers.IsVMarketDomain(c) {
-				return handler(c)
+				return c.Redirect("https://www.vworkai.com/", fiber.StatusMovedPermanently)
 			}
 			return c.Next()
 		}
@@ -808,7 +810,7 @@ func main() {
 	app.Get("/companies", vmarketDomainOnly(handlers.RenderVMarketCompanies))
 	app.Get("/map", vmarketDomainOnly(handlers.RenderVMarketMap))
 	app.Get("/join", vmarketDomainOnly(handlers.RenderVMarketJoin))
-	app.Get("/api/vmarket/search", handlers.VMarketSearch)
+	app.Get("/api/vmarket/search", vmarketDisabled)
 
 	// 登錄頁面（公開路由，不需要認證）
 	app.Get("/login", func(c *fiber.Ctx) error {
@@ -1263,13 +1265,13 @@ func main() {
 	app.Get("/en/help/vai/:category", renderHelpVaiCategory)
 	app.Get("/zh-cn/help/vai/:category", renderHelpVaiCategory)
 
-	// vMarket 支援中心
-	app.Get("/help/vmarket", renderHelpVMarket)
-	app.Get("/en/help/vmarket", renderHelpVMarket)
-	app.Get("/zh-cn/help/vmarket", renderHelpVMarket)
-	app.Get("/help/vmarket/:category", renderHelpVMarketCategory)
-	app.Get("/en/help/vmarket/:category", renderHelpVMarketCategory)
-	app.Get("/zh-cn/help/vmarket/:category", renderHelpVMarketCategory)
+	// vMarket 支援中心已停用
+	app.Get("/help/vmarket", vmarketDisabled)
+	app.Get("/en/help/vmarket", vmarketDisabled)
+	app.Get("/zh-cn/help/vmarket", vmarketDisabled)
+	app.Get("/help/vmarket/:category", vmarketDisabled)
+	app.Get("/en/help/vmarket/:category", vmarketDisabled)
+	app.Get("/zh-cn/help/vmarket/:category", vmarketDisabled)
 
 	// vOffice 支援中心
 	app.Get("/help/voffice", renderHelpVOffice)
@@ -1643,45 +1645,24 @@ func main() {
 		}, "layouts/voffice_cms_layout")
 	})
 
-	// vMarket 搜尋頁（登入後）
+	// vMarket 搜尋頁已停用
 	cmsRoutes.Get("/vmarket-search", func(c *fiber.Ctx) error {
-		companyName := c.Locals("CompanyName").(string)
-		return c.Render("pages/vmarket_search", fiber.Map{
-			"Title":       "搜尋公司 / 服務",
-			"PageName":    "vmarket-search",
-			"CompanyName": companyName,
-			"BasePath":    handlers.VmarketBasePath(c),
-		}, "layouts/vmarket_cms_layout")
+		return c.Redirect("/", fiber.StatusMovedPermanently)
 	})
 
-	// vMarket 費用中心（使用 vmarket layout，保持 vMarket topnav + sidemenu）
+	// vMarket 費用中心已停用
 	cmsRoutes.Get("/vmarket-billing", func(c *fiber.Ctx) error {
-		companyName := c.Locals("CompanyName").(string)
-		return c.Render("pages/billing", fiber.Map{
-			"Title":       "費用中心",
-			"PageName":    "vmarket-billing",
-			"CompanyName": companyName,
-		}, "layouts/vmarket_cms_layout")
+		return c.Redirect("/billing", fiber.StatusMovedPermanently)
 	})
 
-	// vMarket vCoin（使用 vmarket layout，保持 vMarket topnav + sidemenu）
+	// vMarket vCoin 已停用
 	cmsRoutes.Get("/vmarket-vcoins", func(c *fiber.Ctx) error {
-		companyName := c.Locals("CompanyName").(string)
-		return c.Render("pages/ai_coins", fiber.Map{
-			"Title":       "vCoin",
-			"PageName":    "vmarket-vcoins",
-			"CompanyName": companyName,
-		}, "layouts/vmarket_cms_layout")
+		return c.Redirect("/vcoins", fiber.StatusMovedPermanently)
 	})
 
-	// vMarket 帳戶設置（使用 vmarket layout，保持 vMarket topnav + sidemenu）
+	// vMarket 帳戶設置已停用
 	cmsRoutes.Get("/vmarket-personal-data", func(c *fiber.Ctx) error {
-		companyName := c.Locals("CompanyName").(string)
-		return c.Render("pages/personal_data", fiber.Map{
-			"Title":       "帳戶設置",
-			"PageName":    "vmarket-personal-data",
-			"CompanyName": companyName,
-		}, "layouts/vmarket_cms_layout")
+		return c.Redirect("/personal-data", fiber.StatusMovedPermanently)
 	})
 
 	// CMS 全站搜尋頁
@@ -3552,13 +3533,9 @@ func main() {
 		}, "layouts/cms_layout")
 	})
 
-	// VMarket 設定頁面
+	// VMarket 設定頁面已停用
 	cmsRoutes.Get("/vmarket-settings", func(c *fiber.Ctx) error {
-		return c.Render("pages/vmarket_settings", fiber.Map{
-			"Title":    "VMarket 設定",
-			"PageName": "vmarket-settings",
-			"BasePath": handlers.VmarketBasePath(c),
-		}, "layouts/cms_layout")
+		return c.Redirect("/", fiber.StatusMovedPermanently)
 	})
 
 	// 廣告位置管理頁面
@@ -3591,13 +3568,9 @@ func main() {
 		}, "layouts/cms_layout")
 	})
 
-	// 建站完成後的 VMarket 推薦頁
+	// 建站完成後的 VMarket 推薦頁已停用
 	cmsRoutes.Get("/vmarket-join-recommendation", func(c *fiber.Ctx) error {
-		return c.Render("pages/vmarket_join_recommendation", fiber.Map{
-			"Title":       "加入 VMarket",
-			"HideSidebar": true,
-			"HideTopnav":  true,
-		}, "layouts/cms_layout")
+		return c.Redirect("/", fiber.StatusMovedPermanently)
 	})
 
 	// 自訂網域 & SSL（vBuilder）

@@ -9,7 +9,6 @@ const PRODUCT_URLS = (typeof PRODUCT_REDIRECT_URLS !== 'undefined')
         vwork:   'https://www.vworkai.com/dashboard',
         vai:     'https://vai.vsysai.com/vai-chat',
         voffice: 'https://voffice.vsysai.com/voffice-download',
-        vmarket: 'https://www.vmarketai.com/vmarket-search',
     };
 
 /**
@@ -70,7 +69,6 @@ function _legacyProductUrl() {
             'vwork':   '/dashboard',
             'vai':     '/vai-chat',
             'voffice': '/voffice-download',
-            'vmarket': '/vmarket-search',
         };
         return localPaths[product] || '/dashboard';
     }
@@ -81,8 +79,6 @@ function _legacyProductUrl() {
         'vworkai.com':        { product: 'vwork',   path: '/dashboard' },
         'vai.vsysai.com':     { product: 'vai',     path: '/vai-chat' },
         'voffice.vsysai.com': { product: 'voffice', path: '/voffice-download' },
-        'www.vmarketai.com':  { product: 'vmarket', path: '/vmarket-search' },
-        'vmarketai.com':      { product: 'vmarket', path: '/vmarket-search' },
     };
 
     const current = domainMap[host];
@@ -1282,4 +1278,3 @@ async function checkIndustryTemplateAndRedirect() {
         redirectToProduct();
     }
 }
-

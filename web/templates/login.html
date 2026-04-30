@@ -68,10 +68,6 @@
                                     <img src="/static/vofficeicon.png" alt="vOffice">
                                     <span>vOffice</span>
                                 </div>
-                                <div class="vlogin-product-option" data-product="vmarket" onclick="selectProduct('vmarket', event)">
-                                    <img src="/static/vmarketicon.png" alt="vMarket">
-                                    <span>vMarket</span>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -263,8 +259,7 @@
         const PRODUCT_CONFIG = {
             vwork: { name: 'vWork', icon: '/static/vworkicon.png', bg: '/static/login_bg_vwork.png' },
             vai: { name: 'vAI', icon: '/static/vaiicon.png', bg: '/static/login_bg_vwork.png' },
-            voffice: { name: 'vOffice', icon: '/static/vofficeicon.png', bg: '/static/login_bg_voffice.png' },
-            vmarket: { name: 'vMarket', icon: '/static/vmarketicon.png', bg: '/static/login_bg_vmarket.png' }
+            voffice: { name: 'vOffice', icon: '/static/vofficeicon.png', bg: '/static/login_bg_voffice.png' }
         };
 
         // Detect current product from URL param > localStorage > hostname > default
@@ -318,7 +313,6 @@
             const host = window.location.hostname;
             const path = window.location.pathname;
             if (host.includes('voffice') || path.includes('voffice')) currentProduct = 'voffice';
-            else if (host.includes('vmarket') || path.includes('vmarket')) currentProduct = 'vmarket';
             else if (host.includes('vai') || path.includes('vai')) currentProduct = 'vai';
             // Update UI
             updateProductUI(currentProduct);

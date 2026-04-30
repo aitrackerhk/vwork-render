@@ -105,7 +105,7 @@
         })();
     </script>
 </head>
-<body class="home-page has-promo-topbar">
+<body class="home-page home-page-redesign has-promo-topbar">
     <div class="promo-topbar"><span data-i18n="promoTopbar.main">ERP+辦公軟件+AI 助理 免費試用</span> <span class="d-none promo-topbar-sub" data-i18n="promoTopbar.sub">連接 AI 低至 $250 每月</span></div>
     <!-- 導航欄 -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top w-100">
@@ -113,33 +113,8 @@
             <a class="navbar-brand d-flex align-items-end" href="/">
                 <img src="/static/logo3.png" alt="vWork">
             </a>
-            <!-- Mobile: App Switcher, Menu Toggle (always visible, on the right) -->
+            <!-- Mobile: Menu Toggle (always visible, on the right) -->
             <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
-                <li class="nav-item dropdown" id="mobileAppSwitcher">
-                    <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
-                        <i class="bi bi-grid-3x3-gap-fill" style="font-size: 1.5rem; color: #adb5bd;"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end app-switcher-panel">
-                        <div class="app-switcher-grid">
-                            <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
-                                <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
-                                <span class="app-switcher-label">vAI</span>
-                            </a>
-                            <a href="/" class="app-switcher-item" data-app="vwork">
-                                <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
-                                <span class="app-switcher-label">vWork</span>
-                            </a>
-                            <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
-                                <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
-                                <span class="app-switcher-label">vMarket</span>
-                            </a>
-                            <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
-                                <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
-                                <span class="app-switcher-label">vOffice</span>
-                            </a>
-                        </div>
-                    </div>
-                </li>
                 <li class="nav-item" id="goToSystemBtnMobile">
                     <a class="nav-link" href="/dashboard" title="進入系統">
                         <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i>
@@ -196,31 +171,6 @@
                     </li>
                     <li class="nav-item">
                         <div id="theborderbox" style="border: 1px solid #dee2e6; border-radius: 100px; padding: 0.25rem 0.5rem; display: flex; align-items: center; gap: 0.5rem; height: 38px; box-sizing: border-box;">
-                            <div class="dropdown" style="position: relative;">
-                                <a class="app-switcher-trigger" href="#" id="appSwitcherDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="Applications">
-                                    <i class="bi bi-grid-3x3-gap-fill"></i>
-                                </a>
-                                <div class="dropdown-menu app-switcher-panel" aria-labelledby="appSwitcherDropdown">
-                                    <div class="app-switcher-grid">
-                                        <a href="/?domain=vai" class="app-switcher-item" data-app="vai">
-                                            <span class="app-switcher-icon"><img src="/static/vaiicon.png" alt="vAI"></span>
-                                            <span class="app-switcher-label">vAI</span>
-                                        </a>
-                                        <a href="/" class="app-switcher-item" data-app="vwork">
-                                            <span class="app-switcher-icon"><img src="/static/vworkicon.png" alt="vWork"></span>
-                                            <span class="app-switcher-label">vWork</span>
-                                        </a>
-                                        <a href="/?domain=vmarket" class="app-switcher-item" data-app="vmarket">
-                                            <span class="app-switcher-icon"><img src="/static/vmarketicon.png" alt="vMarket"></span>
-                                            <span class="app-switcher-label">vMarket</span>
-                                        </a>
-                                        <a href="/?domain=voffice" class="app-switcher-item" data-app="voffice">
-                                            <span class="app-switcher-icon"><img src="/static/vofficeicon.png" alt="vOffice"></span>
-                                            <span class="app-switcher-label">vOffice</span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="dropdown" style="position: relative;">
                                 <a class="nav-link dropdown-toggle" href="#" id="supportInfoDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
                                     <i class="bi bi-headset"></i> <span data-i18n="nav.supportInfo">支援資訊</span>
@@ -430,175 +380,231 @@
         </nav>
     </div>
 
-    <!-- ===== 首頁 Banner 輪播 ===== -->
-    <div class="hero-carousel" id="heroCarousel">
-        <!-- Slide 1: 零成本創業 (暫時隱藏) -->
-        <!--
-        <div class="hero-slide hero-slide--active" data-slide="0">
-            <section class="zero-cost-banner">
-                <div class="container-fluid px-3">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6 zero-cost-text">
-                            <h2 class="zero-cost-title">
-                                無需資金，<span class="zero-cost-highlight">啟動事業</span>
-                            </h2>
-                            <p class="zero-cost-subtitle">
-                                從註冊到上線，所有工具免費提供。ERP、網店、辦公軟件、AI 助手一鍵到手，讓你專注創造價值，而非煩惱成本。我們會在你營利後才收費。
-                            </p>
-                            <a href="/login?product=vwork" class="btn zero-cost-cta">
-                                立即免費開始 <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                        <div class="col-lg-6 zero-cost-visual">
-                            <div class="zero-cost-cards">
-                                <div class="zero-cost-card zc-card-1">
-                                    <div class="zc-card-icon"><i class="bi bi-shop"></i></div>
-                                    <div class="zc-card-label">網店</div>
-                                    <div class="zc-card-price">$0</div>
-                                </div>
-                                <div class="zero-cost-card zc-card-2">
-                                    <div class="zc-card-icon"><i class="bi bi-bar-chart-line"></i></div>
-                                    <div class="zc-card-label">ERP</div>
-                                    <div class="zc-card-price">$0</div>
-                                </div>
-                                <div class="zero-cost-card zc-card-3">
-                                    <div class="zc-card-icon"><i class="bi bi-file-earmark-text"></i></div>
-                                    <div class="zc-card-label">辦公</div>
-                                    <div class="zc-card-price">$0</div>
-                                </div>
-                                <div class="zero-cost-card zc-card-4">
-                                    <div class="zc-card-icon"><i class="bi bi-cash-stack"></i></div>
-                                    <div class="zc-card-label">POS</div>
-                                    <div class="zc-card-price">$0</div>
-                                </div>
-                            </div>
-                            <div class="zero-cost-ring"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-        -->
-
-        <!-- Slide 2: 一個平台有齊所需 -->
-        <div class="hero-slide hero-slide--active" data-slide="0">
-            <section class="hero-section py-5">
-                <div class="container-fluid px-3">
-                    <div class="row align-items-center">
-                        <div class="col-lg-6 hero-content">
-                            <h1 class="display-4 fw-bold mb-3"><span data-i18n="hero.titleLine1">AI 賦能,</span><span class="text-primary" data-i18n="hero.titleHighlight">化繁為易</span></h1>
-                            <p class="lead mb-3" style="font-size: 1.35rem;" data-i18n="hero.description">ERP + POS + 會計 + 網店 + CRM + 餐飲 + 物流 + AI 助手，全部整合在一起。不用再東拼西湊。</p>
-                            <div class="d-flex gap-3 flex-wrap">
-                                <a href="/login?product=vwork" class="btn btn-light btn-lg" data-i18n="hero.getStarted">免費試用</a>
-                                <a href="#why-vwork" class="btn btn-outline-light btn-lg" data-i18n="hero.learnMore">看看省多少</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 hero-banner-right">
-                            <div class="hero-banner-grid-wrapper">
-                                <div class="hero-banner-grid">
-                                    <div class="hero-banner-square" style="background-image: url('/static/work1.jpg');"></div>
-                                    <div class="hero-banner-square" style="background-image: url('/static/work2.jpg');"></div>
-                                    <div class="hero-banner-square" style="background-image: url('/static/work3.jpg');"></div>
-                                    <div class="hero-banner-square" style="background-image: url('/static/work4.jpg');"></div>
-                                </div>
-                                <div class="hero-banner-overlay">
-                                    <span class="hero-banner-text" data-i18n="hero.supportIndustries">支援不同行業</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <!-- Hero mobile 四格（僅手機顯示） -->
-            <section class="hero-mobile-section d-lg-none">
-                <div class="hero-mobile-grid-wrapper">
-                    <div class="hero-mobile-grid">
-                        <div class="hero-mobile-square" style="background-image: url('/static/work1.jpg');"></div>
-                        <div class="hero-mobile-square" style="background-image: url('/static/work2.jpg');"></div>
-                        <div class="hero-mobile-square" style="background-image: url('/static/work3.jpg');"></div>
-                        <div class="hero-mobile-square" style="background-image: url('/static/work4.jpg');"></div>
-                    </div>
-                    <div class="hero-mobile-overlay">
-                        <span class="hero-banner-text" data-i18n="hero.supportIndustries">支援不同行業</span>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- 輪播指示器 (暫時隱藏，只有一張 slide) -->
-        <div class="hero-carousel-dots" style="display:none;">
-            <button class="hero-dot hero-dot--active" data-dot="0" aria-label="Slide 1"></button>
-            <!--<button class="hero-dot" data-dot="1" aria-label="Slide 2"></button>-->
-        </div>
-    </div>
-
-    <!-- 三大核心優勢 -->
-    <section id="why-vwork" class="py-5" style="background: #fff;">
+    <section class="ai-erp-hero">
         <div class="container-fluid px-3">
-            <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold"><span data-i18n="whyVwork.title">為什麼 16,000+ 間中小企需要</span> <span style="color: #4285f4;">vWork</span></h2>
-                <p class="text-muted lead" data-i18n="whyVwork.subtitle">更高效、低成本、讓決策有數據支持</p>
-            </div>
-            <div class="row g-4">
-                <!-- 整合性 -->
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100 text-center p-4">
-                        <div class="mb-3">
-                            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: inline-flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-diagram-3 fs-1 text-white"></i>
+            <div class="row align-items-center g-4">
+                <div class="col-lg-6">
+                    <span class="ai-erp-eyebrow"><i class="bi bi-stars"></i> AI ERP for modern teams</span>
+                    <h1 class="ai-erp-headline mt-4 mb-3">一個 <span class="ai-erp-gradient">AI ERP 作業系統</span>，接管你的訂單、團隊、財務與決策。</h1>
+                    <p class="ai-erp-subtitle mb-4">vWork 將 ERP、POS、CRM、會計、流程自動化與 vAI 決策助手整合成同一個營運中台。唔再用 Excel 補洞，亦唔需要喺 6 個 SaaS 之間跳來跳去。</p>
+                    <div class="d-flex flex-wrap gap-3 mb-4">
+                        <a href="/login?product=vwork" class="btn btn-primary btn-lg px-4">立即免費試用</a>
+                        <a href="#ai-erp-modules" class="btn btn-outline-dark btn-lg px-4">查看核心模組</a>
+                    </div>
+                    <div class="ai-erp-metric-grid">
+                        <div class="ai-erp-metric">
+                            <small class="text-uppercase text-muted">營運視野</small>
+                            <strong>即時</strong>
+                            <span class="text-muted">訂單、收入、庫存同步</span>
+                        </div>
+                        <div class="ai-erp-metric">
+                            <small class="text-uppercase text-muted">部署方式</small>
+                            <strong>7 日</strong>
+                            <span class="text-muted">由零到上線的標準節奏</span>
+                        </div>
+                        <div class="ai-erp-metric">
+                            <small class="text-uppercase text-muted">AI 執行</small>
+                            <strong>自動化</strong>
+                            <span class="text-muted">報表、提醒、內容、分析</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="ai-erp-hero-card">
+                        <div class="ai-erp-dashboard">
+                            <div class="ai-erp-dashboard-top">
+                                <div>
+                                    <div class="text-white fw-bold">vWork Command Center</div>
+                                    <div class="small text-white-50">AI-powered ERP cockpit</div>
+                                </div>
+                                <span class="ai-erp-chip"><i class="bi bi-lightning-charge-fill"></i> vAI online</span>
+                            </div>
+                            <div class="ai-erp-dashboard-grid">
+                                <div class="ai-erp-panel">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <div class="small text-muted">今日營收預測</div>
+                                            <div class="fs-3 fw-bold text-dark">HK$128,400</div>
+                                        </div>
+                                        <span class="badge text-bg-success">+18%</span>
+                                    </div>
+                                    <div class="mb-3" style="height: 140px; border-radius: 18px; background: linear-gradient(180deg, rgba(37,99,235,0.12) 0%, rgba(124,58,237,0.05) 100%); position: relative; overflow: hidden;">
+                                        <div style="position:absolute; inset:auto 8% 18% 8%; height:3px; background:linear-gradient(90deg,#2563eb,#7c3aed,#06b6d4); border-radius:999px; transform:skewX(-18deg);"></div>
+                                        <div style="position:absolute; inset:auto 16% 34% 18%; height:3px; background:rgba(37,99,235,0.35); border-radius:999px; transform:skewX(-18deg);"></div>
+                                        <div style="position:absolute; inset:auto 26% 52% 28%; height:3px; background:rgba(124,58,237,0.35); border-radius:999px; transform:skewX(-18deg);"></div>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge rounded-pill text-bg-light">訂單自動入帳</span>
+                                        <span class="badge rounded-pill text-bg-light">庫存預警</span>
+                                        <span class="badge rounded-pill text-bg-light">現金流摘要</span>
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-3">
+                                    <div class="ai-erp-panel">
+                                        <div class="small text-muted mb-2">AI 任務</div>
+                                        <div class="fw-semibold text-dark mb-2">自動追單提醒已發送</div>
+                                        <div class="small text-muted">向 18 位客戶發出付款提醒，預計回款 HK$42,000。</div>
+                                    </div>
+                                    <div class="ai-erp-panel">
+                                        <div class="small text-muted mb-2">流程瓶頸</div>
+                                        <div class="fw-semibold text-dark mb-2">採購交期延遲 2.3 日</div>
+                                        <div class="small text-muted">vAI 建議優先調整補貨點與供應商排序。</div>
+                                    </div>
+                                    <div class="ai-erp-panel">
+                                        <div class="small text-muted mb-2">跨部門同步</div>
+                                        <div class="fw-semibold text-dark mb-2">銷售、營運、財務共用同一數據源</div>
+                                        <div class="small text-muted">減少重覆輸入、報表誤差與口頭對數。</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.integration.title">一個系統，連接全部</h4>
-                        <p class="text-muted mb-3" data-i18n="whyVwork.integration.desc">訂單、庫存、會計、客戶、網店、POS、餐飲、物流 — 全部在同一個系統。數據自動串聯，不用再手動對帳。</p>
-                    </div>
-                </div>
-                <!-- AI -->
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100 text-center p-4">
-                        <div class="mb-3">
-                            <img src="/static/vaiicon.png" alt="vAi" style="width: 80px; height: 80px; border-radius: 50%; object-fit: contain; border: 1px solid #dee2e6;">
-                        </div>
-                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.ai.title">vAi 連接, 快速使用</h4>
-                        <p class="text-muted mb-3" data-i18n="whyVwork.ai.desc">不是掛在旁邊的 chatbot。vAi 直接讀取你的訂單、客戶、庫存數據，回答業務問題、生成報表、給出決策建議，更可生成產品影片。</p>
-                        <a href="/?domain=vai" class="btn btn-sm btn-outline-primary mt-auto align-self-center" data-i18n="whyVwork.ai.learnMore">了解更多</a>
-                    </div>
-                </div>
-                <!-- 價格 -->
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100 text-center p-4">
-                        <div class="mb-3">
-                            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: inline-flex; align-items: center; justify-content: center;">
-                                <i class="bi bi-piggy-bank fs-1 text-white"></i>
-                            </div>
-                        </div>
-                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.price.title">同樣功能，價格只要十分之一</h4>
-                        <p class="text-muted mb-3" data-i18n="whyVwork.price.desc">vWork 固定月費，不限用戶數。5 個人用和 50 個人用，價格一樣。其他平台按人頭收費，人越多越貴。</p>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="row g-4 mt-0 justify-content-center">
-                <!-- vOffice -->
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100 text-center p-4">
-                        <div class="mb-3">
-                            <img src="/static/vofficeicon.png" alt="vOffice" style="width: 80px; height: 80px; border-radius: 50%; object-fit: contain;">
+    <section id="ai-erp-modules" class="ai-erp-section">
+        <div class="container-fluid px-3">
+            <div class="ai-erp-section-shell">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+                    <div>
+                        <div class="text-uppercase small text-primary fw-bold mb-2">Core modules</div>
+                        <h2 class="display-6 fw-bold mb-2">由前台營運到後台財務，全部在一個 AI ERP 裡面</h2>
+                        <p class="text-muted mb-0">唔止係功能堆砌，而係將數據流、責任流同決策流整合成同一個作業面。</p>
+                    </div>
+                    <a href="/login?product=vwork" class="btn btn-outline-primary">預約體驗</a>
+                </div>
+                <div class="ai-erp-feature-grid">
+                    <article class="ai-erp-feature">
+                        <div class="ai-erp-feature-icon"><i class="bi bi-diagram-3"></i></div>
+                        <h4 class="fw-bold">營運中台</h4>
+                        <p class="text-muted mb-0">訂單、採購、庫存、物流、客戶資料同步更新，跨部門唔再重覆輸入。</p>
+                    </article>
+                    <article class="ai-erp-feature">
+                        <div class="ai-erp-feature-icon"><i class="bi bi-robot"></i></div>
+                        <h4 class="fw-bold">vAI 決策助手</h4>
+                        <p class="text-muted mb-0">直接理解你的業務數據，生成分析、追蹤異常、輸出報告與內容素材。</p>
+                    </article>
+                    <article class="ai-erp-feature">
+                        <div class="ai-erp-feature-icon"><i class="bi bi-cash-coin"></i></div>
+                        <h4 class="fw-bold">財務自動化</h4>
+                        <p class="text-muted mb-0">收入、成本、應收、付款節奏一體化，管理層即時掌握現金流。</p>
+                    </article>
+                    <article class="ai-erp-feature">
+                        <div class="ai-erp-feature-icon"><i class="bi bi-window-stack"></i></div>
+                        <h4 class="fw-bold">Office workflow</h4>
+                        <p class="text-muted mb-0">透過 vOffice 處理文檔、表格、簡報，同企業數據與流程直接接軌。</p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ai-erp-section">
+        <div class="container-fluid px-3">
+            <div class="ai-erp-section-shell">
+                <div class="row g-4 align-items-center">
+                    <div class="col-lg-5">
+                        <div class="text-uppercase small text-primary fw-bold mb-2">Why teams switch</div>
+                        <h2 class="display-6 fw-bold mb-3">唔再係「再買一個工具」，而係重新設計整間公司點樣運作</h2>
+                        <p class="text-muted">vWork 適合想由傳統流程升級為 AI-first 營運模式嘅企業。從前線開單到老闆睇數，同一條數據鏈路完成。</p>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="ai-erp-proof-grid">
+                            <article class="ai-erp-proof-card">
+                                <div class="ai-erp-proof-icon"><i class="bi bi-lightning"></i></div>
+                                <h5 class="fw-bold">即時決策</h5>
+                                <p class="text-muted mb-0">管理層唔使等月尾報表，日常已經見到收入、缺貨、付款風險同團隊負載。</p>
+                            </article>
+                            <article class="ai-erp-proof-card">
+                                <div class="ai-erp-proof-icon"><i class="bi bi-arrow-repeat"></i></div>
+                                <h5 class="fw-bold">流程串流</h5>
+                                <p class="text-muted mb-0">前線輸入一次，後台自動流轉，將手動抄寫、對單、追數變成系統任務。</p>
+                            </article>
+                            <article class="ai-erp-proof-card">
+                                <div class="ai-erp-proof-icon"><i class="bi bi-shield-check"></i></div>
+                                <h5 class="fw-bold">可控擴張</h5>
+                                <p class="text-muted mb-0">由單店到多部門、多角色權限，都可以用同一平台穩定擴展。</p>
+                            </article>
                         </div>
-                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.voffice.title">vOffice — 免費辦公套件</h4>
-                        <p class="text-muted mb-3" data-i18n="whyVwork.voffice.desc">內建文件、試算表、簡報編輯器，支援 Word / Excel / PowerPoint 格式。團隊可直接在 vWork 內協作，不用額外訂閱其他辦公軟件。</p>
-                        <a href="/?domain=voffice" class="btn btn-sm btn-outline-primary mt-auto align-self-center" data-i18n="whyVwork.voffice.learnMore">了解更多</a>
                     </div>
                 </div>
-                <!-- vMarket -->
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100 text-center p-4">
-                        <div class="mb-3">
-                            <img src="/static/vmarketicon.png" alt="vMarket" style="width: 80px; height: 80px; border-radius: 50%; object-fit: contain;">
-                        </div>
-                        <h4 class="fw-bold mb-3" data-i18n="whyVwork.vmarket.title">vMarket — 商品市集</h4>
-                        <p class="text-muted mb-3" data-i18n="whyVwork.vmarket.desc">將你的產品上架到 vMarket 市集，觸及更多潛在客戶。內建的共享平台讓中小企業也能擁有自己的銷售渠道，零額外成本。</p>
-                        <a href="/?domain=vmarket" class="btn btn-sm btn-outline-primary mt-auto align-self-center" data-i18n="whyVwork.vmarket.learnMore">了解更多</a>
-                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ai-erp-section">
+        <div class="container-fluid px-3">
+            <div class="ai-erp-section-shell">
+                <div class="text-center mb-4">
+                    <div class="text-uppercase small text-primary fw-bold mb-2">Implementation path</div>
+                    <h2 class="display-6 fw-bold mb-2">由舊系統搬到 AI ERP，唔需要一次過推倒重來</h2>
+                    <p class="text-muted mb-0">我哋建議用三步走方式，先見成效，再逐層擴展。</p>
+                </div>
+                <div class="ai-erp-step-grid">
+                    <article class="ai-erp-step">
+                        <div class="ai-erp-step-icon"><i class="bi bi-1-circle-fill"></i></div>
+                        <h5 class="fw-bold">先接前線營運</h5>
+                        <p class="text-muted mb-0">從訂單、CRM、庫存或 POS 開始，先將最影響收入與效率嘅流程統一起來。</p>
+                    </article>
+                    <article class="ai-erp-step">
+                        <div class="ai-erp-step-icon"><i class="bi bi-2-circle-fill"></i></div>
+                        <h5 class="fw-bold">再接財務與審批</h5>
+                        <p class="text-muted mb-0">將應收、成本、報銷、採購、報表拉入同一數據層，管理層即時可見。</p>
+                    </article>
+                    <article class="ai-erp-step">
+                        <div class="ai-erp-step-icon"><i class="bi bi-3-circle-fill"></i></div>
+                        <h5 class="fw-bold">最後打開 vAI 自動化</h5>
+                        <p class="text-muted mb-0">自動摘要、內容生成、異常提示、跟進提醒與分析建議，讓團隊跑得更快。</p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="ai-erp-section">
+        <div class="container-fluid px-3">
+            <div class="ai-erp-section-shell">
+                <div class="text-center mb-4">
+                    <div class="text-uppercase small text-primary fw-bold mb-2">Pricing</div>
+                    <h2 class="display-6 fw-bold mb-2">由免費試用開始，按企業成熟度逐步升級</h2>
+                    <p class="text-muted mb-0">將核心營運系統、AI 助手與辦公協作整合，成本比傳統多工具堆疊更可控。</p>
+                </div>
+                <div class="ai-erp-pricing-grid">
+                    <article class="ai-erp-pricing-card">
+                        <div class="badge text-bg-light border mb-3">Starter</div>
+                        <h4 class="fw-bold">免費試用</h4>
+                        <div class="ai-erp-price my-3">$0</div>
+                        <ul class="ai-erp-list mb-4">
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>快速建立公司與團隊資料</span></li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>體驗核心 ERP 流程與基本 AI 問答</span></li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>適合評估流程、試行導入</span></li>
+                        </ul>
+                        <a href="/login?product=vwork" class="btn btn-outline-primary w-100">立即開始</a>
+                    </article>
+                    <article class="ai-erp-pricing-card is-featured">
+                        <div class="badge text-bg-primary mb-3">Recommended</div>
+                        <h4 class="fw-bold">vSuite Pro</h4>
+                        <div class="ai-erp-price my-3">HK$1,500<span class="fs-6 text-muted">/月起</span></div>
+                        <ul class="ai-erp-list mb-4">
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>完整 ERP + POS + CRM + 財務工作流</span></li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>vAI 報表、助理與日常自動化</span></li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>適合已經正式營運、想提升效率的公司</span></li>
+                        </ul>
+                        <a href="/login?product=vwork" class="btn btn-primary w-100">查看方案</a>
+                    </article>
+                    <article class="ai-erp-pricing-card">
+                        <div class="badge text-bg-dark mb-3">Enterprise</div>
+                        <h4 class="fw-bold">Custom rollout</h4>
+                        <div class="ai-erp-price my-3">按需報價</div>
+                        <ul class="ai-erp-list mb-4">
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>流程重整、系統整合、權限與部署規劃</span></li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>深度客製模組與 AI 自動化場景</span></li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i><span>適合跨部門、跨品牌或高複雜營運</span></li>
+                        </ul>
+                        <a href="/contact" class="btn btn-outline-dark w-100">聯絡我們</a>
+                    </article>
                 </div>
             </div>
         </div>
@@ -752,8 +758,8 @@
         </div>
     </section>
 
-    <!-- 全能商業 vAi 助手 -->
-    <section id="ai-assistant" class="py-5 position-relative" style="background: #F5F5F8; overflow: hidden;">
+    <!-- Legacy sections hidden during redesign -->
+    <section id="ai-assistant" class="py-5 position-relative d-none" style="background: #F5F5F8; overflow: hidden;">
         <div class="container-fluid px-3 position-relative">
             <div class="text-center mb-5">
                 <h2 class="display-5 fw-bold mb-3" style="color: #1e293b;">
@@ -1170,8 +1176,8 @@
         </div>
     </section>
 
-    <!-- 定價 -->
-    <section id="pricing" class="py-5">
+    <!-- Legacy pricing hidden during redesign -->
+    <section id="pricing-legacy" class="py-5 d-none">
         <div class="container-fluid px-3">
             <div class="text-center mb-5">
                 <h2 class="display-5 fw-bold" data-i18n="pricing.title">定價方案</h2>
@@ -1571,7 +1577,6 @@
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="#" class="text-muted text-decoration-none" data-i18n="footer.productList.vai" id="footerProductVAI">vAI</a></li>
                         <li class="mb-2"><a href="/" class="text-muted text-decoration-none" data-i18n="footer.productList.vwork" id="footerProductVWork">vWork</a></li>
-                        <li class="mb-2"><a href="/vmarket" class="text-muted text-decoration-none" data-i18n="footer.productList.vmarket" id="footerProductVMarket">vMarket</a></li>
                         <li class="mb-2"><a href="https://voffice.vsysai.com" class="text-muted text-decoration-none" data-i18n="footer.productList.voffice" id="footerProductVOffice">vOffice</a></li>
                     </ul>
                 </div>
@@ -2328,7 +2333,7 @@
             window.addEventListener('scroll', handlePromoScroll, { passive: true });
         })();
     </script>
-    <!-- Hero Banner Carousel - 10 秒自動切換 -->
+    <!-- Hero Banner Carousel - legacy guard -->
     <script>
         (function() {
             var carousel = document.getElementById('heroCarousel');
@@ -2336,6 +2341,7 @@
 
             var slides = carousel.querySelectorAll('.hero-slide');
             var dots   = carousel.querySelectorAll('.hero-dot');
+            if (!slides.length || !dots.length) return;
             var total  = slides.length;
             var current = 0;
             var interval = 10000;

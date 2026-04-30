@@ -40,6 +40,267 @@ body {
     font-weight: var(--font-weight-normal);
 }
 
+/* Global vMarket / app-switcher shutdown for redesign phase */
+#mobileAppSwitcher,
+.app-switcher-trigger,
+.app-switcher-panel,
+[data-app="vmarket"],
+#footerProductVMarket,
+#productCardVmarket,
+#vmarketBrandLink,
+#vmarketJoinBtn,
+#vmarketSidebarJoinLink,
+#vmarketSidebarJoinIcon,
+#vmarketSidebarJoinText {
+    display: none !important;
+}
+
+.home-page-redesign {
+    background:
+        radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 28%),
+        radial-gradient(circle at top right, rgba(139, 92, 246, 0.14), transparent 32%),
+        linear-gradient(180deg, #f8fbff 0%, #ffffff 22%, #f7f7ff 100%);
+}
+
+.home-page-redesign .navbar {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.ai-erp-hero {
+    padding: 8.5rem 0 4rem;
+}
+
+.ai-erp-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(99, 102, 241, 0.16);
+    color: #4338ca;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.ai-erp-headline {
+    font-size: clamp(2.75rem, 5vw, 5rem);
+    line-height: 1.02;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.03em;
+}
+
+.ai-erp-gradient {
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 52%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.ai-erp-subtitle {
+    max-width: 44rem;
+    font-size: 1.1rem;
+    color: #475569;
+}
+
+.ai-erp-hero-card,
+.ai-erp-panel,
+.ai-erp-metric,
+.ai-erp-feature,
+.ai-erp-step,
+.ai-erp-pricing-card,
+.ai-erp-proof-card,
+.ai-erp-section-shell {
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.08);
+    backdrop-filter: blur(14px);
+}
+
+.ai-erp-hero-card {
+    border-radius: 28px;
+    padding: 1.25rem;
+}
+
+.ai-erp-dashboard {
+    border-radius: 22px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+    color: #e2e8f0;
+}
+
+.ai-erp-dashboard-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.ai-erp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: rgba(59, 130, 246, 0.14);
+    color: #bfdbfe;
+}
+
+.ai-erp-dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 0.9fr;
+    gap: 1rem;
+    padding: 1.25rem;
+}
+
+.ai-erp-panel {
+    border-radius: 22px;
+    padding: 1.1rem;
+}
+
+.ai-erp-metric-grid,
+.ai-erp-feature-grid,
+.ai-erp-proof-grid,
+.ai-erp-step-grid,
+.ai-erp-pricing-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.ai-erp-metric-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ai-erp-metric {
+    border-radius: 20px;
+    padding: 1rem;
+}
+
+.ai-erp-metric strong {
+    display: block;
+    font-size: 1.7rem;
+    color: #0f172a;
+}
+
+.ai-erp-section {
+    padding: 1.6rem 0;
+}
+
+.ai-erp-section-shell {
+    border-radius: 30px;
+    padding: 1.4rem;
+}
+
+.ai-erp-feature-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ai-erp-feature,
+.ai-erp-proof-card,
+.ai-erp-step,
+.ai-erp-pricing-card {
+    border-radius: 24px;
+    padding: 1.4rem;
+    height: 100%;
+}
+
+.ai-erp-feature-icon,
+.ai-erp-proof-icon,
+.ai-erp-step-icon {
+    width: 52px;
+    height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    color: #fff;
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+}
+
+.ai-erp-proof-grid,
+.ai-erp-step-grid,
+.ai-erp-pricing-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ai-erp-pricing-card.is-featured {
+    background: linear-gradient(180deg, rgba(37, 99, 235, 0.06) 0%, rgba(124, 58, 237, 0.09) 100%);
+    border-color: rgba(99, 102, 241, 0.28);
+}
+
+.ai-erp-price {
+    font-size: 2.4rem;
+    line-height: 1;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.ai-erp-list {
+    padding-left: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.ai-erp-list li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    color: #334155;
+    margin-bottom: 0.7rem;
+}
+
+.ai-erp-cta-band {
+    border-radius: 30px;
+    padding: 2rem;
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 48%, #7c3aed 100%);
+    color: #fff;
+    box-shadow: 0 30px 80px rgba(29, 78, 216, 0.28);
+}
+
+@media (max-width: 1199px) {
+    .ai-erp-feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ai-erp-proof-grid,
+    .ai-erp-step-grid,
+    .ai-erp-pricing-grid,
+    .ai-erp-metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ai-erp-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .ai-erp-hero {
+        padding-top: 7rem;
+    }
+
+    .ai-erp-feature-grid,
+    .ai-erp-proof-grid,
+    .ai-erp-step-grid,
+    .ai-erp-pricing-grid,
+    .ai-erp-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ai-erp-cta-band {
+        padding: 1.5rem;
+    }
+}
+
 .min-vh-100 {
     min-height: 100vh;
 }

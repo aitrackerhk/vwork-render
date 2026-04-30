@@ -7,7 +7,6 @@ const PRODUCT_REDIRECT_URLS = {
     vwork:   'https://www.vworkai.com/dashboard',
     vai:     'https://vai.vsysai.com/vai-chat',
     voffice: 'https://voffice.vsysai.com/voffice-download',
-    vmarket: 'https://www.vmarketai.com/vmarket-search',
 };
 
 // Maps each known domain to the product it belongs to, plus the
@@ -19,8 +18,6 @@ const DOMAIN_PRODUCT_MAP = {
     'vworkai.com':        { product: 'vwork',   path: '/dashboard' },
     'vai.vsysai.com':     { product: 'vai',     path: '/vai-chat' },
     'voffice.vsysai.com': { product: 'voffice', path: '/voffice-download' },
-    'www.vmarketai.com':  { product: 'vmarket', path: '/vmarket-search' },
-    'vmarketai.com':      { product: 'vmarket', path: '/vmarket-search' },
 };
 
 /**
@@ -58,7 +55,6 @@ function getProductRedirectUrl() {
             'vwork':   '/dashboard',
             'vai':     '/vai-chat',
             'voffice': '/voffice-download',
-            'vmarket': '/vmarket-search',
         };
         return localPaths[product] || '/dashboard';
     }
@@ -219,7 +215,6 @@ const App = {
             var path = window.location.pathname;
             // Help pages → stay on respective help section
             if (path.startsWith('/help/vwork')) return '/help/vwork';
-            if (path.startsWith('/help/vmarket')) return '/help/vmarket';
             if (path.startsWith('/help/voffice')) return '/help/voffice';
             if (path.startsWith('/help')) return '/help';
             if (path.startsWith('/contact')) return '/contact';
@@ -233,10 +228,6 @@ const App = {
             // vai
             if (domain === 'vai' || hostname.includes('vai.')) {
                 return isLocal ? '/?domain=vai' : '/';
-            }
-            // vmarket
-            if (domain === 'vmarket' || hostname.includes('vmarket')) {
-                return isLocal ? '/?domain=vmarket' : '/';
             }
             // voffice
             if (domain === 'voffice' || hostname.includes('voffice.')) {
