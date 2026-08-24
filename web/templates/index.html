@@ -10,7 +10,7 @@
     <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
     <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/css/custom.css?v=20260825a">
+    <link rel="stylesheet" href="/static/css/custom.css?v=20260825c">
     <!-- i18n 防闪烁样式 -->
     <style>
         /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
@@ -384,7 +384,7 @@
         <div class="container-fluid px-3">
             <div class="row align-items-center g-4">
                 <div class="col-lg-6">
-                    <span class="ai-erp-eyebrow"><i class="bi bi-stars"></i> AI ERP for modern teams</span>
+                    <span class="ai-erp-eyebrow">AI ERP for modern teams</span>
                     <h1 class="ai-erp-headline mt-3 mb-3">一個 <span class="ai-erp-gradient">AI ERP 作業系統</span>，接管你的訂單、團隊、財務與決策。</h1>
                     <p class="ai-erp-subtitle mb-4">vWork 將 ERP、POS、CRM、會計、流程自動化與 vAI 決策助手整合成同一個營運中台。唔再用 Excel 補洞，亦唔需要喺 6 個 SaaS 之間跳來跳去。</p>
                     <div class="d-flex flex-wrap gap-3 mb-4">
@@ -393,67 +393,66 @@
                     </div>
                     <div class="ai-erp-metric-grid">
                         <div class="ai-erp-metric">
-                            <small class="text-uppercase text-muted">數據視野</small>
+                            <small class="text-uppercase">數據視野</small>
                             <strong>即時</strong>
-                            <span class="text-muted">訂單、收入、庫存同步</span>
+                            <span>訂單、收入、庫存同步</span>
                         </div>
                         <div class="ai-erp-metric">
-                            <small class="text-uppercase text-muted">部署方式</small>
+                            <small class="text-uppercase">部署方式</small>
                             <strong>7 日</strong>
-                            <span class="text-muted">由零到上線的標準節奏</span>
+                            <span>由零到上線的標準節奏</span>
                         </div>
                         <div class="ai-erp-metric">
-                            <small class="text-uppercase text-muted">AI 執行</small>
+                            <small class="text-uppercase">AI 執行</small>
                             <strong>自動化</strong>
-                            <span class="text-muted">報表、提醒、內容、分析</span>
+                            <span>報表、提醒、內容、分析</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="ai-erp-hero-card">
-                        <div class="ai-erp-dashboard">
-                            <div class="ai-erp-dashboard-top">
-                                <div>
-                                    <div class="text-white fw-bold">vWork Command Center</div>
-                                    <div class="small text-white-50">AI-powered ERP cockpit</div>
-                                </div>
-                                <span class="ai-erp-chip"><i class="bi bi-lightning-charge-fill"></i> vAI online</span>
+                        <div class="ai-erp-window">
+                            <div class="ai-erp-window-bar">
+                                <span class="ai-erp-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                                <span class="small">今日營運 · Command Center</span>
+                                <span class="ai-erp-chip">vAI 在線</span>
                             </div>
                             <div class="ai-erp-dashboard-grid">
-                                <div class="ai-erp-panel">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div>
-                                            <div class="small text-muted">今日營收預測</div>
-                                            <div class="fs-3 fw-bold text-dark">HK$128,400</div>
-                                        </div>
-                                        <span class="badge text-bg-success">+18%</span>
+                                <div class="ai-erp-stat">
+                                    <div class="ai-erp-stat-label">今日營收預測</div>
+                                    <div class="ai-erp-stat-value">
+                                        <strong>HK$128,400</strong>
+                                        <span class="ai-erp-delta">+18%</span>
                                     </div>
-                                    <div class="mb-3" style="height: 168px; border-radius: 18px; background: linear-gradient(180deg, rgba(37,99,235,0.12) 0%, rgba(124,58,237,0.05) 100%); position: relative; overflow: hidden;">
-                                        <div style="position:absolute; inset:auto 8% 18% 8%; height:3px; background:linear-gradient(90deg,#2563eb,#7c3aed,#06b6d4); border-radius:999px; transform:skewX(-18deg);"></div>
-                                        <div style="position:absolute; inset:auto 16% 34% 18%; height:3px; background:rgba(37,99,235,0.35); border-radius:999px; transform:skewX(-18deg);"></div>
-                                        <div style="position:absolute; inset:auto 26% 52% 28%; height:3px; background:rgba(124,58,237,0.35); border-radius:999px; transform:skewX(-18deg);"></div>
-                                    </div>
-                                    <div class="d-flex flex-wrap gap-2">
-                                        <span class="badge rounded-pill text-bg-light">訂單自動入帳</span>
-                                        <span class="badge rounded-pill text-bg-light">庫存預測</span>
-                                        <span class="badge rounded-pill text-bg-light">現金流摘要</span>
+                                    <svg class="ai-erp-spark" viewBox="0 0 360 128" preserveAspectRatio="none" aria-hidden="true">
+                                        <defs>
+                                            <linearGradient id="revFillHero" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stop-color="#5b8cff" stop-opacity="0.42"/>
+                                                <stop offset="100%" stop-color="#5b8cff" stop-opacity="0"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26 L360,128 L0,128 Z" fill="url(#revFillHero)"/>
+                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26" fill="none" stroke="#8fb0ff" stroke-width="2.4" stroke-linejoin="round"/>
+                                    </svg>
+                                    <div class="ai-erp-pills">
+                                        <span>訂單自動入帳</span>
+                                        <span>庫存預測</span>
+                                        <span>現金流摘要</span>
                                     </div>
                                 </div>
-                                <div class="d-grid gap-3">
-                                    <div class="ai-erp-panel">
-                                        <div class="small text-muted mb-2">AI 任務</div>
-                                        <div class="fw-semibold text-dark mb-2">自動追單提醒已發送</div>
-                                        <div class="small text-muted">向 18 位客戶發出付款提醒，預計回款 HK$42,000。</div>
+                                <div class="ai-erp-feed">
+                                    <div class="ai-erp-feed-kicker mb-2">AI 任務</div>
+                                    <div class="ai-erp-feed-item">
+                                        <b>自動追單提醒已發送</b>
+                                        <span>向 18 位客戶發出付款提醒，預計回款 HK$42,000。</span>
                                     </div>
-                                    <div class="ai-erp-panel">
-                                        <div class="small text-muted mb-2">流程瓶頸</div>
-                                        <div class="fw-semibold text-dark mb-2">採購交期延遲 2.3 日</div>
-                                        <div class="small text-muted">vAI 建議優先調整補貨點與供應商排序。</div>
+                                    <div class="ai-erp-feed-item">
+                                        <b>採購交期延遲 2.3 日</b>
+                                        <span>vAI 建議優先調整補貨點與供應商排序。</span>
                                     </div>
-                                    <div class="ai-erp-panel">
-                                        <div class="small text-muted mb-2">跨部門同步</div>
-                                        <div class="fw-semibold text-dark mb-2">銷售、營運、財務共用同一數據源</div>
-                                        <div class="small text-muted">減少重覆輸入、報表誤差與口頭對數。</div>
+                                    <div class="ai-erp-feed-item">
+                                        <b>銷售、營運、財務共用數據源</b>
+                                        <span>減少重覆輸入、報表誤差與口頭對數。</span>
                                     </div>
                                 </div>
                             </div>
@@ -544,17 +543,17 @@
                 </div>
                 <div class="ai-erp-step-grid">
                     <article class="ai-erp-step">
-                        <div class="ai-erp-step-icon"><i class="bi bi-1-circle-fill"></i></div>
+                        <div class="ai-erp-step-icon">01</div>
                         <h5 class="fw-bold">先接前線營運</h5>
                         <p class="text-muted mb-0">從訂單、CRM、庫存或 POS 開始，先將最影響收入與效率嘅流程統一起來。</p>
                     </article>
                     <article class="ai-erp-step">
-                        <div class="ai-erp-step-icon"><i class="bi bi-2-circle-fill"></i></div>
+                        <div class="ai-erp-step-icon">02</div>
                         <h5 class="fw-bold">再接財務與審批</h5>
                         <p class="text-muted mb-0">將應收、成本、報銷、採購、報表拉入同一數據層，管理層即時可見。</p>
                     </article>
                     <article class="ai-erp-step">
-                        <div class="ai-erp-step-icon"><i class="bi bi-3-circle-fill"></i></div>
+                        <div class="ai-erp-step-icon">03</div>
                         <h5 class="fw-bold">最後打開 vAI 自動化</h5>
                         <p class="text-muted mb-0">自動摘要、內容生成、異常提示、跟進提醒與分析建議，讓團隊跑得更快。</p>
                     </article>
