@@ -10,7 +10,7 @@
     <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
     <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/css/custom.css?v=20260825c">
+    <link rel="stylesheet" href="/static/css/custom.css?v=20260825d">
     <!-- i18n 防闪烁样式 -->
     <style>
         /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
@@ -387,11 +387,11 @@
                     <span class="ai-erp-eyebrow">AI ERP for modern teams</span>
                     <h1 class="ai-erp-headline mt-3 mb-3">一個 <span class="ai-erp-gradient">AI ERP 作業系統</span>，接管你的訂單、團隊、財務與決策。</h1>
                     <p class="ai-erp-subtitle mb-4">vWork 將 ERP、POS、CRM、會計、流程自動化與 vAI 決策助手整合成同一個營運中台。唔再用 Excel 補洞，亦唔需要喺 6 個 SaaS 之間跳來跳去。</p>
-                    <div class="d-flex flex-wrap gap-3 mb-4">
+                    <div class="d-flex flex-wrap gap-3 mb-4 mb-lg-5">
                         <a href="/login?product=vwork" class="btn btn-primary btn-lg px-4">立即免費試用</a>
                         <a href="#ai-erp-modules" class="btn btn-outline-dark btn-lg px-4">查看核心模組</a>
                     </div>
-                    <div class="ai-erp-metric-grid">
+                    <div class="ai-erp-metric-grid ai-erp-metric-grid-desktop">
                         <div class="ai-erp-metric">
                             <small class="text-uppercase">數據視野</small>
                             <strong>即時</strong>
@@ -413,8 +413,7 @@
                     <div class="ai-erp-hero-card">
                         <div class="ai-erp-window">
                             <div class="ai-erp-window-bar">
-                                <span class="ai-erp-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                                <span class="small">今日營運 · Command Center</span>
+                                <span class="small">今日營運</span>
                                 <span class="ai-erp-chip">vAI 在線</span>
                             </div>
                             <div class="ai-erp-dashboard-grid">
@@ -425,14 +424,8 @@
                                         <span class="ai-erp-delta">+18%</span>
                                     </div>
                                     <svg class="ai-erp-spark" viewBox="0 0 360 128" preserveAspectRatio="none" aria-hidden="true">
-                                        <defs>
-                                            <linearGradient id="revFillHero" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stop-color="#5b8cff" stop-opacity="0.42"/>
-                                                <stop offset="100%" stop-color="#5b8cff" stop-opacity="0"/>
-                                            </linearGradient>
-                                        </defs>
-                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26 L360,128 L0,128 Z" fill="url(#revFillHero)"/>
-                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26" fill="none" stroke="#8fb0ff" stroke-width="2.4" stroke-linejoin="round"/>
+                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26 L360,128 L0,128 Z" fill="rgba(255,255,255,0.08)"/>
+                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26" fill="none" stroke="#cfcfcf" stroke-width="2.2" stroke-linejoin="round"/>
                                     </svg>
                                     <div class="ai-erp-pills">
                                         <span>訂單自動入帳</span>
@@ -456,6 +449,25 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 ai-erp-metric-wrap-mobile">
+                    <div class="ai-erp-metric-grid">
+                        <div class="ai-erp-metric">
+                            <small class="text-uppercase">數據視野</small>
+                            <strong>即時</strong>
+                            <span>訂單、收入、庫存同步</span>
+                        </div>
+                        <div class="ai-erp-metric">
+                            <small class="text-uppercase">部署方式</small>
+                            <strong>7 日</strong>
+                            <span>由零到上線的標準節奏</span>
+                        </div>
+                        <div class="ai-erp-metric">
+                            <small class="text-uppercase">AI 執行</small>
+                            <strong>自動化</strong>
+                            <span>報表、提醒、內容、分析</span>
                         </div>
                     </div>
                 </div>
@@ -866,7 +878,7 @@
     </section>
 
     <!-- vBuilder 和 Kiosk Mode POS 介紹 - 雙欄佈局 -->
-    <section id="tools" class="py-5 tools-section" style="background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+    <section id="tools" class="py-5 tools-section">
         <div class="container-fluid px-3">
             <div class="text-center mb-5">
                 <h2 class="display-5 fw-bold" data-i18n="tools.title">強大工具</h2>
@@ -879,12 +891,12 @@
                     <h4 class="fw-bold mb-2" data-i18n="tools.kiosk.title">Kiosk Mode POS 自助收銀系統</h4>
                     <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.kiosk.desc_short">專為零售門店設計的自助收銀模式，簡潔直觀的界面，支持多種付款方式，提升結帳效率。</p>
                     <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
-                        <span class="badge bg-success" data-i18n="tools.kiosk.features.0">簡潔界面</span>
-                        <span class="badge bg-success" data-i18n="tools.kiosk.features.1">快速結帳</span>
-                        <span class="badge bg-success" data-i18n="tools.kiosk.features.2">多種付款</span>
-                        <span class="badge bg-success" data-i18n="tools.kiosk.features.3">自助服務</span>
+                        <span class="badge" data-i18n="tools.kiosk.features.0">簡潔界面</span>
+                        <span class="badge" data-i18n="tools.kiosk.features.1">快速結帳</span>
+                        <span class="badge" data-i18n="tools.kiosk.features.2">多種付款</span>
+                        <span class="badge" data-i18n="tools.kiosk.features.3">自助服務</span>
                     </div>
-                    <a href="/login?product=vwork" class="btn btn-success px-4 py-2" data-i18n="tools.kiosk.cta">立即體驗</a>
+                    <a href="/login?product=vwork" class="btn btn-dark px-4 py-2" data-i18n="tools.kiosk.cta">立即體驗</a>
                 </div>
                 <!-- 自動搵客系統 -->
                 <div class="col-md-4 text-center">
@@ -892,12 +904,12 @@
                     <h4 class="fw-bold mb-2" data-i18n="tools.leadFinder.title">自動搵客系統</h4>
                     <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.leadFinder.desc_short">AI 自動搜尋潛在客戶，智能分析匹配度，自動發送個性化外展訊息，讓商機主動找上門。</p>
                     <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
-                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.0">AI 搵客</span>
-                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.1">自動外展</span>
-                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.2">智能匹配</span>
-                        <span class="badge bg-warning text-dark" data-i18n="tools.leadFinder.features.3">定時發送</span>
+                        <span class="badge" data-i18n="tools.leadFinder.features.0">AI 搵客</span>
+                        <span class="badge" data-i18n="tools.leadFinder.features.1">自動外展</span>
+                        <span class="badge" data-i18n="tools.leadFinder.features.2">智能匹配</span>
+                        <span class="badge" data-i18n="tools.leadFinder.features.3">定時發送</span>
                     </div>
-                    <a href="/login?product=vwork" class="btn btn-warning px-4 py-2" data-i18n="tools.leadFinder.cta">立即體驗</a>
+                    <a href="/login?product=vwork" class="btn btn-dark px-4 py-2" data-i18n="tools.leadFinder.cta">立即體驗</a>
                 </div>
                 <!-- 可視化建站工具 -->
                 <div class="col-md-4 text-center">
@@ -905,12 +917,12 @@
                     <h4 class="fw-bold mb-2" data-i18n="tools.vbuilder.title">可視化建站工具</h4>
                     <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.vbuilder.desc_short">無需編程知識，拖拽式操作創建專業網站。豐富模板、實時預覽，所見即所得。</p>
                     <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
-                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.0">拖拽式編輯</span>
-                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.1">豐富模板</span>
-                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.2">實時預覽</span>
-                        <span class="badge bg-primary" data-i18n="tools.vbuilder.features.3">響應式設計</span>
+                        <span class="badge" data-i18n="tools.vbuilder.features.0">拖拽式編輯</span>
+                        <span class="badge" data-i18n="tools.vbuilder.features.1">豐富模板</span>
+                        <span class="badge" data-i18n="tools.vbuilder.features.2">實時預覽</span>
+                        <span class="badge" data-i18n="tools.vbuilder.features.3">響應式設計</span>
                     </div>
-                    <a href="/login?product=vwork" class="btn btn-primary px-4 py-2" data-i18n="tools.vbuilder.cta">立即體驗</a>
+                    <a href="/login?product=vwork" class="btn btn-dark px-4 py-2" data-i18n="tools.vbuilder.cta">立即體驗</a>
                 </div>
             </div>
         </div>
@@ -929,7 +941,7 @@
                         <div class="card use-case-card border-0 shadow-sm h-100">
                             <div class="card-body p-4">
                                 <div class="mb-3">
-                                    <i class="bi bi-cup-hot fs-1 text-success"></i>
+                                    <i class="bi bi-cup-hot fs-1"></i>
                                 </div>
                                 <h4 class="fw-bold mb-2" data-i18n="useCases.0.title">餐飲</h4>
                                 <p class="text-muted mb-3" data-i18n="useCases.0.desc">三大外賣平台訂單自動匯入 + POS 收銀 + 餐桌管理 + 排隊叫號 + 庫存扣減，一個後台全搞定</p>
@@ -941,7 +953,7 @@
                         <div class="card use-case-card border-0 shadow-sm h-100">
                             <div class="card-body p-4">
                                 <div class="mb-3">
-                                    <i class="bi bi-bag fs-1 text-primary"></i>
+                                    <i class="bi bi-bag fs-1"></i>
                                 </div>
                                 <h4 class="fw-bold mb-2" data-i18n="useCases.1.title">零售</h4>
                                 <p class="text-muted mb-3" data-i18n="useCases.1.desc">POS + 網店 + 庫存實時同步 + 會員積分 + 會計自動入帳，線上線下完全打通</p>
@@ -953,7 +965,7 @@
                         <div class="card use-case-card border-0 shadow-sm h-100">
                             <div class="card-body p-4">
                                 <div class="mb-3">
-                                    <i class="bi bi-cart3 fs-1 text-primary"></i>
+                                    <i class="bi bi-cart3 fs-1"></i>
                                 </div>
                                 <h4 class="fw-bold mb-2" data-i18n="useCases.2.title">電商</h4>
                                 <p class="text-muted mb-3" data-i18n="useCases.2.desc">網店 + 訂單 + SF Express/Lalamove 物流串接 + 庫存 + 會計，一個系統全包，省掉 3-4 個訂閱</p>
@@ -965,7 +977,7 @@
                         <div class="card use-case-card border-0 shadow-sm h-100">
                             <div class="card-body p-4">
                                 <div class="mb-3">
-                                    <i class="bi bi-scissors fs-1 text-info"></i>
+                                    <i class="bi bi-scissors fs-1"></i>
                                 </div>
                                 <h4 class="fw-bold mb-2" data-i18n="useCases.3.title">服務業</h4>
                                 <p class="text-muted mb-3" data-i18n="useCases.3.desc">服務單 + 客戶管理 + 預約排程 + 員工排班 + WhatsApp 通知，客戶歷史一目了然</p>
@@ -977,7 +989,7 @@
                         <div class="card use-case-card border-0 shadow-sm h-100">
                             <div class="card-body p-4">
                                 <div class="mb-3">
-                                    <i class="bi bi-building fs-1 text-warning"></i>
+                                    <i class="bi bi-building fs-1"></i>
                                 </div>
                                 <h4 class="fw-bold mb-2" data-i18n="useCases.4.title">批發/製造</h4>
                                 <p class="text-muted mb-3" data-i18n="useCases.4.desc">採購單 + 庫存管理 + 訂單 + 出貨 + 會計，供應鏈全流程數據自動串聯</p>
@@ -989,7 +1001,7 @@
                         <div class="card use-case-card border-0 shadow-sm h-100">
                             <div class="card-body p-4">
                                 <div class="mb-3">
-                                    <i class="bi bi-briefcase fs-1 text-secondary"></i>
+                                    <i class="bi bi-briefcase fs-1"></i>
                                 </div>
                                 <h4 class="fw-bold mb-2" data-i18n="useCases.5.title">中小企業</h4>
                                 <p class="text-muted mb-3" data-i18n="useCases.5.desc">免費即可開始用，$250/月享受全功能。AI 助手幫你做分析、寫報表、管數據，等於多請了一個員工</p>
@@ -1053,7 +1065,7 @@
     </section>
 
     <!-- 整合場景展示 -->
-    <section class="py-5 position-relative" style="background: #F5F5F8; overflow: hidden;">
+    <section class="py-5 position-relative scenarios-section">
         <div class="container-fluid px-3 position-relative">
             <div class="text-center mb-5">
                 <h2 class="display-5 fw-bold">
@@ -1065,11 +1077,9 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="card border-0 shadow-sm h-100 p-3">
                         <div class="card-body">
-                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
                             <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.0.pain">以前</h6>
                             <p class="small text-muted mb-3" data-i18n="scenarios.items.0.painDesc">Excel 記庫存、另一個系統開單、再手動輸入會計軟件。每天花 2 小時對數。</p>
-                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
-                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.0.solution">用 vWork</h6>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.0.solution">用 vWork</h6>
                             <p class="small mb-0" data-i18n="scenarios.items.0.solutionDesc">開單 → 庫存自動扣 → 會計自動入帳。零手動，零出錯。</p>
                         </div>
                     </div>
@@ -1077,11 +1087,9 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="card border-0 shadow-sm h-100 p-3">
                         <div class="card-body">
-                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
                             <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.1.pain">以前</h6>
                             <p class="small text-muted mb-3" data-i18n="scenarios.items.1.painDesc">Foodpanda、Keeta、Deliveroo 三個平台三部 iPad，忙的時候漏單、出錯。</p>
-                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
-                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.1.solution">用 vWork</h6>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.1.solution">用 vWork</h6>
                             <p class="small mb-0" data-i18n="scenarios.items.1.solutionDesc">三個平台的訂單自動匯入同一個後台。一個畫面看全部，自動接單。</p>
                         </div>
                     </div>
@@ -1089,11 +1097,9 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="card border-0 shadow-sm h-100 p-3">
                         <div class="card-body">
-                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
                             <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.2.pain">以前</h6>
                             <p class="small text-muted mb-3" data-i18n="scenarios.items.2.painDesc">月底要出報表，從 3 個系統導出數據，再用 Excel 合併。老闆問業績只能說「等一下」。</p>
-                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
-                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.2.solution">用 vWork</h6>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.2.solution">用 vWork</h6>
                             <p class="small mb-0" data-i18n="scenarios.items.2.solutionDesc">直接問 vAi：「上個月營收多少？」3 秒出答案。AI 連接所有數據，隨問隨答。</p>
                         </div>
                     </div>
@@ -1101,11 +1107,9 @@
                 <div class="col-md-6 col-lg-3">
                     <div class="card border-0 shadow-sm h-100 p-3">
                         <div class="card-body">
-                            <div class="mb-2"><i class="bi bi-exclamation-triangle text-danger fs-4"></i></div>
                             <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.3.pain">以前</h6>
                             <p class="small text-muted mb-3" data-i18n="scenarios.items.3.painDesc">用 Excel 排班、手動計薪、逐個算加班費。每月出糧日通宵趕工，還經常算錯被員工投訴。</p>
-                            <div class="mb-2"><i class="bi bi-check-circle text-success fs-4"></i></div>
-                            <h6 class="fw-bold mb-2" style="color: #059669;" data-i18n="scenarios.items.3.solution">用 vWork</h6>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.3.solution">用 vWork</h6>
                             <p class="small mb-0" data-i18n="scenarios.items.3.solutionDesc">自動排班、打卡紀錄自動計薪、加班補水一鍵算好。出糧日一鍵匯出，零錯誤零加班。</p>
                         </div>
                     </div>
