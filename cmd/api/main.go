@@ -1129,41 +1129,6 @@ func main() {
 			"Path":          c.Path(),
 		})
 	}
-	renderHelpVMarket := func(c *fiber.Ctx) error {
-		return c.Render("pages/help_vmarket", fiber.Map{
-			"Title":         "支援中心 - vMarket",
-			"CompanyName":   cfg.CompanyName,
-			"Product":       "vmarket",
-			"Category":      "",
-			"CategoryTitle": "",
-			"Path":          c.Path(),
-		})
-	}
-	renderHelpVMarketCategory := func(c *fiber.Ctx) error {
-		category := c.Params("category")
-		categoryTitles := map[string]string{
-			"getting-started": "快速入門",
-			"browse":          "瀏覽市集",
-			"search":          "搜尋功能",
-			"map":             "地圖功能",
-			"join":            "加入 vMarket",
-			"manage":          "管理上架內容",
-			"account":         "帳戶與訂閱",
-			"faq":             "常見問題",
-		}
-		categoryTitle := categoryTitles[category]
-		if categoryTitle == "" {
-			categoryTitle = category
-		}
-		return c.Render("pages/help_vmarket", fiber.Map{
-			"Title":         "支援中心 - vMarket - " + categoryTitle,
-			"CompanyName":   cfg.CompanyName,
-			"Product":       "vmarket",
-			"Category":      category,
-			"CategoryTitle": categoryTitle,
-			"Path":          c.Path(),
-		})
-	}
 	renderHelpVOffice := func(c *fiber.Ctx) error {
 		return c.Render("pages/help_voffice", fiber.Map{
 			"Title":       "支援中心 - vOffice",
