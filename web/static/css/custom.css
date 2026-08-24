@@ -6145,3 +6145,62 @@ body.home-page footer .card.shadow-lg:not([style*="border"]):not(.use-case-card)
 body.home-page .use-case-card:hover {
     box-shadow: none !important;
 }
+
+/* Homepage palette lock: paper / ink / gray only */
+body.home-page-redesign,
+body.home-page-redesign .navbar,
+body.home-page-redesign .navbar.scrolled {
+    background: #fafafa !important;
+}
+
+body.home-page-redesign .ai-erp-window {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+}
+
+body.home-page-redesign .ai-erp-window-bar,
+body.home-page-redesign .ai-erp-pills span {
+    color: #c8c8c8;
+}
+
+body.home-page-redesign .ai-erp-stat-value,
+body.home-page-redesign .ai-erp-feed-item b {
+    color: #f5f5f5;
+}
+
+body.home-page-redesign .ai-erp-stat-label,
+body.home-page-redesign .ai-erp-feed-kicker,
+body.home-page-redesign .ai-erp-feed-item span {
+    color: #9a9a9a;
+}
+
+body.home-page-redesign .btn-nir,
+body.home-page-redesign .btn-nir:hover {
+    background: #fafafa !important;
+    background-color: #fafafa !important;
+    border-color: #fafafa !important;
+    color: #111111 !important;
+}
+
+body.home-page-redesign .whatsapp-floating-btn {
+    background: #111111 !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
+}
+
+body.home-page-redesign .whatsapp-floating-btn:hover {
+    background: #333333 !important;
+    color: #fff !important;
+}
+
+body.home-page-redesign .tools-section img {
+    filter: grayscale(1);
+}
+
+body.home-page-redesign #use-cases .use-case-card {
+    background: #fff !important;
+}
+
+body.home-page-redesign .partners-section {
+    background: #fafafa !important;
+}
+
