@@ -16,8 +16,10 @@ type JobApplicant struct {
 	Email             string     `gorm:"type:varchar(255)" json:"email,omitempty"`
 	Phone             string     `gorm:"type:varchar(50)" json:"phone,omitempty"`
 	ProfilePic        string     `gorm:"type:text" json:"profile_pic,omitempty"`
+	WorkerType        string     `gorm:"type:varchar(20);not null;default:''" json:"worker_type"` // local / overseas
 	Status            string     `gorm:"type:varchar(20);not null;default:'applied'" json:"status"` // applied/interview/offered/hired/rejected
 	Notes             string     `gorm:"type:text" json:"notes,omitempty"`
+	ExtraFields       JSONB      `gorm:"type:jsonb;default:'{}'" json:"extra_fields"`
 	CreatedAt         time.Time  `json:"created_at"`
 	UpdatedAt         time.Time  `json:"updated_at"`
 

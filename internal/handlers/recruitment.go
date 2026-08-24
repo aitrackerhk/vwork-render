@@ -231,6 +231,7 @@ func GetJobApplicants(c *fiber.Ctx) error {
 
 	search := strings.TrimSpace(c.Query("search"))
 	status := strings.TrimSpace(c.Query("status"))
+	workerType := strings.TrimSpace(c.Query("worker_type"))
 
 	query := database.DB.Model(&models.JobApplicant{}).Where("tenant_id = ?", tenantID).Preload("Vacancy")
 	if search != "" {
@@ -239,6 +240,9 @@ func GetJobApplicants(c *fiber.Ctx) error {
 	}
 	if status != "" {
 		query = query.Where("status = ?", status)
+	}
+	if workerType != "" {
+		query = query.Where("worker_type = ?", workerType)
 	}
 
 	var total int64
@@ -300,14 +304,16 @@ func CreateJobApplicant(c *fiber.Ctx) error {
 	}
 
 	var req struct {
-		VacancyID         *uuid.UUID `json:"vacancy_id"`
-		CandidateName     string     `json:"candidate_name"`
-		CandidateLastName string     `json:"candidate_last_name"`
-		Email             string     `json:"email"`
-		Phone             string     `json:"phone"`
-		ProfilePic        string     `json:"profile_pic"`
-		Status            string     `json:"status"`
-		Notes             string     `json:"notes"`
+		VacancyID         *uuid.UUID            `json:"vacancy_id"`
+		CandidateName     string                `json:"candidate_name"`
+		CandidateLastName string                `json:"candidate_last_name"`
+		Email             string                `json:"email"`
+		Phone             string                `json:"phone"`
+		ProfilePic        string                `json:"profile_pic"`
+		WorkerType        string                `json:"worker_type"`
+		Status            string                `json:"status"`
+		Notes             string                `json:"notes"`
+		ExtraFields       map[string]interface{} `json:"extra_fields"`
 	}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
@@ -326,6 +332,11 @@ func CreateJobApplicant(c *fiber.Ctx) error {
 		req.Status = "applied"
 	}
 
+	extra := models.JSONB{}
+	if req.ExtraFields != nil {
+		extra = models.JSONB(req.ExtraFields)
+	}
+
 	item := models.JobApplicant{
 		TenantID:          tenantID,
 		VacancyID:         req.VacancyID,
@@ -334,8 +345,10 @@ func CreateJobApplicant(c *fiber.Ctx) error {
 		Email:             strings.TrimSpace(req.Email),
 		Phone:             strings.TrimSpace(req.Phone),
 		ProfilePic:        strings.TrimSpace(req.ProfilePic),
+		WorkerType:        normalizeWorkerType(req.WorkerType),
 		Status:            req.Status,
 		Notes:             req.Notes,
+		ExtraFields:       extra,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 	}
@@ -359,14 +372,16 @@ func UpdateJobApplicant(c *fiber.Ctx) error {
 	}
 
 	var req struct {
-		VacancyID         *uuid.UUID `json:"vacancy_id"`
-		CandidateName     *string    `json:"candidate_name"`
-		CandidateLastName *string    `json:"candidate_last_name"`
-		Email             *string    `json:"email"`
-		Phone             *string    `json:"phone"`
-		ProfilePic        *string    `json:"profile_pic"`
-		Status            *string    `json:"status"`
-		Notes             *string    `json:"notes"`
+		VacancyID         *uuid.UUID             `json:"vacancy_id"`
+		CandidateName     *string                `json:"candidate_name"`
+		CandidateLastName *string                `json:"candidate_last_name"`
+		Email             *string                `json:"email"`
+		Phone             *string                `json:"phone"`
+		ProfilePic        *string                `json:"profile_pic"`
+		WorkerType        *string                `json:"worker_type"`
+		Status            *string                `json:"status"`
+		Notes             *string                `json:"notes"`
+		ExtraFields       *map[string]interface{} `json:"extra_fields"`
 	}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request"})
@@ -393,6 +408,9 @@ func UpdateJobApplicant(c *fiber.Ctx) error {
 	if req.ProfilePic != nil {
 		item.ProfilePic = strings.TrimSpace(*req.ProfilePic)
 	}
+	if req.WorkerType != nil {
+		item.WorkerType = normalizeWorkerType(*req.WorkerType)
+	}
 	if req.Status != nil {
 		switch *req.Status {
 		case "applied", "interview", "offered", "hired", "rejected":
@@ -401,6 +419,9 @@ func UpdateJobApplicant(c *fiber.Ctx) error {
 	}
 	if req.Notes != nil {
 		item.Notes = *req.Notes
+	}
+	if req.ExtraFields != nil {
+		item.ExtraFields = models.JSONB(*req.ExtraFields)
 	}
 	item.UpdatedAt = time.Now()
 
@@ -421,6 +442,15 @@ func DeleteJobApplicant(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete"})
 	}
 	return c.JSON(fiber.Map{"message": "Deleted"})
+}
+
+func normalizeWorkerType(v string) string {
+	switch strings.ToLower(strings.TrimSpace(v)) {
+	case "local", "overseas":
+		return strings.ToLower(strings.TrimSpace(v))
+	default:
+		return ""
+	}
 }
 
 // ===== Hires =====

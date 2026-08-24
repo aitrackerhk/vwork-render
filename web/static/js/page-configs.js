@@ -2860,6 +2860,7 @@ const PageConfigs = {
         exportEnabled: false,
         columns: [
             { key: 'candidate_display_name', label: '候選人', type: 'text' },
+            { key: 'worker_type', label: '工人類型', type: 'badge', options: { local: 'info', overseas: 'warning' }, labels: { local: '本地工人', overseas: '海外工人' } },
             { key: 'vacancy', label: '空缺', type: 'relation', relationKey: 'title' },
             { key: 'email', label: '電郵', type: 'text' },
             { key: 'phone', label: '電話', type: 'text' },
@@ -2877,10 +2878,19 @@ const PageConfigs = {
                 { value: 'offered', label: '已發 offer' },
                 { value: 'hired', label: '已聘請' },
                 { value: 'rejected', label: '拒絕' }
+            ]},
+            { key: 'worker_type', label: '工人類型', type: 'select', options: [
+                { value: '', label: '全部', labelKey: 'common.all' },
+                { value: 'local', label: '本地工人' },
+                { value: 'overseas', label: '海外工人' }
             ]}
         ],
         formFields: [
             { key: 'vacancy_id', label: '空缺', type: 'select2', relationApi: '/job-vacancies', relationLabel: 'title', required: false, fullWidth: true },
+            { key: 'worker_type', label: '工人類型', type: 'select', required: true, fullWidth: true, options: [
+                { value: 'local', label: '本地工人' },
+                { value: 'overseas', label: '海外工人' }
+            ]},
             { key: 'candidate_name', label: '名字', type: 'text', required: true },
             { key: 'candidate_last_name', label: '姓氏（可選）', type: 'text', required: false, placeholder: '例如：周、Chow' },
             { key: 'email', label: '電郵', type: 'email', required: false },

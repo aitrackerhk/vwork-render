@@ -288,6 +288,7 @@ class DynamicForm {
                     if (typeof FormFieldSettingsHandler !== 'undefined' && FormFieldSettingsHandler.applyFieldSettingsToDOM) {
                         FormFieldSettingsHandler.applyFieldSettingsToDOM(self);
                     }
+                    self.setupFieldDependencies();
                 }, 300);
                 // 針對 Select2 欄位，需要更長的延遲
                 const t2 = setTimeout(() => {
@@ -419,6 +420,7 @@ class DynamicForm {
                     if (typeof FormFieldSettingsHandler !== 'undefined' && FormFieldSettingsHandler.applyFieldSettingsToDOM) {
                         FormFieldSettingsHandler.applyFieldSettingsToDOM(self);
                     }
+                    self.setupFieldDependencies();
                 }, 300);
                 self._fieldSettingsTimeoutIds.push(t2);
             }).catch(err => {
@@ -849,31 +851,19 @@ class DynamicForm {
     // ===== dependency (show/hide fields) =====
     setupFieldDependencies() {
         try {
-            if (!this.config || !Array.isArray(this.config.formFields)) return;
-            // 綁定一次即可
-            if (this._depsBound) return;
-            this._depsBound = true;
-
-            const deps = this.config.formFields.filter(f => f && f.dependency && f.dependency.field);
-            const watched = new Set();
-            deps.forEach(f => watched.add(String(f.dependency.field)));
-
-            watched.forEach(depKey => {
-                const depEl = document.getElementById(`field_${depKey}`);
-                if (!depEl) return;
+            const form = document.getElementById('dynamicForm');
+            if (!form) return;
+            if (!form._vworkDepBound) {
+                form._vworkDepBound = true;
                 const handler = () => {
-                    // 延迟一点确保值已更新
-                    setTimeout(() => {
-                        this.applyFieldDependencies();
-                    }, 50);
+                    setTimeout(() => this.applyFieldDependencies(), 50);
                 };
-
-                // Select2 也會觸發 change，但保險起見加 select2 event
-                depEl.addEventListener('change', handler);
-                if (typeof $ !== 'undefined' && $(depEl).hasClass('select2-hidden-accessible')) {
-                    $(depEl).on('select2:select select2:clear', handler);
+                form.addEventListener('change', handler);
+                if (typeof $ !== 'undefined') {
+                    $(form).on('select2:select select2:clear', handler);
                 }
-            });
+            }
+            this.applyFieldDependencies();
         } catch (e) {
             console.warn('setupFieldDependencies failed', e);
         }
@@ -881,8 +871,10 @@ class DynamicForm {
 
     applyFieldDependencies() {
         try {
-            if (!this.config || !Array.isArray(this.config.formFields)) return;
-            const deps = this.config.formFields.filter(f => f && f.dependency && f.dependency.field);
+            const allFields = (typeof this.getEffectiveFormFields === 'function')
+                ? this.getEffectiveFormFields()
+                : (this.config && this.config.formFields) || [];
+            const deps = allFields.filter(f => f && f.dependency && f.dependency.field);
 
             const getValue = (key) => {
                 const el = document.getElementById(`field_${key}`);
@@ -1125,7 +1117,10 @@ class DynamicForm {
     // - options.<page>.<field>.<value>（同一個 value 在不同頁可以不同翻譯）
     // - options.<field>.<value>（通用翻譯）
     getOptionLabel(fieldKey, opt) {
-        if (!opt) return '';
+        if (opt == null) return '';
+        if (typeof opt === 'string' || typeof opt === 'number') {
+            return String(opt);
+        }
 
         const rawLabel = opt.label != null ? String(opt.label) : '';
         const rawValue = opt.value != null ? String(opt.value) : '';
@@ -5830,6 +5825,14 @@ class DynamicForm {
         }
 
         switch (field.type) {
+            case 'section': {
+                return `
+                    <div class="mb-3 mt-4" id="${defaultContainerId}" ${field.dependency ? 'style="display: none;"' : ''}>
+                        <h5 class="border-bottom pb-2 mb-2">${fieldLabel}</h5>
+                        ${helpTextHtml}
+                    </div>
+                `;
+            }
             case 'shipment-items': {
                 const helpText = _resolvedHelpText ? `<small class="form-text text-muted">${_resolvedHelpText.replace(/\n/g, '<br>')}</small>` : '';
                 const t = (key, fallback) => (typeof I18n !== 'undefined' && I18n.t) ? I18n.t(key) : fallback;
@@ -6012,8 +6015,10 @@ class DynamicForm {
                 // 靜態選項
                 const defaultValue = field.defaultValue !== undefined ? field.defaultValue : (field.default !== undefined ? field.default : undefined);
                 const options = field.options?.map(opt => {
-                    const isSelected = defaultValue !== undefined && String(opt.value) === String(defaultValue) ? 'selected' : '';
-                    return `<option value="${opt.value}" ${isSelected}>${this.getOptionLabel(field.key, opt)}</option>`;
+                    const value = (opt && typeof opt === 'object') ? (opt.value != null ? opt.value : '') : opt;
+                    const isSelected = defaultValue !== undefined && String(value) === String(defaultValue) ? 'selected' : '';
+                    const label = (opt && typeof opt === 'object') ? this.getOptionLabel(field.key, opt) : String(opt ?? '');
+                    return `<option value="${value}" ${isSelected}>${label}</option>`;
                 }).join('') || '';
                 // payment-methods: 付款形式必須立即觸發（避免任何綁定失敗造成「完全沒反應」）
                 const pmOnChange = (this.pageName === 'payment-methods' && field.key === 'payment_type')
@@ -6859,12 +6864,26 @@ class DynamicForm {
                                             <option value="textarea">${getText('common.fieldTypeTextarea', '多行文字')}</option>
                                             <option value="email">${getText('common.fieldTypeEmail', '郵箱')}</option>
                                             <option value="select">${getText('common.fieldTypeSelect', '下拉選單')}</option>
+                                            <option value="checkbox">${getText('common.fieldTypeCheckbox', '勾選')}</option>
+                                            <option value="section">${getText('common.fieldTypeSection', '分節標題')}</option>
                                         </select>
                                     </div>
                                     <div class="col-md-1">
                                         <button type="button" class="btn btn-primary w-100" id="addExtraFieldBtn">
                                             <i class="bi bi-plus"></i>
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="row mt-2" id="extraFieldDependencyRow">
+                                    <div class="col-12">
+                                        <select class="form-select" id="extraFieldDependency">
+                                            <option value="">${getText('common.alwaysShow', '永遠顯示')}</option>
+                                            ${(this.config.formFields || []).some(f => f.key === 'worker_type') ? `
+                                            <option value="worker_type:local">${getText('common.showWhenLocalWorker', '僅當工人類型 = 本地工人')}</option>
+                                            <option value="worker_type:overseas">${getText('common.showWhenOverseasWorker', '僅當工人類型 = 海外工人')}</option>
+                                            ` : ''}
+                                        </select>
+                                        <small class="text-muted">${getText('common.fieldShowWhenHelp', '可依其他欄位值動態顯示此額外欄位')}</small>
                                     </div>
                                 </div>
                                 <div class="row mt-2" id="selectOptionsRow" style="display: none;">
@@ -7420,11 +7439,20 @@ class DynamicForm {
                     required: false,
                     isExtra: true
                 };
+                if (type === 'textarea' || type === 'section') {
+                    newField.fullWidth = true;
+                }
                 
                 // 如果是 select 類型，添加選項
                 if (type === 'select' && optionsSelectEl) {
                     const options = $(optionsSelectEl).val() || [];
-                    newField.options = options;
+                    newField.options = options.map(o => (typeof o === 'object' ? o : { value: o, label: o }));
+                }
+
+                const depSelect = document.getElementById('extraFieldDependency');
+                if (depSelect && depSelect.value && depSelect.value.includes(':')) {
+                    const [depField, depValue] = depSelect.value.split(':');
+                    newField.dependency = { field: depField, value: depValue };
                 }
                 
                 if (!this.fieldSettings.extraFields) {
@@ -7451,7 +7479,9 @@ class DynamicForm {
                     date: getText('common.fieldTypeDate', '日期'),
                     textarea: getText('common.fieldTypeTextarea', '多行文字'),
                     email: getText('common.fieldTypeEmail', '郵箱'),
-                    select: getText('common.fieldTypeSelect', '下拉選單')
+                    select: getText('common.fieldTypeSelect', '下拉選單'),
+                    checkbox: getText('common.fieldTypeCheckbox', '勾選'),
+                    section: getText('common.fieldTypeSection', '分節標題')
                 };
                 const typeBadgeLabel = typeMap[type] || type;
                 if (type === 'select') {

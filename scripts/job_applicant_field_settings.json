@@ -1,0 +1,3980 @@
+{
+  "field_config": {
+    "fields": [
+      {
+        "key": "vacancy_id",
+        "visible": true,
+        "order": 0
+      },
+      {
+        "key": "worker_type",
+        "visible": true,
+        "order": 1
+      },
+      {
+        "key": "candidate_name",
+        "visible": true,
+        "order": 2
+      },
+      {
+        "key": "candidate_last_name",
+        "visible": true,
+        "order": 3
+      },
+      {
+        "key": "email",
+        "visible": true,
+        "order": 4
+      },
+      {
+        "key": "phone",
+        "visible": true,
+        "order": 5
+      },
+      {
+        "key": "profile_pic",
+        "visible": true,
+        "order": 6
+      },
+      {
+        "key": "status",
+        "visible": true,
+        "order": 7
+      },
+      {
+        "key": "loc_emp1_sec",
+        "visible": true,
+        "order": 8
+      },
+      {
+        "key": "loc_emp1_employer_location",
+        "visible": true,
+        "order": 9
+      },
+      {
+        "key": "loc_emp1_house_size",
+        "visible": true,
+        "order": 10
+      },
+      {
+        "key": "loc_emp1_from",
+        "visible": true,
+        "order": 11
+      },
+      {
+        "key": "loc_emp1_to",
+        "visible": true,
+        "order": 12
+      },
+      {
+        "key": "loc_emp1_employer_name",
+        "visible": true,
+        "order": 13
+      },
+      {
+        "key": "loc_emp1_reason_leave",
+        "visible": true,
+        "order": 14
+      },
+      {
+        "key": "loc_emp1_newborn",
+        "visible": true,
+        "order": 15
+      },
+      {
+        "key": "loc_emp1_pets",
+        "visible": true,
+        "order": 16
+      },
+      {
+        "key": "loc_emp1_children",
+        "visible": true,
+        "order": 17
+      },
+      {
+        "key": "loc_emp1_children_ages",
+        "visible": true,
+        "order": 18
+      },
+      {
+        "key": "loc_emp1_adults",
+        "visible": true,
+        "order": 19
+      },
+      {
+        "key": "loc_emp1_elderly",
+        "visible": true,
+        "order": 20
+      },
+      {
+        "key": "loc_emp1_elderly_ages",
+        "visible": true,
+        "order": 21
+      },
+      {
+        "key": "loc_emp1_salary",
+        "visible": true,
+        "order": 22
+      },
+      {
+        "key": "loc_emp1_duties",
+        "visible": true,
+        "order": 23
+      },
+      {
+        "key": "loc_emp2_sec",
+        "visible": true,
+        "order": 24
+      },
+      {
+        "key": "loc_emp2_employer_location",
+        "visible": true,
+        "order": 25
+      },
+      {
+        "key": "loc_emp2_house_size",
+        "visible": true,
+        "order": 26
+      },
+      {
+        "key": "loc_emp2_from",
+        "visible": true,
+        "order": 27
+      },
+      {
+        "key": "loc_emp2_to",
+        "visible": true,
+        "order": 28
+      },
+      {
+        "key": "loc_emp2_employer_name",
+        "visible": true,
+        "order": 29
+      },
+      {
+        "key": "loc_emp2_reason_leave",
+        "visible": true,
+        "order": 30
+      },
+      {
+        "key": "loc_emp2_newborn",
+        "visible": true,
+        "order": 31
+      },
+      {
+        "key": "loc_emp2_pets",
+        "visible": true,
+        "order": 32
+      },
+      {
+        "key": "loc_emp2_children",
+        "visible": true,
+        "order": 33
+      },
+      {
+        "key": "loc_emp2_children_ages",
+        "visible": true,
+        "order": 34
+      },
+      {
+        "key": "loc_emp2_adults",
+        "visible": true,
+        "order": 35
+      },
+      {
+        "key": "loc_emp2_elderly",
+        "visible": true,
+        "order": 36
+      },
+      {
+        "key": "loc_emp2_elderly_ages",
+        "visible": true,
+        "order": 37
+      },
+      {
+        "key": "loc_emp2_salary",
+        "visible": true,
+        "order": 38
+      },
+      {
+        "key": "loc_emp2_duties",
+        "visible": true,
+        "order": 39
+      },
+      {
+        "key": "loc_nd1_sec",
+        "visible": true,
+        "order": 40
+      },
+      {
+        "key": "loc_nd1_employer_location",
+        "visible": true,
+        "order": 41
+      },
+      {
+        "key": "loc_nd1_from",
+        "visible": true,
+        "order": 42
+      },
+      {
+        "key": "loc_nd1_to",
+        "visible": true,
+        "order": 43
+      },
+      {
+        "key": "loc_nd1_employer_name",
+        "visible": true,
+        "order": 44
+      },
+      {
+        "key": "loc_nd1_reason_leave",
+        "visible": true,
+        "order": 45
+      },
+      {
+        "key": "loc_nd1_position",
+        "visible": true,
+        "order": 46
+      },
+      {
+        "key": "loc_nd1_salary",
+        "visible": true,
+        "order": 47
+      },
+      {
+        "key": "loc_nd1_job_desc",
+        "visible": true,
+        "order": 48
+      },
+      {
+        "key": "loc_exp_sec",
+        "visible": true,
+        "order": 49
+      },
+      {
+        "key": "loc_exp_baby",
+        "visible": true,
+        "order": 50
+      },
+      {
+        "key": "loc_exp_cooking",
+        "visible": true,
+        "order": 51
+      },
+      {
+        "key": "loc_exp_elderly",
+        "visible": true,
+        "order": 52
+      },
+      {
+        "key": "loc_q_sec",
+        "visible": true,
+        "order": 53
+      },
+      {
+        "key": "loc_q01",
+        "visible": true,
+        "order": 54
+      },
+      {
+        "key": "loc_q02",
+        "visible": true,
+        "order": 55
+      },
+      {
+        "key": "loc_q03",
+        "visible": true,
+        "order": 56
+      },
+      {
+        "key": "loc_q04",
+        "visible": true,
+        "order": 57
+      },
+      {
+        "key": "loc_q05",
+        "visible": true,
+        "order": 58
+      },
+      {
+        "key": "loc_q06",
+        "visible": true,
+        "order": 59
+      },
+      {
+        "key": "loc_q07",
+        "visible": true,
+        "order": 60
+      },
+      {
+        "key": "loc_q08",
+        "visible": true,
+        "order": 61
+      },
+      {
+        "key": "loc_q09",
+        "visible": true,
+        "order": 62
+      },
+      {
+        "key": "loc_q10",
+        "visible": true,
+        "order": 63
+      },
+      {
+        "key": "loc_q11",
+        "visible": true,
+        "order": 64
+      },
+      {
+        "key": "loc_q12",
+        "visible": true,
+        "order": 65
+      },
+      {
+        "key": "loc_q13",
+        "visible": true,
+        "order": 66
+      },
+      {
+        "key": "loc_q14",
+        "visible": true,
+        "order": 67
+      },
+      {
+        "key": "loc_q15",
+        "visible": true,
+        "order": 68
+      },
+      {
+        "key": "loc_q16",
+        "visible": true,
+        "order": 69
+      },
+      {
+        "key": "loc_health_sec",
+        "visible": true,
+        "order": 70
+      },
+      {
+        "key": "loc_smoke",
+        "visible": true,
+        "order": 71
+      },
+      {
+        "key": "loc_alcohol",
+        "visible": true,
+        "order": 72
+      },
+      {
+        "key": "loc_physical_defects",
+        "visible": true,
+        "order": 73
+      },
+      {
+        "key": "loc_allergy",
+        "visible": true,
+        "order": 74
+      },
+      {
+        "key": "loc_convicted",
+        "visible": true,
+        "order": 75
+      },
+      {
+        "key": "loc_remarks",
+        "visible": true,
+        "order": 76
+      },
+      {
+        "key": "ov_personal_sec",
+        "visible": true,
+        "order": 77
+      },
+      {
+        "key": "ov_ref_no",
+        "visible": true,
+        "order": 78
+      },
+      {
+        "key": "ov_nationality",
+        "visible": true,
+        "order": 79
+      },
+      {
+        "key": "ov_dob",
+        "visible": true,
+        "order": 80
+      },
+      {
+        "key": "ov_place_of_birth",
+        "visible": true,
+        "order": 81
+      },
+      {
+        "key": "ov_age",
+        "visible": true,
+        "order": 82
+      },
+      {
+        "key": "ov_religion",
+        "visible": true,
+        "order": 83
+      },
+      {
+        "key": "ov_sex",
+        "visible": true,
+        "order": 84
+      },
+      {
+        "key": "ov_marital",
+        "visible": true,
+        "order": 85
+      },
+      {
+        "key": "ov_height",
+        "visible": true,
+        "order": 86
+      },
+      {
+        "key": "ov_weight",
+        "visible": true,
+        "order": 87
+      },
+      {
+        "key": "ov_horoscope_cn",
+        "visible": true,
+        "order": 88
+      },
+      {
+        "key": "ov_horoscope",
+        "visible": true,
+        "order": 89
+      },
+      {
+        "key": "ov_overseas_address",
+        "visible": true,
+        "order": 90
+      },
+      {
+        "key": "ov_lang_sec",
+        "visible": true,
+        "order": 91
+      },
+      {
+        "key": "ov_cantonese",
+        "visible": true,
+        "order": 92
+      },
+      {
+        "key": "ov_mandarin",
+        "visible": true,
+        "order": 93
+      },
+      {
+        "key": "ov_english_spoken",
+        "visible": true,
+        "order": 94
+      },
+      {
+        "key": "ov_english_written",
+        "visible": true,
+        "order": 95
+      },
+      {
+        "key": "ov_country_sec",
+        "visible": true,
+        "order": 96
+      },
+      {
+        "key": "ov_exp_hk",
+        "visible": true,
+        "order": 97
+      },
+      {
+        "key": "ov_exp_sg",
+        "visible": true,
+        "order": 98
+      },
+      {
+        "key": "ov_exp_my",
+        "visible": true,
+        "order": 99
+      },
+      {
+        "key": "ov_exp_tw",
+        "visible": true,
+        "order": 100
+      },
+      {
+        "key": "ov_exp_sa",
+        "visible": true,
+        "order": 101
+      },
+      {
+        "key": "ov_exp_kr",
+        "visible": true,
+        "order": 102
+      },
+      {
+        "key": "ov_exp_other",
+        "visible": true,
+        "order": 103
+      },
+      {
+        "key": "ov_memo",
+        "visible": true,
+        "order": 104
+      },
+      {
+        "key": "ov_family_sec",
+        "visible": true,
+        "order": 105
+      },
+      {
+        "key": "ov_father_name",
+        "visible": true,
+        "order": 106
+      },
+      {
+        "key": "ov_father_occupation",
+        "visible": true,
+        "order": 107
+      },
+      {
+        "key": "ov_mother_name",
+        "visible": true,
+        "order": 108
+      },
+      {
+        "key": "ov_mother_occupation",
+        "visible": true,
+        "order": 109
+      },
+      {
+        "key": "ov_spouse_name",
+        "visible": true,
+        "order": 110
+      },
+      {
+        "key": "ov_spouse_occupation",
+        "visible": true,
+        "order": 111
+      },
+      {
+        "key": "ov_brothers_ages",
+        "visible": true,
+        "order": 112
+      },
+      {
+        "key": "ov_sisters_ages",
+        "visible": true,
+        "order": 113
+      },
+      {
+        "key": "ov_sons_ages",
+        "visible": true,
+        "order": 114
+      },
+      {
+        "key": "ov_daughters_ages",
+        "visible": true,
+        "order": 115
+      },
+      {
+        "key": "ov_family_rank",
+        "visible": true,
+        "order": 116
+      },
+      {
+        "key": "ov_edu_sec",
+        "visible": true,
+        "order": 117
+      },
+      {
+        "key": "ov_edu_elementary",
+        "visible": true,
+        "order": 118
+      },
+      {
+        "key": "ov_edu_junior",
+        "visible": true,
+        "order": 119
+      },
+      {
+        "key": "ov_edu_senior",
+        "visible": true,
+        "order": 120
+      },
+      {
+        "key": "ov_edu_college",
+        "visible": true,
+        "order": 121
+      },
+      {
+        "key": "ov_edu_university",
+        "visible": true,
+        "order": 122
+      },
+      {
+        "key": "ov_skill_sec",
+        "visible": true,
+        "order": 123
+      },
+      {
+        "key": "ov_special_skill",
+        "visible": true,
+        "order": 124
+      },
+      {
+        "key": "ov_intl_license_years",
+        "visible": true,
+        "order": 125
+      },
+      {
+        "key": "ov_intl_license_since",
+        "visible": true,
+        "order": 126
+      },
+      {
+        "key": "ov_hk_license_years",
+        "visible": true,
+        "order": 127
+      },
+      {
+        "key": "ov_hk_license_since",
+        "visible": true,
+        "order": 128
+      },
+      {
+        "key": "ov_other_training",
+        "visible": true,
+        "order": 129
+      },
+      {
+        "key": "ov_exp_work_sec",
+        "visible": true,
+        "order": 130
+      },
+      {
+        "key": "ov_skill_01",
+        "visible": true,
+        "order": 131
+      },
+      {
+        "key": "ov_skill_02",
+        "visible": true,
+        "order": 132
+      },
+      {
+        "key": "ov_skill_03",
+        "visible": true,
+        "order": 133
+      },
+      {
+        "key": "ov_skill_04",
+        "visible": true,
+        "order": 134
+      },
+      {
+        "key": "ov_skill_05",
+        "visible": true,
+        "order": 135
+      },
+      {
+        "key": "ov_skill_06",
+        "visible": true,
+        "order": 136
+      },
+      {
+        "key": "ov_skill_07",
+        "visible": true,
+        "order": 137
+      },
+      {
+        "key": "ov_skill_08",
+        "visible": true,
+        "order": 138
+      },
+      {
+        "key": "ov_skill_09",
+        "visible": true,
+        "order": 139
+      },
+      {
+        "key": "ov_skill_10",
+        "visible": true,
+        "order": 140
+      },
+      {
+        "key": "ov_skill_11",
+        "visible": true,
+        "order": 141
+      },
+      {
+        "key": "ov_skill_12",
+        "visible": true,
+        "order": 142
+      },
+      {
+        "key": "ov_skill_13",
+        "visible": true,
+        "order": 143
+      },
+      {
+        "key": "ov_skill_14",
+        "visible": true,
+        "order": 144
+      },
+      {
+        "key": "ov_skill_15",
+        "visible": true,
+        "order": 145
+      },
+      {
+        "key": "ov_skill_16",
+        "visible": true,
+        "order": 146
+      },
+      {
+        "key": "ov_skill_17",
+        "visible": true,
+        "order": 147
+      },
+      {
+        "key": "ov_skill_18",
+        "visible": true,
+        "order": 148
+      },
+      {
+        "key": "ov_skill_19",
+        "visible": true,
+        "order": 149
+      },
+      {
+        "key": "ov_skill_20",
+        "visible": true,
+        "order": 150
+      },
+      {
+        "key": "ov_skill_21",
+        "visible": true,
+        "order": 151
+      },
+      {
+        "key": "ov_skill_22",
+        "visible": true,
+        "order": 152
+      },
+      {
+        "key": "ov_skill_23",
+        "visible": true,
+        "order": 153
+      },
+      {
+        "key": "ov_skill_24",
+        "visible": true,
+        "order": 154
+      },
+      {
+        "key": "ov_skill_25",
+        "visible": true,
+        "order": 155
+      },
+      {
+        "key": "ov_skill_26",
+        "visible": true,
+        "order": 156
+      },
+      {
+        "key": "ov_skill_27",
+        "visible": true,
+        "order": 157
+      },
+      {
+        "key": "ov_emp1_sec",
+        "visible": true,
+        "order": 158
+      },
+      {
+        "key": "ov_emp1_employer_name",
+        "visible": true,
+        "order": 159
+      },
+      {
+        "key": "ov_emp1_employer_location",
+        "visible": true,
+        "order": 160
+      },
+      {
+        "key": "ov_emp1_working_area",
+        "visible": true,
+        "order": 161
+      },
+      {
+        "key": "ov_emp1_phone",
+        "visible": true,
+        "order": 162
+      },
+      {
+        "key": "ov_emp1_from",
+        "visible": true,
+        "order": 163
+      },
+      {
+        "key": "ov_emp1_to",
+        "visible": true,
+        "order": 164
+      },
+      {
+        "key": "ov_emp1_duty_newborn",
+        "visible": true,
+        "order": 165
+      },
+      {
+        "key": "ov_emp1_duty_children",
+        "visible": true,
+        "order": 166
+      },
+      {
+        "key": "ov_emp1_duty_elderly",
+        "visible": true,
+        "order": 167
+      },
+      {
+        "key": "ov_emp1_duty_disabled",
+        "visible": true,
+        "order": 168
+      },
+      {
+        "key": "ov_emp1_reason_quit",
+        "visible": true,
+        "order": 169
+      },
+      {
+        "key": "ov_emp1_family_ages",
+        "visible": true,
+        "order": 170
+      },
+      {
+        "key": "ov_emp2_sec",
+        "visible": true,
+        "order": 171
+      },
+      {
+        "key": "ov_emp2_employer_name",
+        "visible": true,
+        "order": 172
+      },
+      {
+        "key": "ov_emp2_employer_location",
+        "visible": true,
+        "order": 173
+      },
+      {
+        "key": "ov_emp2_working_area",
+        "visible": true,
+        "order": 174
+      },
+      {
+        "key": "ov_emp2_phone",
+        "visible": true,
+        "order": 175
+      },
+      {
+        "key": "ov_emp2_from",
+        "visible": true,
+        "order": 176
+      },
+      {
+        "key": "ov_emp2_to",
+        "visible": true,
+        "order": 177
+      },
+      {
+        "key": "ov_emp2_duty_newborn",
+        "visible": true,
+        "order": 178
+      },
+      {
+        "key": "ov_emp2_duty_children",
+        "visible": true,
+        "order": 179
+      },
+      {
+        "key": "ov_emp2_duty_elderly",
+        "visible": true,
+        "order": 180
+      },
+      {
+        "key": "ov_emp2_duty_disabled",
+        "visible": true,
+        "order": 181
+      },
+      {
+        "key": "ov_emp2_reason_quit",
+        "visible": true,
+        "order": 182
+      },
+      {
+        "key": "ov_emp2_family_ages",
+        "visible": true,
+        "order": 183
+      },
+      {
+        "key": "ov_emp3_sec",
+        "visible": true,
+        "order": 184
+      },
+      {
+        "key": "ov_emp3_employer_name",
+        "visible": true,
+        "order": 185
+      },
+      {
+        "key": "ov_emp3_employer_location",
+        "visible": true,
+        "order": 186
+      },
+      {
+        "key": "ov_emp3_working_area",
+        "visible": true,
+        "order": 187
+      },
+      {
+        "key": "ov_emp3_phone",
+        "visible": true,
+        "order": 188
+      },
+      {
+        "key": "ov_emp3_from",
+        "visible": true,
+        "order": 189
+      },
+      {
+        "key": "ov_emp3_to",
+        "visible": true,
+        "order": 190
+      },
+      {
+        "key": "ov_emp3_duty_newborn",
+        "visible": true,
+        "order": 191
+      },
+      {
+        "key": "ov_emp3_duty_children",
+        "visible": true,
+        "order": 192
+      },
+      {
+        "key": "ov_emp3_duty_elderly",
+        "visible": true,
+        "order": 193
+      },
+      {
+        "key": "ov_emp3_duty_disabled",
+        "visible": true,
+        "order": 194
+      },
+      {
+        "key": "ov_emp3_reason_quit",
+        "visible": true,
+        "order": 195
+      },
+      {
+        "key": "ov_emp3_family_ages",
+        "visible": true,
+        "order": 196
+      },
+      {
+        "key": "notes",
+        "visible": true,
+        "order": 197
+      }
+    ],
+    "extraFields": [
+      {
+        "key": "loc_emp1_sec",
+        "label": "DOMESTIC EMPLOYMENT RECORDS 僱傭經驗 1",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_emp1_employer_location",
+        "label": "Location of Employer 僱主地區",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_house_size",
+        "label": "How big the house? 房屋面積",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_from",
+        "label": "From 由",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_to",
+        "label": "To 至",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_employer_name",
+        "label": "Employer's Name 僱主姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_reason_leave",
+        "label": "Reason to leave 離職原因",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_newborn",
+        "label": "How many care of New Born Babies? 照顧初生嬰兒人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_pets",
+        "label": "How many care of Pets? 照顧寵物數量",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_children",
+        "label": "How many care of Children? 照顧小孩人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_children_ages",
+        "label": "Their Ages? 小孩年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_adults",
+        "label": "No. of Adults 成人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_elderly",
+        "label": "How many care of Elderly Persons? 照顧長者人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_elderly_ages",
+        "label": "Their Ages? 長者年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_salary",
+        "label": "Salary 薪金",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp1_duties",
+        "label": "Duties 工作範圍",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_emp2_sec",
+        "label": "DOMESTIC EMPLOYMENT RECORDS 僱傭經驗 2",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_emp2_employer_location",
+        "label": "Location of Employer 僱主地區",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_house_size",
+        "label": "How big the house? 房屋面積",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_from",
+        "label": "From 由",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_to",
+        "label": "To 至",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_employer_name",
+        "label": "Employer's Name 僱主姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_reason_leave",
+        "label": "Reason to leave 離職原因",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_newborn",
+        "label": "How many care of New Born Babies? 照顧初生嬰兒人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_pets",
+        "label": "How many care of Pets? 照顧寵物數量",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_children",
+        "label": "How many care of Children? 照顧小孩人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_children_ages",
+        "label": "Their Ages? 小孩年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_adults",
+        "label": "No. of Adults 成人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_elderly",
+        "label": "How many care of Elderly Persons? 照顧長者人數",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_elderly_ages",
+        "label": "Their Ages? 長者年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_salary",
+        "label": "Salary 薪金",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_emp2_duties",
+        "label": "Duties 工作範圍",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_nd1_sec",
+        "label": "Non-DOMESTIC EMPLOYMENT RECORDS 其他工作經驗 1",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_nd1_employer_location",
+        "label": "Location of Employer 僱主地區",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_nd1_from",
+        "label": "From 由",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_nd1_to",
+        "label": "To 至",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_nd1_employer_name",
+        "label": "Employer's Name 僱主姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_nd1_reason_leave",
+        "label": "Reason to leave 離職原因",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_nd1_position",
+        "label": "Position 職位",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_nd1_salary",
+        "label": "Salary 薪金",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        }
+      },
+      {
+        "key": "loc_nd1_job_desc",
+        "label": "Description of Job 工作描述",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_exp_sec",
+        "label": "經驗描述 Experience",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_exp_baby",
+        "label": "Tell us something about your experience in baby / children care 嬰兒／小孩照顧經驗",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_exp_cooking",
+        "label": "Tell us about your cooking experience 煮食經驗",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_exp_elderly",
+        "label": "Tell us about your experience in taking care of elderly, invalid / semi-invalid person 照顧長者／傷殘人士經驗",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_q_sec",
+        "label": "ANSWER SHEET 問卷",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_q01",
+        "label": "1. Care of babies aged 0-3 months 照顧 0-3 個月嬰兒",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q02",
+        "label": "2. Care of babies aged 3-12 months 照顧 3-12 個月嬰兒",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q03",
+        "label": "3. Care of children aged 1-5 yrs old 照顧 1-5 歲小孩",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q04",
+        "label": "4. Care of children aged 5-10 yrs old 照顧 5-10 歲小孩",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q05",
+        "label": "5. Tutoring children 教導小孩功課",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q06",
+        "label": "6. Play with children 陪小孩玩",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q07",
+        "label": "7. Operate washing machine 使用洗衣機",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q08",
+        "label": "8. Laundry by hands 手洗衣服",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q09",
+        "label": "9. Ironing 燙衫",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q10",
+        "label": "10. Cook Chinese food 煮中菜",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q11",
+        "label": "11. Gardening 園藝",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q12",
+        "label": "12. Washing car 洗車",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q13",
+        "label": "13. Care of pets 照顧寵物",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q14",
+        "label": "14. Look after elderly person 照顧長者",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q15",
+        "label": "15. Look after invalid person 照顧傷殘人士",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_q16",
+        "label": "16. Look after semi-invalid person 照顧半傷殘人士",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_health_sec",
+        "label": "Health & Legal 健康及法律",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_smoke",
+        "label": "Do you smoke? 你是否吸煙？",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_alcohol",
+        "label": "Do you drink alcohol? 你是否喝酒？",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "loc_physical_defects",
+        "label": "Are you have any physical defects? 你是否有任何身體缺陷？",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_allergy",
+        "label": "Do you suffer from any allergy? 你是否有過敏？",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_convicted",
+        "label": "Have you been convicted of any crimes or offences either in Hong Kong or elsewhere? 你是否曾在香港或其他地方被定罪？",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "loc_remarks",
+        "label": "REMARKS 備註",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "local"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_personal_sec",
+        "label": "Personal Data 個人紀錄",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_ref_no",
+        "label": "Ref No. 檔案編號",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_nationality",
+        "label": "Nationality 國籍",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_dob",
+        "label": "Date of Birth 出生日期",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_place_of_birth",
+        "label": "Place of Birth 出生地點",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_age",
+        "label": "Age 年齡",
+        "type": "number",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_religion",
+        "label": "Religion 宗教",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_sex",
+        "label": "Sex 性別",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "F",
+            "label": "Female 女"
+          },
+          {
+            "value": "M",
+            "label": "Male 男"
+          }
+        ]
+      },
+      {
+        "key": "ov_marital",
+        "label": "Marital Status 婚姻狀況",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "single",
+            "label": "Single 未婚"
+          },
+          {
+            "value": "married",
+            "label": "Married 已婚"
+          },
+          {
+            "value": "divorced",
+            "label": "Divorced 離婚"
+          },
+          {
+            "value": "widowed",
+            "label": "Widowed 喪偶"
+          }
+        ]
+      },
+      {
+        "key": "ov_height",
+        "label": "Height 身高",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_weight",
+        "label": "Weight 體重",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_horoscope_cn",
+        "label": "Chinese Horoscope 生肖",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_horoscope",
+        "label": "Horoscope 星座",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_overseas_address",
+        "label": "Overseas Address 原居地址",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_lang_sec",
+        "label": "Languages 語言",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_cantonese",
+        "label": "Spoken Cantonese 能講廣東話",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "average",
+            "label": "Average 平"
+          },
+          {
+            "value": "good",
+            "label": "Good 好"
+          },
+          {
+            "value": "excellent",
+            "label": "Excellent 優"
+          }
+        ]
+      },
+      {
+        "key": "ov_mandarin",
+        "label": "Spoken Mandarin 能講國語",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "average",
+            "label": "Average 平"
+          },
+          {
+            "value": "good",
+            "label": "Good 好"
+          },
+          {
+            "value": "excellent",
+            "label": "Excellent 優"
+          }
+        ]
+      },
+      {
+        "key": "ov_english_spoken",
+        "label": "Spoken English 能講英語",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "average",
+            "label": "Average 平"
+          },
+          {
+            "value": "good",
+            "label": "Good 好"
+          },
+          {
+            "value": "excellent",
+            "label": "Excellent 優"
+          }
+        ]
+      },
+      {
+        "key": "ov_english_written",
+        "label": "Written English 能寫英語",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "average",
+            "label": "Average 平"
+          },
+          {
+            "value": "good",
+            "label": "Good 好"
+          },
+          {
+            "value": "excellent",
+            "label": "Excellent 優"
+          }
+        ]
+      },
+      {
+        "key": "ov_country_sec",
+        "label": "Other Country Experience 其他國家經驗（年）",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_exp_hk",
+        "label": "Hong Kong 香港 (Year)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_exp_sg",
+        "label": "Singapore 新加坡 (Year)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_exp_my",
+        "label": "Malaysia 馬來西亞 (Year)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_exp_tw",
+        "label": "Taiwan 台灣 (Year)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_exp_sa",
+        "label": "Saudi Arabia 沙地阿拉伯 (Year)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_exp_kr",
+        "label": "South Korea 南韓 (Year)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_exp_other",
+        "label": "Other country 其他國家",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_memo",
+        "label": "Memo 備忘錄",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_family_sec",
+        "label": "Family Background 家庭背景",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_father_name",
+        "label": "Father's Name 父親姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_father_occupation",
+        "label": "Father's Occupation 父親職業",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_mother_name",
+        "label": "Mother's Name 母親姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_mother_occupation",
+        "label": "Mother's Occupation 母親職業",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_spouse_name",
+        "label": "Spouse's Name 配偶姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_spouse_occupation",
+        "label": "Spouse's Occupation 配偶職業",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_brothers_ages",
+        "label": "Age of Brothers 兄弟年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_sisters_ages",
+        "label": "Age of Sisters 姊妹年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_sons_ages",
+        "label": "Age of Sons 兒子年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_daughters_ages",
+        "label": "Age of Daughters 女兒年齡",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_family_rank",
+        "label": "In the family, I am no. 在家排行",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_edu_sec",
+        "label": "Educational Details 學歷",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_edu_elementary",
+        "label": "Elementary 小學 (From-To)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_edu_junior",
+        "label": "Junior High School 初中 (From-To)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_edu_senior",
+        "label": "Senior High School 高中 (From-To)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_edu_college",
+        "label": "College 學院 (From-To)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_edu_university",
+        "label": "University 大學 (From-To)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_skill_sec",
+        "label": "Special Skill / License 特殊技能及駕照",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_special_skill",
+        "label": "Special Skill 特殊技能",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_intl_license_years",
+        "label": "International Drive License Years 國際駕駛執照年資",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_intl_license_since",
+        "label": "International Drive License Since 國際駕駛執照自",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_hk_license_years",
+        "label": "Hong Kong Drive License Years 香港駕駛執照年資",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_hk_license_since",
+        "label": "Hong Kong Drive License Since 香港駕駛執照自",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_other_training",
+        "label": "Other Training 其他訓練",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_exp_work_sec",
+        "label": "Experience as Domestic Helper 家傭經驗（願意 / 經驗）",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_skill_01",
+        "label": "1. Taking care of New Born to 1 year old Babies 照顧初生至一歲大嬰兒",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_02",
+        "label": "2. Take care of 1-5 years old Children 照顧一歲至五歲小孩子",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_03",
+        "label": "3. Take care of 5-10 years old Children 照顧五歲至十歲小孩子",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_04",
+        "label": "4. Take care of 10-18 years old Children 照顧十歲至十八歲小孩子",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_05",
+        "label": "5. Tutoring English Homework for ages 10 or below 英語教導 10 歲以下功課",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_06",
+        "label": "6. Looking after Male Disable Person 照顧行動不便的男性",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_07",
+        "label": "7. Looking after Female Disable Person 照顧行動不便的女性",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_08",
+        "label": "8. Looking after over 60 year old Male Elderly Person 照顧 60 歲以上男性長者",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_09",
+        "label": "9. Looking after over 60 year old Female Elderly Person 照顧 60 歲以上女性長者",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_10",
+        "label": "10. Looking after Male Patient 照顧男性病人",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_11",
+        "label": "11. Looking after Female Patient 照顧女性病人",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_12",
+        "label": "12. Care of Small Dog 照顧小狗",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_13",
+        "label": "13. Care of Big Dog 照顧大狗",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_14",
+        "label": "14. Care of Pets 照顧寵物",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_15",
+        "label": "15. General House Works 一般家務",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_16",
+        "label": "16. Operating Electrical Appliances 使用家用電器",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_17",
+        "label": "17. Doing Laundry by hands 手洗衣服",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_18",
+        "label": "18. Ironing 燙衫",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_19",
+        "label": "19. Car Washing 抺車",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_20",
+        "label": "20. Gardening 料理花園，園藝",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_21",
+        "label": "21. Cooking Chinese Foods 煮中國菜",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_22",
+        "label": "22. Cooking Western Foods 煮西餐",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_23",
+        "label": "23. Eat Pork 吃豬肉",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_24",
+        "label": "24. Eat Beef 吃牛肉",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_25",
+        "label": "25. Prepare food for 10 persons or above 處理 10 人以上膳食",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_26",
+        "label": "26. Prepare party food for 20 persons or above 處理 20 人以上派對膳食",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_skill_27",
+        "label": "27. Week Day Holiday 平日休假",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "none",
+            "label": "—"
+          },
+          {
+            "value": "willing",
+            "label": "願意 Willing"
+          },
+          {
+            "value": "experienced",
+            "label": "經驗 Experienced"
+          },
+          {
+            "value": "both",
+            "label": "願意+經驗"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp1_sec",
+        "label": "Domestic Employment Records 工作紀錄 1",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_emp1_employer_name",
+        "label": "Name of Employer 僱主姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp1_employer_location",
+        "label": "Location of Employer 僱主地區",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp1_working_area",
+        "label": "Working Area 工作面積 (M2)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp1_phone",
+        "label": "Telephone No. 電話",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp1_from",
+        "label": "From 由",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp1_to",
+        "label": "To 至",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp1_duty_newborn",
+        "label": "Caring of New born baby 照顧初生嬰兒",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp1_duty_children",
+        "label": "Caring of Children 照顧小孩",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp1_duty_elderly",
+        "label": "Caring of Elderly 照顧長者",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp1_duty_disabled",
+        "label": "Caring of Disabled 照顧傷殘人士",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp1_reason_quit",
+        "label": "Reason to Quit 離職原因",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp1_family_ages",
+        "label": "Age of family members on first day 到任時家庭成員年齡",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_emp2_sec",
+        "label": "Domestic Employment Records 工作紀錄 2",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_emp2_employer_name",
+        "label": "Name of Employer 僱主姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp2_employer_location",
+        "label": "Location of Employer 僱主地區",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp2_working_area",
+        "label": "Working Area 工作面積 (M2)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp2_phone",
+        "label": "Telephone No. 電話",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp2_from",
+        "label": "From 由",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp2_to",
+        "label": "To 至",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp2_duty_newborn",
+        "label": "Caring of New born baby 照顧初生嬰兒",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp2_duty_children",
+        "label": "Caring of Children 照顧小孩",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp2_duty_elderly",
+        "label": "Caring of Elderly 照顧長者",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp2_duty_disabled",
+        "label": "Caring of Disabled 照顧傷殘人士",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp2_reason_quit",
+        "label": "Reason to Quit 離職原因",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp2_family_ages",
+        "label": "Age of family members on first day 到任時家庭成員年齡",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_emp3_sec",
+        "label": "Domestic Employment Records 工作紀錄 3",
+        "type": "section",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      },
+      {
+        "key": "ov_emp3_employer_name",
+        "label": "Name of Employer 僱主姓名",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp3_employer_location",
+        "label": "Location of Employer 僱主地區",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp3_working_area",
+        "label": "Working Area 工作面積 (M2)",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp3_phone",
+        "label": "Telephone No. 電話",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp3_from",
+        "label": "From 由",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp3_to",
+        "label": "To 至",
+        "type": "date",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp3_duty_newborn",
+        "label": "Caring of New born baby 照顧初生嬰兒",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp3_duty_children",
+        "label": "Caring of Children 照顧小孩",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp3_duty_elderly",
+        "label": "Caring of Elderly 照顧長者",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp3_duty_disabled",
+        "label": "Caring of Disabled 照顧傷殘人士",
+        "type": "select",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "options": [
+          {
+            "value": "yes",
+            "label": "Yes 是"
+          },
+          {
+            "value": "no",
+            "label": "No 否"
+          }
+        ]
+      },
+      {
+        "key": "ov_emp3_reason_quit",
+        "label": "Reason to Quit 離職原因",
+        "type": "text",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        }
+      },
+      {
+        "key": "ov_emp3_family_ages",
+        "label": "Age of family members on first day 到任時家庭成員年齡",
+        "type": "textarea",
+        "required": false,
+        "isExtra": true,
+        "dependency": {
+          "field": "worker_type",
+          "value": "overseas"
+        },
+        "fullWidth": true
+      }
+    ]
+  }
+}
