@@ -8,10 +8,24 @@ import (
 	"nwork/internal/middleware"
 	"nwork/internal/models"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
+
+// formFieldSettingsPageNames returns URL/config aliases so job-applicants
+// and job_applicants share the same 欄位設定.
+func formFieldSettingsPageNames(pageName string) []string {
+	names := []string{pageName}
+	if alt := strings.ReplaceAll(pageName, "-", "_"); alt != pageName {
+		names = append(names, alt)
+	}
+	if alt := strings.ReplaceAll(pageName, "_", "-"); alt != pageName {
+		names = append(names, alt)
+	}
+	return names
+}
 
 // ============================================
 // 用戶表單欄位設定 API
@@ -35,6 +49,14 @@ func GetUserFormFieldSettings(c *fiber.Ctx) error {
 
 	var settings models.UserFormFieldSettings
 	err := database.DB.Where("tenant_id = ? AND page_name = ?", tenantID, pageName).First(&settings).Error
+	if err != nil {
+		for _, alias := range formFieldSettingsPageNames(pageName)[1:] {
+			if ferr := database.DB.Where("tenant_id = ? AND page_name = ?", tenantID, alias).First(&settings).Error; ferr == nil {
+				err = nil
+				break
+			}
+		}
+	}
 	if err != nil {
 		// 如果不存在，返回空設定
 		return c.JSON(fiber.Map{
@@ -124,6 +146,14 @@ func SaveUserFormFieldSettings(c *fiber.Ctx) error {
 	var settings models.UserFormFieldSettings
 	err := database.DB.Where("tenant_id = ? AND page_name = ?", tenantID, pageName).First(&settings).Error
 	if err != nil {
+		for _, alias := range formFieldSettingsPageNames(pageName)[1:] {
+			if ferr := database.DB.Where("tenant_id = ? AND page_name = ?", tenantID, alias).First(&settings).Error; ferr == nil {
+				err = nil
+				break
+			}
+		}
+	}
+	if err != nil {
 		// 創建新記錄 — 使用原始 SQL 確保 jsonb 類型正確
 		newID := uuid.New()
 		if err := database.DB.Exec(
@@ -144,8 +174,8 @@ func SaveUserFormFieldSettings(c *fiber.Ctx) error {
 		// pgx v5 中 []byte 會被當成 bytea，導致 GORM 的 JSONB.Value() 寫入失敗
 		// 用 string + ::jsonb 顯式轉型繞過此問題
 		if err := database.DB.Exec(
-			"UPDATE user_form_field_settings SET field_config = ?::jsonb, updated_at = NOW() WHERE id = ?",
-			string(fieldConfigJSON), settings.ID,
+			"UPDATE user_form_field_settings SET field_config = ?::jsonb, updated_at = NOW() WHERE tenant_id = ? AND page_name IN ?",
+			string(fieldConfigJSON), tenantID, formFieldSettingsPageNames(pageName),
 		).Error; err != nil {
 			log.Printf("[FieldSettings][SAVE] Update FAILED: %v", err)
 			return c.Status(500).JSON(fiber.Map{"error": "Failed to update form field settings"})
@@ -196,7 +226,7 @@ func DeleteUserFormFieldSettings(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Page name is required"})
 	}
 
-	result := database.DB.Where("tenant_id = ? AND page_name = ?", tenantID, pageName).Delete(&models.UserFormFieldSettings{})
+	result := database.DB.Where("tenant_id = ? AND page_name IN ?", tenantID, formFieldSettingsPageNames(pageName)).Delete(&models.UserFormFieldSettings{})
 	if result.Error != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to delete form field settings"})
 	}
