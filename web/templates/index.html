@@ -10,7 +10,7 @@
     <link href="/static/vendor/fonts/momo-trust-sans.css" rel="stylesheet">
     <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/static/css/custom.css?v=20260825e">
+    <link rel="stylesheet" href="/static/css/custom.css?v=20260825f">
     <!-- i18n 防闪烁样式 -->
     <style>
         /* 当 body 有 i18n-loading 类时，隐藏所有需要翻译的元素，避免显示中文后切换 */
@@ -115,6 +115,9 @@
             </a>
             <!-- Mobile: Menu Toggle (always visible, on the right) -->
             <ul class="navbar-nav d-lg-none ms-auto align-items-center" style="flex-direction: row; gap: 0.5rem;">
+                <li class="nav-item" id="tryFreeBtnMobile">
+                    <a class="btn btn-sm btn-primary" href="/login?product=vwork" data-i18n="nav.tryFree" style="padding: 0.4rem 0.85rem; font-weight: 700; font-size: 0.85rem;">免費試用</a>
+                </li>
                 <li class="nav-item" id="goToSystemBtnMobile">
                     <a class="nav-link" href="/dashboard" title="進入系統">
                         <i class="bi bi-box-arrow-in-right" style="font-size: 1.5rem; color: #adb5bd;"></i>
@@ -163,7 +166,7 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     <!-- 未登录时显示 -->
                     <li class="nav-item" id="tryFreeBtn">
-                        <a class="btn btn-sm btn-outline-secondary" href="/login?product=vwork" data-i18n="nav.tryFree" style="padding: 0.6rem 0.75rem; border-radius: 100px; border-color: #dee2e6; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box;">免費試用</a>
+                        <a class="btn btn-sm btn-primary" href="/login?product=vwork" data-i18n="nav.tryFree" style="padding: 0.6rem 1.1rem; height: 38px; display: inline-flex; align-items: center; box-sizing: border-box; font-weight: 700;">免費試用</a>
                     </li>
                     <!-- 登录后显示 -->
                     <li class="nav-item" id="goToSystemBtn" style="display: none;">
@@ -387,9 +390,9 @@
                     <span class="ai-erp-eyebrow">AI ERP for modern teams</span>
                     <h1 class="ai-erp-headline mt-3 mb-3">一個 <span class="ai-erp-gradient">AI ERP 作業系統</span>，接管你的訂單、團隊、財務與決策。</h1>
                     <p class="ai-erp-subtitle mb-4">vWork 將 ERP、POS、CRM、會計、流程自動化與 vAI 決策助手整合成同一個營運中台。唔再用 Excel 補洞，亦唔需要喺 6 個 SaaS 之間跳來跳去。</p>
-                    <div class="d-flex flex-wrap gap-3 mb-4 mb-lg-5">
+                    <div class="d-flex flex-wrap align-items-center gap-2 gap-sm-3 mb-4 mb-lg-5">
                         <a href="/login?product=vwork" class="btn btn-primary btn-lg px-4">立即免費試用</a>
-                        <a href="#ai-erp-modules" class="btn btn-outline-dark btn-lg px-4">查看核心模組</a>
+                        <a href="#ai-erp-modules" class="ai-erp-textlink">睇下點運作 <i class="bi bi-arrow-down"></i></a>
                     </div>
                     <div class="ai-erp-metric-grid ai-erp-metric-grid-desktop">
                         <div class="ai-erp-metric">
@@ -424,8 +427,8 @@
                                         <span class="ai-erp-delta">+18%</span>
                                     </div>
                                     <svg class="ai-erp-spark" viewBox="0 0 360 128" preserveAspectRatio="none" aria-hidden="true">
-                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26 L360,128 L0,128 Z" fill="rgba(255,255,255,0.08)"/>
-                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26" fill="none" stroke="#cfcfcf" stroke-width="2.2" stroke-linejoin="round"/>
+                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26 L360,128 L0,128 Z" fill="rgba(29,111,248,0.14)"/>
+                                        <path d="M0,96 L30,90 L60,94 L90,72 L120,78 L150,58 L180,64 L210,42 L240,48 L270,30 L300,36 L330,22 L360,26" fill="none" stroke="#3d8bff" stroke-width="2.2" stroke-linejoin="round"/>
                                     </svg>
                                     <div class="ai-erp-pills">
                                         <span>訂單自動入帳</span>
@@ -475,12 +478,32 @@
         </div>
     </section>
 
+    <!-- 三個結果，取代原本一整段抽象的「為何轉用」章節 -->
+    <section class="ai-erp-proof-strip is-canvas">
+        <div class="container-fluid px-3">
+            <div class="ai-erp-proof-strip-grid">
+                <div>
+                    <span class="ai-erp-kicker">即時決策</span>
+                    <p class="mb-0">管理層唔使等月尾報表，日常已經見到收入、缺貨同付款風險。</p>
+                </div>
+                <div>
+                    <span class="ai-erp-kicker">流程串流</span>
+                    <p class="mb-0">前線輸入一次，後台自動流轉，抄寫、對單、追數變成系統任務。</p>
+                </div>
+                <div>
+                    <span class="ai-erp-kicker">可控擴張</span>
+                    <p class="mb-0">由單店到多部門、多角色權限，都用同一平台穩定擴展。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="ai-erp-modules" class="ai-erp-section">
         <div class="container-fluid px-3">
             <div class="ai-erp-section-shell">
                 <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
                     <div>
-                        <div class="text-uppercase small text-primary fw-bold mb-2">Core modules</div>
+                        <div class="ai-erp-kicker">Core modules</div>
                         <h2 class="display-6 fw-bold mb-2">由前台營運到後台財務，全部在一個 AI ERP 裡面</h2>
                         <p class="text-muted mb-0">唔止係功能堆砌，而係將數據流、責任流同決策流整合成同一個作業面。</p>
                     </div>
@@ -506,68 +529,6 @@
                         <div class="ai-erp-feature-icon"><i class="bi bi-window-stack"></i></div>
                         <h4 class="fw-bold">Office workflow</h4>
                         <p class="text-muted mb-0">透過 vOffice 處理文檔、表格、簡報，同企業數據與流程直接接軌。</p>
-                    </article>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="ai-erp-section">
-        <div class="container-fluid px-3">
-            <div class="ai-erp-section-shell">
-                <div class="row g-4 align-items-center">
-                    <div class="col-lg-5">
-                        <div class="text-uppercase small text-primary fw-bold mb-2">Why teams switch</div>
-                        <h2 class="display-6 fw-bold mb-3">唔再係「再買一個工具」，而係重新設計整間公司點樣運作</h2>
-                        <p class="text-muted">vWork 適合想由傳統流程升級為 AI-first 營運模式嘅企業。從前線開單到老闆睇數，同一條數據鏈路完成。</p>
-                    </div>
-                    <div class="col-lg-7">
-                        <div class="ai-erp-proof-grid">
-                            <article class="ai-erp-proof-card">
-                                <div class="ai-erp-proof-icon"><i class="bi bi-lightning"></i></div>
-                                <h5 class="fw-bold">即時決策</h5>
-                                <p class="text-muted mb-0">管理層唔使等月尾報表，日常已經見到收入、缺貨、付款風險同團隊負載。</p>
-                            </article>
-                            <article class="ai-erp-proof-card">
-                                <div class="ai-erp-proof-icon"><i class="bi bi-arrow-repeat"></i></div>
-                                <h5 class="fw-bold">流程串流</h5>
-                                <p class="text-muted mb-0">前線輸入一次，後台自動流轉，將手動抄寫、對單、追數變成系統任務。</p>
-                            </article>
-                            <article class="ai-erp-proof-card">
-                                <div class="ai-erp-proof-icon"><i class="bi bi-shield-check"></i></div>
-                                <h5 class="fw-bold">可控擴張</h5>
-                                <p class="text-muted mb-0">由單店到多部門、多角色權限，都可以用同一平台穩定擴展。</p>
-                            </article>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="ai-erp-section">
-        <div class="container-fluid px-3">
-            <div class="ai-erp-section-shell">
-                <div class="text-center mb-4">
-                    <div class="text-uppercase small text-primary fw-bold mb-2">Implementation path</div>
-                    <h2 class="display-6 fw-bold mb-2">由舊系統搬到 AI ERP，唔需要一次過推倒重來</h2>
-                    <p class="text-muted mb-0">我哋建議用三步走方式，先見成效，再逐層擴展。</p>
-                </div>
-                <div class="ai-erp-step-grid">
-                    <article class="ai-erp-step">
-                        <div class="ai-erp-step-icon">01</div>
-                        <h5 class="fw-bold">先接前線營運</h5>
-                        <p class="text-muted mb-0">從訂單、CRM、庫存或 POS 開始，先將最影響收入與效率嘅流程統一起來。</p>
-                    </article>
-                    <article class="ai-erp-step">
-                        <div class="ai-erp-step-icon">02</div>
-                        <h5 class="fw-bold">再接財務與審批</h5>
-                        <p class="text-muted mb-0">將應收、成本、報銷、採購、報表拉入同一數據層，管理層即時可見。</p>
-                    </article>
-                    <article class="ai-erp-step">
-                        <div class="ai-erp-step-icon">03</div>
-                        <h5 class="fw-bold">最後打開 vAI 自動化</h5>
-                        <p class="text-muted mb-0">自動摘要、內容生成、異常提示、跟進提醒與分析建議，讓團隊跑得更快。</p>
                     </article>
                 </div>
             </div>
@@ -877,17 +838,73 @@
         </style>
     </section>
 
+    <!-- 整合場景展示 -->
+    <section class="py-5 position-relative scenarios-section is-canvas">
+        <div class="container-fluid px-3 position-relative">
+            <div class="text-center mb-4">
+                <div class="ai-erp-kicker">Before / after</div>
+                <h2 class="fw-bold">
+                    <span data-i18n="scenarios.title">你的日常，</span><span class="gradient-text" data-i18n="scenarios.titleHighlight">vWork 全部搞定</span>
+                </h2>
+                <p class="text-muted" data-i18n="scenarios.subtitle">不管你做什麼行業，這些場景你一定遇過</p>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.0.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.0.painDesc">Excel 記庫存、另一個系統開單、再手動輸入會計軟件。每天花 2 小時對數。</p>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.0.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.0.solutionDesc">開單 → 庫存自動扣 → 會計自動入帳。零手動，零出錯。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.1.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.1.painDesc">Foodpanda、Keeta、Deliveroo 三個平台三部 iPad，忙的時候漏單、出錯。</p>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.1.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.1.solutionDesc">三個平台的訂單自動匯入同一個後台。一個畫面看全部，自動接單。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.2.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.2.painDesc">月底要出報表，從 3 個系統導出數據，再用 Excel 合併。老闆問業績只能說「等一下」。</p>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.2.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.2.solutionDesc">直接問 vAi：「上個月營收多少？」3 秒出答案。AI 連接所有數據，隨問隨答。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.3.pain">以前</h6>
+                            <p class="small text-muted mb-3" data-i18n="scenarios.items.3.painDesc">用 Excel 排班、手動計薪、逐個算加班費。每月出糧日通宵趕工，還經常算錯被員工投訴。</p>
+                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.3.solution">用 vWork</h6>
+                            <p class="small mb-0" data-i18n="scenarios.items.3.solutionDesc">自動排班、打卡紀錄自動計薪、加班補水一鍵算好。出糧日一鍵匯出，零錯誤零加班。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- vBuilder 和 Kiosk Mode POS 介紹 - 雙欄佈局 -->
     <section id="tools" class="py-5 tools-section">
         <div class="container-fluid px-3">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold" data-i18n="tools.title">強大工具</h2>
-                <p class="text-muted lead" data-i18n="tools.subtitle">為您的業務提供全方位的數位化工具</p>
+                <div class="ai-erp-kicker">Tools</div>
+                <h2 class="fw-bold" data-i18n="tools.title">強大工具</h2>
+                <p class="text-muted" data-i18n="tools.subtitle">為您的業務提供全方位的數位化工具</p>
             </div>
-            <div class="row g-5">
+            <div class="row g-4 g-lg-5">
                 <!-- Kiosk Mode POS -->
                 <div class="col-md-4 text-center">
-                    <img src="/static/tool_pos.png" alt="Kiosk Mode POS" class="img-fluid mb-3" style="max-height: 200px; border-radius: 12px;">
+                    <img src="/static/tool_pos.png" alt="Kiosk Mode POS" class="img-fluid mb-3 tools-shot">
                     <h4 class="fw-bold mb-2" data-i18n="tools.kiosk.title">Kiosk Mode POS 自助收銀系統</h4>
                     <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.kiosk.desc_short">專為零售門店設計的自助收銀模式，簡潔直觀的界面，支持多種付款方式，提升結帳效率。</p>
                     <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
@@ -896,11 +913,11 @@
                         <span class="badge" data-i18n="tools.kiosk.features.2">多種付款</span>
                         <span class="badge" data-i18n="tools.kiosk.features.3">自助服務</span>
                     </div>
-                    <a href="/login?product=vwork" class="btn btn-dark px-4 py-2" data-i18n="tools.kiosk.cta">立即體驗</a>
+                    <a href="/login?product=vwork" class="btn btn-outline-primary px-4 py-2" data-i18n="tools.kiosk.cta">立即體驗</a>
                 </div>
                 <!-- 自動搵客系統 -->
                 <div class="col-md-4 text-center">
-                    <img src="/static/tool_leadfinder.png" alt="自動搵客系統" class="img-fluid mb-3" style="max-height: 200px; border-radius: 12px;">
+                    <img src="/static/tool_leadfinder.png" alt="自動搵客系統" class="img-fluid mb-3 tools-shot">
                     <h4 class="fw-bold mb-2" data-i18n="tools.leadFinder.title">自動搵客系統</h4>
                     <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.leadFinder.desc_short">AI 自動搜尋潛在客戶，智能分析匹配度，自動發送個性化外展訊息，讓商機主動找上門。</p>
                     <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
@@ -909,11 +926,11 @@
                         <span class="badge" data-i18n="tools.leadFinder.features.2">智能匹配</span>
                         <span class="badge" data-i18n="tools.leadFinder.features.3">定時發送</span>
                     </div>
-                    <a href="/login?product=vwork" class="btn btn-dark px-4 py-2" data-i18n="tools.leadFinder.cta">立即體驗</a>
+                    <a href="/login?product=vwork" class="btn btn-outline-primary px-4 py-2" data-i18n="tools.leadFinder.cta">立即體驗</a>
                 </div>
                 <!-- 可視化建站工具 -->
                 <div class="col-md-4 text-center">
-                    <img src="/static/tool_web.png" alt="網站建置工具" class="img-fluid mb-3" style="max-height: 200px; border-radius: 12px;">
+                    <img src="/static/tool_web.png" alt="網站建置工具" class="img-fluid mb-3 tools-shot">
                     <h4 class="fw-bold mb-2" data-i18n="tools.vbuilder.title">可視化建站工具</h4>
                     <p class="text-muted mb-3" style="font-size: 0.95rem;" data-i18n="tools.vbuilder.desc_short">無需編程知識，拖拽式操作創建專業網站。豐富模板、實時預覽，所見即所得。</p>
                     <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
@@ -922,7 +939,7 @@
                         <span class="badge" data-i18n="tools.vbuilder.features.2">實時預覽</span>
                         <span class="badge" data-i18n="tools.vbuilder.features.3">響應式設計</span>
                     </div>
-                    <a href="/login?product=vwork" class="btn btn-dark px-4 py-2" data-i18n="tools.vbuilder.cta">立即體驗</a>
+                    <a href="/login?product=vwork" class="btn btn-outline-primary px-4 py-2" data-i18n="tools.vbuilder.cta">立即體驗</a>
                 </div>
             </div>
         </div>
@@ -932,8 +949,9 @@
     <section id="use-cases" class="py-5">
         <div class="container-fluid px-3 position-relative use-cases-wrapper">
             <div class="text-center mb-4">
-                <h2 class="display-5 fw-bold mb-3" data-i18n="useCases.title">不管什麼行業，都能用</h2>
-                <p class="text-muted lead" data-i18n="useCases.subtitle">vWork 的高整合性讓每個行業都能找到適合自己的用法</p>
+                <div class="ai-erp-kicker">Industries</div>
+                <h2 class="fw-bold mb-2" data-i18n="useCases.title">不管什麼行業，都能用</h2>
+                <p class="text-muted" data-i18n="useCases.subtitle">vWork 的高整合性讓每個行業都能找到適合自己的用法</p>
             </div>
             <div class="use-cases-carousel">
                 <div class="use-cases-scroll" data-scroll-container>
@@ -1064,55 +1082,31 @@
         </script>
     </section>
 
-    <!-- 整合場景展示 -->
-    <section class="py-5 position-relative scenarios-section">
-        <div class="container-fluid px-3 position-relative">
-            <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold">
-                    <span data-i18n="scenarios.title">你的日常，</span><span class="gradient-text" data-i18n="scenarios.titleHighlight">vWork 全部搞定</span>
-                </h2>
-                <p class="text-muted lead" data-i18n="scenarios.subtitle">不管你做什麼行業，這些場景你一定遇過</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm h-100 p-3">
-                        <div class="card-body">
-                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.0.pain">以前</h6>
-                            <p class="small text-muted mb-3" data-i18n="scenarios.items.0.painDesc">Excel 記庫存、另一個系統開單、再手動輸入會計軟件。每天花 2 小時對數。</p>
-                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.0.solution">用 vWork</h6>
-                            <p class="small mb-0" data-i18n="scenarios.items.0.solutionDesc">開單 → 庫存自動扣 → 會計自動入帳。零手動，零出錯。</p>
-                        </div>
-                    </div>
+    <!-- 部署節奏：由「強大工具」與行業案例之後才交代，讀者先睇到價值再睇流程 -->
+    <section class="ai-erp-section is-canvas">
+        <div class="container-fluid px-3">
+            <div class="ai-erp-section-shell">
+                <div class="text-center mb-4">
+                    <div class="ai-erp-kicker">Implementation path</div>
+                    <h2 class="fw-bold mb-2">7 日上線，唔需要一次過推倒重來</h2>
+                    <p class="text-muted mb-0">三步走：先見成效，再逐層擴展。</p>
                 </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm h-100 p-3">
-                        <div class="card-body">
-                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.1.pain">以前</h6>
-                            <p class="small text-muted mb-3" data-i18n="scenarios.items.1.painDesc">Foodpanda、Keeta、Deliveroo 三個平台三部 iPad，忙的時候漏單、出錯。</p>
-                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.1.solution">用 vWork</h6>
-                            <p class="small mb-0" data-i18n="scenarios.items.1.solutionDesc">三個平台的訂單自動匯入同一個後台。一個畫面看全部，自動接單。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm h-100 p-3">
-                        <div class="card-body">
-                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.2.pain">以前</h6>
-                            <p class="small text-muted mb-3" data-i18n="scenarios.items.2.painDesc">月底要出報表，從 3 個系統導出數據，再用 Excel 合併。老闆問業績只能說「等一下」。</p>
-                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.2.solution">用 vWork</h6>
-                            <p class="small mb-0" data-i18n="scenarios.items.2.solutionDesc">直接問 vAi：「上個月營收多少？」3 秒出答案。AI 連接所有數據，隨問隨答。</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 shadow-sm h-100 p-3">
-                        <div class="card-body">
-                            <h6 class="fw-bold text-muted mb-2" data-i18n="scenarios.items.3.pain">以前</h6>
-                            <p class="small text-muted mb-3" data-i18n="scenarios.items.3.painDesc">用 Excel 排班、手動計薪、逐個算加班費。每月出糧日通宵趕工，還經常算錯被員工投訴。</p>
-                            <h6 class="fw-bold mb-2" data-i18n="scenarios.items.3.solution">用 vWork</h6>
-                            <p class="small mb-0" data-i18n="scenarios.items.3.solutionDesc">自動排班、打卡紀錄自動計薪、加班補水一鍵算好。出糧日一鍵匯出，零錯誤零加班。</p>
-                        </div>
-                    </div>
+                <div class="ai-erp-step-grid">
+                    <article class="ai-erp-step">
+                        <div class="ai-erp-step-icon">01</div>
+                        <h5 class="fw-bold">先接前線營運</h5>
+                        <p class="text-muted mb-0">從訂單、CRM、庫存或 POS 開始，先將最影響收入與效率嘅流程統一起來。</p>
+                    </article>
+                    <article class="ai-erp-step">
+                        <div class="ai-erp-step-icon">02</div>
+                        <h5 class="fw-bold">再接財務與審批</h5>
+                        <p class="text-muted mb-0">將應收、成本、報銷、採購、報表拉入同一數據層，管理層即時可見。</p>
+                    </article>
+                    <article class="ai-erp-step">
+                        <div class="ai-erp-step-icon">03</div>
+                        <h5 class="fw-bold">最後打開 vAI 自動化</h5>
+                        <p class="text-muted mb-0">自動摘要、內容生成、異常提示、跟進提醒與分析建議，讓團隊跑得更快。</p>
+                    </article>
                 </div>
             </div>
         </div>
@@ -1121,7 +1115,7 @@
     <!-- Partners Section -->
     <section class="partners-section py-5">
         <div class="container-fluid px-3">
-            <h3 class="text-center mb-5" data-i18n="partners.title">合作夥伴</h3>
+            <h3 class="text-center mb-4 ai-erp-partners-title" data-i18n="partners.title">合作夥伴</h3>
             <div class="partners-container">
                 <div class="partners-slider">
                     <!-- First set of 6 logos -->
@@ -1547,12 +1541,10 @@
     <!-- CTA Section -->
     <section class="cta-section py-5">
         <div class="container-fluid px-3">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <h3 class="mb-2" style="color: var(--nir-dark); font-weight: 700;" data-i18n="cta.title">還在用 Excel + 多個系統拼湊？</h3>
-                    <p class="text-muted mb-0" data-i18n="cta.subtitle">免費試用 vWork，體驗一個後台管理全部業務的感覺</p>
-                </div>
-                <div class="col-lg-4 text-lg-end text-start mt-3 mt-lg-0">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-7">
+                    <h3 class="mb-3 fw-bold" data-i18n="cta.title">還在用 Excel + 多個系統拼湊？</h3>
+                    <p class="mb-4" data-i18n="cta.subtitle">免費試用 vWork，體驗一個後台管理全部業務的感覺</p>
                     <a href="/login?product=vwork" class="btn btn-nir" data-i18n="cta.button">免費開始</a>
                 </div>
             </div>
@@ -1868,6 +1860,7 @@
         // 注意：後端主要用 HttpOnly cookie 保存 auth_token；前端無法讀 cookie，因此不能只靠 localStorage 判斷是否已登入。
         async function checkAuthAndUpdateNav() {
             const tryFreeBtn = document.getElementById('tryFreeBtn');
+            const tryFreeBtnMobile = document.getElementById('tryFreeBtnMobile');
             const userDropdownNav = document.getElementById('userDropdown');
             const userNameSpan = document.getElementById('userName');
             const logoutBtn = document.getElementById('logoutBtn');
@@ -1935,6 +1928,9 @@
                 // 已登錄，顯示用戶下拉菜單和前往系統按鈕
                 if (tryFreeBtn) {
                     tryFreeBtn.style.display = 'none';
+                }
+                if (tryFreeBtnMobile) {
+                    tryFreeBtnMobile.style.display = 'none';
                 }
                 const goToSystemBtn = document.getElementById('goToSystemBtn');
                 if (goToSystemBtn) {
@@ -2048,6 +2044,9 @@
                 // 未登錄，顯示免費試用按鈕
                 if (tryFreeBtn) {
                     tryFreeBtn.style.display = 'list-item';
+                }
+                if (tryFreeBtnMobile) {
+                    tryFreeBtnMobile.style.display = 'list-item';
                 }
                 const goToSystemBtn = document.getElementById('goToSystemBtn');
                 if (goToSystemBtn) {

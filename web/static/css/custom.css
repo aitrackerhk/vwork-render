@@ -56,34 +56,44 @@ body {
 }
 
 .home-page-redesign {
-    --ledger-paper: #fafafa;
-    --ledger-ink: #111111;
-    --ledger-muted: #6b6b6b;
-    --ledger-line: #e6e6e6;
-    --ledger-blue: #111111;
-    --ledger-good: #111111;
-    background: var(--ledger-paper);
-    color: var(--ledger-ink);
+    --v-paper: #ffffff;
+    --v-canvas: #f5f6f9;
+    --v-ink: #0b1220;
+    --v-muted: #5c6573;
+    --v-line: #e6e8ec;
+    --v-brand: #1d6ff8;
+    --v-brand-deep: #0b44b8;
+    --v-brand-soft: rgba(29, 111, 248, 0.09);
+    --v-chrome: #0e1219;
+    /* aliases kept so older homepage rules inherit the new palette */
+    --ledger-paper: var(--v-paper);
+    --ledger-ink: var(--v-ink);
+    --ledger-muted: var(--v-muted);
+    --ledger-line: var(--v-line);
+    --ledger-blue: var(--v-brand);
+    --ledger-good: var(--v-brand);
+    background: var(--v-paper);
+    color: var(--v-ink);
 }
 
 .home-page-redesign .navbar {
-    background: rgba(250, 250, 250, 0.94);
+    background: rgba(255, 255, 255, 0.86);
     backdrop-filter: blur(18px);
-    border-bottom: 1px solid var(--ledger-line);
+    border-bottom: 1px solid var(--v-line);
 }
 
 .home-page-redesign.has-promo-topbar .promo-topbar {
-    background: #111111;
-    color: #fafafa;
+    background: var(--v-ink);
+    color: #ffffff;
     font-weight: 600;
     letter-spacing: 0.04em;
 }
 
 .home-page-redesign .ai-erp-hero .btn-primary,
 .home-page-redesign .ai-erp-section .btn-primary {
-    background: #14161b;
-    border-color: #14161b;
-    border-radius: 999px;
+    background: var(--v-brand);
+    border-color: var(--v-brand);
+    border-radius: 10px;
     font-weight: 700;
     letter-spacing: 0.01em;
     box-shadow: none;
@@ -91,29 +101,47 @@ body {
 
 .home-page-redesign .ai-erp-hero .btn-primary:hover,
 .home-page-redesign .ai-erp-section .btn-primary:hover {
-    background: #333333;
-    border-color: #333333;
+    background: var(--v-brand-deep);
+    border-color: var(--v-brand-deep);
 }
 
 .home-page-redesign .ai-erp-hero .btn-outline-dark,
 .home-page-redesign .ai-erp-section .btn-outline-primary,
 .home-page-redesign .ai-erp-section .btn-outline-dark {
-    border-radius: 999px;
-    border-color: #14161b;
-    color: #14161b;
+    border-radius: 10px;
+    border-color: var(--v-line);
+    color: var(--v-ink);
     font-weight: 700;
-    background: transparent;
+    background: #fff;
 }
 
 .home-page-redesign .ai-erp-hero .btn-outline-dark:hover,
 .home-page-redesign .ai-erp-section .btn-outline-primary:hover,
 .home-page-redesign .ai-erp-section .btn-outline-dark:hover {
-    background: #14161b;
-    color: #f4f0e6;
+    background: #fff;
+    border-color: var(--v-ink);
+    color: var(--v-ink);
+}
+
+/* Quiet text-link action so the hero has one obvious primary button */
+.home-page-redesign .ai-erp-textlink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 0.25rem;
+    font-weight: 700;
+    color: var(--v-ink);
+    text-decoration: none;
+    transition: color 0.15s ease, gap 0.15s ease;
+}
+
+.home-page-redesign .ai-erp-textlink:hover {
+    color: var(--v-brand);
+    gap: 0.65rem;
 }
 
 .ai-erp-hero {
-    padding: 2rem 0 3.25rem;
+    padding: 2.75rem 0 3.5rem;
 }
 
 .ai-erp-eyebrow {
@@ -123,32 +151,32 @@ body {
     padding: 0;
     border: 0;
     background: none;
-    color: var(--ledger-muted);
-    font-size: 0.78rem;
-    font-weight: 700;
+    color: var(--v-brand);
+    font-size: 0.76rem;
+    font-weight: 800;
     letter-spacing: 0.16em;
     text-transform: uppercase;
 }
 
 .ai-erp-headline {
-    font-size: clamp(2.05rem, 3.4vw, 3.2rem);
-    line-height: 1.16;
+    font-size: clamp(2.15rem, 3.6vw, 3.35rem);
+    line-height: 1.14;
     font-weight: 800;
-    color: var(--ledger-ink);
+    color: var(--v-ink);
     letter-spacing: -0.035em;
 }
 
 .ai-erp-gradient {
-    color: var(--ledger-ink);
+    color: var(--v-ink);
     background: none;
-    box-shadow: inset 0 -0.18em 0 rgba(17, 17, 17, 0.12);
+    box-shadow: none;
 }
 
 .ai-erp-subtitle {
-    max-width: 38rem;
-    font-size: 1.05rem;
+    max-width: 34rem;
+    font-size: 1.02rem;
     line-height: 1.7;
-    color: var(--ledger-muted);
+    color: var(--v-muted);
 }
 
 .ai-erp-hero-card,
@@ -170,11 +198,11 @@ body {
 }
 
 .ai-erp-window {
-    border: 1px solid #2a2e38;
-    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     overflow: hidden;
-    background: #171920;
-    box-shadow: 18px 28px 60px rgba(20, 22, 27, 0.18);
+    background: var(--v-chrome, #0e1219);
+    box-shadow: 0 24px 60px rgba(11, 18, 32, 0.24);
 }
 
 .ai-erp-window-bar,
@@ -213,9 +241,9 @@ body {
     padding: 0.28rem 0.7rem;
     font-size: 0.72rem;
     font-weight: 700;
-    background: rgba(255, 255, 255, 0.08);
-    color: #cfcfcf;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(29, 111, 248, 0.16);
+    color: #8ab4ff;
+    border: 1px solid rgba(29, 111, 248, 0.32);
 }
 
 .ai-erp-chip::before {
@@ -223,7 +251,7 @@ body {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #cfcfcf;
+    background: #3d8bff;
     box-shadow: none;
 }
 
@@ -247,7 +275,7 @@ body {
     font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #8b8578;
+    color: #8b93a1;
     font-weight: 700;
 }
 
@@ -256,7 +284,7 @@ body {
     align-items: baseline;
     gap: 0.65rem;
     margin: 0.35rem 0 0.9rem;
-    color: #f6f3ea;
+    color: #f4f6fa;
 }
 
 .ai-erp-stat-value strong {
@@ -266,7 +294,7 @@ body {
 }
 
 .ai-erp-delta {
-    color: #cfcfcf;
+    color: #4d92ff;
     font-size: 0.85rem;
     font-weight: 700;
 }
@@ -285,8 +313,8 @@ body {
 }
 
 .ai-erp-pills span {
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #d7d3c8;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #c3cad6;
     border-radius: 999px;
     padding: 0.28rem 0.65rem;
     font-size: 0.75rem;
@@ -304,13 +332,13 @@ body {
 
 .ai-erp-feed-item b {
     display: block;
-    color: #f4f0e6;
+    color: #eef1f6;
     font-size: 0.92rem;
     margin-bottom: 0.2rem;
 }
 
 .ai-erp-feed-item span {
-    color: #9b9488;
+    color: #8b93a1;
     font-size: 0.8rem;
     line-height: 1.45;
 }
@@ -328,7 +356,7 @@ body {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1.5rem;
     padding-top: 1.15rem;
-    border-top: 1px solid var(--ledger-line);
+    border-top: 1px solid var(--v-line);
 }
 
 .ai-erp-metric {
@@ -339,7 +367,7 @@ body {
     display: block;
     font-size: 0.7rem;
     letter-spacing: 0.14em;
-    color: var(--ledger-muted);
+    color: var(--v-muted);
     margin-bottom: 0.2rem;
 }
 
@@ -347,72 +375,99 @@ body {
     display: block;
     font-size: 1.35rem;
     line-height: 1.15;
-    color: var(--ledger-ink);
+    color: var(--v-ink);
 }
 
 .ai-erp-metric span {
     display: block;
     margin-top: 0.15rem;
     font-size: 0.86rem;
-    color: var(--ledger-muted);
+    color: var(--v-muted);
 }
 
 .ai-erp-section {
-    padding: 2.6rem 0;
+    padding: 4.25rem 0;
 }
 
 .ai-erp-section-shell {
     border-radius: 0;
     padding: 0;
-    border-top: 1px solid var(--ledger-line);
-    padding-top: 2.4rem;
+    border-top: 0;
+}
+
+/* Alternating surface so sections read as separate chapters */
+.home-page-redesign .ai-erp-section.is-canvas,
+.home-page-redesign section.is-canvas {
+    background: var(--v-canvas) !important;
 }
 
 .ai-erp-feature-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.5rem;
+    gap: 1.25rem;
 }
 
 .ai-erp-feature,
 .ai-erp-proof-card,
-.ai-erp-step,
+.ai-erp-step {
+    border-radius: 14px;
+    padding: 1.5rem;
+    height: 100%;
+    background: var(--v-paper);
+    border: 1px solid var(--v-line);
+    transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.ai-erp-feature:hover,
+.ai-erp-proof-card:hover,
+.ai-erp-step:hover {
+    border-color: rgba(29, 111, 248, 0.35);
+    transform: translateY(-2px);
+}
+
 .ai-erp-pricing-card {
-    border-radius: 0;
-    padding: 0;
+    border-radius: 14px;
+    padding: 1.5rem;
     height: 100%;
 }
 
 .ai-erp-feature-icon,
-.ai-erp-proof-icon,
+.ai-erp-proof-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--v-brand-soft);
+    color: var(--v-brand);
+    font-size: 1.15rem;
+    margin-bottom: 1rem;
+}
+
 .ai-erp-step-icon {
     width: auto;
     height: auto;
     display: block;
-    border-radius: 0;
     background: none;
-    color: var(--ledger-ink);
-    font-size: 1.15rem;
-    margin-bottom: 0.85rem;
-}
-
-.ai-erp-step-icon {
+    border-radius: 0;
+    margin-bottom: 0.75rem;
     font-size: 0.78rem;
     letter-spacing: 0.16em;
     font-weight: 800;
-    color: var(--ledger-muted);
+    color: var(--v-brand);
 }
 
 .ai-erp-proof-grid,
 .ai-erp-step-grid,
 .ai-erp-pricing-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.75rem;
+    gap: 1.25rem;
 }
 
 .ai-erp-pricing-card {
-    border: 1px solid var(--ledger-line);
+    border: 1px solid var(--v-line);
     padding: 1.5rem;
-    background: rgba(255,255,255,0.35);
+    background: var(--v-paper);
 }
 
 .ai-erp-pricing-card.is-featured {
@@ -463,31 +518,38 @@ body {
 .ai-erp-cta-band {
     border-radius: 0;
     padding: 2rem 0;
-    background: #111111;
-    color: #fafafa;
+    background: var(--v-ink);
+    color: #ffffff;
     box-shadow: none;
 }
 
 .home-page-redesign .cta-section {
-    background: #111111 !important;
-    color: #fafafa;
+    background: var(--v-ink) !important;
+    color: #ffffff;
+    padding: 4rem 0 !important;
 }
 
-.home-page-redesign .cta-section h3,
+.home-page-redesign .cta-section h3 {
+    color: #ffffff !important;
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+    letter-spacing: -0.02em;
+}
+
 .home-page-redesign .cta-section p {
-    color: #fafafa !important;
+    color: rgba(255, 255, 255, 0.72) !important;
 }
 
 .home-page-redesign .btn-nir {
-    background: #fafafa;
-    color: #111111;
-    border-radius: 999px;
+    background: var(--v-brand);
+    color: #ffffff;
+    border-radius: 10px;
     font-weight: 700;
+    padding: 0.85rem 1.75rem;
 }
 
 .home-page-redesign .btn-nir:hover {
-    background: #fff;
-    color: #111111;
+    background: #4a8bff;
+    color: #ffffff;
 }
 
 @media (max-width: 1199px) {
@@ -548,24 +610,25 @@ body {
     }
 }
 
+/* One accent only: every semantic colour utility collapses onto brand or ink */
 .home-page-redesign .text-primary,
 .home-page-redesign .text-success,
 .home-page-redesign .text-danger,
 .home-page-redesign .text-warning,
 .home-page-redesign .text-info {
-    color: var(--ledger-ink) !important;
+    color: var(--v-brand) !important;
 }
 
 .home-page-redesign .text-uppercase.small.text-primary {
-    color: var(--ledger-muted) !important;
+    color: var(--v-brand) !important;
 }
 
 .home-page-redesign .btn-primary,
 .home-page-redesign .btn-success,
 .home-page-redesign .btn-warning,
 .home-page-redesign .btn-info {
-    background: #111111 !important;
-    border-color: #111111 !important;
+    background: var(--v-brand) !important;
+    border-color: var(--v-brand) !important;
     color: #fff !important;
     box-shadow: none !important;
 }
@@ -574,9 +637,16 @@ body {
 .home-page-redesign .btn-success:hover,
 .home-page-redesign .btn-warning:hover,
 .home-page-redesign .btn-info:hover {
-    background: #333333 !important;
-    border-color: #333333 !important;
+    background: var(--v-brand-deep) !important;
+    border-color: var(--v-brand-deep) !important;
     color: #fff !important;
+}
+
+.home-page-redesign .btn-dark {
+    background: var(--v-ink) !important;
+    border-color: var(--v-ink) !important;
+    border-radius: 10px;
+    font-weight: 700;
 }
 
 .home-page-redesign .btn-outline-primary,
@@ -584,9 +654,9 @@ body {
 .home-page-redesign .btn-outline-warning,
 .home-page-redesign .btn-outline-info,
 .home-page-redesign .btn-outline-secondary {
-    background: transparent !important;
-    border-color: #111111 !important;
-    color: #111111 !important;
+    background: #fff !important;
+    border-color: var(--v-line) !important;
+    color: var(--v-ink) !important;
 }
 
 .home-page-redesign .btn-outline-primary:hover,
@@ -595,21 +665,21 @@ body {
 .home-page-redesign .btn-outline-info:hover,
 .home-page-redesign .btn-outline-secondary:hover,
 .home-page-redesign .btn-outline-dark:hover {
-    background: #111111 !important;
-    border-color: #111111 !important;
-    color: #fff !important;
+    background: #fff !important;
+    border-color: var(--v-brand) !important;
+    color: var(--v-brand) !important;
 }
 
 .home-page-redesign .ai-erp-pricing-card.is-featured .btn-primary {
-    background: #fafafa !important;
-    border-color: #fafafa !important;
-    color: #111111 !important;
+    background: #ffffff !important;
+    border-color: #ffffff !important;
+    color: var(--v-ink) !important;
 }
 
 .home-page-redesign .ai-erp-pricing-card.is-featured .btn-primary:hover {
-    background: #fff !important;
-    border-color: #fff !important;
-    color: #111111 !important;
+    background: #eef3ff !important;
+    border-color: #eef3ff !important;
+    color: var(--v-ink) !important;
 }
 
 .home-page-redesign .badge,
@@ -621,68 +691,247 @@ body {
 .home-page-redesign .badge.text-bg-success,
 .home-page-redesign .badge.text-bg-warning,
 .home-page-redesign .badge.text-bg-primary {
-    background: #efefef !important;
-    color: #111111 !important;
+    background: var(--v-brand-soft) !important;
+    color: var(--v-brand) !important;
     border: 0;
+    font-weight: 600;
+    padding: 0.4em 0.75em;
+    border-radius: 999px;
 }
 
 .home-page-redesign .gradient-text {
     background: none !important;
-    color: #111111 !important;
-    -webkit-text-fill-color: #111111 !important;
+    color: var(--v-brand) !important;
+    -webkit-text-fill-color: var(--v-brand) !important;
 }
 
 .home-page-redesign .tools-section,
 .home-page-redesign .partners-section,
 .home-page-redesign #use-cases,
 .home-page-redesign section.py-5 {
-    background: var(--ledger-paper) !important;
+    background: var(--v-paper) !important;
     box-shadow: none !important;
 }
 
 .home-page-redesign .cta-section,
 .home-page-redesign .ai-erp-cta-band {
-    background: #111111 !important;
+    background: var(--v-ink) !important;
 }
 
 .home-page-redesign .card {
     background: #fff;
     box-shadow: none !important;
-    border: 1px solid var(--ledger-line) !important;
+    border: 1px solid var(--v-line) !important;
+    border-radius: 14px;
 }
 
-.home-page-redesign .use-case-card,
+.home-page-redesign .use-case-card {
+    transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
 .home-page-redesign .use-case-card:hover {
-    transform: none;
-    box-shadow: none !important;
+    transform: translateY(-2px);
+    border-color: rgba(29, 111, 248, 0.35) !important;
 }
 
-.home-page-redesign .partner-logo,
-.home-page-redesign .partner-logo:hover {
+.home-page-redesign .partner-logo {
     filter: grayscale(1);
-    opacity: 0.55;
+    opacity: 0.5;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+.home-page-redesign .partner-logo:hover {
+    filter: grayscale(0);
+    opacity: 1;
 }
 
 .home-page-redesign .whatsapp-floating-btn {
-    background: #111111;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    background: #25d366;
+    box-shadow: 0 10px 24px rgba(11, 18, 32, 0.18);
 }
 
 .home-page-redesign .whatsapp-floating-btn:hover {
-    background: #333333;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    background: #1eb757;
+    box-shadow: 0 10px 24px rgba(11, 18, 32, 0.24);
     color: #fff;
 }
 
 .home-page-redesign .site-footer-light {
-    background: var(--ledger-paper);
-    border-top: 1px solid var(--ledger-line);
+    background: var(--v-canvas);
+    border-top: 1px solid var(--v-line);
 }
 
 .home-page-redesign .alert-success {
-    background: #efefef;
-    border-color: var(--ledger-line);
-    color: #111111;
+    background: var(--v-brand-soft);
+    border-color: rgba(29, 111, 248, 0.25);
+    color: var(--v-brand-deep);
+}
+
+/* Section headers share one scale so no title shouts over the hero */
+.home-page-redesign .ai-erp-section h2,
+.home-page-redesign section.py-5 h2 {
+    font-size: clamp(1.6rem, 2.6vw, 2.25rem);
+    line-height: 1.25;
+    letter-spacing: -0.025em;
+    color: var(--v-ink);
+}
+
+.home-page-redesign .ai-erp-section h2 + p,
+.home-page-redesign section.py-5 h2 + p,
+.home-page-redesign section.py-5 .lead {
+    font-size: 1rem;
+    color: var(--v-muted) !important;
+}
+
+.home-page-redesign .ai-erp-section h4,
+.home-page-redesign .ai-erp-section h5,
+.home-page-redesign section.py-5 h4 {
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+}
+
+.home-page-redesign .ai-erp-section p,
+.home-page-redesign section.py-5 p {
+    font-size: 0.94rem;
+    line-height: 1.65;
+}
+
+.home-page-redesign section.py-5 {
+    padding-top: 4.25rem !important;
+    padding-bottom: 4.25rem !important;
+}
+
+/* Thin outcome strip that sits between the hero and the module grid */
+.home-page-redesign .ai-erp-proof-strip {
+    border-top: 1px solid var(--v-line);
+    border-bottom: 1px solid var(--v-line);
+    padding: 1.75rem 0;
+}
+
+.home-page-redesign .ai-erp-proof-strip-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.home-page-redesign .ai-erp-proof-strip-grid > div + div {
+    padding-left: 1.5rem;
+    border-left: 1px solid var(--v-line);
+}
+
+.home-page-redesign .ai-erp-proof-strip p {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--v-muted);
+}
+
+@media (max-width: 767px) {
+    .home-page-redesign .ai-erp-proof-strip-grid {
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+    }
+
+    .home-page-redesign .ai-erp-proof-strip-grid > div + div {
+        padding-left: 0;
+        padding-top: 1.1rem;
+        border-left: 0;
+        border-top: 1px solid var(--v-line);
+    }
+}
+
+/* Adjacent white sections need a rule, otherwise they read as one long block */
+.home-page-redesign #use-cases,
+.home-page-redesign .partners-section {
+    border-top: 1px solid var(--v-line);
+}
+
+.home-page-redesign .ai-erp-partners-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--v-muted);
+}
+
+/* Kicker label above each section title */
+.home-page-redesign .ai-erp-kicker {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--v-brand);
+    margin-bottom: 0.6rem;
+}
+
+/* Before / after scenario cards read as one comparison, not two paragraphs */
+.home-page-redesign .scenarios-section .card-body h6:first-child {
+    color: var(--v-muted) !important;
+}
+
+.home-page-redesign .scenarios-section .card-body h6 + p {
+    padding-bottom: 0.9rem;
+    border-bottom: 1px dashed var(--v-line);
+}
+
+.home-page-redesign .scenarios-section .card-body h6:nth-of-type(2) {
+    color: var(--v-brand) !important;
+}
+
+/* One shared crop so the three tool shots line up instead of stair-stepping */
+.home-page-redesign .tools-section .tools-shot {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    object-position: center top;
+    border: 1px solid var(--v-line);
+    border-radius: 12px;
+    background: var(--v-canvas);
+}
+
+@media (max-width: 767px) {
+    .home-page-redesign .ai-erp-section,
+    .home-page-redesign section.py-5 {
+        padding-top: 2.75rem !important;
+        padding-bottom: 2.75rem !important;
+    }
+
+    .home-page-redesign .cta-section {
+        padding: 2.75rem 0 !important;
+    }
+
+    .home-page-redesign .ai-erp-headline {
+        font-size: 1.9rem;
+        letter-spacing: -0.03em;
+    }
+
+    .home-page-redesign .ai-erp-subtitle {
+        font-size: 0.95rem;
+    }
+
+    /* Metrics stay a single compact row so the product window is reachable */
+    .home-page-redesign .ai-erp-metric-wrap-mobile .ai-erp-metric-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .home-page-redesign .ai-erp-metric-wrap-mobile .ai-erp-metric span {
+        display: none;
+    }
+
+    .home-page-redesign .ai-erp-metric-wrap-mobile .ai-erp-metric strong {
+        font-size: 1.05rem;
+    }
+
+    .home-page-redesign .ai-erp-metric-wrap-mobile .ai-erp-metric small {
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+    }
+
+    .home-page-redesign .ai-erp-feature,
+    .home-page-redesign .ai-erp-step {
+        padding: 1.25rem;
+    }
 }
 
 .min-vh-100 {
@@ -6146,61 +6395,43 @@ body.home-page .use-case-card:hover {
     box-shadow: none !important;
 }
 
-/* Homepage palette lock: paper / ink / gray only */
+/* Homepage palette: white surfaces, ink type, one brand-blue accent */
 body.home-page-redesign,
 body.home-page-redesign .navbar,
 body.home-page-redesign .navbar.scrolled {
-    background: #fafafa !important;
-}
-
-body.home-page-redesign .ai-erp-window {
-    background: #1a1a1a;
-    border-color: #2a2a2a;
-}
-
-body.home-page-redesign .ai-erp-window-bar,
-body.home-page-redesign .ai-erp-pills span {
-    color: #c8c8c8;
-}
-
-body.home-page-redesign .ai-erp-stat-value,
-body.home-page-redesign .ai-erp-feed-item b {
-    color: #f5f5f5;
-}
-
-body.home-page-redesign .ai-erp-stat-label,
-body.home-page-redesign .ai-erp-feed-kicker,
-body.home-page-redesign .ai-erp-feed-item span {
-    color: #9a9a9a;
+    background: #ffffff !important;
 }
 
 body.home-page-redesign .btn-nir,
 body.home-page-redesign .btn-nir:hover {
-    background: #fafafa !important;
-    background-color: #fafafa !important;
-    border-color: #fafafa !important;
-    color: #111111 !important;
+    background: #1d6ff8 !important;
+    background-color: #1d6ff8 !important;
+    border-color: #1d6ff8 !important;
+    color: #ffffff !important;
 }
 
 body.home-page-redesign .whatsapp-floating-btn {
-    background: #111111 !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
+    background: #25d366 !important;
 }
 
 body.home-page-redesign .whatsapp-floating-btn:hover {
-    background: #333333 !important;
+    background: #1eb757 !important;
     color: #fff !important;
-}
-
-body.home-page-redesign .tools-section img {
-    filter: grayscale(1);
 }
 
 body.home-page-redesign #use-cases .use-case-card {
     background: #fff !important;
 }
 
+body.home-page-redesign section.is-canvas {
+    background: #f5f6f9 !important;
+}
+
 body.home-page-redesign .partners-section {
-    background: #fafafa !important;
+    background: #ffffff !important;
+}
+
+body.home-page-redesign .cta-section {
+    background: #0b1220 !important;
 }
 
