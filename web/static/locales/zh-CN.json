@@ -2617,6 +2617,8 @@
         "付款賬戶": "付款账户",
         "candidate_name": "名字",
         "candidate_last_name": "姓氏（可选）",
+        "worker_type": "工人类型",
+        "basicInfo": "基本资料",
         "candidate_display_name": "候选人",
         "vacancy": "空缺",
         "vacancy_id": "空缺",
@@ -4252,6 +4254,10 @@
         "stampRedeemAdded": "已添加印花换购产品"
     },
     "options": {
+        "worker_type": {
+            "local": "本地工人",
+            "overseas": "海外工人"
+        },
         "pages": {
             "status": {
                 "draft": "草稿",

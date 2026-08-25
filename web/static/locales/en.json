@@ -1270,6 +1270,8 @@
         "seo_keywords": "SEO Keywords",
         "candidate_name": "First Name",
         "candidate_last_name": "Last Name",
+        "worker_type": "Worker Type",
+        "basicInfo": "Basic info",
         "candidate_display_name": "Candidate",
         "vacancy": "Vacancy",
         "vacancy_id": "Vacancy",
@@ -2385,6 +2387,10 @@
         "revenue": "Revenue"
     },
     "options": {
+        "worker_type": {
+            "local": "Local",
+            "overseas": "Overseas"
+        },
         "pages": {
             "status": {
                 "draft": "Draft",

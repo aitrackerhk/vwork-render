@@ -245,7 +245,7 @@ class DynamicForm {
                         if (sfSetting && sfSetting.visible === false) return;
                         
                         const fieldId = `field_${ef.key}`;
-                        if (document.getElementById(fieldId)) return; // Already in DOM
+                        if (document.getElementById(fieldId) || document.getElementById(`field_container_${ef.key}`)) return; // Already in DOM
                         
                         // Render the field HTML and inject before form buttons
                         const fieldHtml = self.renderField(ef);
@@ -333,7 +333,7 @@ class DynamicForm {
                         if (sfSetting && sfSetting.visible === false) return;
                         
                         const fieldId = `field_${ef.key}`;
-                        if (document.getElementById(fieldId)) return; // Already in DOM
+                        if (document.getElementById(fieldId) || document.getElementById(`field_container_${ef.key}`)) return; // Already in DOM
                         
                         const fieldHtml = self.renderField(ef);
                         if (!fieldHtml) return;
@@ -1014,9 +1014,195 @@ class DynamicForm {
                     }
                 }
             });
+            this.syncApplicantSectionVisibility();
         } catch (e) {
             console.warn('applyFieldDependencies failed', e);
         }
+    }
+
+    isJobApplicantPage() {
+        return this.pageName === 'job-applicants' || this.pageName === 'job_applicants';
+    }
+
+    syncApplicantSectionVisibility() {
+        document.querySelectorAll('.applicant-section').forEach(sec => {
+            const boxes = sec.querySelectorAll('[id^="field_container_"]');
+            if (!boxes.length) return;
+            const anyVisible = Array.from(boxes).some(el => el.style.display !== 'none');
+            sec.style.display = anyVisible ? '' : 'none';
+        });
+    }
+
+    applicantFieldHtml(field) {
+        let html = this.renderField(field) || '';
+        html = html.replace(/class="mb-3 mt-4"/g, 'class="mb-0"');
+        html = html.replace(/class="mb-3"/g, 'class="mb-0"');
+        return html;
+    }
+
+    shouldPairApplicantFields(a, b) {
+        if (!a || !b) return false;
+        if (a.fullWidth || b.fullWidth) return false;
+        if (a.type === 'textarea' || b.type === 'textarea') return false;
+        if (a.type === 'profile-image' || b.type === 'profile-image') return false;
+        if (a.type === 'section' || b.type === 'section') return false;
+        const ak = a.key || '';
+        const bk = b.key || '';
+        if (ak.endsWith('_from') && bk.endsWith('_to') && ak.slice(0, -5) === bk.slice(0, -3)) return true;
+        if (bk === `${ak}_ages`) return true;
+        const fixed = {
+            candidate_name: 'candidate_last_name',
+            email: 'phone',
+            ov_dob: 'ov_age',
+            ov_height: 'ov_weight',
+            ov_sex: 'ov_marital',
+            ov_horoscope_cn: 'ov_horoscope',
+            ov_cantonese: 'ov_mandarin',
+            ov_english_spoken: 'ov_english_written',
+            ov_father_name: 'ov_father_occupation',
+            ov_mother_name: 'ov_mother_occupation',
+            ov_spouse_name: 'ov_spouse_occupation',
+            ov_brothers_ages: 'ov_sisters_ages',
+            ov_sons_ages: 'ov_daughters_ages',
+            ov_intl_license_years: 'ov_intl_license_since',
+            ov_hk_license_years: 'ov_hk_license_since'
+        };
+        if (fixed[ak] === bk) return true;
+        if (ak.endsWith('_employer_location') && bk.endsWith('_house_size')) return true;
+        if (ak.endsWith('_employer_name') && (bk.endsWith('_reason_leave') || bk.endsWith('_reason_quit'))) return true;
+        if (ak.endsWith('_newborn') && bk.endsWith('_pets')) return true;
+        if (ak.endsWith('_duty_newborn') && bk.endsWith('_duty_children')) return true;
+        if (ak.endsWith('_duty_elderly') && bk.endsWith('_duty_disabled')) return true;
+        return false;
+    }
+
+    isCompactApplicantField(field) {
+        const key = (field && field.key) || '';
+        return /^(ov_skill_|loc_q|ov_exp_|loc_exp_)/.test(key)
+            && field.type !== 'textarea'
+            && field.type !== 'section';
+    }
+
+    buildApplicantRows(fields) {
+        const rows = [];
+        let i = 0;
+        while (i < fields.length) {
+            const f = fields[i];
+            const n = fields[i + 1];
+            const n2 = fields[i + 2];
+            if (f.type === 'section') {
+                i += 1;
+                continue;
+            }
+            if (f.fullWidth || f.type === 'textarea' || f.type === 'profile-image' || f.type === 'button-group') {
+                rows.push([f]);
+                i += 1;
+                continue;
+            }
+            if (this.isCompactApplicantField(f) && n && this.isCompactApplicantField(n) && n2 && this.isCompactApplicantField(n2)) {
+                rows.push([f, n, n2]);
+                i += 3;
+                continue;
+            }
+            if (this.shouldPairApplicantFields(f, n)) {
+                rows.push([f, n]);
+                i += 2;
+                continue;
+            }
+            if (n && !n.fullWidth && n.type !== 'textarea' && n.type !== 'profile-image' && n.type !== 'section' && n.type !== 'button-group') {
+                rows.push([f, n]);
+                i += 2;
+                continue;
+            }
+            rows.push([f]);
+            i += 1;
+        }
+        return rows;
+    }
+
+    renderApplicantGrid(fields) {
+        const rows = this.buildApplicantRows(fields);
+        return rows.map(row => {
+            const col = row.length === 3 ? 'col-md-4' : (row.length === 1 ? 'col-12' : 'col-md-6');
+            const cols = row.map(f => `<div class="${col}">${this.applicantFieldHtml(f)}</div>`).join('');
+            return `<div class="row g-3 mb-2">${cols}</div>`;
+        }).join('');
+    }
+
+    renderApplicantSection(sectionField, fields) {
+        const key = (sectionField && sectionField.key) || 'misc';
+        const title = sectionField ? this.getFieldLabel(sectionField) : '';
+        const collapsed = /(_emp[23]_sec|_nd1_sec)$/.test(key);
+        const grid = this.renderApplicantGrid(fields);
+        return `
+            <details class="applicant-section mb-3" data-section-key="${key}" ${collapsed ? '' : 'open'}>
+                <summary class="applicant-section-summary">
+                    <i class="bi bi-chevron-right applicant-section-caret"></i>
+                    <span>${title}</span>
+                </summary>
+                <div class="applicant-section-body">${grid}</div>
+            </details>
+        `;
+    }
+
+    renderApplicantFormHtml(effectiveFields) {
+        const fields = (effectiveFields || []).filter(Boolean);
+        const t = (key, fallback) => {
+            if (typeof I18n !== 'undefined' && I18n.t) {
+                const v = I18n.t(key);
+                if (v && v !== key) return v;
+            }
+            return fallback;
+        };
+        let html = '';
+        const leading = [];
+        const trailing = [];
+        const groups = [];
+        let current = null;
+        let phase = 'core';
+
+        fields.forEach(f => {
+            const extra = !!(f.isExtra || /^(loc_|ov_)/.test(f.key || ''));
+            if (f.type === 'section' || extra) phase = 'extra';
+
+            if (phase !== 'extra') {
+                leading.push(f);
+                return;
+            }
+            if (f.type === 'section') {
+                if (current) groups.push(current);
+                current = { section: f, fields: [] };
+                return;
+            }
+            if (!extra) {
+                if (current) {
+                    groups.push(current);
+                    current = null;
+                }
+                trailing.push(f);
+                return;
+            }
+            if (!current) current = { section: null, fields: [] };
+            current.fields.push(f);
+        });
+        if (current) groups.push(current);
+
+        if (leading.length) {
+            html += `
+                <div class="applicant-core mb-4">
+                    <div class="applicant-core-title">${t('fields.basicInfo', '基本資料')}</div>
+                    ${this.renderApplicantGrid(leading)}
+                </div>
+            `;
+        }
+        groups.forEach(g => {
+            if (g.section) html += this.renderApplicantSection(g.section, g.fields);
+            else html += this.renderApplicantGrid(g.fields);
+        });
+        if (trailing.length) {
+            html += `<div class="applicant-trailing mt-3">${this.renderApplicantGrid(trailing)}</div>`;
+        }
+        return html;
     }
 
     checkEditMode() {
@@ -2925,6 +3111,9 @@ class DynamicForm {
             // 不需要再由後面的 extra fields block 重複渲染
             this._extraFieldsRenderedByEffective = true;
 
+            if (this.isJobApplicantPage()) {
+                formFields += this.renderApplicantFormHtml(effectiveFields);
+            } else {
             const processedFields = new Set();
 
             // 先處理 sameRow 字段（維持原邏輯：同組字段並排）
@@ -3003,6 +3192,7 @@ class DynamicForm {
 
             // 處理剩餘的單個字段（會自動使用 full width）
             flushHalfRow(currentRow);
+            }
         }
 
         // ── 渲染額外欄位（extra fields from field settings）──
@@ -3040,7 +3230,7 @@ class DynamicForm {
         const form = `
             <div class="card">
                 <div class="card-body">
-                    <form id="dynamicForm" onsubmit="return false;">
+                    <form id="dynamicForm" class="${(this.pageName === 'job-applicants' || this.pageName === 'job_applicants') ? 'applicant-biodata-form' : ''}" onsubmit="return false;">
                         <input type="hidden" id="itemId" value="${this.itemId || ''}">
                         ${this.pageName === 'customers' ? `
                             <ul class="nav nav-tabs mb-4" id="customerFormTabs" role="tablist">
@@ -6092,6 +6282,7 @@ class DynamicForm {
                 const buttonGroupReadonlyClass = field.readonly ? 'disabled' : '';
                 const buttonGroupOptions = field.options || [];
                 const buttonGroupDefaultValue = field.defaultValue || field.default || '';
+                const workerTypeIcons = { local: 'bi-house-door', overseas: 'bi-globe' };
                 const buttonGroupOptionsHtml = buttonGroupOptions.map(opt => {
                     const isSelected = buttonGroupDefaultValue === opt.value ? 'active' : '';
                     // 优先使用 labelKey，否则使用 getOptionLabel
@@ -6102,9 +6293,12 @@ class DynamicForm {
                             optLabel = translated;
                         }
                     }
+                    const iconClass = field.key === 'worker_type' ? (workerTypeIcons[opt.value] || '') : '';
+                    const iconHtml = iconClass ? `<i class="bi ${iconClass} me-1"></i>` : '';
+                    const labelExtraClass = field.key === 'worker_type' ? 'py-2' : '';
                     return `
-                        <input type="radio" class="btn-check" name="${fieldId}_radio" id="${fieldId}_${opt.value}" value="${opt.value}" autocomplete="off" ${buttonGroupDefaultValue === opt.value ? 'checked' : ''} ${buttonGroupReadonly}>
-                        <label class="btn btn-outline-primary flex-fill ${isSelected}" for="${fieldId}_${opt.value}" ${opt.labelKey ? `data-i18n="${opt.labelKey}"` : ''}>${optLabel}</label>
+                        <input type="radio" class="btn-check" name="${fieldId}_radio" id="${fieldId}_${opt.value}" value="${opt.value}" autocomplete="off" ${buttonGroupDefaultValue === opt.value ? 'checked' : ''} ${field.required ? 'required' : ''} ${buttonGroupReadonly}>
+                        <label class="btn btn-outline-primary flex-fill ${labelExtraClass} ${isSelected}" for="${fieldId}_${opt.value}" ${opt.labelKey ? `data-i18n="${opt.labelKey}"` : ''}>${iconHtml}${optLabel}</label>
                     `;
                 }).join('');
                 return `
@@ -6113,7 +6307,7 @@ class DynamicForm {
                         <div class="btn-group w-100 ${buttonGroupReadonlyClass}" role="group" id="${fieldId}_group">
                             ${buttonGroupOptionsHtml}
                         </div>
-                        <input type="hidden" id="${fieldId}" name="${field.key}" value="${buttonGroupDefaultValue}" ${field.required ? 'required' : ''}>
+                        <input type="hidden" id="${fieldId}" name="${field.key}" value="${buttonGroupDefaultValue}">
                     </div>
                 `;
             
@@ -6588,6 +6782,15 @@ class DynamicForm {
                 result.push(f);
             }
         });
+
+        // 求職者表單：工人類型放最上面，方便直接點選本地／海外
+        if (this.pageName === 'job-applicants' || this.pageName === 'job_applicants') {
+            const wtIdx = result.findIndex(f => f && f.key === 'worker_type');
+            if (wtIdx > 0) {
+                const [wt] = result.splice(wtIdx, 1);
+                result.unshift(wt);
+            }
+        }
         
         return result;
     }
@@ -7685,7 +7888,7 @@ class DynamicForm {
                             if (sfSetting && sfSetting.visible === false) return;
                             
                             const fieldId = `field_${ef.key}`;
-                            if (document.getElementById(fieldId)) return; // Already in DOM
+                            if (document.getElementById(fieldId) || document.getElementById(`field_container_${ef.key}`)) return; // Already in DOM
                             
                             const fieldHtml = self.renderField(ef);
                             if (!fieldHtml) return;
@@ -10831,6 +11034,7 @@ class DynamicForm {
                             const label = document.querySelector(`label[for="${radioId}"]`);
                             if (label) label.classList.add('active');
                         }
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 }
             } else if (field.key === 'payment_type' && this.pageName === 'payment-methods') {
@@ -11004,12 +11208,16 @@ class DynamicForm {
                         newRadio.addEventListener('change', function() {
                             if (this.checked && hiddenInput) {
                                 hiddenInput.value = this.value;
+                                hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
                                 // 更新按鈕的 active 狀態
                                 const group = document.getElementById(`${fieldId}_group`);
                                 if (group) {
                                     group.querySelectorAll('label').forEach(label => label.classList.remove('active'));
                                     const label = document.querySelector(`label[for="${this.id}"]`);
                                     if (label) label.classList.add('active');
+                                }
+                                if (window.dynamicForm && typeof window.dynamicForm.applyFieldDependencies === 'function') {
+                                    window.dynamicForm.applyFieldDependencies();
                                 }
                             }
                         });
