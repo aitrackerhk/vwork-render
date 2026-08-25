@@ -942,7 +942,12 @@ class DynamicForm {
                     containerId = `field_container_${f.key}_${depValue}`;
                 }
                 
-                const container = document.getElementById(containerId);
+                let container = document.getElementById(containerId);
+                if (!container) {
+                    const fieldEl = document.getElementById(`field_${f.key}`);
+                    container = fieldEl ? fieldEl.closest('.mb-3, .form-check') : null;
+                    if (container && !container.id) container.id = containerId;
+                }
                 if (container) {
                     container.style.display = ok ? '' : 'none';
                     // hidden 時 disable 內部控件，避免 required/提交問題
@@ -6075,7 +6080,7 @@ class DynamicForm {
                 const dateReadonly = field.readonly ? 'readonly' : '';
                 const dateReadonlyClass = field.readonly ? 'bg-light text-muted' : '';
                 return `
-                    <div class="mb-3">
+                    <div class="mb-3" id="${defaultContainerId}" ${field.dependency ? 'style="display: none;"' : ''}>
                         <label class="form-label" data-i18n-field="${field.key}">${fieldLabel} ${required}</label>
                         <input type="date" class="form-control ${dateReadonlyClass}" id="${fieldId}" ${field.required ? 'required' : ''} ${dateReadonly} ${tooltipAttr}>
                     </div>
@@ -6157,7 +6162,7 @@ class DynamicForm {
                 const emailReadonly = field.readonly ? 'readonly' : '';
                 const emailReadonlyClass = field.readonly ? 'bg-light text-muted' : '';
                 return `
-                    <div class="mb-3">
+                    <div class="mb-3" id="${defaultContainerId}" ${field.dependency ? 'style="display: none;"' : ''}>
                         <label class="form-label" data-i18n-field="${field.key}">${fieldLabel} ${required}</label>
                         <input type="email" class="form-control ${emailReadonlyClass}" id="${fieldId}" ${field.required ? 'required' : ''} ${emailReadonly} ${tooltipAttr}>
                     </div>
