@@ -11,7 +11,7 @@
     <link href="/static/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/vendor/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/static/css/custom.css?v=20260316c">
-    <link rel="stylesheet" href="/static/css/applicant-form.css?v=20260825i">
+    <link rel="stylesheet" href="/static/css/applicant-form.css?v=20260831a">
     <link rel="stylesheet" href="/static/css/vai.css">
     <!-- Select2 CSS -->
     <link href="/static/vendor/select2/select2.min.css" rel="stylesheet" />
@@ -327,9 +327,10 @@
     <script src="/static/js/utils.js?v=20260316d"></script>
     <script src="/static/js/draft-manager.js"></script>
     <script src="/static/js/page-configs.js?v=20260825h"></script>
-    <script src="/static/js/dynamic-list.js"></script>
+    <script src="/static/js/dynamic-list.js?v=20260831a"></script>
     <script src="/static/js/form-field-settings-handler.js?v=20260223b"></script>
-    <script src="/static/js/dynamic-form.js?v=20260825i"></script>
+    <script src="/static/js/job-applicant-cv.js?v=20260831a"></script>
+    <script src="/static/js/dynamic-form.js?v=20260831a"></script>
     <script src="/static/js/page-field-settings.js"></script>
     <script src="/static/vendor/marked.min.js"></script>
     <script src="/static/vendor/purify.min.js"></script>
@@ -2481,6 +2482,13 @@
                         } else if (clonedBtn.tagName === 'A' && originalHref) {
                             // 鏈接按鈕：保持原有 href
                             clonedBtn.setAttribute('href', originalHref);
+                        } else if (clonedBtn.id === 'exportApplicantCvBtn') {
+                            clonedBtn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                if (window.JobApplicantCV && window.JobApplicantCV.printFromForm && window.dynamicForm) {
+                                    window.JobApplicantCV.printFromForm(window.dynamicForm);
+                                }
+                            });
                         } else if (clonedBtn.tagName === 'A') {
                             // 鏈接按鈕但沒有 href：可能是返回按鈕，保持原有行為
                             const originalClickHandler = btn.onclick;

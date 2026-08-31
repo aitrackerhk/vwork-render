@@ -15,7 +15,14 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     color: #64748b;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.35rem;
+}
+
+.applicant-biodata-form .applicant-core-hint {
+    font-size: 0.86rem;
+    color: #475569;
+    margin-bottom: 0.9rem;
+    line-height: 1.45;
 }
 
 .applicant-biodata-form .applicant-section {

@@ -2619,6 +2619,7 @@
         "candidate_last_name": "姓氏（可选）",
         "worker_type": "工人类型",
         "basicInfo": "基本资料",
+        "applicantTypeHint": "请先选择本地或海外工人，然后向下填写 biodata。填完可按「导出 CV PDF」发给客人。",
         "candidate_display_name": "候选人",
         "vacancy": "空缺",
         "vacancy_id": "空缺",

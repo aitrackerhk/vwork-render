@@ -1272,6 +1272,7 @@
         "candidate_last_name": "Last Name",
         "worker_type": "Worker Type",
         "basicInfo": "Basic info",
+        "applicantTypeHint": "Choose local or overseas helper first, then scroll down to fill the biodata. When done, use Export CV PDF to send to the employer.",
         "candidate_display_name": "Candidate",
         "vacancy": "Vacancy",
         "vacancy_id": "Vacancy",

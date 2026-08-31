@@ -39,6 +39,7 @@ go.zip
 
 # Temp / scratch
 tmp_*.json
+.superdesign/tmp/
 TASK_REPORT.md
 logs_cleanup_report.md
 debug_dns.go

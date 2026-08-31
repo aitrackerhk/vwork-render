@@ -1682,6 +1682,14 @@ class DynamicList {
 
             // 特殊處理：頁面列表添加預覽按鈕
             let extraActions = '';
+            // 求職者：匯出紙本 CV PDF
+            if (this.config.apiPath === '/job-applicants' && !this.trashMode) {
+                extraActions += `
+                    <button class="btn btn-sm btn-outline-danger" onclick="window.JobApplicantCV && window.JobApplicantCV.printFromId('${safeItemId}')" title="匯出 CV PDF">
+                        <i class="bi bi-file-earmark-pdf"></i> CV
+                    </button>
+                `;
+            }
             if (this.config.apiPath === '/pages') {
                 const slug = item.slug || '';
                 const safeSlug = String(slug).replace(/'/g, "\\'").replace(/"/g, '&quot;');

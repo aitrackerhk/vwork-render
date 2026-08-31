@@ -1033,6 +1033,14 @@ class DynamicForm {
         });
     }
 
+    revealApplicantBiodata() {
+        if (!this.isJobApplicantPage()) return;
+        const visible = [...document.querySelectorAll('.applicant-section')].find(s => s.style.display !== 'none');
+        if (!visible) return;
+        visible.open = true;
+        visible.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     applicantFieldHtml(field) {
         let html = this.renderField(field) || '';
         html = html.replace(/class="mb-3 mt-4"/g, 'class="mb-0"');
@@ -1191,6 +1199,7 @@ class DynamicForm {
             html += `
                 <div class="applicant-core mb-4">
                     <div class="applicant-core-title">${t('fields.basicInfo', '基本資料')}</div>
+                    <p class="applicant-core-hint">${t('fields.applicantTypeHint', '請先選擇本地或海外工人，然後向下填寫 biodata。填完可按「匯出 CV PDF」發給客人。')}</p>
                     ${this.renderApplicantGrid(leading)}
                 </div>
             `;
@@ -3258,6 +3267,10 @@ class DynamicForm {
                             <button type="submit" class="btn btn-primary" data-i18n="common.save">
                                 <i class="bi bi-save"></i> <span data-i18n="common.save">${getText('common.save')}</span>
                             </button>
+                            ${(this.pageName === 'job-applicants' || this.pageName === 'job_applicants') ? `
+                            <button type="button" class="btn btn-outline-danger" id="exportApplicantCvBtn" onclick="window.JobApplicantCV && window.JobApplicantCV.printFromForm(window.dynamicForm); return false;">
+                                <i class="bi bi-file-earmark-pdf"></i> 匯出 CV PDF
+                            </button>` : ''}
                             <button type="button" class="btn btn-secondary" id="cancelBtn" onclick="return window.dynamicForm ? window.dynamicForm.handleCancel(event) : false;" data-i18n="common.cancel">
                                 <i class="bi bi-x"></i> <span data-i18n="common.cancel">${getText('common.cancel')}</span>
                             </button>
@@ -6600,6 +6613,7 @@ class DynamicForm {
             const cached = sessionStorage.getItem(cacheKey);
             if (cached) {
                 this.fieldSettings = JSON.parse(cached);
+                this.applyPaperBiodataFieldMerge();
                 return;
             }
         } catch (e) {
@@ -6615,6 +6629,14 @@ class DynamicForm {
             })),
             extraFields: []
         };
+        this.applyPaperBiodataFieldMerge();
+    }
+
+    applyPaperBiodataFieldMerge() {
+        if (!this.isJobApplicantPage() || !this.fieldSettings) return;
+        if (window.JobApplicantCV && typeof window.JobApplicantCV.mergePaperBiodataFields === 'function') {
+            this.fieldSettings = window.JobApplicantCV.mergePaperBiodataFields(this.fieldSettings);
+        }
     }
     
     // 從 API 載入欄位設定（異步）
@@ -6670,6 +6692,8 @@ class DynamicForm {
                     extraFields: []
                 };
             }
+
+            this.applyPaperBiodataFieldMerge();
             
             // 快取到 sessionStorage
             const cacheKey = `form_field_settings_cache_${this.pageName}`;
@@ -6686,6 +6710,7 @@ class DynamicForm {
                 })),
                 extraFields: []
             };
+            this.applyPaperBiodataFieldMerge();
         }
     }
     
@@ -9436,6 +9461,18 @@ class DynamicForm {
                 const extraFieldsData = formData.extra_fields || existingExtraFields || {};
                 
                 extraFieldsToCollect.forEach(ef => {
+                    if (ef.type === 'section') return;
+                    if (ef.dependency) {
+                        const dependencyField = document.getElementById(`field_${ef.dependency.field}`);
+                        if (dependencyField) {
+                            const dependencyValue = dependencyField.type === 'checkbox' ? String(dependencyField.checked) : dependencyField.value;
+                            const allowedValues = Array.isArray(ef.dependency.values) ? ef.dependency.values : [ef.dependency.value];
+                            if (!allowedValues.includes(dependencyValue)) {
+                                delete extraFieldsData[ef.key];
+                                return;
+                            }
+                        }
+                    }
                     const fieldId = `field_${ef.key}`;
                     const input = document.getElementById(fieldId);
                     if (!input) return;
@@ -11218,6 +11255,7 @@ class DynamicForm {
                                 }
                                 if (window.dynamicForm && typeof window.dynamicForm.applyFieldDependencies === 'function') {
                                     window.dynamicForm.applyFieldDependencies();
+                                    setTimeout(() => window.dynamicForm.revealApplicantBiodata(), 80);
                                 }
                             }
                         });
